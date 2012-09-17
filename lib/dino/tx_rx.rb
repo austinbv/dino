@@ -6,50 +6,39 @@ module Dino
     include Celluloid
     BAUD = 115200
 
-    def arduino
-      @arduino ||= tty_devices.map do |device|
+    def io
+      @io ||= tty_devices.map do |device|
         next if device.match /^cu/
         begin
-          SerialPort.new(device, BAUD)
+          SerialPort.new("/dev/#{device}", BAUD)
         rescue
           nil
         end
       end.compact.first
     end
 
-    def arduino=(device)
-      @arduino = SerialPort.new(device, BAUD)
+    def io=(device)
+      @io = SerialPort.new(device, BAUD)
     end
 
     def read
-      message, started = [], false
-
       loop do
-        input = @arduino.getc
-
-        if input == '!' || started
-          message << input
-          started = true
+        if IO.select([io], nil, nil, 0.05)
+          puts io.gets
         end
-
-        if input == '.'
-          started = false
-          puts input
-        end
+        sleep 0.001
       end
     end
 
-    def puts(message)
-      @arduino.puts(message)
-    end
-
-    def serial_messages
+    def write(message)
+      IO.select(nil, [io], nil, 0.05)
+      io.puts(message)
     end
 
     private
 
     def tty_devices
-      exec('ls /dev | grep usb').split /\n/
+      `ls /dev | grep usb`.split(/\n/)
     end
   end
 end
