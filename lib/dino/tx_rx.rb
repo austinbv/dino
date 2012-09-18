@@ -1,9 +1,7 @@
-require 'celluloid'
 require 'serialport'
 
 module Dino
   class TxRx
-    include Celluloid
     BAUD = 115200
 
     def io
@@ -22,12 +20,19 @@ module Dino
     end
 
     def read
-      loop do
-        if IO.select([io], nil, nil, 0.05)
-          puts io.gets
+      @thread ||= Thread.new do
+        loop do
+          if IO.select([io], nil, nil, 0.05)
+            puts io.gets
+          end
+          sleep 0.005
         end
-        sleep 0.001
       end
+    end
+
+    def close_read
+      Thread.kill(@thread)
+      @thread = nil
     end
 
     def write(message)

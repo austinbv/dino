@@ -15,5 +15,4 @@ Gem::Specification.new do |gem|
   gem.version       = Dino::VERSION
 
   gem.add_dependency 'serialport'
-  gem.add_dependency 'celluloid'
 end
