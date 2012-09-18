@@ -1,8 +1,15 @@
 require 'serialport'
+require 'observer'
 
 module Dino
   class TxRx
+    include Observable
+
     BAUD = 115200
+
+    def initialize
+      @first_write = false
+    end
 
     def io
       @io ||= tty_devices.map do |device|
@@ -23,14 +30,16 @@ module Dino
       @thread ||= Thread.new do
         loop do
           if IO.select([io], nil, nil, 0.05)
-            puts io.gets
+            pin, message = *io.gets.chop.split(/::/)
+            pin && message && changed && notify_observers(pin, message)
           end
-          sleep 0.005
+          sleep 0.004
         end
       end
     end
 
     def close_read
+      return nil if @thread.nil?
       Thread.kill(@thread)
       @thread = nil
     end

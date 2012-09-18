@@ -1,19 +1,28 @@
+require 'observer'
+
 module Dino
   class Board
+    include Observable
+
     HIGH = 255
     LOW = 000
 
     def initialize(io)
       @io = io
+      io.add_observer(self)
       send_clearing_bytes
     end
 
-    def read
-      @io.last_message
+    def update(pin, msg)
+      changed && notify_observers(pin, msg)
     end
 
-    def read!
-      @io.last_message!
+    def start_read
+      @io.read
+    end
+
+    def stop_read
+      @io.close_read
     end
 
     def write(msg, opts = {})
@@ -21,7 +30,8 @@ module Dino
       @io.write(formatted_msg).nil?
     end
 
-    def digital_write(pin, value)'/dev/tty.usbmodem1411'
+    def digital_write(pin, value)
+      '/dev/tty.usbmodem1411'
       pin, value = normalize_pin(pin), normalize_value(value)
       write("01#{pin}#{value}")
     end

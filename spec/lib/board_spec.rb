@@ -3,14 +3,13 @@ require 'spec_helper'
 module Dino
   describe Board do
     def io_mock(methods = {})
-      @io ||= mock(:io, {write: nil}.merge(methods))
+      @io ||= mock(:io, {write: nil, add_observer: nil}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
+    before { subject }
 
-    before {
-      subject
-    }
+    it {should be_kind_of Observable}
 
     describe '#initialize' do
       it 'should take a io class' do
@@ -25,25 +24,23 @@ module Dino
       end
     end
 
-    describe '#read' do
-      it 'should return the first message in io' do
-        io = io_mock(last_message: nil)
-        io.should_receive(:last_message)
-        Board.new(io).read
+    describe '#start_read' do
+      it 'should tell the io to read' do
+        io_mock(read: nil).should_receive(:read)
+        Board.new(io_mock).start_read
       end
     end
 
-    describe '#read!' do
-      it 'should return the first message in io with a destructive read' do
-        io = io_mock(last_message!: nil)
-        io.should_receive(:last_message!)
-        Board.new(io).read!
+    describe '#stop_read' do
+      it 'should tell the io to read' do
+        io_mock(close_read: nil).should_receive(:close_read)
+        Board.new(io_mock).stop_read
       end
     end
 
     describe '#write' do
       it 'should return true if the write succeeds' do
-        board = Board.new(mock(:io, write: nil))
+        board = Board.new(io_mock(write: nil))
         board.write("message").should == true
       end
 
@@ -53,18 +50,16 @@ module Dino
       end
 
       it 'should not wrap the message if no_wrap is set to true' do
-        io = io_mock
-        board = Board.new(io)
-        io.should_receive(:write).with('hello')
+        board = Board.new(io_mock)
+        io_mock.should_receive(:write).with('hello')
         board.write('hello', no_wrap: true)
       end
     end
 
     describe '#digital_write' do
       it 'should append a append a write to the pin and value' do
-        io = mock(:io, write: nil)
-        io.should_receive(:write).with('!0101003.')
-        Board.new(io).digital_write(01, 003)
+        io_mock.should_receive(:write).with('!0101003.')
+        Board.new(io_mock).digital_write(01, 003)
       end
     end
 
@@ -126,5 +121,7 @@ module Dino
         subject.set_debug(:off)
       end
     end
+
+    it 'should have tests for observing the io'
   end
 end
