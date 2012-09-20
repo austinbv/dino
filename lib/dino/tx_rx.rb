@@ -46,11 +46,6 @@ module Dino
 
     def write(message)
       IO.select(nil, [io], nil)
-      p "writing #{message}"
-      if @first_write
-        io.puts('00000000')
-        @first_write = false
-      end
       io.puts(message)
     end
 

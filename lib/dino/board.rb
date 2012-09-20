@@ -6,6 +6,7 @@ module Dino
     def initialize(io)
       @io, @digital_hardware, @analog_hardware = io, [], []
       io.add_observer(self)
+      send_clearing_bytes
       start_heart_beat
     end
 
