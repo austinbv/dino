@@ -6,7 +6,7 @@ module Dino
 
     describe '#initialize' do
       it 'should set first_write to false' do
-        TxRx.new.instance_variable_get(:@first_write).should == false
+        TxRx.new.instance_variable_get(:@first_write).should == true
       end
     end
 

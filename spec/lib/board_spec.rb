@@ -9,8 +9,6 @@ module Dino
     subject { Board.new(io_mock) }
     before { subject }
 
-    it {should be_kind_of Observable}
-
     describe '#initialize' do
       it 'should take a io class' do
         expect {
@@ -18,9 +16,32 @@ module Dino
         }.to_not raise_exception
       end
 
-      it 'should send 8 bits first if this is the first write' do
-        io_mock.should_receive(:write).with('00000000')
-        Board.new(io_mock)
+      it 'should observe the io' do
+        io_mock.should_receive(:add_observer).with(subject)
+        subject.send(:initialize, io_mock)
+      end
+
+      it 'should send the board reads for any hardware' do
+        pending do
+          subject.add_digital_hardware(mock(:part, pin: 12))
+          subject.add_digital_hardware(mock(:part, pin: 15))
+          io_mock.should_receive(:write).with('!0212000.')
+          io_mock.should_receive(:write).with('!0215000.')
+        end
+      end
+    end
+
+    describe '#digital_hardware' do
+      it 'should initialize as empty' do
+        subject.digital_hardware.empty?.should == true
+      end
+    end
+
+    describe '#add_digital_hardware' do
+      it 'should return the add digital hardware to the board' do
+        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12))
+        subject.add_digital_hardware(mock2 = mock(:part2, pin: 14))
+        subject.digital_hardware.should =~ [mock1, mock2]
       end
     end
 

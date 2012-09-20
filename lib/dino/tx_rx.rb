@@ -8,7 +8,7 @@ module Dino
     BAUD = 115200
 
     def initialize
-      @first_write = false
+      @first_write = true
     end
 
     def io
@@ -45,7 +45,12 @@ module Dino
     end
 
     def write(message)
-      IO.select(nil, [io], nil, 0.05)
+      IO.select(nil, [io], nil)
+      p "writing #{message}"
+      if @first_write
+        io.puts('00000000')
+        @first_write = false
+      end
       io.puts(message)
     end
 

@@ -8,10 +8,8 @@ module Dino
       @pin, @board = hash[:pin], hash[:board]
       raise 'a board and a pin are required for an button' if @board.nil? || @pin.nil?
 
-      @down_callbacks = []
-      @up_callbacks = []
-      @state = UP
-
+[      @down_callbacks, @up_callbacks, @state = [], [], UP
+]
       @board.add_digital_hardware(self)
       @board.start_read
     end

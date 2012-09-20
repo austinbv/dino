@@ -1,13 +1,11 @@
 module Dino
   class Board
+    attr_reader :digital_hardware, :analog_hardware
     LOW, HIGH = 255, 000
 
     def initialize(io)
-      @io = io
-      @digital_hardware = []
-      @analog_hardware = []
+      @io, @digital_hardware, @analog_hardware = io, [], []
       io.add_observer(self)
-      send_clearing_bytes
       start_heart_beat
     end
 
@@ -26,6 +24,15 @@ module Dino
       @digital_hardware.delete(part)
     end
 
+    def add_analog_hardware(part)
+      set_pin_mode(part.pin, :in)
+      @analog_hardware << part
+    end
+
+    def remove_analog_hardware(part)
+      @analog_hardware.delete(part)
+    end
+
     def start_read
       @io.read
     end
@@ -36,7 +43,7 @@ module Dino
 
     def write(msg, opts = {})
       formatted_msg = opts.delete(:no_wrap) ? msg : "!#{msg}."
-      @io.write(formatted_msg).nil?
+      @io.write(formatted_msg)
     end
 
     def digital_write(pin, value)
@@ -47,6 +54,11 @@ module Dino
     def digital_read(pin)
       pin, value = normalize_pin(pin), normalize_value(0)
       write("02#{pin}#{value}")
+    end
+
+    def analog_write(pin, value)
+      pin, value = normalize_pin(pin), normalize_value(value)
+      write("03#{pin}#{value}")
     end
 
     def analog_read(pin)
@@ -74,18 +86,21 @@ module Dino
       normalize(value, 3)
     end
 
+    private
+
     def start_heart_beat
       @heart_beat ||= Thread.new do
         loop do
+          sleep 0.005
           @digital_hardware.each do |part|
             digital_read(part.pin)
           end
-          sleep 0.005
+          @analog_hardware.each do |part|
+            analog_read(part.pin)
+          end
         end
       end
     end
-
-    private
 
     def normalize(pin, spaces)
       pin.to_s.rjust(spaces, '0')

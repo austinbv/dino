@@ -16,18 +16,6 @@ module Dino
           Button.new(board: board)
         }.to raise_exception('a board and a pin are required for an button')
       end
-
-      it 'should set the pin to out' do
-        board.should_receive(:set_pin_mode).with(13, :in)
-        Button.new(pin: 13, board: board)
-      end
-
-      it 'should add itself as an observer to the board'
-
-      it 'should start_reading the board' do
-        board.should_receive(:start_read)
-        Button.new(pin: 13, board: board)
-      end
     end
   end
 end
