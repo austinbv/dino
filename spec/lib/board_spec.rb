@@ -61,7 +61,8 @@ module Dino
 
     describe '#write' do
       it 'should return true if the write succeeds' do
-        board = Board.new(io_mock(write: nil))
+        @io = nil
+        board = Board.new(io_mock(write: true))
         board.write("message").should == true
       end
 

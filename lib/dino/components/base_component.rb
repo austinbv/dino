@@ -24,8 +24,8 @@ module Dino
         self.board.analog_write(pin, value)
       end
 
-      def set_pin_mode(value, pin = self.pin)
-        self.board.digital_write(pin, value)
+      def set_pin_mode(mode, pin = self.pin)
+        self.board.set_pin_mode(pin, mode)
       end
     end
   end
