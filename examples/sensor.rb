@@ -7,7 +7,7 @@
 require '../lib/dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
-sensor = Dino::Sensor.new(pin: 'A0', board: board)
+sensor = Dino::Component::Sensor.new(pin: 'A0', board: board)
 
 current_state = nil
 
