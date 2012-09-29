@@ -11,7 +11,7 @@ module Dino
     end
 
     def update(pin, msg)
-      @digital_hardware.concat(@analog_hardware).each do |part|
+      (@digital_hardware + @analog_hardware).each do |part|
         part.update(msg) if pin == normalize_pin(part.pin)
       end
     end
