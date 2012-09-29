@@ -6,7 +6,7 @@
 require '../lib/dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
-led = Dino::Component::RgbLed.new(pins: {red: 9, green: 10, blue: 11}, board: board)
+led = Dino::Components::RgbLed.new(pins: {red: 9, green: 10, blue: 11}, board: board)
 
 sleep(2)
 led.red
