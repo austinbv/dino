@@ -9,8 +9,6 @@ require '../lib/dino'
 board = Dino::Board.new(Dino::TxRx.new)
 sensor = Dino::Components::Sensor.new(pin: 'A0', board: board)
 
-current_state = nil
-
 on_data = Proc.new do |data|
     puts data
 end

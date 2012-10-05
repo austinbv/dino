@@ -29,7 +29,7 @@ module Dino
     def read
       @thread ||= Thread.new do
         loop do
-          if IO.select([io], nil, nil, 0.05)
+          if IO.select([io], nil, nil, 0.005)
             pin, message = *io.gets.chop.split(/::/)
             pin && message && changed && notify_observers(pin, message)
           end

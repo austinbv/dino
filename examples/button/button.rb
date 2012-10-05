@@ -7,7 +7,7 @@
 require '../lib/dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
-button = Dino::Components::Button.new(pin: 13, board: board)
+button = Dino::Components::Button.new(pin: 2, board: board)
 
 button_down = Proc.new do
   puts "button down"

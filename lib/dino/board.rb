@@ -1,7 +1,7 @@
 module Dino
   class Board
     attr_reader :digital_hardware, :analog_hardware
-    LOW, HIGH = 255, 000
+    LOW, HIGH = 000, 255
 
     def initialize(io)
       @io, @digital_hardware, @analog_hardware = io, [], []
