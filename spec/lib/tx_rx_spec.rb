@@ -10,8 +10,22 @@ module Dino
       end
     end
 
-    describe '#locate_board' do
-      it 'should find a tty.usb board'
+    describe '#io' do
+      it 'should be tested'
     end
+
+    describe '#read' do
+      it 'should be tested'
+    end
+
+    describe '#close_read' do
+      it 'should be tested'
+    end
+
+    describe '#write' do
+      it 'should be tested'
+    end
+
+    it 'should find a tty.usb board'
   end
 end

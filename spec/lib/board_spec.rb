@@ -31,7 +31,11 @@ module Dino
       end
     end
 
-    describe '#digital_hardware' do
+    describe '#update' do
+      it 'should be tested'
+    end
+
+    describe '@digital_hardware' do
       it 'should initialize as empty' do
         subject.digital_hardware.empty?.should == true
       end
@@ -43,6 +47,18 @@ module Dino
         subject.add_digital_hardware(mock2 = mock(:part2, pin: 14))
         subject.digital_hardware.should =~ [mock1, mock2]
       end
+    end
+
+    describe '#remove_digital_hardware' do
+      it 'should be tested'
+    end
+
+    describe '#add_analog_hardware' do
+      it 'should be tested'
+    end
+
+    describe '#remove_analog_hardware' do
+      it 'should be tested'
     end
 
     describe '#start_read' do
@@ -92,6 +108,38 @@ module Dino
       end
     end
 
+    describe '#analog_write' do
+      it 'should be tested'
+    end
+
+    describe '#analog_read' do
+      it 'should be tested'
+    end
+
+    describe '#set_pin_mode' do
+      it 'should send a value of 1 if the pin mode is set to out' do
+        io_mock.should_receive(:write).with('!0013001.')
+        subject.set_pin_mode(13, :out)
+      end
+
+      it 'should send a value of 0 if the pin mode is set to in' do
+        io_mock.should_receive(:write).with('!0013000.')
+        subject.set_pin_mode(13, :in)
+      end
+    end
+
+    describe '#set_debug' do
+      it 'should set the boards debug on when passed on' do
+        io_mock.should_receive(:write).with('!9900001.')
+        subject.set_debug(:on)
+      end
+
+      it 'should set the boards debug off when passed off' do
+        io_mock.should_receive(:write).with('!9900000.')
+        subject.set_debug(:off)
+      end
+    end
+
     describe '#normalize_pin' do
       it 'should normalize numbers so they are two digits' do
         subject.normalize_pin(1).should == '01'
@@ -117,30 +165,6 @@ module Dino
 
       it 'should raise if a number larger than three digits are given' do
         expect { subject.normalize_value(1000) }.to raise_exception 'values are limited to three digits'
-      end
-    end
-
-    describe '#set_pin_mode' do
-      it 'should send a value of 1 if the pin mode is set to out' do
-        io_mock.should_receive(:write).with('!0013001.')
-        subject.set_pin_mode(13, :out)
-      end
-
-      it 'should send a value of 0 if the pin mode is set to in' do
-        io_mock.should_receive(:write).with('!0013000.')
-        subject.set_pin_mode(13, :in)
-      end
-    end
-
-    describe '#set_debug' do
-      it 'should set the boards debug on when passed on' do
-        io_mock.should_receive(:write).with('!9900001.')
-        subject.set_debug(:on)
-      end
-
-      it 'should set the boards debug off when passed off' do
-        io_mock.should_receive(:write).with('!9900000.')
-        subject.set_debug(:off)
       end
     end
 
