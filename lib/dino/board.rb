@@ -12,7 +12,7 @@ module Dino
 
     def update(pin, msg)
       (@digital_hardware + @analog_hardware).each do |part|
-        part.update(msg) if pin == normalize_pin(part.pin)
+        part.update(msg) if normalize_pin(pin) == normalize_pin(part.pin)
       end
     end
 

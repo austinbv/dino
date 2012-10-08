@@ -1,16 +1,15 @@
 require 'spec_helper'
 
 module Dino
-  describe Board do
+  describe Dino::Board do
     def io_mock(methods = {})
       @io ||= mock(:io, {write: nil, add_observer: nil}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
-    before { subject }
 
     describe '#initialize' do
-      it 'should take a io class' do
+      it 'should take an io class' do
         expect {
           Board.new(io_mock)
         }.to_not raise_exception
@@ -21,56 +20,122 @@ module Dino
         subject.send(:initialize, io_mock)
       end
 
-      it 'should send the board reads for any hardware' do
-        pending do
-          subject.add_digital_hardware(mock(:part, pin: 12))
-          subject.add_digital_hardware(mock(:part, pin: 15))
-          io_mock.should_receive(:write).with('!0212000.')
-          io_mock.should_receive(:write).with('!0215000.')
-        end
+      it 'should start the heart beat' do
+        io_mock.should_receive(:write).with('!0212000.')
+        subject.add_digital_hardware(mock(:part, pin: 12))
+        sleep 0.01
+      end
+
+      it 'should send clearing bytes to the io' do
+        io_mock.should_receive(:write).with("00000000")
+        subject
       end
     end
 
     describe '#update' do
-      it 'should be tested'
+      context 'when the given pin connects to an analog hardware part' do
+        it 'should call update with the message on the part' do
+          part = mock(:part, pin: 7)
+          subject.add_analog_hardware(part)
+          other_part = mock(:part, pin: 9)
+          subject.add_analog_hardware(other_part)
+
+          part.should_receive(:update).with('wake up!')
+          subject.update(7, 'wake up!')
+        end
+      end
+
+      context 'when the given pin connects to an digital hardware part' do
+        it 'should call update with the message on the part' do
+          part = mock(:part, pin: 5)
+          subject.add_digital_hardware(part)
+          other_part = mock(:part, pin: 11)
+          subject.add_digital_hardware(other_part)
+
+          part.should_receive(:update).with('wake up!')
+          other_part.should_not_receive(:update).with('wake up!')
+
+          subject.update(5, 'wake up!')
+        end
+      end
+
+      context 'when the given pin is not connected' do
+        it 'should not do anything' do
+          expect {
+            subject.update(5, 'wake up!')
+          }.to_not raise_exception
+        end
+      end
     end
 
-    describe '@digital_hardware' do
+    describe '#digital_hardware' do
       it 'should initialize as empty' do
-        subject.digital_hardware.empty?.should == true
+        subject.digital_hardware.should == []
+      end
+    end
+
+    describe '#analog_hardware' do
+      it 'should initialize as empty' do
+        subject.analog_hardware.should == []
       end
     end
 
     describe '#add_digital_hardware' do
-      it 'should return the add digital hardware to the board' do
+      it 'should add digital hardware to the board' do
         subject.add_digital_hardware(mock1 = mock(:part1, pin: 12))
         subject.add_digital_hardware(mock2 = mock(:part2, pin: 14))
         subject.digital_hardware.should =~ [mock1, mock2]
       end
+
+      it 'should set the mode for the given pin to "in"' do
+        subject
+        subject.should_receive(:write).with("0012000")
+        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12))
+      end
     end
 
     describe '#remove_digital_hardware' do
-      it 'should be tested'
+      it 'should remove the given part from the hardware of the board' do
+        mock = mock(:part1, pin: 12)
+        subject.add_digital_hardware(mock)
+        subject.remove_digital_hardware(mock)
+        subject.digital_hardware.should == []
+      end
     end
 
     describe '#add_analog_hardware' do
-      it 'should be tested'
+      it 'should add analog hardware to the board' do
+        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12))
+        subject.add_analog_hardware(mock2 = mock(:part2, pin: 14))
+        subject.analog_hardware.should =~ [mock1, mock2]
+      end
+
+      it 'should set the mode for the given pin to "in"' do
+        subject
+        subject.should_receive(:write).with("0012000")
+        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12))
+      end
     end
 
     describe '#remove_analog_hardware' do
-      it 'should be tested'
+      it 'should remove the given part from the hardware of the board' do
+        mock = mock(:part1, pin: 12)
+        subject.add_analog_hardware(mock)
+        subject.remove_analog_hardware(mock)
+        subject.analog_hardware.should == []
+      end
     end
 
     describe '#start_read' do
       it 'should tell the io to read' do
-        io_mock(read: nil).should_receive(:read)
+        io_mock.should_receive(:read)
         Board.new(io_mock).start_read
       end
     end
 
     describe '#stop_read' do
       it 'should tell the io to read' do
-        io_mock(close_read: nil).should_receive(:close_read)
+        io_mock.should_receive(:close_read)
         Board.new(io_mock).stop_read
       end
     end
@@ -79,7 +144,7 @@ module Dino
       it 'should return true if the write succeeds' do
         @io = nil
         board = Board.new(io_mock(write: true))
-        board.write("message").should == true
+        board.write('message').should == true
       end
 
       it 'should wrap the message in a ! and a . by default' do
@@ -97,7 +162,7 @@ module Dino
     describe '#digital_write' do
       it 'should append a append a write to the pin and value' do
         io_mock.should_receive(:write).with('!0101003.')
-        Board.new(io_mock).digital_write(01, 003)
+        subject.digital_write(01, 003)
       end
     end
 
@@ -109,11 +174,17 @@ module Dino
     end
 
     describe '#analog_write' do
-      it 'should be tested'
+      it 'should append a append a write to the pin and value' do
+        io_mock.should_receive(:write).with('!0301003.')
+        subject.analog_write(01, 003)
+      end
     end
 
     describe '#analog_read' do
-      it 'should be tested'
+      it 'should tell the board to start reading from the given pin' do
+        io_mock.should_receive(:write).with('!0413000.')
+        subject.analog_read(13)
+      end
     end
 
     describe '#set_pin_mode' do
@@ -167,7 +238,5 @@ module Dino
         expect { subject.normalize_value(1000) }.to raise_exception 'values are limited to three digits'
       end
     end
-
-    it 'should have tests for observing the io'
   end
 end
