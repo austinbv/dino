@@ -16,15 +16,21 @@ module Dino
       end
 
       def blue
-        analog_write(Board::HIGH, pins[:red])
-        analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::LOW, pins[:blue])
+        analog_write(Board::LOW, pins[:red])
+        analog_write(Board::LOW, pins[:green])
+        analog_write(Board::HIGH, pins[:blue])
       end
 
       def red
+        analog_write(Board::HIGH, pins[:red])
+        analog_write(Board::LOW, pins[:green])
+        analog_write(Board::LOW, pins[:blue])
+      end
+
+      def green
         analog_write(Board::LOW, pins[:red])
         analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::HIGH, pins[:blue])
+        analog_write(Board::LOW, pins[:blue])
       end
 
       def blinky
