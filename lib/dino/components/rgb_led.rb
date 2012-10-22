@@ -34,10 +34,8 @@ module Dino
       end
 
       def blinky
-        [Board::HIGH, Board::LOW].cycle do |level|
-          analog_write(level, pins[:red])
-          analog_write(level, pins[:green])
-          analog_write(level, pins[:blue])
+        [:red, :green, :blue].cycle do |color|
+          self.send(color)
           sleep(0.01)
         end
       end
