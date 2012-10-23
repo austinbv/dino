@@ -24,7 +24,6 @@ module Dino
         digital_write(Board::HIGH, self.pins[:step])
         digital_write(Board::LOW, self.pins[:step])
       end
-
     end
   end
 end

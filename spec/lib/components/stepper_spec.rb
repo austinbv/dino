@@ -55,8 +55,6 @@ module Dino
           @stepper.step_cw
         end
       end
-
-
     end
   end
 end
