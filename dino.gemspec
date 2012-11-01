@@ -4,7 +4,8 @@ require File.expand_path('../lib/dino/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Austinbv"]
   gem.email         = ["austinbv@gmail.com"]
-  gem.description   = %q{Control your arduino through a serial port}
+  gem.description   = %q{A utility library for interfacting with an Arduino.
+  Designed for control, expansion, and with love.}
   gem.summary       = %q{Control your arduino through a serial port}
   gem.homepage      = 'https://github.com/austinbv/dino'
 

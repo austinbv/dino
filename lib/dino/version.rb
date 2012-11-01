@@ -1,3 +1,3 @@
 module Dino
-  VERSION = "0.0.1"
+  VERSION = "0.8"
 end
