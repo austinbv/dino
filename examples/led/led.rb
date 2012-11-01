@@ -1,4 +1,4 @@
-  #
+#
 # This is a simple example to blink an led
 # every half a second
 #
