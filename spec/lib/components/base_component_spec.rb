@@ -40,17 +40,24 @@ module Dino
 
           def sucessfully_initialized? ; @success ; end
 
+          def options ; @options ; end
+
           def after_initialize(options={})
             @success = true
+            @options = options
           end
         end
 
-        it "should call #after_initialize" do
-          pin = "a pin"
-          board = "a board"
-          component = SpecComponent.new(pin: pin, board: board)
+        let(:options) { { pin: pin, board: board } }
+        let(:pin) { "a pin" }
+        let(:board) { "a board" }
+
+        it "should call #after_initialize with options" do
+          component = SpecComponent.new(options)
           component.should be_sucessfully_initialized
+          component.options.should eq options
         end
+
       end
 
     end
