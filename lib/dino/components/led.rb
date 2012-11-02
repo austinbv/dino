@@ -5,7 +5,7 @@ module Dino
         super(options)
 
         set_pin_mode(:out)
-        digital_write(Board::LOW)
+        off
       end
 
       def on
