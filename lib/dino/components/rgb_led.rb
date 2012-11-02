@@ -4,33 +4,33 @@ module Dino
       # options = {board: my_board, pins: {red: red_pin, green: green_pin, blue: blue_pin}
       def initialize(options={})
         super(options)
+        self.pins.merge!(self.pins) {|k, v| Led.new(pin: v, board: options[:board])}
+      end
 
-        raise 'missing pins[:red] pin' unless self.pins[:red]
-        raise 'missing pins[:green] pin' unless self.pins[:green]
-        raise 'missing pins[:blue] pin' unless self.pins[:blue]
+      def set(options={})
+        options.each{|k, v| self.pins[k].set(v)}
+      end
 
-        pins.each do |color, pin|
-          set_pin_mode(:out, pin)
-          analog_write(Board::LOW, pin)
-        end
+      def color(color)
+        self.pins[color]
       end
 
       def blue
-        analog_write(Board::LOW, pins[:red])
-        analog_write(Board::LOW, pins[:green])
-        analog_write(Board::HIGH, pins[:blue])
+        self.pins[:red].off
+        self.pins[:green].off
+        self.pins[:blue].on
       end
 
       def red
-        analog_write(Board::HIGH, pins[:red])
-        analog_write(Board::LOW, pins[:green])
-        analog_write(Board::LOW, pins[:blue])
+        self.pins[:red].on
+        self.pins[:green].off
+        self.pins[:blue].off
       end
 
       def green
-        analog_write(Board::LOW, pins[:red])
-        analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::LOW, pins[:blue])
+        self.pins[:red].off
+        self.pins[:green].on
+        self.pins[:blue].off
       end
 
       def blinky
