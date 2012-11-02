@@ -15,6 +15,8 @@ module Dino
         self.pins[color]
       end
 
+      alias :[] :color
+      
       def blue
         self.pins[:red].off
         self.pins[:green].off
