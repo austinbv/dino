@@ -15,6 +15,10 @@ module Dino
       def off
         digital_write(Board::LOW)
       end
+
+      def fade(value)
+        analog_write(value)
+      end
     end
   end
 end
