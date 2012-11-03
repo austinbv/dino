@@ -26,6 +26,11 @@ module Dino
         subject.io = '/dev/tty1.usb'
         subject.io.should == mock_serial
       end
+
+      it 'should raise a BoardNotFound exception if there is no board connected' do
+        SerialPort.stub(:new).and_raise
+        expect { subject.io }.to raise_exception BoardNotFound
+      end
     end
 
     describe '#io=' do

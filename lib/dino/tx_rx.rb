@@ -12,14 +12,8 @@ module Dino
     end
 
     def io
-      @io ||= tty_devices.map do |device|
-        next if device.match /^cu/
-        begin
-          SerialPort.new("/dev/#{device}", BAUD)
-        rescue
-          nil
-        end
-      end.compact.first
+      raise BoardNotFound unless @io ||= find_arduino
+      @io
     end
 
     def io=(device)
@@ -53,6 +47,17 @@ module Dino
 
     def tty_devices
       `ls /dev | grep usb`.split(/\n/)
+    end
+
+    def find_arduino
+      tty_devices.map do |device|
+        next if device.match /^cu/
+        begin
+          SerialPort.new("/dev/#{device}", BAUD)
+        rescue
+          nil
+        end
+      end.compact.first
     end
   end
 end
