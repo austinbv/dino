@@ -3,7 +3,7 @@
 # every half a second
 #
 
-require '../lib/dino'
+require File.expand_path('../../lib/dino', __FILE__)
 
 board = Dino::Board.new(Dino::TxRx.new)
 led = Dino::Components::RgbLed.new(pins: {red: 11, green: 10, blue: 9}, board: board)

@@ -5,7 +5,7 @@
 # and changes the sleep delay for the LED on/off cycle.  
 #  
 
-require '../lib/dino'
+require File.expand_path('../../lib/dino', __FILE__)
 
 board = Dino::Board.new(Dino::TxRx.new)
 led = Dino::Components::Led.new(pin: 13, board: board)
