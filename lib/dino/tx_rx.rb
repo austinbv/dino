@@ -46,7 +46,7 @@ module Dino
     private
 
     def tty_devices
-      `ls /dev | grep usb`.split(/\n/)
+      `ls /dev`.split("\n").grep(/usb|ACM/)
     end
 
     def find_arduino
