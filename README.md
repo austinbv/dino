@@ -1,4 +1,5 @@
 # Welcome to Dino
+[![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
 ## Get started in no time
 Dino was designed to help you start working with your Arduino in minutes.
@@ -13,3 +14,6 @@ By now you should be blinking away
 
 
 Take a look in the example directory for more information
+
+
+I gave a talk on this library at RubyConf, you can see the slides here: [Arudino The Ruby Way](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
