@@ -11,5 +11,6 @@ Dino was designed to help you start working with your Arduino in minutes.
 
 By now you should be blinking away
 
-
 Take a look in the example directory for more information
+
+The slides for the talk are available at: https://speakerdeck.com/austinbv/arduino-the-ruby-way
