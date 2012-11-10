@@ -9,7 +9,17 @@ module Dino
         self.board = options[:board]
 
         raise 'board and pin or pins are required for a component' if self.board.nil? || self.pin.nil?
+        after_initialize(options)
       end
+
+      #
+      # As BaseComponent does a lot of work for you with regarding to setting up, it is
+      # best not to override #initialize and instead define an #after_initialize method
+      # within your subclass.
+      #
+      # @note This method should be implemented in the BaseComponent subclass.
+      #
+      def after_initialize(options={}) ; end
 
       protected
 
