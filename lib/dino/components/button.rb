@@ -11,11 +11,11 @@ module Dino
         self.board.start_read
       end
 
-      def down(callback)
+      def down(&callback)
         @down_callbacks << callback
       end
 
-      def up(callback)
+      def up(&callback)
         @up_callbacks << callback
       end
 
