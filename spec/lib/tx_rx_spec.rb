@@ -12,9 +12,10 @@ module Dino
 
     describe '#io' do
       it 'should instantiate a new SerialPort for each usb tty device found' do
-        subject.should_receive(:tty_devices).and_return(['cu.usb', 'tty1.usb', 'tty2.usb'])
+        subject.should_receive(:tty_devices).and_return(['cu.usb', 'tty1.usb', 'tty2.usb', 'tty.ACM0'])
         SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::BAUD).and_return(mock_serial = mock)
         SerialPort.should_receive(:new).with('/dev/tty2.usb', TxRx::BAUD).and_return(mock)
+        SerialPort.should_receive(:new).with('/dev/tty.ACM0', TxRx::BAUD).and_return(mock)
 
         subject.io.should == mock_serial
       end
