@@ -4,9 +4,7 @@ module Dino
       UP = "01"
       DOWN = "00"
 
-      def initialize(options={})
-        super(options)
-
+      def after_initialize(options={})
         @down_callbacks, @up_callbacks, @state = [], [], UP
 
         self.board.add_digital_hardware(self)

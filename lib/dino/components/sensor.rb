@@ -1,9 +1,7 @@
 module Dino
   module Components
     class Sensor < BaseComponent
-      def initialize(options={})
-        super(options)
-
+      def after_initialize(options={})
         @data_callbacks = []
         @board.add_analog_hardware(self)
         @board.start_read
