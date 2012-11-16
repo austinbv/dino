@@ -46,7 +46,7 @@ module Dino
     private
 
     def tty_devices
-      if RUBY_PLATFORM.include? "mswin"
+      if RUBY_PLATFORM.include?("mswin") || RUBY_PLATFORM.include?("mingw")
         ["COM1", "COM2", "COM3", "COM4"]
       else
         `ls /dev`.split("\n").grep(/usb|ACM/).map{|d| "/dev/#{d}"}
