@@ -46,14 +46,18 @@ module Dino
     private
 
     def tty_devices
-      `ls /dev`.split("\n").grep(/usb|ACM/)
+      if RUBY_PLATFORM.include?("mswin") || RUBY_PLATFORM.include?("mingw")
+        ["COM1", "COM2", "COM3", "COM4"]
+      else
+        `ls /dev`.split("\n").grep(/usb|ACM/).map{|d| "/dev/#{d}"}
+      end
     end
 
     def find_arduino
       tty_devices.map do |device|
         next if device.match /^cu/
         begin
-          SerialPort.new("/dev/#{device}", BAUD)
+          SerialPort.new(device, BAUD)
         rescue
           nil
         end

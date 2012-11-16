@@ -11,13 +11,30 @@ module Dino
     end
 
     describe '#io' do
-      it 'should instantiate a new SerialPort for each usb tty device found' do
-        subject.should_receive(:tty_devices).and_return(['cu.usb', 'tty1.usb', 'tty2.usb', 'tty.ACM0'])
-        SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::BAUD).and_return(mock_serial = mock)
-        SerialPort.should_receive(:new).with('/dev/tty2.usb', TxRx::BAUD).and_return(mock)
-        SerialPort.should_receive(:new).with('/dev/tty.ACM0', TxRx::BAUD).and_return(mock)
+      context "on windows" do
+        it 'should instantiate a new SerialPort for each usb tty device found' do
+          original_platform = RUBY_PLATFORM
+          RUBY_PLATFORM = "mswin"
+          subject.should_receive(:tty_devices).and_return(["COM1", "COM2", "COM3", "COM4"])
+          SerialPort.should_receive(:new).with('COM1', TxRx::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_receive(:new).with('COM2', TxRx::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('COM3', TxRx::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('COM4', TxRx::BAUD).and_return(mock)
 
-        subject.io.should == mock_serial
+          subject.io.should == mock_serial
+          RUBY_PLATFORM = original_platform
+        end
+      end
+
+      context "on unix" do
+        it 'should instantiate a new SerialPort for each usb tty device found' do
+          subject.should_receive(:tty_devices).and_return(['/dev/tty1.usb', '/dev/tty1.usb', '/dev/tty.ACM0'])
+          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('/dev/tty.ACM0', TxRx::BAUD).and_return(mock)
+
+          subject.io.should == mock_serial
+        end
       end
 
       it 'should use the existing io instance if set' do
