@@ -16,4 +16,4 @@ By now you should be blinking away
 Take a look in the example directory for more information
 
 
-I gave a talk on this library at RubyConf, you can see the slides here: [Arudino The Ruby Way](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
+I gave a [talk on this library at RubyConf](http://confreaks.com/videos/1294-rubyconf2012-arduino-the-ruby-way), you can see the slides here: [Arudino The Ruby Way](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
