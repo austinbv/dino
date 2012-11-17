@@ -9,15 +9,12 @@ require File.expand_path('../../../lib/dino', __FILE__)
 board = Dino::Board.new(Dino::TxRx.new)
 button = Dino::Components::Button.new(pin: 13, board: board)
 
-button_down = Proc.new do
+button.down do
   puts "button down"
 end
 
-button_up = Proc.new do
+button.up do
   puts "button up"
 end
-
-button.down(button_down)
-button.up(button_up)
 
 sleep
