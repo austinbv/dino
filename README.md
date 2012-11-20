@@ -31,6 +31,7 @@ gem install dino
 
 * Take a look in [the example directory](https://github.com/austinbv/dino/tree/master/examples) for small component examples
 * Try [Getting Started with Arduino and Dino](http://tutorials.jumpstartlab.com/projects/arduino/introducing_arduino.html) from [Jumpstart Lab](http://jumpstartlab.com), building a number-guessing game and a simple nightlight
+* An example [rails app using Dino and Pusher](https://github.com/austinbv/dino_rails_example)
 
 ### Explanatory Talks
 
