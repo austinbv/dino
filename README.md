@@ -34,6 +34,6 @@ gem install dino
 
 ### Explanatory Talks
 
-* RubyConf 2012
+* "Arduino the Ruby Way" at RubyConf 2012
   * [Video by ConFreaks](http://confreaks.com/videos/1294-rubyconf2012-arduino-the-ruby-way)
   * [Slides on SpeakerDeck](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
