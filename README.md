@@ -1,19 +1,39 @@
 # Welcome to Dino
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
-## Get started in no time
+## Get Started In No Time
+
 Dino was designed to help you start working with your Arduino in minutes.
 
-> * `gem install dino`
-> * Burn the file `src/du.ino` to your Arduino
-> ** You can do this in the [Arduino IDE](http://www.arduino.cc/en/Main/software)
-> * Plug in your Arduino and wire the led like in `examples/led/led.png`
-> * Run `ruby example/led/led.rb`
+#### Install the Gem
 
-By now you should be blinking away
+```
+gem install dino
+```
 
+#### Upload the Bootstrapper
 
-Take a look in the example directory for more information
+* Open [the normal Arduino IDE](http://arduino.cc/en/Main/Software)
+* Download the bootstrapper [src/du.ino](https://raw.github.com/austinbv/dino/master/src/du.ino)
+* Open the file in the Arduino IDE
+* Plug in your Arduino via USB
+* Click the upload button (an arrow)
 
+#### Verify Install
 
-I gave a [talk on this library at RubyConf](http://confreaks.com/videos/1294-rubyconf2012-arduino-the-ruby-way), you can see the slides here: [Arudino The Ruby Way](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
+* Build the sample circuit [examples/led/led.png](https://raw.github.com/austinbv/dino/master/examples/led/led.png)
+* From your terminal, execute `ruby example/led/led.rb`
+* Observe your LED blinking continuously
+
+## Examples and Tutorials
+
+### Circuits and Programs
+
+* Take a look in [the example directory](https://github.com/austinbv/dino/tree/master/examples) for small component examples
+* Try [Getting Started with Arduino and Dino](http://tutorials.jumpstartlab.com/projects/arduino/introducing_arduino.html) from [Jumpstart Lab](http://jumpstartlab.com), building a number-guessing game and a simple nightlight
+
+### Explanatory Talks
+
+* RubyConf 2012
+  * [Video by ConFreaks](http://confreaks.com/videos/1294-rubyconf2012-arduino-the-ruby-way)
+  * [Slides on SpeakerDeck](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
