@@ -1,8 +1,5 @@
 #
-# This is an example of how to use the button class
-# You must register helpers and have the main thread
-# sleep or in someway keep running or your program
-# will exit before any callbacks can be called
+# This is an example of how to use the servo class
 #
 
 require File.expand_path('../../lib/dino', __FILE__)
