@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module Dino
-  describe TxRx::Serial do
+  describe TxRx::USB do
     it { should be }
 
     describe '#initialize' do
@@ -16,10 +16,10 @@ module Dino
           original_platform = RUBY_PLATFORM
           RUBY_PLATFORM = "mswin"
           subject.should_receive(:tty_devices).and_return(["COM1", "COM2", "COM3", "COM4"])
-          SerialPort.should_receive(:new).with('COM1', TxRx::Serial::BAUD).and_return(mock_serial = mock)
-          SerialPort.should_receive(:new).with('COM2', TxRx::Serial::BAUD).and_return(mock)
-          SerialPort.should_receive(:new).with('COM3', TxRx::Serial::BAUD).and_return(mock)
-          SerialPort.should_receive(:new).with('COM4', TxRx::Serial::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('COM1', TxRx::USB::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_receive(:new).with('COM2', TxRx::USB::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('COM3', TxRx::USB::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('COM4', TxRx::USB::BAUD).and_return(mock)
 
           subject.io.should == mock_serial
           RUBY_PLATFORM = original_platform
@@ -29,9 +29,9 @@ module Dino
       context "on unix" do
         it 'should instantiate a new SerialPort for each usb tty device found' do
           subject.should_receive(:tty_devices).and_return(['/dev/tty1.usb', '/dev/tty1.usb', '/dev/tty.ACM0'])
-          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::Serial::BAUD).and_return(mock_serial = mock)
-          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::Serial::BAUD).and_return(mock)
-          SerialPort.should_receive(:new).with('/dev/tty.ACM0', TxRx::Serial::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::USB::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::USB::BAUD).and_return(mock)
+          SerialPort.should_receive(:new).with('/dev/tty.ACM0', TxRx::USB::BAUD).and_return(mock)
 
           subject.io.should == mock_serial
         end
@@ -53,7 +53,7 @@ module Dino
 
     describe '#io=' do
       it 'should set io to a new serial port with the specified device' do
-        SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::Serial::BAUD).and_return(mock_serial = mock)
+        SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::USB::BAUD).and_return(mock_serial = mock)
         subject.io = '/dev/tty1.usb'
         subject.instance_variable_get(:@io).should == mock_serial
       end
