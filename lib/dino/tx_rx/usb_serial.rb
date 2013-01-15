@@ -3,7 +3,7 @@ require 'observer'
 
 module Dino
   module TxRx
-    class USB
+    class USBSerial
       include Observable
 
       BAUD = 115200
