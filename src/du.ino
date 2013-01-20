@@ -62,18 +62,23 @@ void process() {
   }
 
   // if (debug) Serial.println(request);
+  
+  int p = getPin(pin);
+  if (p == -1) return; // Should raise some kind of "bad pin" error.
+  
+  
   int cmdid = atoi(cmd);
 
   switch(cmdid) {
-    case 0:  setMode(pin,val);         break;
-    case 1:  dWrite(pin,val);          break;
-    case 2:  dRead(pin);               break;
-    case 3:  aWrite(pin,val);          break;
-    case 4:  aRead(pin);               break;
-    case 97: handlePing(pin,val,aux);  break;
-    case 98: handleServo(pin,val,aux); break;
-    case 99: toggleDebug(val);         break;
-    default:                           break;
+    case 0:  setMode    (p, val);       break;
+    case 1:  dWrite     (p, val);       break;
+    case 2:  dRead      (p);            break;
+    case 3:  aWrite     (p, val);       break;
+    case 4:  aRead      (p);            break;
+    case 97: handlePing (p, val, aux);  break;
+    case 98: handleServo(p, val, aux);  break;
+    case 99: toggleDebug(val);          break;
+    default:                            break;
   }
 }
 
@@ -82,9 +87,7 @@ void process() {
 /*
  * Set pin mode
  */
-void setMode(char *pin, char *val) {
-  int p = getPin(pin);
-  if (p == -1) return;
+void setMode(int p, char *val) {
   if (atoi(val) == 0) {
     pinMode(p, OUTPUT);
   } else {
@@ -97,9 +100,7 @@ void setMode(char *pin, char *val) {
 /*
  *  Basic reads and writes
  */
-void dWrite(char *pin, char *val) {
-  int p = getPin(pin);
-  if (p == -1) return;
+void dWrite(int p, char *val) {
   pinMode(p, OUTPUT);
   if (atoi(val) == 0) {
     digitalWrite(p, LOW);
@@ -107,27 +108,21 @@ void dWrite(char *pin, char *val) {
     digitalWrite(p, HIGH);
   }
 }
-void dRead(char *pin) {
-  int p = getPin(pin);
-  if (p == -1) return;  
+void dRead(int p) { 
   pinMode(p, INPUT);
   int oraw = digitalRead(p);
   char m[7];
   sprintf(m, "%02d::%02d", p, oraw);
   response = m;
 }
-void aRead(char *pin) {
-  int p = getPin(pin);
-  if (p == -1) return;
+void aRead(int p) {
   pinMode(p, INPUT);
   int rval = analogRead(p);
   char m[8];
   sprintf(m, "%s::%03d", pin, rval);
   response = m;
 }
-void aWrite(char *pin, char *val) {
-  int p = getPin(pin);
-  if (p == -1) return;
+void aWrite(int p, char *val) {
   pinMode(p, OUTPUT);
   analogWrite(p,atoi(val));
 }
@@ -138,10 +133,7 @@ void aWrite(char *pin, char *val) {
  * Handle Ping commands
  * fire, read
  */
-void handlePing(char *pin, char *val, char *aux) {
-  int p = getPin(pin);
-  if (p == -1) return;
-  
+void handlePing(int p, char *val, char *aux) {  
   // 01(1) Fire and Read
   if (atoi(val) == 1) {
     char m[16];
@@ -169,10 +161,7 @@ void handlePing(char *pin, char *val, char *aux) {
  * Handle Servo commands
  * attach, detach, write, read, writeMicroseconds, attached
  */
-void handleServo(char *pin, char *val, char *aux) {
-  int p = getPin(pin);
-  if (p == -1) return;
-  
+void handleServo(int p, char *val, char *aux) {
   // 00(0) Detach
   if (atoi(val) == 0) {
     servo.detach();
