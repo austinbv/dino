@@ -1,16 +1,18 @@
 #include <Servo.h>
+Servo servo;
 
 bool debug = false;
 
+char request[12];
 int index = 0;
-
-char messageBuffer[12];
 char cmd[3];
 char pin[3];
 char val[4];
 char aux[4];
 
-Servo servo;
+String response = "";
+
+
 
 void setup() {
   Serial.begin(115200);
@@ -18,52 +20,56 @@ void setup() {
 
 void loop() {
   while(Serial.available() > 0) {
-    char x = Serial.read();
-    if (x == '!') index = 0;      // start
-    else if (x == '.') process(); // end
-    else messageBuffer[index++] = x;
+    char c = Serial.read();
+
+    // Reset the request and response when the beginning delimiter is received.
+    if (c == '!') {
+      index = 0;
+      response = "";
+    } 
+    
+    // Catch the request's ending delimiter and process the request.
+    else if (c == '.') {
+      process();
+      if(response != "") Serial.println(response);
+    }
+       
+    else request[index++] = c;
   }
 }
+
+
 
 /*
  * Deal with a full message and determine function to call
  */
 void process() {
-  index = 0;
-
-  strncpy(cmd, messageBuffer, 2);
+  strncpy(cmd, request, 2);
   cmd[2] = '\0';
-  strncpy(pin, messageBuffer + 2, 2);
+  strncpy(pin, request + 2, 2);
   pin[2] = '\0';
 
   if (atoi(cmd) > 90) {
-    strncpy(val, messageBuffer + 4, 2);
+    strncpy(val, request + 4, 2);
     val[2] = '\0';
-    strncpy(aux, messageBuffer + 6, 3);
+    strncpy(aux, request + 6, 3);
     aux[3] = '\0';
   } else {
-    strncpy(val, messageBuffer + 4, 3);
+    strncpy(val, request + 4, 3);
     val[4] = '\0';
-    strncpy(aux, messageBuffer + 7, 3);
+    strncpy(aux, request + 7, 3);
     aux[4] = '\0';
   }
 
-  if (debug) {
-    Serial.println(messageBuffer);
-  }
+  if (debug) Serial.println(request);
   int cmdid = atoi(cmd);
 
-  // Serial.println(cmd);
-  // Serial.println(pin);
-  // Serial.println(val);
-  // Serial.println(aux);
-
   switch(cmdid) {
-    case 0:  sm(pin,val);              break;
-    case 1:  dw(pin,val);              break;
-    case 2:  dr(pin,val);              break;
-    case 3:  aw(pin,val);              break;
-    case 4:  ar(pin,val);              break;
+    case 0:  setMode(pin,val);         break;
+    case 1:  dWrite(pin,val);          break;
+    case 2:  dRead(pin);               break;
+    case 3:  aWrite(pin,val);          break;
+    case 4:  aRead(pin);               break;
     case 97: handlePing(pin,val,aux);  break;
     case 98: handleServo(pin,val,aux); break;
     case 99: toggleDebug(val);         break;
@@ -71,26 +77,14 @@ void process() {
   }
 }
 
-/*
- * Toggle debug mode
- */
-void toggleDebug(char *val) {
-  if (atoi(val) == 0) {
-    debug = false;
-    Serial.println("goodbye");
-  } else {
-    debug = true;
-    Serial.println("hello");
-  }
-}
+
 
 /*
  * Set pin mode
  */
-void sm(char *pin, char *val) {
-  if (debug) Serial.println("sm");
+void setMode(char *pin, char *val) {
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if (p == -1) return;
   if (atoi(val) == 0) {
     pinMode(p, OUTPUT);
   } else {
@@ -98,13 +92,14 @@ void sm(char *pin, char *val) {
   }
 }
 
+
+
 /*
- * Digital write
+ *  Basic reads and writes
  */
-void dw(char *pin, char *val) {
-  if (debug) Serial.println("dw");
+void dWrite(char *pin, char *val) {
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if (p == -1) return;
   pinMode(p, OUTPUT);
   if (atoi(val) == 0) {
     digitalWrite(p, LOW);
@@ -112,63 +107,32 @@ void dw(char *pin, char *val) {
     digitalWrite(p, HIGH);
   }
 }
-
-/*
- * Digital read
- */
-void dr(char *pin, char *val) {
-  if (debug) Serial.println("dr");
+void dRead(char *pin) {
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if (p == -1) return;  
   pinMode(p, INPUT);
   int oraw = digitalRead(p);
   char m[7];
-  sprintf(m, "%02d::%02d", p,oraw);
-  Serial.println(m);
+  sprintf(m, "%02d::%02d", p, oraw);
+  response = m;
 }
-
-/*
- * Analog read
- */
-void ar(char *pin, char *val) {
-  if(debug) Serial.println("ar");
+void aRead(char *pin) {
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
-  pinMode(p, INPUT); // don't want to sw
+  if (p == -1) return;
+  pinMode(p, INPUT);
   int rval = analogRead(p);
   char m[8];
   sprintf(m, "%s::%03d", pin, rval);
-  Serial.println(m);
+  response = m;
 }
-
-void aw(char *pin, char *val) {
-  if(debug) Serial.println("aw");
+void aWrite(char *pin, char *val) {
   int p = getPin(pin);
+  if (p == -1) return;
   pinMode(p, OUTPUT);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
   analogWrite(p,atoi(val));
 }
 
-int getPin(char *pin) { //Converts to A0-A5, and returns -1 on error
-  int ret = -1;
-  if(pin[0] == 'A' || pin[0] == 'a') {
-    switch(pin[1]) {
-      case '0':  ret = A0; break;
-      case '1':  ret = A1; break;
-      case '2':  ret = A2; break;
-      case '3':  ret = A3; break;
-      case '4':  ret = A4; break;
-      case '5':  ret = A5; break;
-      default:             break;
-    }
-  } else {
-    ret = atoi(pin);
-    if(ret == 0 && (pin[0] != '0' || pin[1] != '0')) {
-      ret = -1;
-    }
-  }
-  return ret;
-}
+
 
 /*
  * Handle Ping commands
@@ -201,6 +165,8 @@ void handlePing(char *pin, char *val, char *aux) {
     delay(50);
   }
 }
+
+
 
 /*
  * Handle Servo commands
@@ -248,4 +214,45 @@ void handleServo(char *pin, char *val, char *aux) {
     sprintf(m, "%s::read::%03d", pin, sval);
     Serial.println(m);
   }
+}
+
+
+
+/*
+ * Toggle debug mode
+ */
+void toggleDebug(char *val) {
+  if (atoi(val) == 0) {
+    debug = false;
+    Serial.println("goodbye");
+  } else {
+    debug = true;
+    Serial.println("hello");
+  }
+}
+
+
+
+/*
+ * Converts to A0-A5, and returns -1 on error
+ */
+int getPin(char *pin) {
+  int ret = -1;
+  if(pin[0] == 'A' || pin[0] == 'a') {
+    switch(pin[1]) {
+      case '0':  ret = A0; break;
+      case '1':  ret = A1; break;
+      case '2':  ret = A2; break;
+      case '3':  ret = A3; break;
+      case '4':  ret = A4; break;
+      case '5':  ret = A5; break;
+      default:             break;
+    }
+  } else {
+    ret = atoi(pin);
+    if(ret == 0 && (pin[0] != '0' || pin[1] != '0')) {
+      ret = -1;
+    }
+  }
+  return ret;
 }
