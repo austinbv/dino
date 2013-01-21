@@ -1,17 +1,7 @@
-#include <Servo.h>
-Servo servo;
-
-bool debug = false;
-
 char request[7];
 int index = 0;
-char cmd[3];
-char pin[3];
-char val[4];
-
 String response = "";
-
-
+bool debug = false;
 
 void setup() {
   Serial.begin(115200);
@@ -29,7 +19,7 @@ void loop() {
     
     // Catch the request's ending delimiter and process the request.
     else if (c == '.') {
-      process();
+      process(request);
       if(response != "") Serial.println(response);
     }
        
@@ -42,24 +32,24 @@ void loop() {
 /*
  * Deal with a full request and determine function to call
  */
-void process() {
-  strncpy(cmd, request, 2);      cmd[2] = '\0';
-  strncpy(pin, request + 2, 2);  pin[2] = '\0';
-  strncpy(val, request + 4, 3);  val[3] = '\0';
-
+void process(char *request) {
+   char cmd[3];  strncpy(cmd, request, 2);      cmd[2] = '\0';
+   char pin[3];  strncpy(pin, request + 2, 2);  pin[2] = '\0';
+   char val[4];  strncpy(val, request + 4, 3);  val[3] = '\0';
+  
   // if (debug) Serial.println(request);  
-  int p = getPin(pin);
-  if (p == -1) return; // Should raise some kind of "bad pin" error.
+  int rawPin = getPin(pin);
+  if (rawPin == -1) return; // Should raise some kind of "bad pin" error.
  
   int cmdid = atoi(cmd);
   switch(cmdid) {
-    case 0:  setMode    (p, val);       break;
-    case 1:  dWrite     (p, val);       break;
-    case 2:  dRead      (p);            break;
-    case 3:  aWrite     (p, val);       break;
-    case 4:  aRead      (p);            break;
-    case 99: toggleDebug(val);          break;
-    default:                            break;
+    case 0:  setMode    (rawPin, val);             break;
+    case 1:  dWrite     (rawPin, val);             break;
+    case 2:  dRead      (rawPin, &response);       break;
+    case 3:  aWrite     (rawPin, val);             break;
+    case 4:  aRead      (rawPin, &response, pin);  break;
+    case 99: toggleDebug(val);                     break;
+    default:                                       break;
   }
 }
 
@@ -89,24 +79,25 @@ void dWrite(int p, char *val) {
     digitalWrite(p, HIGH);
   }
 }
-void dRead(int p) { 
+void dRead(int p, String *response) { 
   pinMode(p, INPUT);
   int oraw = digitalRead(p);
   char m[7];
   sprintf(m, "%02d::%02d", p, oraw);
-  response = m;
-}
-void aRead(int p) {
-  pinMode(p, INPUT);
-  int rval = analogRead(p);
-  char m[8];
-  sprintf(m, "%s::%03d", pin, rval);
-  response = m;
+  *response = m;
 }
 void aWrite(int p, char *val) {
   pinMode(p, OUTPUT);
   analogWrite(p,atoi(val));
 }
+void aRead(int p, String *response, char *pin) {
+  pinMode(p, INPUT);
+  int rval = analogRead(p);
+  char m[8];
+  sprintf(m, "%s::%03d", pin, rval);
+  *response = m;
+}
+
 
 
 
