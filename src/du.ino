@@ -44,10 +44,8 @@ void loop() {
  * Deal with a full request and determine function to call
  */
 void process() {
-  strncpy(cmd, request, 2);
-  cmd[2] = '\0';
-  strncpy(pin, request + 2, 2);
-  pin[2] = '\0';
+  strncpy(cmd, request, 2);      cmd[2] = '\0';
+  strncpy(pin, request + 2, 2);  pin[2] = '\0';
 
   if (atoi(cmd) > 90) {
     strncpy(val, request + 4, 2);
@@ -56,9 +54,9 @@ void process() {
     aux[3] = '\0';
   } else {
     strncpy(val, request + 4, 3);
-    val[4] = '\0';
+    val[3] = '\0';
     strncpy(aux, request + 7, 3);
-    aux[4] = '\0';
+    aux[3] = '\0';
   }
 
   // if (debug) Serial.println(request);
