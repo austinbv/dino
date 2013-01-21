@@ -3,7 +3,7 @@ Servo servo;
 
 bool debug = false;
 
-char request[12];
+char request[7];
 int index = 0;
 char cmd[3];
 char pin[3];
@@ -46,35 +46,19 @@ void loop() {
 void process() {
   strncpy(cmd, request, 2);      cmd[2] = '\0';
   strncpy(pin, request + 2, 2);  pin[2] = '\0';
+  strncpy(val, request + 4, 3);  val[3] = '\0';
 
-  if (atoi(cmd) > 90) {
-    strncpy(val, request + 4, 2);
-    val[2] = '\0';
-    strncpy(aux, request + 6, 3);
-    aux[3] = '\0';
-  } else {
-    strncpy(val, request + 4, 3);
-    val[3] = '\0';
-    strncpy(aux, request + 7, 3);
-    aux[3] = '\0';
-  }
-
-  // if (debug) Serial.println(request);
-  
+  // if (debug) Serial.println(request);  
   int p = getPin(pin);
   if (p == -1) return; // Should raise some kind of "bad pin" error.
-  
-  
+ 
   int cmdid = atoi(cmd);
-
   switch(cmdid) {
     case 0:  setMode    (p, val);       break;
     case 1:  dWrite     (p, val);       break;
     case 2:  dRead      (p);            break;
     case 3:  aWrite     (p, val);       break;
     case 4:  aRead      (p);            break;
-    case 97: handlePing (p, val, aux);  break;
-    case 98: handleServo(p, val, aux);  break;
     case 99: toggleDebug(val);          break;
     default:                            break;
   }
@@ -123,71 +107,6 @@ void aRead(int p) {
 void aWrite(int p, char *val) {
   pinMode(p, OUTPUT);
   analogWrite(p,atoi(val));
-}
-
-
-
-/*
- * Handle Ping commands
- * fire, read
- */
-void handlePing(int p, char *val, char *aux) {  
-  // 01(1) Fire and Read
-  if (atoi(val) == 1) {
-    char m[16];
-
-    pinMode(p, OUTPUT);
-    digitalWrite(p, LOW);
-    delayMicroseconds(2);
-    digitalWrite(p, HIGH);
-    delayMicroseconds(5);
-    digitalWrite(p, LOW);
-
-    // Serial.println("ping fired");
-
-    pinMode(p, INPUT);
-    sprintf(m, "%s::read::%08d", pin, pulseIn(p, HIGH));
-    response = m;
-
-    delay(50);
-  }
-}
-
-
-
-/*
- * Handle Servo commands
- * attach, detach, write, read, writeMicroseconds, attached
- */
-void handleServo(int p, char *val, char *aux) {
-  // 00(0) Detach
-  if (atoi(val) == 0) {
-    servo.detach();
-    char m[12];
-    sprintf(m, "%s::detached", pin);
-    response = m;
-
-  // 01(1) Attach
-  } else if (atoi(val) == 1) {
-    // servo.attach(p, 750, 2250);
-    servo.attach(p);
-    char m[12];
-    sprintf(m, "%s::attached", pin);
-    response = m;
-
-  // 02(2) Write
-  } else if (atoi(val) == 2) {
-    // Write to servo
-    servo.write(atoi(aux));
-    delay(15);
-
-  // 03(3) Read
-  } else if (atoi(val) == 3) {
-    int sval = servo.read();
-    char m[13];
-    sprintf(m, "%s::read::%03d", pin, sval);
-    response = m;
-  }
 }
 
 
