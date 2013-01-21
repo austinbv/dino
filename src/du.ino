@@ -8,7 +8,6 @@ int index = 0;
 char cmd[3];
 char pin[3];
 char val[4];
-char aux[4];
 
 String response = "";
 
