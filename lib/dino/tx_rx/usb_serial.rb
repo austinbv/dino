@@ -50,7 +50,7 @@ module Dino
         if RUBY_PLATFORM.include?("mswin") || RUBY_PLATFORM.include?("mingw")
           com_ports = []
           1.upto(9) { |n| com_ports << "COM#{n}" }
-          com_ports # ["COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9"]
+          com_ports
         else
           `ls /dev`.split("\n").grep(/usb|ACM/).map{|d| "/dev/#{d}"}
         end
