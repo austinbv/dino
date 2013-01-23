@@ -1,6 +1,6 @@
 #include "Dino.h"
 
-char request[7];
+char request[8];
 int index = 0;
 String response = "";
 Dino dino;
