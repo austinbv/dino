@@ -47,21 +47,23 @@ void loop() {
           int requestStart = url.indexOf('!');
           int requestEnd = url.indexOf('.', requestStart);
 
+          // Need some way to verify the format of a request and reject if necessary. Regex?
           // Convert it into a char array and pass it to the Dino library.
           url.substring(requestStart + 1, requestEnd).toCharArray(request, 8);
-          Serial.println(request);
           dino.process(request, &response);
 
-          // Return an HTTP response.
+          // Need to return something if there's no response or HTTP connection hangs.          
+          if ((response == "") || (response == " ")) response = "OK";
+          
+          // Write the HTTP response.
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/plain");
           client.println();
           client.println(response);
-          break;
+          client.stop();
         }
       }
     }
-    client.stop();
   }
 }
 

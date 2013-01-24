@@ -16,7 +16,11 @@ void Dino::process(char *request, String *loopResponse) {
   strncpy(pin, request + 2, 2);  pin[2] = '\0';
   strncpy(val, request + 4, 3);  val[3] = '\0';
   
-  // if (debug) Serial.println(request);  
+  // Serial.println(cmd);
+  // Serial.println(pin);
+  // Serial.println(val);
+  // if (debug) Serial.println(request);
+  
   convertPin();
   if (intPin == -1) return; // Should raise some kind of "bad pin" error.
   
