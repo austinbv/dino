@@ -21,7 +21,7 @@ module Dino
             io.waitfor("\n") do |text|
               @read_buffer += text
               while line = @read_buffer.slice!(/^.*\n/) do
-                pin, message = line.chop.split(/::/)
+                pin, message = line.chomp.split(/::/)
                 pin && message && changed && notify_observers(pin, message)
               end
             end
