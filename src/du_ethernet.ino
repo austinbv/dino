@@ -9,24 +9,28 @@ int port = 80;
 
 Dino dino;
 EthernetServer server(port);
-// String url = "";
 char request[8];
+char c;
 int index = 0;
 String response = "";
 
+
 void setup() {
+  // Explicitly disable the SD card.
+  pinMode(4,OUTPUT);
+  digitalWrite(4,HIGH);
+  
   // Start up the network connection and server.
   Ethernet.begin(mac, ip);
   server.begin();
-  
+    
   // Start serial for debugging.
   Serial.begin(115200);
-  Serial.print("Dino TCP client started at ");
+  Serial.print("Dino::TCP started at ");
   Serial.print(Ethernet.localIP());
   Serial.print(" on port ");
   Serial.println(port);
 }
-
 
 
 void loop() {
@@ -39,7 +43,7 @@ void loop() {
     response = "";
     while (client.connected()) {
       if (client.available()) {
-        char c = client.read();
+        c = client.read();
         
         // Reset the request and response when the beginning delimiter is received.
         if (c == '!') {
