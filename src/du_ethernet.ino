@@ -9,11 +9,11 @@ int port = 80;
 
 Dino dino;
 EthernetServer server(port);
-char request[8];
 char c;
 int index = 0;
-String response = "";
-
+char request[8];
+char response[9];
+char listenerResponses[22][9];
 
 void setup() {
   // Explicitly disable the SD card.
@@ -40,20 +40,21 @@ void loop() {
   // Handle a connection.
   if (client) {
     index = 0;
-    response = "";
+    strcpy(response, "");
+    
     while (client.connected()) {
-      if (client.available()) {
+      while (client.available()) {
         c = client.read();
         
         // Reset the request and response when the beginning delimiter is received.
         if (c == '!') {
           index = 0;
-          response = "";
+          strcpy(response, "");
         }
         
         // Catch the request's ending delimiter and process the request.
         else if (c == '.') {
-          dino.process(request, &response);
+          dino.process(request, response);
           if(response != "") client.println(response);
         }
 

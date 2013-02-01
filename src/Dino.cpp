@@ -1,20 +1,24 @@
+/*
+  Library for dino ruby gem.
+*/
+
 #include "Arduino.h"
 #include "Dino.h"
 
 Dino::Dino(){
-  debug: false;
+  reset();
 }
 
-// Deal with a single request.
-void Dino::process(char *request, String *loopResponse) {
+
+void Dino::process(char* request, char* loopResponse) {
   
-  // Reset the instance variable.
-  response = "";
+  // Reset the response.
+  strcpy(response, "");
   
   // Parse the request.
-  strncpy(cmd, request, 2);      cmd[2] = '\0';
-  strncpy(pin, request + 2, 2);  pin[2] = '\0';
-  strncpy(val, request + 4, 3);  val[3] = '\0';
+  strncpy(cmd, request, 2);         cmd[2] =    '\0';
+  strncpy(pinStr, request + 2, 2);  pinStr[2] = '\0';
+  strncpy(val, request + 4, 3);     val[3] =    '\0';
   
   // Serial.println(cmd);
   // Serial.println(pin);
@@ -22,97 +26,185 @@ void Dino::process(char *request, String *loopResponse) {
   // if (debug) Serial.println(request);
   
   convertPin();
-  if (intPin == -1) return; // Should raise some kind of "bad pin" error.
+  if (pin == -1) return; // Should raise some kind of "bad pin" error.
   
   int cmdid = atoi(cmd);
   switch(cmdid) {
-    case 0:  setMode    ();  break;
-    case 1:  dWrite     ();  break;
-    case 2:  dRead      ();  break;
-    case 3:  aWrite     ();  break;
-    case 4:  aRead      ();  break;
-    case 99: toggleDebug();  break;
-    default:                 break;
+    case 0:  setMode             ();  break;
+    case 1:  dWrite              ();  break;
+    case 2:  dRead               ();  break;
+    case 3:  aWrite              ();  break;
+    case 4:  aRead               ();  break;
+    case 10: addDigitalListener  ();  break;
+    case 11: addAnalogListener   ();  break;
+    case 12: removeListener      ();  break;
+    case 90: reset               ();  break;
+    case 98: setHeartRate        ();  break;
+    case 99: toggleDebug         ();  break;
+    default:                          break;
   }
   
-  // Write the instance variable back to the global for the main loop to catch.
-  *loopResponse = response;
+  // Write local response back to the global var for main loop to handle.
+  strcpy(loopResponse, response);
+}
+
+
+int Dino::updateListeners(char* responses) {
+  int count = 0;
+
+  // Update digital listeners.
+  for (int i = 0; i < 22; i++) {
+    if (digitalListeners[i]) {
+      pin = i;
+      dRead();
+      strcpy((responses + (count * 9)), response);;
+      count++;
+    }
+  }
+
+  // Update analog listeners.
+  for (int i = 0; i < 8; i++) {
+    if (analogListeners[i] != 0) {
+      pin = analogListeners[i]; pinStr[0] = 'A';
+      pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
+      aRead();
+      strcpy((responses + (count * 9)), response);
+      count++;
+    }
+  }
+ 
+  return count;
 }
 
 
 
-// Set pin mode.
+// CMD = 00 // Pin Mode
 void Dino::setMode() {
   if (atoi(val) == 0) {
-    pinMode(intPin, OUTPUT);
+    pinMode(pin, OUTPUT);
   } else {
-    pinMode(intPin, INPUT);
+    pinMode(pin, INPUT);
   }
 }
 
-
-
-// Basic reads and writes.
+// CMD = 01 // Digital Write
 void Dino::dWrite() {
-  pinMode(intPin, OUTPUT);
+  removeListener();
+  pinMode(pin, OUTPUT);
   if (atoi(val) == 0) {
-    digitalWrite(intPin, LOW);
+    digitalWrite(pin, LOW);
   } else {
-    digitalWrite(intPin, HIGH);
+    digitalWrite(pin, HIGH);
   }
 }
+
+// CMD = 02 // Digital Read
 void Dino::dRead() { 
-  pinMode(intPin, INPUT);
-  int oraw = digitalRead(intPin);
-  char m[7];
-  sprintf(m, "%02d::%02d", intPin, oraw);
-  response = m;
-}
-void Dino::aWrite() {
-  pinMode(intPin, OUTPUT);
-  analogWrite(intPin,atoi(val));
-}
-void Dino::aRead() {
-  pinMode(intPin, INPUT);
-  int rval = analogRead(intPin);
+  pinMode(pin, INPUT);
+  int oraw = digitalRead(pin);
   char m[8];
-  sprintf(m, "%s::%03d", pin, rval); // Send response with 'A0' formatting, not integer, so pin and not intPin.
-  response = m;
+  if (analogPin) {
+    sprintf(response, "%s::%02d", pinStr, oraw);
+  } else {
+    sprintf(response, "%02d::%02d", pin, oraw);
+  }
+}
+
+// CMD = 03 // Analog (PWM) Write
+void Dino::aWrite() {
+  removeListener();
+  pinMode(pin, OUTPUT);
+  analogWrite(pin,atoi(val));
+}
+
+// CMD = 04 // Analog Read
+void Dino::aRead() {
+  pinMode(pin, INPUT);
+  int rval = analogRead(pin);
+  char m[8];
+  sprintf(response, "%s::%03d", pinStr, rval);  // Send response with 'A0' formatting, not raw pin number, so pinStr not pin.
 }
 
 
+// CMD = 10
+// Listen for a digital signal on any pin.
+void Dino::addDigitalListener() {
+  if (analogPin) {
+    int index = atoi(&pinStr[1]);
+    analogListeners[index] = 0; // Disable existing analog listener if any.
+  }
+  digitalListeners[pin] = true;
+}
 
-// Toggle debug mode
+// CMD = 11
+// Listen for an analog signal on analog pins only.
+void Dino::addAnalogListener() {
+  if (analogPin) {
+    int index = atoi(&pinStr[1]);
+    analogListeners[index] = pin;
+  }
+}
+
+// CMD = 12
+// Remove analog and digital listeners from any pin.
+void Dino::removeListener() {
+  if (analogPin) {
+    int index = atoi(&pinStr[1]);
+    analogListeners[index] = 0;
+  }
+  digitalListeners[pin] = false;
+}
+
+
+// CMD = 90
+void Dino::reset() {
+  debug = false;
+  heartRate = 5; // Default heart rate is 5ms.
+  for (int i = 0; i < 14; i++) digitalListeners[i] = false;
+  for (int i = 0; i < 8; i++)  analogListeners[i] = false;
+}
+
+// CMD = 98
+// Set the heart rate in milliseconds.
+void Dino::setHeartRate() {
+  heartRate = atoi(val);
+}
+
+// CMD = 99
 void Dino::toggleDebug() {
   if (atoi(val) == 0) {
     debug = false;
-    response = "Debugging disabled.";
+    strcpy(response, "Debug 0");
   } else {
     debug = true;
-    response = "Debugging enabled.";
+    strcpy(response, "Debug 1");
   }
 }
 
 
 
-// Converts to A0-A5, and returns -1 on error.
+// Convert the pin received in stringy form to a raw pin as an integer.
+// pin is -1 on error.
 void Dino::convertPin() {
-  intPin = -1;
-  if(pin[0] == 'A' || pin[0] == 'a') {
-    switch(pin[1]) {
-      case '0':  intPin = A0; break;
-      case '1':  intPin = A1; break;
-      case '2':  intPin = A2; break;
-      case '3':  intPin = A3; break;
-      case '4':  intPin = A4; break;
-      case '5':  intPin = A5; break;
-      default:                break;
+  pin = -1;
+  if(pinStr[0] == 'A' || pinStr[0] == 'a') {
+    analogPin = true;
+    switch(pinStr[1]) {
+      case '0':  pin = A0; break;
+      case '1':  pin = A1; break;
+      case '2':  pin = A2; break;
+      case '3':  pin = A3; break;
+      case '4':  pin = A4; break;
+      case '5':  pin = A5; break;
+      case '6':  pin = A6; break;
+      case '7':  pin = A7; break;
+      default:             break;
     }
   } else {
-    intPin = atoi(pin);
-    if(intPin == 0 && (pin[0] != '0' || pin[1] != '0')) {
-      intPin = -1;
+    analogPin = false;
+    pin = atoi(pinStr);
+    if(pin == 0 && (pinStr[0] != '0' || pinStr[1] != '0')) {
+      pin = -1;
     }
   }
 }
-
