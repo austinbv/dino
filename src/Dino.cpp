@@ -189,17 +189,8 @@ void Dino::convertPin() {
   pin = -1;
   if(pinStr[0] == 'A' || pinStr[0] == 'a') {
     analogPin = true;
-    switch(pinStr[1]) {
-      case '0':  pin = A0; break;
-      case '1':  pin = A1; break;
-      case '2':  pin = A2; break;
-      case '3':  pin = A3; break;
-      case '4':  pin = A4; break;
-      case '5':  pin = A5; break;
-      case '6':  pin = A6; break;
-      case '7':  pin = A7; break;
-      default:             break;
-    }
+    int analogPin0 = A0;
+    pin = analogPin0 + atoi(&pinStr[1]);
   } else {
     analogPin = false;
     pin = atoi(pinStr);
