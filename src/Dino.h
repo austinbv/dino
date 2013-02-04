@@ -10,10 +10,12 @@ class Dino {
   public:
     Dino();
     bool debug;
-    void process(char* request, char* loopResponse);
-    void updateListeners(char* responses);
+    void process(char* request);
+    void updateListeners();
     boolean updateReady();
     int listenerCount;
+    char responses[22][9];
+    int responseCount;
 
   private:
     // Heartbeat timing.

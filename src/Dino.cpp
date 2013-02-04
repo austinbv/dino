@@ -10,10 +10,11 @@ Dino::Dino(){
 }
 
 
-void Dino::process(char* request, char* loopResponse) {
+void Dino::process(char* request) {
   
-  // Reset the response.
-  strcpy(response, "");
+  // Reset the response and count.
+  response[0] = '\0';
+  responseCount = 0;
   
   // Parse the request.
   strncpy(cmd, request, 2);         cmd[2] =    '\0';
@@ -44,21 +45,24 @@ void Dino::process(char* request, char* loopResponse) {
     default:                          break;
   }
   
-  // Write local response back to the global var for main loop to handle.
-  strcpy(loopResponse, response);
+  // Let the main loop know there's 1 response.
+  if (response[0] != '\0') {
+    strcpy(responses[0], response);
+    responseCount = 1;
+  }
 }
 
 
-void Dino::updateListeners(char* responses) {
-  int count = 0;
+void Dino::updateListeners() {
+  responseCount = 0;
 
   // Update digital listeners.
   for (int i = 0; i < 22; i++) {
     if (digitalListeners[i]) {
       pin = i;
       dRead();
-      strcpy((responses + (count * 9)), response);;
-      count++;
+      strcpy(responses[responseCount], response);
+      responseCount++;
     }
   }
 
@@ -68,11 +72,11 @@ void Dino::updateListeners(char* responses) {
       pin = analogListeners[i]; pinStr[0] = 'A';
       pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
       aRead();
-      strcpy((responses + (count * 9)), response);
-      count++;
+      strcpy(responses[responseCount], response);
+      responseCount++;
     }
   }
- 
+  
   lastUpdate = millis();
 }
 
