@@ -12,8 +12,6 @@ EthernetServer server(port);
 char c;
 int index = 0;
 char request[8];
-char response[9];
-char listenerResponses[22][9];
 
 void setup() {
   // Explicitly disable the SD card.
@@ -38,10 +36,7 @@ void loop() {
   EthernetClient client = server.available();
 
   // Handle a connection.
-  if (client) {
-    index = 0;
-    strcpy(response, "");
-    
+  if (client) {   
     while (client.connected()) {
       while (client.available()) {
         c = client.read();
@@ -49,13 +44,14 @@ void loop() {
         // Reset the request and response when the beginning delimiter is received.
         if (c == '!') {
           index = 0;
-          strcpy(response, "");
         }
         
         // Catch the request's ending delimiter and process the request.
         else if (c == '.') {
-          dino.process(request, response);
-          if(response != "") client.println(response);
+          dino.process(request);
+          for (int i = 0; i < dino.responseCount; i++) {
+            client.println(dino.responses[i]);
+          }
         }
 
         else request[index++] = c;
@@ -64,3 +60,4 @@ void loop() {
     client.stop();
   }
 }
+
