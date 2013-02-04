@@ -73,7 +73,13 @@ int Dino::updateListeners(char* responses) {
     }
   }
  
+  lastUpdate = millis();
   return count;
+}
+
+
+boolean Dino::updateReady() {
+ if (millis() > (lastUpdate + heartRate) && heartRate > 0) return true;
 }
 
 
@@ -162,12 +168,15 @@ void Dino::reset() {
   heartRate = 5; // Default heart rate is 5ms.
   for (int i = 0; i < 14; i++) digitalListeners[i] = false;
   for (int i = 0; i < 8; i++)  analogListeners[i] = false;
+  lastUpdate = millis();
 }
 
 // CMD = 98
-// Set the heart rate in milliseconds.
+// Set the heart rate in milliseconds. Min = 5ms.
 void Dino::setHeartRate() {
-  heartRate = atoi(val);
+  int rate = atoi(val);
+  if (rate < 5 && rate !=0) rate = 5;
+  heartRate = rate;
 }
 
 // CMD = 99

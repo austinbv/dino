@@ -10,11 +10,15 @@ class Dino {
   public:
     Dino();
     bool debug;
-    int heartRate;
     void process(char* request, char* loopResponse);
     int updateListeners(char* responses);
-    
+    boolean updateReady();
+
   private:
+    // Heartbeat timing.
+    long lastUpdate;
+    long heartRate;
+    
     // Storage for enough analog and digital listeners for UNO or Nano board.
     // Analogs correspond to pins A0 through A7 by array index, and store raw pin number as int. 0 == disabled.
     // Digitals correspond to raw pin number by array index, and store boolean. false == disabled.

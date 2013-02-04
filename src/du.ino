@@ -30,14 +30,11 @@ void loop() {
     else request[index++] = c;
   }
   
-  /*
-  // Wait for the heartbeat interval.
-  delay(dino.heartRate);
-
-  // Get responses for all listeners to and write to serial.
-  int responseCount = dino.updateListeners(*listenerResponses);
-  for (int i = 0; i < responseCount; i++) {
-    Serial.println(listenerResponses[i]);
+  // Update listeners if it's time.
+  if (dino.updateReady()) {
+    int responseCount = dino.updateListeners(*listenerResponses);
+    for (int i = 0; i < responseCount; i++) {
+      Serial.println(listenerResponses[i]);
+    }
   }
-  */
 }
