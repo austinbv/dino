@@ -11,8 +11,9 @@ class Dino {
     Dino();
     bool debug;
     void process(char* request, char* loopResponse);
-    int updateListeners(char* responses);
+    void updateListeners(char* responses);
     boolean updateReady();
+    int listenerCount;
 
   private:
     // Heartbeat timing.
@@ -52,6 +53,7 @@ class Dino {
     
     // Internal functions.
     void convertPin     ();
+    void countListeners ();
 };
 
 #endif

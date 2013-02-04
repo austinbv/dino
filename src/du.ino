@@ -32,8 +32,8 @@ void loop() {
   
   // Update listeners if it's time.
   if (dino.updateReady()) {
-    int responseCount = dino.updateListeners(*listenerResponses);
-    for (int i = 0; i < responseCount; i++) {
+    dino.updateListeners(*listenerResponses);
+    for (int i = 0; i < dino.listenerCount; i++) {
       Serial.println(listenerResponses[i]);
     }
   }

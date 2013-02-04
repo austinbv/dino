@@ -49,7 +49,7 @@ void Dino::process(char* request, char* loopResponse) {
 }
 
 
-int Dino::updateListeners(char* responses) {
+void Dino::updateListeners(char* responses) {
   int count = 0;
 
   // Update digital listeners.
@@ -74,12 +74,25 @@ int Dino::updateListeners(char* responses) {
   }
  
   lastUpdate = millis();
-  return count;
+}
+
+void Dino::countListeners() {
+  listenerCount = 0;
+  for (int i = 0; i < 22; i++) {
+    if (digitalListeners[i]) listenerCount++;
+  }
+  for (int i = 0; i < 8; i++) {
+    if (analogListeners[i] != 0) listenerCount++;
+  }
 }
 
 
 boolean Dino::updateReady() {
- if (millis() > (lastUpdate + heartRate) && heartRate > 0) return true;
+ if (listenerCount > 0 && millis() > (lastUpdate + heartRate)) {
+   return true;
+ } else {
+   return false;
+ }
 }
 
 
@@ -140,6 +153,7 @@ void Dino::addDigitalListener() {
     analogListeners[index] = 0; // Disable existing analog listener if any.
   }
   digitalListeners[pin] = true;
+  countListeners();
 }
 
 // CMD = 11
@@ -149,6 +163,7 @@ void Dino::addAnalogListener() {
     int index = atoi(&pinStr[1]);
     analogListeners[index] = pin;
   }
+  countListeners();
 }
 
 // CMD = 12
@@ -159,6 +174,7 @@ void Dino::removeListener() {
     analogListeners[index] = 0;
   }
   digitalListeners[pin] = false;
+  countListeners();
 }
 
 
@@ -168,6 +184,7 @@ void Dino::reset() {
   heartRate = 5; // Default heart rate is 5ms.
   for (int i = 0; i < 14; i++) digitalListeners[i] = false;
   for (int i = 0; i < 8; i++)  analogListeners[i] = false;
+  listenerCount = 0;
   lastUpdate = millis();
 }
 
