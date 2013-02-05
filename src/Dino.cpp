@@ -61,8 +61,11 @@ void Dino::updateListeners() {
     if (digitalListeners[i]) {
       pin = i;
       dRead();
-      strcpy(responses[responseCount], response);
-      responseCount++;
+      if (rval != digitalListenerValues[i]) {
+        digitalListenerValues[i] = rval;
+        strcpy(responses[responseCount], response);
+        responseCount++;
+      } 
     }
   }
 
@@ -124,12 +127,11 @@ void Dino::dWrite() {
 // CMD = 02 // Digital Read
 void Dino::dRead() { 
   pinMode(pin, INPUT);
-  int oraw = digitalRead(pin);
-  char m[8];
+  rval = digitalRead(pin);
   if (analogPin) {
-    sprintf(response, "%s::%02d", pinStr, oraw);
+    sprintf(response, "%s::%02d", pinStr, rval);
   } else {
-    sprintf(response, "%02d::%02d", pin, oraw);
+    sprintf(response, "%02d::%02d", pin, rval);
   }
 }
 
@@ -143,8 +145,7 @@ void Dino::aWrite() {
 // CMD = 04 // Analog Read
 void Dino::aRead() {
   pinMode(pin, INPUT);
-  int rval = analogRead(pin);
-  char m[8];
+  rval = analogRead(pin);
   sprintf(response, "%s::%03d", pinStr, rval);  // Send response with 'A0' formatting, not raw pin number, so pinStr not pin.
 }
 
@@ -152,17 +153,16 @@ void Dino::aRead() {
 // CMD = 10
 // Listen for a digital signal on any pin.
 void Dino::addDigitalListener() {
-  if (analogPin) {
-    int index = atoi(&pinStr[1]);
-    analogListeners[index] = 0; // Disable existing analog listener if any.
-  }
+  removeListener();
   digitalListeners[pin] = true;
+  digitalListenerValues[pin] = 2;
   countListeners();
 }
 
 // CMD = 11
 // Listen for an analog signal on analog pins only.
 void Dino::addAnalogListener() {
+  removeListener();
   if (analogPin) {
     int index = atoi(&pinStr[1]);
     analogListeners[index] = pin;
@@ -186,8 +186,9 @@ void Dino::removeListener() {
 void Dino::reset() {
   debug = false;
   heartRate = 5; // Default heart rate is 5ms.
-  for (int i = 0; i < 14; i++) digitalListeners[i] = false;
-  for (int i = 0; i < 8; i++)  analogListeners[i] = false;
+  for (int i = 0; i < 22; i++) digitalListeners[i] = false;
+  for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
+  for (int i = 0; i < 8; i++)  analogListeners[i] = 0;
   listenerCount = 0;
   lastUpdate = millis();
 }
