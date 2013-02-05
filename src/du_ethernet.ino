@@ -9,9 +9,14 @@ int port = 80;
 
 Dino dino;
 EthernetServer server(port);
+EthernetClient client;
 char c;
 int index = 0;
 char request[8];
+
+// Dino.h doesn't handle TXRX. Setup a function to tell it to write to the TCP socket.
+void writeResponse(char *response) { Serial.println(response); client.println(response); }
+void (*writeCallback)(char *str) = writeResponse;
 
 void setup() {
   // Explicitly disable the SD card.
@@ -28,34 +33,25 @@ void setup() {
   Serial.print(Ethernet.localIP());
   Serial.print(" on port ");
   Serial.println(port);
+  
+  // Attach the write callback.
+  dino.setupWrite(writeCallback);                  
 }
-
 
 void loop() {
   // Listen for connections.
-  EthernetClient client = server.available();
-
+  client = server.available();
+  
   // Handle a connection.
-  if (client) {   
+  if (client) {
     while (client.connected()) {
       while (client.available()) {
         c = client.read();
-        
-        // Reset the request and response when the beginning delimiter is received.
-        if (c == '!') {
-          index = 0;
-        }
-        
-        // Catch the request's ending delimiter and process the request.
-        else if (c == '.') {
-          dino.process(request);
-          for (int i = 0; i < dino.responseCount; i++) {
-            client.println(dino.responses[i]);
-          }
-        }
-
-        else request[index++] = c;
+        if (c == '!') index = 0;                     // Reset request
+        else if (c == '.') dino.process(request);    // End request and process
+        else request[index++] = c;                   // Append to request
       }
+      if (dino.updateReady()) dino.updateListeners();
     }
     client.stop();
   }
