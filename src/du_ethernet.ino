@@ -15,7 +15,7 @@ int index = 0;
 char request[8];
 
 // Dino.h doesn't handle TXRX. Setup a function to tell it to write to the TCP socket.
-void writeResponse(char *response) { Serial.println(response); client.println(response); }
+void writeResponse(char *response) { client.println(response); }
 void (*writeCallback)(char *str) = writeResponse;
 
 void setup() {
