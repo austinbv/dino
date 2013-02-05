@@ -1,41 +1,26 @@
 #include "Dino.h"
-
 Dino dino;
 char c;
 int index = 0;
 char request[8];
 
+// Dino.h doesn't handle TXRX. Setup a function to tell it to write to Serial.
+void writeResponse(char *response) { Serial.println(response); }
+void (*writeCallback)(char *str) = writeResponse;
+
 void setup() {
   Serial.begin(115200);
+  dino.setupWrite(writeCallback);                // Attach the callback so Dino can write
 }
 
 void loop() {
   while(Serial.available() > 0) {
     c = Serial.read();
-
-    // Reset request when the beginning delimiter is received.
-    if (c == '!') {
-      index = 0;
-    } 
-    
-    // Catch the request's ending delimiter and process the request.
-    else if (c == '.') {
-      dino.process(request);
-      writeResponses();
-    }
-       
-    else request[index++] = c;
+    if (c == '!') index = 0;                     // Reset request
+    else if (c == '.') dino.process(request);    // End request and process
+    else request[index++] = c;                   // Append to request
   }
   
-  // Update listeners if it's time.
-  if (dino.updateReady()) {
-    dino.updateListeners();
-    writeResponses();
-  }
+  if (dino.updateReady()) dino.updateListeners();
 }
 
-void writeResponses() {
-  for (int i = 0; i < dino.responseCount; i++) {
-    Serial.println(dino.responses[i]);
-  }
-}

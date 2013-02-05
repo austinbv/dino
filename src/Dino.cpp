@@ -12,10 +12,9 @@ Dino::Dino(){
 
 void Dino::process(char* request) {
   
-  // Reset the response and count.
+  // Default response.
   response[0] = '\0';
-  responseCount = 0;
-  
+
   // Parse the request.
   strncpy(cmd, request, 2);         cmd[2] =    '\0';
   strncpy(pinStr, request + 2, 2);  pinStr[2] = '\0';
@@ -45,17 +44,17 @@ void Dino::process(char* request) {
     default:                          break;
   }
   
-  // Let the main loop know there's 1 response.
-  if (response[0] != '\0') {
-    strcpy(responses[0], response);
-    responseCount = 1;
-  }
+  if (response[0] != '\0') writeResponse();
 }
 
+void Dino::setupWrite(void (* writeCallback)(char *str)) {
+  _writeCallback = writeCallback;
+}
+void Dino::writeResponse() {
+  _writeCallback(response);
+}
 
 void Dino::updateListeners() {
-  responseCount = 0;
-
   // Update digital listeners.
   for (int i = 0; i < 22; i++) {
     if (digitalListeners[i]) {
@@ -63,8 +62,7 @@ void Dino::updateListeners() {
       dRead();
       if (rval != digitalListenerValues[i]) {
         digitalListenerValues[i] = rval;
-        strcpy(responses[responseCount], response);
-        responseCount++;
+        writeResponse();
       } 
     }
   }
@@ -75,8 +73,7 @@ void Dino::updateListeners() {
       pin = analogListeners[i]; pinStr[0] = 'A';
       pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
       aRead();
-      strcpy(responses[responseCount], response);
-      responseCount++;
+      writeResponse();
     }
   }
   
@@ -92,7 +89,6 @@ void Dino::countListeners() {
     if (analogListeners[i] != 0) listenerCount++;
   }
 }
-
 
 boolean Dino::updateReady() {
  if (listenerCount > 0 && millis() > (lastUpdate + heartRate)) {

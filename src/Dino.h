@@ -10,37 +10,39 @@ class Dino {
   public:
     Dino();
     bool debug;
-    void process(char* request);
+    void setupWrite(void (*writeCallback)(char *str));
+    void process(char *request);
     void updateListeners();
     boolean updateReady();
-    int listenerCount;
-    char responses[22][9];
-    int responseCount;
-
+    byte listenerCount;
+    
   private:
     // Heartbeat timing.
     long lastUpdate;
     long heartRate;
     
     // Storage for enough analog and digital listeners for UNO or Nano board.
-    // Analogs correspond to pins A0 through A7 by array index, and store raw pin number as int. 0 == disabled.
+    // Analogs correspond to pins A0 through A7 by array index, and store raw pin number as byte. 0 == disabled.
     // Digitals correspond to raw pin number by array index, and store boolean. false == disabled.
     // Analog pins can be listened to for a digital signal, hence 22.
     byte analogListeners[8];
     boolean digitalListeners[22];
+    
+    // Keep track of the last read values for digital listeners. Only write responses when changed.
     byte digitalListenerValues[22];
-    int rval;
-  
-    // Storage for a single request after parsing.
+    
+    // Storage for a single parsed request and read value.
     char cmd[3];
     char pinStr[3];
-    int  pin;
+    byte pin;
     boolean analogPin;
     char val[4];
+    int rval;
     
-    // Storage for a single response.
-    // process() and updateListeners() are responsible for passing this to the main loop as needed.
+    // Storage for a single response, the write callback function, and a convenience method.
     char response[9];
+    void (*_writeCallback)(char *str);
+    void writeResponse();
 
     // API-accessible functions.
     void setMode               ();
