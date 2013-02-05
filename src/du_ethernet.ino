@@ -51,7 +51,7 @@ void loop() {
         else if (c == '.') dino.process(request);    // End request and process
         else request[index++] = c;                   // Append to request
       }
-      if (dino.updateReady()) dino.updateListeners();
+      dino.updateListeners();
     }
     client.stop();
   }

@@ -21,6 +21,6 @@ void loop() {
     else request[index++] = c;                   // Append to request
   }
   
-  if (dino.updateReady()) dino.updateListeners();
+  dino.updateListeners();
 }
 

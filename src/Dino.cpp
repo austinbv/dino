@@ -47,6 +47,7 @@ void Dino::process(char* request) {
   if (response[0] != '\0') writeResponse();
 }
 
+
 void Dino::setupWrite(void (* writeCallback)(char *str)) {
   _writeCallback = writeCallback;
 }
@@ -54,48 +55,47 @@ void Dino::writeResponse() {
   _writeCallback(response);
 }
 
+
 void Dino::updateListeners() {
-  // Update digital listeners.
-  for (int i = 0; i < 22; i++) {
-    if (digitalListeners[i]) {
-      pin = i;
-      dRead();
-      if (rval != digitalListenerValues[i]) {
-        digitalListenerValues[i] = rval;
+  if (listenerCount > 0) {
+    updateDigitalListeners();
+    updateAnalogListeners();
+  }
+}
+
+void Dino::updateDigitalListeners() {
+  if (timeSince(lastDigitalUpdate) > 5 || timeSince(lastDigitalUpdate) < 0) {
+    for (int i = 0; i < 22; i++) {
+      if (digitalListeners[i]) {
+        pin = i;
+        dRead();
+        if (rval != digitalListenerValues[i]) {
+          digitalListenerValues[i] = rval;
+          writeResponse();
+        } 
+      }
+    }
+    lastDigitalUpdate = millis();
+  }
+}
+
+void Dino::updateAnalogListeners() {
+  if (timeSince(lastAnalogUpdate) > heartRate || timeSince(lastAnalogUpdate) < 0) {  
+    for (int i = 0; i < 8; i++) {
+      if (analogListeners[i] != 0) {
+        pin = analogListeners[i]; pinStr[0] = 'A';
+        pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
+        aRead();
         writeResponse();
-      } 
+      }
     }
-  }
-
-  // Update analog listeners.
-  for (int i = 0; i < 8; i++) {
-    if (analogListeners[i] != 0) {
-      pin = analogListeners[i]; pinStr[0] = 'A';
-      pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
-      aRead();
-      writeResponse();
-    }
-  }
-  
-  lastUpdate = millis();
-}
-
-void Dino::countListeners() {
-  listenerCount = 0;
-  for (int i = 0; i < 22; i++) {
-    if (digitalListeners[i]) listenerCount++;
-  }
-  for (int i = 0; i < 8; i++) {
-    if (analogListeners[i] != 0) listenerCount++;
+    lastAnalogUpdate = millis();
   }
 }
 
-boolean Dino::updateReady() {
- if (listenerCount > 0 && millis() > (lastUpdate + heartRate)) {
-   return true;
- } else {
-   return false;
- }
+long Dino::timeSince(long event) {
+ long time = millis() - event;
+ return time;
 }
 
 
@@ -177,6 +177,16 @@ void Dino::removeListener() {
   countListeners();
 }
 
+void Dino::countListeners() {
+  listenerCount = 0;
+  for (int i = 0; i < 22; i++) {
+    if (digitalListeners[i]) listenerCount++;
+  }
+  for (int i = 0; i < 8; i++) {
+    if (analogListeners[i] != 0) listenerCount++;
+  }
+}
+
 
 // CMD = 90
 void Dino::reset() {
@@ -186,7 +196,8 @@ void Dino::reset() {
   for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
   for (int i = 0; i < 8; i++)  analogListeners[i] = 0;
   listenerCount = 0;
-  lastUpdate = millis();
+  lastDigitalUpdate = millis();
+  lastAnalogUpdate = millis();
 }
 
 // CMD = 98

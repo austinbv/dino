@@ -13,12 +13,12 @@ class Dino {
     void setupWrite(void (*writeCallback)(char *str));
     void process(char *request);
     void updateListeners();
-    boolean updateReady();
     byte listenerCount;
     
   private:
     // Heartbeat timing.
-    long lastUpdate;
+    long lastDigitalUpdate;
+    long lastAnalogUpdate;
     long heartRate;
     
     // Storage for enough analog and digital listeners for UNO or Nano board.
@@ -58,8 +58,11 @@ class Dino {
     void removeListener        ();
     
     // Internal functions.
-    void convertPin     ();
-    void countListeners ();
+    void convertPin             ();
+    void countListeners         ();
+    long timeSince              (long event);
+    void updateDigitalListeners ();
+    void updateAnalogListeners  ();
 };
 
 #endif
