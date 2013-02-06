@@ -11,7 +11,8 @@ class Dino {
     Dino();
     bool debug;
     void setupWrite(void (*writeCallback)(char *str));
-    void process(char *request);
+    void parse(char c);
+    void process();
     void updateListeners();
     byte listenerCount;
     
@@ -31,15 +32,17 @@ class Dino {
     // Keep track of the last read values for digital listeners. Only write responses when changed.
     byte digitalListenerValues[22];
     
-    // Storage for a single parsed request and read value.
+    // Request storage.
+    char request[8];
+    int index;
     char cmd[3];
     char pinStr[3];
     byte pin;
     boolean analogPin;
     char val[4];
-    int rval;
     
-    // Storage for a single response, the write callback function, and a convenience method.
+    // Value and response storage.
+    int rval;
     char response[9];
     void (*_writeCallback)(char *str);
     void writeResponse();

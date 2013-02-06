@@ -10,9 +10,6 @@ int port = 80;
 Dino dino;
 EthernetServer server(port);
 EthernetClient client;
-char c;
-int index = 0;
-char request[8];
 
 // Dino.h doesn't handle TXRX. Setup a function to tell it to write to the TCP socket.
 void writeResponse(char *response) { client.println(response); }
@@ -45,12 +42,7 @@ void loop() {
   // Handle a connection.
   if (client) {
     while (client.connected()) {
-      while (client.available()) {
-        c = client.read();
-        if (c == '!') index = 0;                     // Reset request
-        else if (c == '.') dino.process(request);    // End request and process
-        else request[index++] = c;                   // Append to request
-      }
+      while (client.available()) dino.parse(client.read());
       dino.updateListeners();
     }
     client.stop();

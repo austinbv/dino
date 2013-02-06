@@ -9,8 +9,13 @@ Dino::Dino(){
   reset();
 }
 
+void Dino::parse(char c) {
+  if (c == '!') index = 0;        // Reset request
+  else if (c == '.') process();   // End request and process
+  else request[index++] = c;      // Append to request
+}
 
-void Dino::process(char* request) {
+void Dino::process() {
   
   // Default response.
   response[0] = '\0';
@@ -48,7 +53,7 @@ void Dino::process(char* request) {
 }
 
 
-void Dino::setupWrite(void (* writeCallback)(char *str)) {
+void Dino::setupWrite(void (*writeCallback)(char *str)) {
   _writeCallback = writeCallback;
 }
 void Dino::writeResponse() {
@@ -198,6 +203,7 @@ void Dino::reset() {
   listenerCount = 0;
   lastDigitalUpdate = millis();
   lastAnalogUpdate = millis();
+  index = 0;
 }
 
 // CMD = 98
