@@ -31,6 +31,36 @@ module Dino
         analog_write(Board::LOW, pins[:blue])
       end
 
+      def cyan
+        analog_write(Board::LOW,  pins[:red])
+        analog_write(Board::HIGH, pins[:green])
+        analog_write(Board::HIGH, pins[:blue])
+      end
+
+      def yellow
+        analog_write(Board::HIGH, pins[:red])
+        analog_write(Board::HIGH, pins[:green])
+        analog_write(Board::LOW,  pins[:blue])
+      end
+
+      def magenta
+        analog_write(Board::HIGH, pins[:red])
+        analog_write(Board::LOW,  pins[:green])
+        analog_write(Board::HIGH, pins[:blue])
+      end
+
+      def white
+        analog_write(Board::HIGH, pins[:red])
+        analog_write(Board::HIGH, pins[:green])
+        analog_write(Board::HIGH, pins[:blue])
+      end
+
+      def off
+        analog_write(Board::LOW,  pins[:red])
+        analog_write(Board::LOW,  pins[:green])
+        analog_write(Board::LOW,  pins[:blue])
+      end
+
       def blinky
         [:red, :green, :blue].cycle do |color|
           self.send(color)

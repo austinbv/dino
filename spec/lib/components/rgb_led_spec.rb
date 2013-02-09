@@ -64,6 +64,51 @@ module Dino
         end
       end
 
+      describe '#cyan' do
+        it 'should set blue and green to high, red to low' do
+          board.should_receive(:analog_write).with(1, Board::LOW)
+          board.should_receive(:analog_write).with(2, Board::HIGH)
+          board.should_receive(:analog_write).with(3, Board::HIGH)
+          rgb.cyan
+        end
+      end
+
+      describe '#yellow' do
+        it 'should set red and green to high, blue to low' do
+          board.should_receive(:analog_write).with(1, Board::HIGH)
+          board.should_receive(:analog_write).with(2, Board::HIGH)
+          board.should_receive(:analog_write).with(3, Board::LOW)
+          rgb.yellow
+        end
+      end
+
+      describe '#magenta' do
+        it 'should set red and blue to high, green to low' do
+          board.should_receive(:analog_write).with(1, Board::HIGH)
+          board.should_receive(:analog_write).with(2, Board::LOW)
+          board.should_receive(:analog_write).with(3, Board::HIGH)
+          rgb.magenta
+        end
+      end
+
+      describe '#white' do
+        it 'should set all to high' do
+          board.should_receive(:analog_write).with(1, Board::HIGH)
+          board.should_receive(:analog_write).with(2, Board::HIGH)
+          board.should_receive(:analog_write).with(3, Board::HIGH)
+          rgb.white
+        end
+      end
+
+      describe '#off' do
+        it 'should set all to low' do
+          board.should_receive(:analog_write).with(1, Board::LOW)
+          board.should_receive(:analog_write).with(2, Board::LOW)
+          board.should_receive(:analog_write).with(3, Board::LOW)
+          rgb.off
+        end
+      end
+
       describe '#blinky' do
         it 'should set blue to high, red and green to low' do
           Array.any_instance.should_receive(:cycle).and_yield(:red).and_yield(:green).and_yield(:blue)
