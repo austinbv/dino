@@ -13,52 +13,24 @@ module Dino
         end
       end
 
-      def blue
-        analog_write(Board::LOW, pins[:red])
-        analog_write(Board::LOW, pins[:green])
-        analog_write(Board::HIGH, pins[:blue])
-      end
+      # Format: [R, G, B]
+      COLORS = {
+        red:     [255, 000, 000],
+        green:   [000, 255, 000],
+        blue:    [000, 000, 255],
+        cyan:    [000, 255, 255],
+        yellow:  [255, 255, 000],
+        magenta: [255, 000, 255],
+        white:   [255, 255, 255],
+        off:     [000, 000, 000]
+      }
 
-      def red
-        analog_write(Board::HIGH, pins[:red])
-        analog_write(Board::LOW, pins[:green])
-        analog_write(Board::LOW, pins[:blue])
-      end
-
-      def green
-        analog_write(Board::LOW, pins[:red])
-        analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::LOW, pins[:blue])
-      end
-
-      def cyan
-        analog_write(Board::LOW,  pins[:red])
-        analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::HIGH, pins[:blue])
-      end
-
-      def yellow
-        analog_write(Board::HIGH, pins[:red])
-        analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::LOW,  pins[:blue])
-      end
-
-      def magenta
-        analog_write(Board::HIGH, pins[:red])
-        analog_write(Board::LOW,  pins[:green])
-        analog_write(Board::HIGH, pins[:blue])
-      end
-
-      def white
-        analog_write(Board::HIGH, pins[:red])
-        analog_write(Board::HIGH, pins[:green])
-        analog_write(Board::HIGH, pins[:blue])
-      end
-
-      def off
-        analog_write(Board::LOW,  pins[:red])
-        analog_write(Board::LOW,  pins[:green])
-        analog_write(Board::LOW,  pins[:blue])
+      COLORS.each_key do |color|
+        define_method(color) do
+          analog_write(COLORS[color][0],  pins[:red])
+          analog_write(COLORS[color][1],  pins[:green])
+          analog_write(COLORS[color][2],  pins[:blue])
+        end 
       end
 
       def blinky
