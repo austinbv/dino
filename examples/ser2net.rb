@@ -1,7 +1,8 @@
 #
-# Example showing how to access an Arduino over a telnet connection.
-# Running ser2net on the machine that the Arduino is connected to will serve up the serial interface over telnet.
+# Example showing how to access an Arduino over a ser2net connection.
+# Running ser2net on the machine with the Arduino will serve up the serial interface over the network interface.
 # You can then communicate with that Arduino over your local network or the Internet.
+# Note that we're using ser2net in raw mode so we can connect to it from Ruby with Dino::TxRx::TCP.
 # 
 # Example ser2net command for an Arduino UNO on Mac:
 # ser2net -u -C "9000:raw:0:/dev/cu.usbmodem621:115200"
@@ -18,7 +19,7 @@
 require File.expand_path('../../lib/dino', __FILE__)
 
 # The host and port for the telnet connection must be passed in as arguments.
-connection = Dino::TxRx::Telnet.new("localhost", 9000)
+connection = Dino::TxRx::TCP.new("localhost", 9000)
 board = Dino::Board.new(connection)
 led = Dino::Components::Led.new(pin: 13, board: board)
 
