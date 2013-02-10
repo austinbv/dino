@@ -1,11 +1,8 @@
 require 'serialport'
-require 'observer'
 
 module Dino
   module TxRx
-    class USBSerial
-      include Observable
-
+    class USBSerial < Base
       BAUD = 115200
 
       def initialize
@@ -21,22 +18,8 @@ module Dino
         @io = SerialPort.new(device, BAUD)
       end
 
-      def read
-        @thread ||= Thread.new do
-          loop do
-            if IO.select([io], nil, nil, 0.005)
-              pin, message = *io.gets.chop.split(/::/)
-              pin && message && changed && notify_observers(pin, message)
-            end
-            sleep 0.004
-          end
-        end
-      end
-
-      def close_read
-        return nil if @thread.nil?
-        Thread.kill(@thread)
-        @thread = nil
+      def gets
+        IO.select([io], nil, nil, 0.05) && io.gets
       end
 
       def write(message)

@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   describe Dino::Board do
     def io_mock(methods = {})
-      @io ||= mock(:io, {write: nil, add_observer: nil}.merge(methods))
+      @io ||= mock(:io, {write: nil, add_observer: nil, gets: "ACK\n"}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
@@ -20,16 +20,12 @@ module Dino
         subject.send(:initialize, io_mock)
       end
 
-      it 'should start the heart beat' do
-        io_mock.should_receive(:write).with('!0212000.')
-        subject.add_digital_hardware(mock(:part, pin: 12))
-        sleep 0.01
-      end
-
-      it 'should send clearing bytes to the io' do
-        io_mock.should_receive(:write).with("00000000")
+      it 'should initiate the handshake' do
+        io_mock.should_receive(:write).with("!9000000.")
         subject
       end
+
+      it 'should wait for acknowledgement'
     end
 
     describe '#update' do
@@ -87,9 +83,10 @@ module Dino
         subject.digital_hardware.should =~ [mock1, mock2]
       end
 
-      it 'should set the mode for the given pin to "in"' do
+      it 'should set the mode for the given pin to "in" and add a digital listener' do
         subject
-        subject.should_receive(:write).with("0012000")
+        subject.should_receive(:write).with("0012001")
+        subject.should_receive(:write).with("0512000")
         subject.add_digital_hardware(mock1 = mock(:part1, pin: 12))
       end
     end
@@ -110,9 +107,10 @@ module Dino
         subject.analog_hardware.should =~ [mock1, mock2]
       end
 
-      it 'should set the mode for the given pin to "in"' do
+      it 'should set the mode for the given pin to "in" and add an analog listener' do
         subject
-        subject.should_receive(:write).with("0012000")
+        subject.should_receive(:write).with("0012001")
+        subject.should_receive(:write).with("0612000")
         subject.add_analog_hardware(mock1 = mock(:part1, pin: 12))
       end
     end
@@ -167,7 +165,7 @@ module Dino
     end
 
     describe '#digital_read' do
-      it 'should tell the board to start reading from the given pin' do
+      it 'should tell the board to read once from the given pin' do
         io_mock.should_receive(:write).with('!0213000.')
         subject.digital_read(13)
       end
@@ -181,21 +179,49 @@ module Dino
     end
 
     describe '#analog_read' do
-      it 'should tell the board to start reading from the given pin' do
+      it 'should tell the board to read once from the given pin' do
         io_mock.should_receive(:write).with('!0413000.')
         subject.analog_read(13)
       end
     end
 
+    describe '#digital_listen' do
+      it 'should tell the board to continuously read from the given pin' do
+        io_mock.should_receive(:write).with('!0513000.')
+        subject.digital_listen(13)
+      end
+    end
+
+    describe '#analog_listen' do
+      it 'should tell the board to continuously read from the given pin' do
+        io_mock.should_receive(:write).with('!0613000.')
+        subject.analog_listen(13)
+      end
+    end
+
+    describe '#stop_listener' do
+      it 'should tell the board to stop sending values for the given pin' do
+        io_mock.should_receive(:write).with('!0713000.')
+        subject.stop_listener(13)
+      end
+    end
+
     describe '#set_pin_mode' do
-      it 'should send a value of 1 if the pin mode is set to out' do
-        io_mock.should_receive(:write).with('!0013001.')
+      it 'should send a value of 0 if the pin mode is set to out' do
+        io_mock.should_receive(:write).with('!0013000.')
         subject.set_pin_mode(13, :out)
       end
 
-      it 'should send a value of 0 if the pin mode is set to in' do
-        io_mock.should_receive(:write).with('!0013000.')
+      it 'should send a value of 1 if the pin mode is set to in' do
+        io_mock.should_receive(:write).with('!0013001.')
         subject.set_pin_mode(13, :in)
+      end
+    end
+
+    describe '#reset' do
+      it 'should tell the board to reset to defaults' do
+        io_mock.should_receive(:write).with('!0900000.')
+        subject.reset
       end
     end
 

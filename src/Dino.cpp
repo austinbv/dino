@@ -40,9 +40,9 @@ void Dino::process() {
     case 2:  dRead               ();  break;
     case 3:  aWrite              ();  break;
     case 4:  aRead               ();  break;
-    case 10: addDigitalListener  ();  break;
-    case 11: addAnalogListener   ();  break;
-    case 12: removeListener      ();  break;
+    case 5:  addDigitalListener  ();  break;
+    case 6:  addAnalogListener   ();  break;
+    case 7:  removeListener      ();  break;
     case 90: reset               ();  break;
     case 98: setHeartRate        ();  break;
     case 99: toggleDebug         ();  break;
@@ -204,6 +204,7 @@ void Dino::reset() {
   lastDigitalUpdate = millis();
   lastAnalogUpdate = millis();
   index = 0;
+  strcpy(response, "ACK");
 }
 
 // CMD = 98

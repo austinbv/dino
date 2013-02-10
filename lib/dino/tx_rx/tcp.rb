@@ -1,11 +1,8 @@
 require 'socket'
-require 'observer'
 
 module Dino
   module TxRx
-    class TCP
-      include Observable
-
+    class TCP < Base
       def initialize(host, port=80)
         @host, @port = host, port
       end
@@ -14,22 +11,8 @@ module Dino
         @io ||= connect
       end
 
-      def read
-        @thread ||= Thread.new do
-          loop do
-            while line = io.gets
-              pin, message = line.chomp.split(/::/)
-              pin && message && changed && notify_observers(pin, message)
-            end
-            sleep 0.004
-          end
-        end
-      end
-
-      def close_read
-        return nil if @thread.nil?
-        Thread.kill(@thread)
-        @thread = nil
+      def gets
+        io.gets
       end
 
       def write(message)
