@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   describe Dino::Board do
     def io_mock(methods = {})
-      @io ||= mock(:io, {write: nil, add_observer: nil, gets: "ACK\n"}.merge(methods))
+      @io ||= mock(:io, {write: nil, add_observer: nil, gets: "ACK\n", flush_read: nil}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
@@ -220,7 +220,7 @@ module Dino
 
     describe '#reset' do
       it 'should tell the board to reset to defaults' do
-        io_mock.should_receive(:write).with('!0900000.')
+        io_mock.should_receive(:write).with('!9000000.')
         subject.reset
       end
     end
