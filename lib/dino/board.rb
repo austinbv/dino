@@ -107,7 +107,7 @@ module Dino
     def handshake
       100.times do
         reset
-        sleep 0.05
+        sleep 0.045
         return @io.flush_read if @io.gets.to_s.chop.match /ACK/
       end
       raise BoardNotFound

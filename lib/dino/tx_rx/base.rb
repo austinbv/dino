@@ -15,7 +15,6 @@ module Dino
       end
 
       def flush_read
-        gets until gets == nil
       end
 
       def close_read
