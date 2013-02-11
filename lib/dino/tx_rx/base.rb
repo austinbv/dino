@@ -1,3 +1,4 @@
+require 'timeout'
 require 'observer'
 
 module Dino
@@ -12,9 +13,6 @@ module Dino
             pin && message && changed && notify_observers(pin, message)
           end
         end
-      end
-
-      def flush_read
       end
 
       def close_read

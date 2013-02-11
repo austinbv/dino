@@ -71,7 +71,7 @@ module Dino
         IO.should_receive(:select).and_return(true)
         Thread.should_receive(:new).and_yield
         subject.should_receive(:loop).and_yield
-        mock_serial.should_receive(:gets).and_return("foo::bar\n")
+        mock_serial.should_receive(:gets).and_return("foo:bar\n")
         subject.should_receive(:changed).and_return(true)
         subject.should_receive(:notify_observers).with('foo','bar')
 

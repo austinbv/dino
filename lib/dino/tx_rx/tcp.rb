@@ -15,6 +15,12 @@ module Dino
         io.gets
       end
 
+      def flush_read
+        loop do; Timeout::timeout(0.005) { gets } end
+      rescue
+        nil
+      end
+
       def write(message)
         io.write(message + "\r\n")
       end

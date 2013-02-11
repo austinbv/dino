@@ -1,3 +1,5 @@
+require 'timeout'
+
 module Dino
   class Board
     attr_reader :digital_hardware, :analog_hardware
@@ -105,12 +107,18 @@ module Dino
     end
 
     def handshake
-      100.times do
-        reset
-        sleep 0.045
-        return @io.flush_read if @io.gets.to_s.chop.match /ACK/
+      50.times do
+        begin
+          reset
+          Timeout::timeout(0.1) do 
+            return @io.flush_read if @io.gets.to_s.chop.match /ACK/
+          end
+        rescue
+          nil
+        end
       end
       raise BoardNotFound
     end
+
   end
 end
