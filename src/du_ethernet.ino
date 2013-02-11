@@ -3,7 +3,7 @@
 #include <Ethernet.h>
 
 // Configure your MAC address, IP address, and HTTP port here.
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };
 IPAddress ip(192,168,0,77);
 int port = 80;
 
@@ -40,12 +40,10 @@ void loop() {
   client = server.available();
   
   // Handle a connection.
-  if (client) {
-    while (client.connected()) {
-      while (client.available()) dino.parse(client.read());
-      dino.updateListeners();
-    }
-    client.stop();
+  while (client.connected()) {
+    while (client.available()) dino.parse(client.read());
+    dino.updateListeners();
   }
+  client.stop();
 }
 
