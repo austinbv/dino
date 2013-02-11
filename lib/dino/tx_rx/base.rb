@@ -8,7 +8,7 @@ module Dino
       def read
         @thread ||= Thread.new do
           loop do
-            pin, message = gets.chop.split(/::/) 
+            pin, message = gets.chop.split(/:/) 
             pin && message && changed && notify_observers(pin, message)
           end
         end

@@ -62,44 +62,39 @@ void Dino::writeResponse() {
 
 
 void Dino::updateListeners() {
-  if (listenerCount > 0) {
-    updateDigitalListeners();
+  if (timeSince(lastUpdate) > heartRate || timeSince(lastUpdate) < 0) {
+    lastUpdate = micros();
     updateAnalogListeners();
+    updateDigitalListeners();
   }
 }
 
 void Dino::updateDigitalListeners() {
-  if (timeSince(lastDigitalUpdate) > 5 || timeSince(lastDigitalUpdate) < 0) {
-    for (int i = 0; i < 22; i++) {
-      if (digitalListeners[i]) {
-        pin = i;
-        dRead();
-        if (rval != digitalListenerValues[i]) {
-          digitalListenerValues[i] = rval;
-          writeResponse();
-        } 
-      }
+  for (int i = 0; i < 22; i++) {
+    if (digitalListeners[i]) {
+      pin = i;
+      dRead();
+      if (rval != digitalListenerValues[i]) {
+        digitalListenerValues[i] = rval;
+        writeResponse();
+      } 
     }
-    lastDigitalUpdate = millis();
   }
 }
 
 void Dino::updateAnalogListeners() {
-  if (timeSince(lastAnalogUpdate) > heartRate || timeSince(lastAnalogUpdate) < 0) {  
-    for (int i = 0; i < 8; i++) {
-      if (analogListeners[i] != 0) {
-        pin = analogListeners[i]; pinStr[0] = 'A';
-        pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
-        aRead();
-        writeResponse();
-      }
+  for (int i = 0; i < 8; i++) {
+    if (analogListeners[i] != 0) {
+      pin = analogListeners[i]; pinStr[0] = 'A';
+      pinStr[1] = (char)(((int)'0')+i); pinStr[2] = '\0'; // Should make this suitable for > 9 analog pins.
+      aRead();
+      writeResponse();
     }
-    lastAnalogUpdate = millis();
   }
 }
 
 long Dino::timeSince(long event) {
- long time = millis() - event;
+ long time = micros() - event;
  return time;
 }
 
@@ -111,6 +106,7 @@ void Dino::setMode() {
     pinMode(pin, OUTPUT);
   } else {
     pinMode(pin, INPUT);
+    digitalWrite(pin, HIGH);
   }
 }
 
@@ -130,9 +126,9 @@ void Dino::dRead() {
   pinMode(pin, INPUT);
   rval = digitalRead(pin);
   if (analogPin) {
-    sprintf(response, "%s::%02d", pinStr, rval);
+    sprintf(response, "%s:%02d", pinStr, rval);
   } else {
-    sprintf(response, "%02d::%02d", pin, rval);
+    sprintf(response, "%02d:%02d", pin, rval);
   }
 }
 
@@ -147,7 +143,7 @@ void Dino::aWrite() {
 void Dino::aRead() {
   pinMode(pin, INPUT);
   rval = analogRead(pin);
-  sprintf(response, "%s::%03d", pinStr, rval);  // Send response with 'A0' formatting, not raw pin number, so pinStr not pin.
+  sprintf(response, "%s:%03d", pinStr, rval);  // Send response with 'A0' formatting, not raw pin number, so pinStr not pin.
 }
 
 
@@ -155,20 +151,20 @@ void Dino::aRead() {
 // Listen for a digital signal on any pin.
 void Dino::addDigitalListener() {
   removeListener();
+  pinMode(pin, INPUT);
   digitalListeners[pin] = true;
   digitalListenerValues[pin] = 2;
-  countListeners();
 }
 
 // CMD = 11
 // Listen for an analog signal on analog pins only.
 void Dino::addAnalogListener() {
   removeListener();
+  pinMode(pin, INPUT);
   if (analogPin) {
     int index = atoi(&pinStr[1]);
     analogListeners[index] = pin;
   }
-  countListeners();
 }
 
 // CMD = 12
@@ -179,40 +175,25 @@ void Dino::removeListener() {
     analogListeners[index] = 0;
   }
   digitalListeners[pin] = false;
-  countListeners();
 }
-
-void Dino::countListeners() {
-  listenerCount = 0;
-  for (int i = 0; i < 22; i++) {
-    if (digitalListeners[i]) listenerCount++;
-  }
-  for (int i = 0; i < 8; i++) {
-    if (analogListeners[i] != 0) listenerCount++;
-  }
-}
-
 
 // CMD = 90
 void Dino::reset() {
   debug = false;
-  heartRate = 5; // Default heart rate is 5ms.
+  heartRate = 4940; // Default heartRate is ~5ms.
   for (int i = 0; i < 22; i++) digitalListeners[i] = false;
   for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
   for (int i = 0; i < 8; i++)  analogListeners[i] = 0;
-  listenerCount = 0;
-  lastDigitalUpdate = millis();
-  lastAnalogUpdate = millis();
+  lastUpdate = micros();
   index = 0;
   strcpy(response, "ACK");
 }
 
 // CMD = 98
-// Set the heart rate in milliseconds. Min = 5ms.
+// Set the heart rate in milliseconds.
 void Dino::setHeartRate() {
-  int rate = atoi(val);
-  if (rate < 5 && rate !=0) rate = 5;
-  heartRate = rate;
+  long rate = atoi(val);
+  heartRate = (rate * 1000) - 60;
 }
 
 // CMD = 99

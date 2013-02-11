@@ -14,13 +14,11 @@ class Dino {
     void parse(char c);
     void process();
     void updateListeners();
-    byte listenerCount;
     
   private:
-    // Heartbeat timing.
-    long lastDigitalUpdate;
-    long lastAnalogUpdate;
+    // Manage heartbeat and listeners.
     long heartRate;
+    long lastUpdate;
     
     // Storage for enough analog and digital listeners for UNO or Nano board.
     // Analogs correspond to pins A0 through A7 by array index, and store raw pin number as byte. 0 == disabled.
