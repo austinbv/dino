@@ -14,8 +14,8 @@
 #
 # http://sourceforge.net/projects/ser2net/ for more info on configuring ser2net.
 #
-
-require File.expand_path('../../lib/dino', __FILE__)
+require 'bundler/setup'
+require 'dino'
 
 # The host and port for the telnet connection must be passed in as arguments.
 connection = Dino::TxRx::Telnet.new("localhost", 9000)

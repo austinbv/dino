@@ -1,8 +1,8 @@
 #
 # This is an example of how to use the servo class
 #
-
-require File.expand_path('../../lib/dino', __FILE__)
+require 'bundler/setup'
+require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
 servo = Dino::Components::Servo.new(pin: 9, board: board)
