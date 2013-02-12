@@ -18,7 +18,7 @@ module Dino
     end
 
     def add_digital_hardware(part)
-      set_pin_mode(part.pin, :in)
+      set_pin_mode(part.pin, :in, part.pullup)
       digital_listen(part.pin)
       @digital_hardware << part
     end
@@ -52,9 +52,10 @@ module Dino
       @io.write(formatted_msg)
     end
 
-    def set_pin_mode(pin, mode)
+    def set_pin_mode(pin, mode, pullup=nil)
       pin, value = normalize_pin(pin), normalize_value(mode == :out ? 0 : 1)
       write("00#{pin}#{value}")
+      digital_write(pin, 1) if (pullup && mode != :out)
     end
 
     COMMANDS = {
@@ -119,6 +120,5 @@ module Dino
       end
       raise BoardNotFound
     end
-
   end
 end

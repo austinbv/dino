@@ -105,15 +105,13 @@ void Dino::setMode() {
   if (atoi(val) == 0) {
     pinMode(pin, OUTPUT);
   } else {
+    removeListener();
     pinMode(pin, INPUT);
-    digitalWrite(pin, HIGH);
   }
 }
 
 // CMD = 01 // Digital Write
 void Dino::dWrite() {
-  removeListener();
-  pinMode(pin, OUTPUT);
   if (atoi(val) == 0) {
     digitalWrite(pin, LOW);
   } else {
@@ -123,7 +121,6 @@ void Dino::dWrite() {
 
 // CMD = 02 // Digital Read
 void Dino::dRead() { 
-  pinMode(pin, INPUT);
   rval = digitalRead(pin);
   if (analogPin) {
     sprintf(response, "%s:%02d", pinStr, rval);
@@ -134,14 +131,11 @@ void Dino::dRead() {
 
 // CMD = 03 // Analog (PWM) Write
 void Dino::aWrite() {
-  removeListener();
-  pinMode(pin, OUTPUT);
   analogWrite(pin,atoi(val));
 }
 
 // CMD = 04 // Analog Read
 void Dino::aRead() {
-  pinMode(pin, INPUT);
   rval = analogRead(pin);
   sprintf(response, "%s:%03d", pinStr, rval);  // Send response with 'A0' formatting, not raw pin number, so pinStr not pin.
 }
@@ -151,7 +145,6 @@ void Dino::aRead() {
 // Listen for a digital signal on any pin.
 void Dino::addDigitalListener() {
   removeListener();
-  pinMode(pin, INPUT);
   digitalListeners[pin] = true;
   digitalListenerValues[pin] = 2;
 }
@@ -160,7 +153,6 @@ void Dino::addDigitalListener() {
 // Listen for an analog signal on analog pins only.
 void Dino::addAnalogListener() {
   removeListener();
-  pinMode(pin, INPUT);
   if (analogPin) {
     int index = atoi(&pinStr[1]);
     analogListeners[index] = pin;
