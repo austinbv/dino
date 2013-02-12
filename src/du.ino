@@ -141,6 +141,9 @@ void ar(char *pin, char *val) {
   Serial.println(m);
 }
 
+/*
+ * Analog write
+ */
 void aw(char *pin, char *val) {
   if(debug) Serial.println("aw");
   int p = getPin(pin);
