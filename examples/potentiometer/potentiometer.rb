@@ -4,7 +4,7 @@
 # LED. The set_delay callback reads from the potentiometer
 # and changes the sleep delay for the LED on/off cycle.  
 #  
-$LOAD_PATH.unshift(File.expand_path('../../../lib', __FILE__))
+require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)

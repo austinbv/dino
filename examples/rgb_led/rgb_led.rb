@@ -2,7 +2,7 @@
 # This is a simple example to blink an led
 # every half a second
 #
-$LOAD_PATH.unshift(File.expand_path('../../../lib', __FILE__))
+require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)

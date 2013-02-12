@@ -14,7 +14,7 @@
 #
 # http://sourceforge.net/projects/ser2net/ for more info on configuring ser2net.
 #
-$LOAD_PATH.unshift(File.expand_path('../../../lib', __FILE__))
+require 'bundler/setup'
 require 'dino'
 
 # The host and port for the telnet connection must be passed in as arguments.

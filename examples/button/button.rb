@@ -4,7 +4,7 @@
 # sleep or in someway keep running or your program
 # will exit before any callbacks can be called
 #
-$LOAD_PATH.unshift(File.expand_path('../../../lib', __FILE__))
+require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
