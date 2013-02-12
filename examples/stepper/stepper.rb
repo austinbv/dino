@@ -1,8 +1,8 @@
 #
 # This is a simple example to move a stepper motor using the sparkfun easydriver shield: https://www.sparkfun.com/products/10267?
 #
-
-require File.expand_path('../../../lib/dino', __FILE__)
+require 'bundler/setup'
+require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
 stepper = Dino::Components::Stepper.new(board: board, pins: { step: 10, direction: 8 })
