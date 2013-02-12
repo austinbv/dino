@@ -14,7 +14,7 @@ module Dino
       context "on windows" do
         it 'should instantiate a new SerialPort for each usb tty device found' do
           original_platform = RUBY_PLATFORM
-          RUBY_PLATFORM = "mswin"
+          Constants.redefine(:RUBY_PLATFORM, "mswin", :on => Object)
           subject.should_receive(:tty_devices).and_return(["COM1", "COM2", "COM3", "COM4"])
           SerialPort.should_receive(:new).with('COM1', TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
           SerialPort.should_receive(:new).with('COM2', TxRx::USBSerial::BAUD).and_return(mock)
@@ -22,7 +22,7 @@ module Dino
           SerialPort.should_receive(:new).with('COM4', TxRx::USBSerial::BAUD).and_return(mock)
 
           subject.io.should == mock_serial
-          RUBY_PLATFORM = original_platform
+          Constants.redefine(:RUBY_PLATFORM, original_platform, :on => Object)
         end
       end
 
