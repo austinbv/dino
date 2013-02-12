@@ -13,11 +13,14 @@ gem install dino
 
 #### Upload the Bootstrapper
 
+* Generate the Arduino files using the included command line tool:
+````
+dino generate-sketches
+````
 * Open [the normal Arduino IDE](http://arduino.cc/en/Main/Software)
-* Download the bootstrapper [src/du.ino](https://raw.github.com/austinbv/dino/master/src/du.ino)
-* Open the file in the Arduino IDE
-* Plug in your Arduino via USB
-* Click the upload button (an arrow)
+* Open the sketch you want to upload in the Arduino IDE. Use `du.ino` if you want to talk to the Arduino via USB or Serial. Use `du_ethernet.ino` for the Ethernet shield.
+* Plug in your Arduino via USB.
+* Click the upload button (an arrow).
 
 #### Verify Install
 

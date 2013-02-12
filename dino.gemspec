@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "dino"
   gem.require_paths = ["lib"]
   gem.version       = Dino::VERSION
+  gem.executables   = ["dino"]
 
   gem.add_dependency 'serialport'
 end

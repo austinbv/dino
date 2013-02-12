@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+require "pathname"
+
+if ARGV[0] == "generate-sketches"
+  working_dir = Dir.pwd
+  src_dir = Pathname.new(__FILE__).realpath.to_s.chomp("/bin/dino") + "/src"
+
+  lib_files = ["Dino.h", "Dino.cpp"].map { |f| File.join src_dir, "lib", f }
+  serial_sketch_file = File.join src_dir, "du", "du.ino"
+  ethernet_sketch_file =  File.join src_dir, "du_ethernet", "du_ethernet.ino"
+
+  # Make directories for the sketches.
+  serial_sketch_dir   =  File.join(working_dir, "du")
+  ethernet_sketch_dir =  File.join(working_dir, "du_ethernet")
+  Dir::mkdir serial_sketch_dir
+  Dir::mkdir ethernet_sketch_dir
+
+  # Copy reused library files.
+  [serial_sketch_dir, ethernet_sketch_dir].each do |dir|
+    FileUtils.cp lib_files, dir
+  end
+
+  # Copy the sketches.
+  FileUtils.cp serial_sketch_file, serial_sketch_dir
+  FileUtils.cp ethernet_sketch_file, ethernet_sketch_dir
+end
