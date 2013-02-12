@@ -43,9 +43,9 @@ module Dino
 
       context 'when the given pin connects to an digital hardware part' do
         it 'should call update with the message on the part' do
-          part = mock(:part, pin: 5)
+          part = mock(:part, pin: 5, pullup: nil)
           subject.add_digital_hardware(part)
-          other_part = mock(:part, pin: 11)
+          other_part = mock(:part, pin: 11, pullup: nil)
           subject.add_digital_hardware(other_part)
 
           part.should_receive(:update).with('wake up!')
@@ -78,8 +78,8 @@ module Dino
 
     describe '#add_digital_hardware' do
       it 'should add digital hardware to the board' do
-        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12))
-        subject.add_digital_hardware(mock2 = mock(:part2, pin: 14))
+        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
+        subject.add_digital_hardware(mock2 = mock(:part2, pin: 14, pullup: nil))
         subject.digital_hardware.should =~ [mock1, mock2]
       end
 
@@ -87,13 +87,13 @@ module Dino
         subject
         subject.should_receive(:write).with("0012001")
         subject.should_receive(:write).with("0512000")
-        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12))
+        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end
     end
 
     describe '#remove_digital_hardware' do
       it 'should remove the given part from the hardware of the board' do
-        mock = mock(:part1, pin: 12)
+        mock = mock(:part1, pin: 12, pullup: nil)
         subject.add_digital_hardware(mock)
         subject.remove_digital_hardware(mock)
         subject.digital_hardware.should == []
@@ -102,8 +102,8 @@ module Dino
 
     describe '#add_analog_hardware' do
       it 'should add analog hardware to the board' do
-        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12))
-        subject.add_analog_hardware(mock2 = mock(:part2, pin: 14))
+        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
+        subject.add_analog_hardware(mock2 = mock(:part2, pin: 14, pullup: nil))
         subject.analog_hardware.should =~ [mock1, mock2]
       end
 
@@ -111,13 +111,13 @@ module Dino
         subject
         subject.should_receive(:write).with("0012001")
         subject.should_receive(:write).with("0612000")
-        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12))
+        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end
     end
 
     describe '#remove_analog_hardware' do
       it 'should remove the given part from the hardware of the board' do
-        mock = mock(:part1, pin: 12)
+        mock = mock(:part1, pin: 12, pullup: nil)
         subject.add_analog_hardware(mock)
         subject.remove_analog_hardware(mock)
         subject.analog_hardware.should == []

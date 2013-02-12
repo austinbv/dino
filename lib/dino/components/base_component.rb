@@ -27,15 +27,15 @@ module Dino
       attr_writer :board, :pin, :pullup
       alias :pins= :pin=
 
-      def digital_write(value)
+      def digital_write(pin=self.pin, value)
         self.board.digital_write(pin, value)
       end
 
-      def analog_write(value)
+      def analog_write(pin=self.pin, value)
         self.board.analog_write(pin, value)
       end
 
-      def set_pin_mode(mode)
+      def set_pin_mode(pin=self.pin, mode)
         self.board.set_pin_mode(pin, mode, pullup)
       end
     end
