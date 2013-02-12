@@ -4,7 +4,8 @@
 # sleep or in someway keep running or your program
 # will exit before any callbacks can be called
 #
-require File.expand_path('../../../lib/dino', __FILE__)
+$LOAD_PATH.unshift(File.expand_path('../../../lib', __FILE__))
+require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
 button = Dino::Components::Button.new(pin: 13, board: board)
