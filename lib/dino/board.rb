@@ -1,5 +1,3 @@
-require 'timeout'
-
 module Dino
   class Board
     attr_reader :digital_hardware, :analog_hardware, :analog_zero
@@ -8,7 +6,7 @@ module Dino
     def initialize(io)
       @io, @digital_hardware, @analog_hardware = io, [], []
       io.add_observer(self)
-      handshake
+      reset
     end
 
     def update(pin, msg)
@@ -37,6 +35,10 @@ module Dino
     def remove_analog_hardware(part)
       stop_listener(part.pin)
       @analog_hardware.delete(part)
+    end
+
+    def reset
+      @analog_zero = @io.handshake
     end
 
     def start_read
@@ -75,10 +77,6 @@ module Dino
       end
     end
 
-    def reset
-      write("!9000000.", no_wrap: true)
-    end
-
     def set_debug(on_off)
       pin, value = normalize_pin(0), normalize_value(on_off == :on ? 1 : 0)
       write("99#{pin}#{value}")
@@ -108,24 +106,6 @@ module Dino
 
     def normalize(pin, spaces)
       pin.to_s.rjust(spaces, '0')
-    end
-
-    def handshake
-      50.times do
-        begin
-          reset
-          Timeout::timeout(0.1) do
-            line = @io.gets.to_s.chop
-            if line.match /ACK/
-              @analog_zero = line.split(/:/)[1].to_i
-              return @io.flush_read 
-            end
-          end
-        rescue
-          nil
-        end
-      end
-      raise BoardNotFound
     end
   end
 end

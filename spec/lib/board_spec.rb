@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   describe Dino::Board do
     def io_mock(methods = {})
-      @io ||= mock(:io, {write: nil, add_observer: nil, gets: "ACK\n", flush_read: nil}.merge(methods))
+      @io ||= mock(:io, {write: nil, add_observer: nil, flush_read: nil, handshake: "14"}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
@@ -21,11 +21,9 @@ module Dino
       end
 
       it 'should initiate the handshake' do
-        io_mock.should_receive(:write).with("!9000000.")
+        io_mock.should_receive(:handshake)
         subject
       end
-
-      it 'should wait for acknowledgement'
     end
 
     describe '#update' do
@@ -220,7 +218,7 @@ module Dino
 
     describe '#reset' do
       it 'should tell the board to reset to defaults' do
-        io_mock.should_receive(:write).with('!9000000.')
+        io_mock.should_receive(:handshake)
         subject.reset
       end
     end
@@ -247,7 +245,7 @@ module Dino
       end
 
       it 'should raise if a number larger than two digits are given' do
-        expect { subject.normalize_pin(1000) }.to raise_exception 'pins can only be two digits'
+        expect { subject.normalize_pin(1000) }.to raise_exception 'pin number must be in 0-99'
       end
     end
 

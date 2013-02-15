@@ -1,4 +1,5 @@
 require 'observer'
+require 'timeout'
 
 module Dino
   module TxRx
@@ -26,10 +27,28 @@ module Dino
       def write(message)
         loop do
           if IO.select(nil, [io], nil)
-            io.write(message)
+            io.puts(message)
             break
           end
         end
+      end
+
+      def handshake
+        100.times do
+          begin
+            write("!9000000.")
+            Timeout::timeout(0.1) do
+              line = gets.to_s.chop
+              if line.match /ACK/
+                flush_read
+                return line.split(/:/)[1].to_i
+              end
+            end
+          rescue
+            nil
+          end
+        end
+       raise BoardNotFound
       end
 
       def flush_read
@@ -37,7 +56,7 @@ module Dino
       end
 
       def gets
-        IO.select([io], nil, nil, 0.01) && io.gets
+        IO.select([io], nil, nil, 0.005) && io.gets
       end
     end
   end
