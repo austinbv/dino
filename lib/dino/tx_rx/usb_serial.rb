@@ -18,19 +18,6 @@ module Dino
         @io = SerialPort.new(device, BAUD)
       end
 
-      def gets
-        IO.select([io], nil, nil, 0.05) && io.gets
-      end
-
-      def flush_read
-        gets until gets == nil
-      end
-
-      def write(message)
-        IO.select(nil, [io], nil)
-        io.puts(message)
-      end
-
       private
 
       def tty_devices
