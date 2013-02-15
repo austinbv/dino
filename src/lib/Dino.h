@@ -24,7 +24,7 @@ class Dino {
     // Analogs correspond to pins A0 through A7 by array index, and store raw pin number as byte. 0 == disabled.
     // Digitals correspond to raw pin number by array index, and store boolean. false == disabled.
     // Analog pins can be listened to for a digital signal, hence 22.
-    byte analogListeners[8];
+    boolean analogListeners[22];
     boolean digitalListeners[22];
     
     // Keep track of the last read values for digital listeners. Only write responses when changed.
@@ -33,11 +33,12 @@ class Dino {
     // Request storage.
     char request[8];
     int index;
-    char cmd[3];
+    char cmdStr[3];
+    byte cmd;
     char pinStr[3];
     byte pin;
-    boolean analogPin;
-    char val[4];
+    char valStr[4];
+    int val;
     
     // Value and response storage.
     int rval;
@@ -59,8 +60,6 @@ class Dino {
     void removeListener        ();
     
     // Internal functions.
-    void convertPin             ();
-    void countListeners         ();
     long timeSince              (long event);
     void updateDigitalListeners ();
     void updateAnalogListeners  ();

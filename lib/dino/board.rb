@@ -2,7 +2,7 @@ require 'timeout'
 
 module Dino
   class Board
-    attr_reader :digital_hardware, :analog_hardware
+    attr_reader :digital_hardware, :analog_hardware, :analog_zero
     LOW, HIGH = 000, 255
 
     def initialize(io)
@@ -71,9 +71,7 @@ module Dino
     COMMANDS.each_key do |command|
       define_method(command) do |pin, value=nil|
         cmd = normalize_cmd(COMMANDS[command])
-        pin = normalize_pin(pin)
-        value = normalize_value(value)
-        write("#{cmd}#{pin}#{value}")
+        write "#{cmd}#{normalize_pin(pin)}#{normalize_value(value)}"
       end
     end
 
@@ -87,12 +85,17 @@ module Dino
     end
 
     def normalize_pin(pin)
-      raise Exception.new('pins can only be two digits') if pin.to_s.length > 2
-      normalize(pin, 2)
+      if pin.to_s.match /\Aa/i
+        int_pin = @analog_zero + pin.to_s.gsub(/\Aa/i, '').to_i
+      else
+        int_pin = pin
+      end
+      raise Exception.new('pin number must be in 0-99') if int_pin.to_i > 99
+      return normalize(int_pin, 2)
     end
 
     def normalize_cmd(cmd)
-      raise Exception.new('pins can only be two digits') if cmd.to_s.length > 2
+      raise Exception.new('commands can only be two digits') if cmd.to_s.length > 2
       normalize(cmd, 2)
     end
 
@@ -111,8 +114,12 @@ module Dino
       50.times do
         begin
           reset
-          Timeout::timeout(0.1) do 
-            return @io.flush_read if @io.gets.to_s.chop.match /ACK/
+          Timeout::timeout(0.1) do
+            line = @io.gets.to_s.chop
+            if line.match /ACK/
+              @analog_zero = line.split(/:/)[1].to_i
+              return @io.flush_read 
+            end
           end
         rescue
           nil
