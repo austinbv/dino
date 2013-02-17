@@ -19,11 +19,11 @@ class Dino {
     // Manage heartbeat and listeners.
     long heartRate;
     long lastUpdate;
+    unsigned int loopCount;
+    unsigned int analogDivider;
     
     // Storage for enough analog and digital listeners for UNO or Nano board.
-    // Analogs correspond to pins A0 through A7 by array index, and store raw pin number as byte. 0 == disabled.
-    // Digitals correspond to raw pin number by array index, and store boolean. false == disabled.
-    // Analog pins can be listened to for a digital signal, hence 22.
+    // Correspond to raw pin number by array index, and store boolean. false == disabled.
     boolean analogListeners[22];
     boolean digitalListeners[22];
     
@@ -42,7 +42,7 @@ class Dino {
     
     // Value and response storage.
     int rval;
-    char response[9];
+    char response[8];
     void (*_writeCallback)(char *str);
     void writeResponse();
 
@@ -52,13 +52,13 @@ class Dino {
     void dRead                 ();
     void aWrite                ();
     void aRead                 ();
-    void toggleDebug           ();
-    void setHeartRate          ();
-    void reset                 ();
     void addDigitalListener    ();
     void addAnalogListener     ();
     void removeListener        ();
-    
+    void reset                 ();
+    void setHeartRate          ();
+    void toggleDebug           ();
+
     // Internal functions.
     long timeSince              (long event);
     void updateDigitalListeners ();

@@ -10,10 +10,28 @@ int port = 80;
 Dino dino;
 EthernetServer server(port);
 EthernetClient client;
+char responseBuffer[65];
 
-// Dino.h doesn't handle TXRX. Setup a function to tell it to write to the TCP socket.
-void writeResponse(char *response) { client.println(response); }
-void (*writeCallback)(char *str) = writeResponse;
+
+// Dino.h doesn't handle TXRX. Setup a callback to receive the responses and buffer them.
+void bufferResponse(char *response) {
+   if (strlen(responseBuffer) > 56 ) {
+     writeResponses();
+     strcpy(responseBuffer, response);
+   } else {
+     strcat(responseBuffer, response);
+   }
+   strcat(responseBuffer, "\n");
+}
+void (*writeCallback)(char *str) = bufferResponse;
+
+// Write the buffered responses to the client.
+void writeResponses() {
+  if (responseBuffer[0] != '\0')
+    client.write(responseBuffer);
+    responseBuffer[0] = '\0';
+}
+
 
 void setup() {
   // Explicitly disable the SD card.
@@ -25,14 +43,14 @@ void setup() {
   server.begin();
     
   // Start serial for debugging.
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.print("Dino::TCP started at ");
   Serial.print(Ethernet.localIP());
   Serial.print(" on port ");
   Serial.println(port);
   
   // Attach the write callback.
-  dino.setupWrite(writeCallback);                  
+  dino.setupWrite(writeCallback);
 }
 
 void loop() {
@@ -40,9 +58,12 @@ void loop() {
   client = server.available();
   
   // Handle a connection.
-  while (client.connected()) {
-    while (client.available()) dino.parse(client.read());
-    dino.updateListeners();
+  if (client) {
+    while (client.connected()) {
+      while (client.available()) dino.parse(client.read());
+      dino.updateListeners();
+      writeResponses();
+    }
   }
   client.stop();
 }

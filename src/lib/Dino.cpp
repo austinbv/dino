@@ -16,8 +16,6 @@ void Dino::parse(char c) {
 }
 
 void Dino::process() {
-  
-  // Default response.
   response[0] = '\0';
 
   // Parse the request.
@@ -49,6 +47,8 @@ void Dino::process() {
 }
 
 
+
+// WRITE CALLBACK
 void Dino::setupWrite(void (*writeCallback)(char *str)) {
   _writeCallback = writeCallback;
 }
@@ -57,14 +57,16 @@ void Dino::writeResponse() {
 }
 
 
+
+// LISTNENERS
 void Dino::updateListeners() {
   if (timeSince(lastUpdate) > heartRate || timeSince(lastUpdate) < 0) {
     lastUpdate = micros();
-    updateAnalogListeners();
+    loopCount++;
     updateDigitalListeners();
+    if (loopCount % analogDivider == 0) updateAnalogListeners();
   }
 }
-
 void Dino::updateDigitalListeners() {
   for (int i = 0; i < 22; i++) {
     if (digitalListeners[i]) {
@@ -77,7 +79,6 @@ void Dino::updateDigitalListeners() {
     }
   }
 }
-
 void Dino::updateAnalogListeners() {
   for (int i = 0; i < 22; i++) {
     if (analogListeners[i]) {
@@ -87,7 +88,6 @@ void Dino::updateAnalogListeners() {
     }
   }
 }
-
 long Dino::timeSince(long event) {
  long time = micros() - event;
  return time;
@@ -95,6 +95,7 @@ long Dino::timeSince(long event) {
 
 
 
+// API FUNCTIONS
 // CMD = 00 // Pin Mode
 void Dino::setMode() {
   if (val == 0)
@@ -130,8 +131,7 @@ void Dino::aRead() {
   sprintf(response, "%02d:%02d", pin, rval);
 }
 
-
-// CMD = 10
+// CMD = 05
 // Listen for a digital signal on any pin.
 void Dino::addDigitalListener() {
   removeListener();
@@ -139,14 +139,14 @@ void Dino::addDigitalListener() {
   digitalListenerValues[pin] = 2;
 }
 
-// CMD = 11
+// CMD = 06
 // Listen for an analog signal on analog pins only.
 void Dino::addAnalogListener() {
   removeListener();
   analogListeners[pin] = true;
 }
 
-// CMD = 12
+// CMD = 07
 // Remove analog and digital listeners from any pin.
 void Dino::removeListener() {
   analogListeners[pin] = false;
@@ -156,7 +156,9 @@ void Dino::removeListener() {
 // CMD = 90
 void Dino::reset() {
   debug = false;
-  heartRate = 4940; // Default heartRate is ~5ms.
+  heartRate = 4000; // Default heartRate is ~4ms.
+  loopCount = 0;
+  analogDivider = 4;
   for (int i = 0; i < 22; i++) digitalListeners[i] = false;
   for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
   for (int i = 0; i < 22; i++)  analogListeners[i] = false;
@@ -166,10 +168,10 @@ void Dino::reset() {
 }
 
 // CMD = 98
-// Set the heart rate in milliseconds.
+// Set the heart rate in milliseconds. Store it in microseconds.
 void Dino::setHeartRate() {
   long rate = val;
-  heartRate = (rate * 1000) - 60;
+  heartRate = (rate * 1000);
 }
 
 // CMD = 99
