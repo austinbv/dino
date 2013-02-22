@@ -10,10 +10,8 @@ require 'dino'
 board = Dino::Board.new(Dino::TxRx.new)
 sensor = Dino::Components::Sensor.new(pin: 'A0', board: board)
 
-on_data = Proc.new do |data|
-    puts data
+sensor.when_data_received do |data|
+  puts data
 end
-
-sensor.when_data_received(on_data)
 
 sleep

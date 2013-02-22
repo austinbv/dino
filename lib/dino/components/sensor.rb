@@ -7,8 +7,8 @@ module Dino
         @board.start_read
       end
 
-      def when_data_received(callback)
-        @data_callbacks << callback
+      def when_data_received(&block)
+        @data_callbacks << block
       end
 
       def update(data)

@@ -12,12 +12,10 @@ potentiometer = Dino::Components::Sensor.new(pin: 'A0', board: board)
 
 delay = 500.0
 
-set_delay = Proc.new do |data|
+potentiometer.when_data_received do |data|
   sleep 0.5
   puts "DATA: #{delay = data.to_i}"
 end
-
-potentiometer.when_data_received(set_delay)
 
   sleep(2)
 loop do
