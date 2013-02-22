@@ -44,17 +44,17 @@ module Dino
         it 'should call all callbacks passing in the given data' do
           sensor = Sensor.new(board: board, pin: 'a pin')
           
-          first_block_called = false
-          second_block_called = false
+          first_block_data = nil
+          second_block_data = nil
           sensor.when_data_received do |data|
-            first_block_called = true
+            first_block_data = data
           end
           sensor.when_data_received do |data|
-            second_block_called = true
+            second_block_data = data
           end
 
           sensor.update('Some data')
-          fail unless first_block_called && second_block_called
+          [first_block_data, second_block_data].each { |block_data| block_data.should == "Some data" }
         end
       end
     end
