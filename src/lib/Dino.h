@@ -6,10 +6,16 @@
 #define Dino_h
 #include "Arduino.h"
 
+// Allocate listener storage based on what board we're running.
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#  define PIN_COUNT 70
+#else
+#  define PIN_COUNT 22
+#endif
+
 class Dino {
   public:
     Dino();
-    bool debug;
     void setupWrite(void (*writeCallback)(char *str));
     void parse(char c);
     void process();
@@ -24,11 +30,11 @@ class Dino {
     
     // Storage for enough analog and digital listeners for UNO or Nano board.
     // Correspond to raw pin number by array index, and store boolean. false == disabled.
-    boolean analogListeners[22];
-    boolean digitalListeners[22];
+    boolean analogListeners[PIN_COUNT];
+    boolean digitalListeners[PIN_COUNT];
     
     // Keep track of the last read values for digital listeners. Only write responses when changed.
-    byte digitalListenerValues[22];
+    byte digitalListenerValues[PIN_COUNT];
     
     // Request storage.
     char request[8];
@@ -56,8 +62,8 @@ class Dino {
     void addAnalogListener     ();
     void removeListener        ();
     void reset                 ();
+    void setAnalogDivider      ();
     void setHeartRate          ();
-    void toggleDebug           ();
 
     // Internal functions.
     long timeSince              (long event);

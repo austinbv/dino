@@ -37,8 +37,8 @@ void Dino::process() {
     case 6:  addAnalogListener   ();  break;
     case 7:  removeListener      ();  break;
     case 90: reset               ();  break;
+    case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
-    case 99: toggleDebug         ();  break;
     default:                          break;
   }
   
@@ -155,10 +155,9 @@ void Dino::removeListener() {
 
 // CMD = 90
 void Dino::reset() {
-  debug = false;
   heartRate = 4000; // Default heartRate is ~4ms.
   loopCount = 0;
-  analogDivider = 4;
+  analogDivider = 4; // Update analog listeners every ~16ms.
   for (int i = 0; i < 22; i++) digitalListeners[i] = false;
   for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
   for (int i = 0; i < 22; i++)  analogListeners[i] = false;
@@ -167,20 +166,15 @@ void Dino::reset() {
   sprintf(response, "ACK:%02d", A0);
 }
 
+// CMD = 97
+// Set the analog divider. Powers of 2 up to 128 are valid.
+void Dino::setAnalogDivider() {
+  analogDivider = val;
+}
+
 // CMD = 98
 // Set the heart rate in milliseconds. Store it in microseconds.
 void Dino::setHeartRate() {
-  long rate = val;
+  int rate = val;
   heartRate = (rate * 1000);
-}
-
-// CMD = 99
-void Dino::toggleDebug() {
-  if (val == 0) {
-    debug = false;
-    strcpy(response, "Debug 0");
-  } else {
-    debug = true;
-    strcpy(response, "Debug 1");
-  }
 }

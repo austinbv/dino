@@ -6,7 +6,36 @@ module Dino
     def initialize(io)
       @io, @digital_hardware, @analog_hardware = io, [], []
       io.add_observer(self)
-      reset
+      handshake
+    end
+
+    def handshake
+      @analog_zero = @io.handshake
+    end
+
+    def analog_divider=(value)
+      unless [1, 2, 4, 8, 16, 32, 64, 128].include? value
+        puts "Analog divider must be in 1, 2, 4, 8, 16, 32, 64, 128"
+      else
+        write "9700#{normalize_value(value)}"
+      end
+    end
+
+    def heart_rate=(value)
+      write "9800#{normalize_value(value)}"
+    end
+
+    def start_read
+      @io.read
+    end
+
+    def stop_read
+      @io.close_read
+    end
+
+    def write(msg, opts = {})
+      formatted_msg = opts.delete(:no_wrap) ? msg : "!#{msg}."
+      @io.write(formatted_msg)
     end
 
     def update(pin, msg)
@@ -37,30 +66,13 @@ module Dino
       @analog_hardware.delete(part)
     end
 
-    def reset
-      @analog_zero = @io.handshake
-    end
-
-    def start_read
-      @io.read
-    end
-
-    def stop_read
-      @io.close_read
-    end
-
-    def write(msg, opts = {})
-      formatted_msg = opts.delete(:no_wrap) ? msg : "!#{msg}."
-      @io.write(formatted_msg)
-    end
-
     def set_pin_mode(pin, mode, pullup=nil)
       pin, value = normalize_pin(pin), normalize_value(mode == :out ? 0 : 1)
       write("00#{pin}#{value}")
       digital_write(pin, 1) if (pullup && mode != :out)
     end
 
-    COMMANDS = {
+    PIN_COMMANDS = {
       digital_write:   01,
       digital_read:    02,
       analog_write:    03,
@@ -70,16 +82,11 @@ module Dino
       stop_listener:   07,
     }
 
-    COMMANDS.each_key do |command|
+    PIN_COMMANDS.each_key do |command|
       define_method(command) do |pin, value=nil|
-        cmd = normalize_cmd(COMMANDS[command])
+        cmd = normalize_cmd(PIN_COMMANDS[command])
         write "#{cmd}#{normalize_pin(pin)}#{normalize_value(value)}"
       end
-    end
-
-    def set_debug(on_off)
-      pin, value = normalize_pin(0), normalize_value(on_off == :on ? 1 : 0)
-      write("99#{pin}#{value}")
     end
 
     def normalize_pin(pin)
