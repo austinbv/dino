@@ -3,7 +3,7 @@ require 'socket'
 module Dino
   module TxRx
     class TCP < Base
-      def initialize(host, port=80)
+      def initialize(host, port=3466)
         @host, @port = host, port
       end
 
@@ -14,7 +14,7 @@ module Dino
     private
 
       def connect
-        TCPSocket.open(@host, @port)
+        Timeout::timeout(10) { TCPSocket.open(@host, @port) }
       rescue
         raise BoardNotFound
       end

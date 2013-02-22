@@ -5,7 +5,7 @@
 // Configure your MAC address, IP address, and HTTP port here.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };
 IPAddress ip(192,168,0,77);
-int port = 80;
+int port = 3466;
 
 Dino dino;
 EthernetServer server(port);

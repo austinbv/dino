@@ -216,22 +216,10 @@ module Dino
       end
     end
 
-    describe '#reset' do
+    describe '#handshake' do
       it 'should tell the board to reset to defaults' do
         io_mock.should_receive(:handshake)
-        subject.reset
-      end
-    end
-
-    describe '#set_debug' do
-      it 'should set the boards debug on when passed on' do
-        io_mock.should_receive(:write).with('!9900001.')
-        subject.set_debug(:on)
-      end
-
-      it 'should set the boards debug off when passed off' do
-        io_mock.should_receive(:write).with('!9900000.')
-        subject.set_debug(:off)
+        subject.handshake
       end
     end
 
