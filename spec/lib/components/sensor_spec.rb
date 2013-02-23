@@ -32,25 +32,29 @@ module Dino
       end
 
       describe '#when_data_received' do
-        it 'should add a callback back to the list of callbacks' do
+        
+        it "should add a callback to the list of callbacks" do
           sensor = Sensor.new(board: board, pin: 'a pin')
-          sensor.when_data_received 'Foo'
-          sensor.instance_variable_get(:@data_callbacks).should == ['Foo']
+          sensor.when_data_received { "this is a block" }
+          sensor.instance_variable_get(:@data_callbacks).should_not be_empty
         end
       end
 
       describe '#update' do
         it 'should call all callbacks passing in the given data' do
-          first_callback, second_callback = mock, mock
-          first_callback.should_receive(:call).with('Some data')
-          second_callback.should_receive(:call).with('Some data')
-
           sensor = Sensor.new(board: board, pin: 'a pin')
-
-          sensor.when_data_received first_callback
-          sensor.when_data_received second_callback
+          
+          first_block_data = nil
+          second_block_data = nil
+          sensor.when_data_received do |data|
+            first_block_data = data
+          end
+          sensor.when_data_received do |data|
+            second_block_data = data
+          end
 
           sensor.update('Some data')
+          [first_block_data, second_block_data].each { |block_data| block_data.should == "Some data" }
         end
       end
     end
