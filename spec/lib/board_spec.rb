@@ -84,6 +84,7 @@ module Dino
       it 'should set the mode for the given pin to "in" and add a digital listener' do
         subject
         subject.should_receive(:write).with("0012001")
+        subject.should_receive(:write).with("0112000")
         subject.should_receive(:write).with("0512000")
         subject.add_digital_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end
@@ -108,6 +109,7 @@ module Dino
       it 'should set the mode for the given pin to "in" and add an analog listener' do
         subject
         subject.should_receive(:write).with("0012001")
+        subject.should_receive(:write).with("0112000")
         subject.should_receive(:write).with("0612000")
         subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end

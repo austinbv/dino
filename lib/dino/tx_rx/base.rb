@@ -10,7 +10,7 @@ module Dino
         @thread ||= Thread.new do
           loop do
             line = gets
-            if line
+            if line.match /\A\d+:/
               pin, message = line.chop.split(/:/)
               pin && message && changed && notify_observers(pin, message)
             end
@@ -38,10 +38,10 @@ module Dino
           begin
             write("!9000000.")
             Timeout::timeout(0.1) do
-              line = gets.to_s.chop
+              line = gets.to_s
               if line.match /ACK/
                 flush_read
-                return line.split(/:/)[1].to_i
+                return line.chop.split(/:/)[1].to_i
               end
             end
           rescue
