@@ -69,9 +69,13 @@ module Dino
     def set_pin_mode(pin, mode, pullup=nil)
       pin, value = normalize_pin(pin), normalize_value(mode == :out ? 0 : 1)
       write("00#{pin}#{value}")
-      digital_write(pin, 1) if (pullup && mode != :out)
+      set_pullup(pin, pullup) if mode == :in
     end
 
+    def set_pullup(pin, pullup)
+      pullup ? digital_write(pin, HIGH) : digital_write(pin, LOW)
+    end
+      
     PIN_COMMANDS = {
       digital_write:   01,
       digital_read:    02,
