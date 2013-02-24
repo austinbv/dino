@@ -26,6 +26,13 @@ void Dino::process() {
   pin = atoi(pinStr);
   val = atoi(valStr);
 
+  #ifdef debug
+   Serial.print("Received request - "); Serial.println(request);
+   Serial.print("Command - ");          Serial.println(cmdStr);
+   Serial.print("Pin - ");              Serial.println(pinStr);
+   Serial.print("Value - ");            Serial.println(valStr);
+  #endif
+
   // Call the command.
   switch(cmd) {
     case 0:  setMode             ();  break;
@@ -44,6 +51,11 @@ void Dino::process() {
   
   // Write the response.
   if (response[0] != '\0') writeResponse();
+  
+  #ifdef debug
+   Serial.print("Responded with - "); Serial.println(response);
+   Serial.println();
+  #endif
 }
 
 
@@ -98,20 +110,35 @@ long Dino::timeSince(long event) {
 // API FUNCTIONS
 // CMD = 00 // Pin Mode
 void Dino::setMode() {
-  if (val == 0)
+  if (val == 0) {
     pinMode(pin, OUTPUT);
+    #ifdef debug
+      Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("OUTPUT mode");
+    #endif
+  }
   else {
     removeListener();
     pinMode(pin, INPUT);
+    #ifdef debug
+      Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("INPTUT mode");
+    #endif
   }
 }
 
 // CMD = 01 // Digital Write
 void Dino::dWrite() {
-  if (val == 0)
+  if (val == 0) {
     digitalWrite(pin, LOW);
-  else
+    #ifdef debug
+      Serial.print("Digital write "); Serial.print(LOW); Serial.print(" to pin "); Serial.println(pin);
+    #endif
+  }
+  else {
     digitalWrite(pin, HIGH);
+    #ifdef debug
+      Serial.print("Digital write "); Serial.print(HIGH); Serial.print(" to pin "); Serial.println(pin);
+    #endif
+  }
 }
 
 // CMD = 02 // Digital Read
@@ -123,6 +150,9 @@ void Dino::dRead() {
 // CMD = 03 // Analog (PWM) Write
 void Dino::aWrite() {
   analogWrite(pin,val);
+  #ifdef debug
+    Serial.print("Analog write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
+  #endif
 }
 
 // CMD = 04 // Analog Read
@@ -137,6 +167,9 @@ void Dino::addDigitalListener() {
   removeListener();
   digitalListeners[pin] = true;
   digitalListenerValues[pin] = 2;
+  #ifdef debug
+    Serial.print("Added digital listener on pin "); Serial.println(pin);
+  #endif
 }
 
 // CMD = 06
@@ -144,6 +177,9 @@ void Dino::addDigitalListener() {
 void Dino::addAnalogListener() {
   removeListener();
   analogListeners[pin] = true;
+  #ifdef debug
+    Serial.print("Added analog listener on pin "); Serial.println(pin);
+  #endif
 }
 
 // CMD = 07
@@ -151,6 +187,9 @@ void Dino::addAnalogListener() {
 void Dino::removeListener() {
   analogListeners[pin] = false;
   digitalListeners[pin] = false;
+  #ifdef debug
+    Serial.print("Removed listeners on pin "); Serial.println(pin);
+  #endif
 }
 
 // CMD = 90
@@ -163,6 +202,9 @@ void Dino::reset() {
   for (int i = 0; i < 22; i++)  analogListeners[i] = false;
   lastUpdate = micros();
   index = 0;
+  #ifdef debug
+    Serial.println("Reset the board to defaults.  pin ");
+  #endif
   sprintf(response, "ACK:%02d", A0);
 }
 
@@ -170,6 +212,9 @@ void Dino::reset() {
 // Set the analog divider. Powers of 2 up to 128 are valid.
 void Dino::setAnalogDivider() {
   analogDivider = val;
+  #ifdef debug
+    Serial.print("Analog divider set to "); Serial.println(analogDivider);
+  #endif
 }
 
 // CMD = 98
@@ -177,4 +222,8 @@ void Dino::setAnalogDivider() {
 void Dino::setHeartRate() {
   int rate = val;
   heartRate = (rate * 1000);
+  #ifdef debug
+    Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
+  #endif
 }
+

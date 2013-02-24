@@ -13,6 +13,9 @@
 #  define PIN_COUNT 22
 #endif
 
+// Uncomment this line to enable debugging mode.
+// #define debug true
+
 class Dino {
   public:
     Dino();
