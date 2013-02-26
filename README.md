@@ -3,7 +3,7 @@
 
 ## Get Started In No Time
 
-Dino was designed to help you start working with your Arduino in minutes.
+Dino lets you start programming your Arduino with Ruby in minutes.
 
 #### Install the Gem
 
@@ -11,15 +11,28 @@ Dino was designed to help you start working with your Arduino in minutes.
 gem install dino
 ```
 
-#### Upload the Bootstrapper
+#### Prepare the Bootstrapper
 
-* Generate the Arduino files using the included command line tool:
+Use the included command line tool to create a folder with the Arduino sketch you want to use and optionally configure it.
+
 ````
-dino generate-sketches
+# If connecting via serial, USB or ser2net, this is all you should need:
+dino generate-sketch serial
+
+# If usng the ethernet shield, you'll want to specify unique MAC and IP addresses:
+dino generate-sketch ethernet --mac XX:XX:XX:XX:XX:XX --ip XXX.XXX.XXX.XXX
+
+# For more options:
+dino help
 ````
+
+__Note:__ Current Ethernet shields come with a sticker indicating the MAC address you should use with them. For older shields without a dedicated MAC address, inventing a random one should work, but don't use the same one for multiple boards. Valid IP addresses depend on the configuration of your network.
+
+#### Upload The Bootstrapper
+
+* Connect the Arduino to a USB port on your machine, regardless of which sketch you're using.
 * Open [the normal Arduino IDE](http://arduino.cc/en/Main/Software)
-* Open the sketch you want to upload in the Arduino IDE. Use `du.ino` if you want to talk to the Arduino via USB or Serial. Use `du_ethernet.ino` for the Ethernet shield.
-* Plug in your Arduino via USB.
+* Open the `.ino` file in the sketch folder you just generated.
 * Click the upload button (an arrow).
 
 #### Verify Install
