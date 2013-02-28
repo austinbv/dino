@@ -9,7 +9,7 @@
 # Note that we're using ser2net in raw TCP mode and not telnet mode which is more common.
 # 
 # Replace /dev/cu.usbmodem621 with your Arduino device.
-# Arduino UNOs are usually /dev/ACM0 under Linux.
+# Arduino UNOs are usually /dev/ttyACM0 under Linux.
 #
 # ser2net is preinstalled on many Linuxes. Install ser2net at the Mac Terminal with:
 # brew install ser2net

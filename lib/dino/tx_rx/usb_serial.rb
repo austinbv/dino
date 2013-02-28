@@ -5,42 +5,27 @@ module Dino
     class USBSerial < Base
       BAUD = 115200
 
-      def initialize(device = nil)
+      def initialize(device = nil, options={})
         @device = device
+        @baud = options[:baud] || BAUD
         @first_write = true
       end
 
       def io
-        raise BoardNotFound unless @io ||= find_arduino
-        @io
-      end
-
-      def io=(device)
-        @io = SerialPort.new(device, BAUD)
+        @io ||= connect
       end
 
       private
 
-      def tty_devices
-        return [@device] if @device
-        if RUBY_PLATFORM.include?("mswin") || RUBY_PLATFORM.include?("mingw")
-          com_ports = []
-          1.upto(9) { |n| com_ports << "COM#{n}" }
-          com_ports
-        else
-          `ls /dev`.split("\n").grep(/usb|ACM/).map{|d| "/dev/#{d}"}
-        end
+      def connect
+        tty_devices.each { |device| return SerialPort.new(device, @baud) rescue nil }
+        raise BoardNotFound
       end
 
-      def find_arduino
-        tty_devices.map do |device|
-          next if device.match /^cu/
-          begin
-            SerialPort.new(device, BAUD)
-          rescue
-            nil
-          end
-        end.compact.first
+      def tty_devices
+        return [@device] if @device
+        return (1..9).map { |n| "COM#{n}" } if RUBY_PLATFORM.match /mswin|mingw/i
+        `ls /dev`.split("\n").grep(/usb|ACM/).map{ |d| "/dev/#{d}" }
       end
     end
   end

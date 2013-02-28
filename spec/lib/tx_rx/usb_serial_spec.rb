@@ -12,14 +12,15 @@ module Dino
 
     describe '#io' do
       context "on windows" do
-        it 'should instantiate a new SerialPort for each usb tty device found' do
+        it 'should instantiate a new SerialPort for the first available tty device' do
           original_platform = RUBY_PLATFORM
           Constants.redefine(:RUBY_PLATFORM, "mswin", :on => Object)
-          subject.should_receive(:tty_devices).and_return(["COM1", "COM2", "COM3", "COM4"])
-          SerialPort.should_receive(:new).with('COM1', TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
-          SerialPort.should_receive(:new).with('COM2', TxRx::USBSerial::BAUD).and_return(mock)
-          SerialPort.should_receive(:new).with('COM3', TxRx::USBSerial::BAUD).and_return(mock)
-          SerialPort.should_receive(:new).with('COM4', TxRx::USBSerial::BAUD).and_return(mock)
+          subject.should_receive(:tty_devices).and_return(["COM1", "COM2", "COM3"])
+
+          # COM2 is chosen as available for this test.
+          SerialPort.should_receive(:new).with("COM1", TxRx::USBSerial::BAUD).and_raise
+          SerialPort.should_receive(:new).with("COM2", TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_not_receive(:new).with("COM3", TxRx::USBSerial::BAUD)
 
           subject.io.should == mock_serial
           Constants.redefine(:RUBY_PLATFORM, original_platform, :on => Object)
@@ -27,35 +28,28 @@ module Dino
       end
 
       context "on unix" do
-        it 'should instantiate a new SerialPort for each usb tty device found' do
-          subject.should_receive(:tty_devices).and_return(['/dev/tty1.usb', '/dev/tty1.usb', '/dev/tty.ACM0'])
-          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
-          SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::USBSerial::BAUD).and_return(mock)
-          SerialPort.should_receive(:new).with('/dev/tty.ACM0', TxRx::USBSerial::BAUD).and_return(mock)
+        it 'should instantiate a new SerialPort for the first available tty device' do
+          subject.should_receive(:tty_devices).and_return(['/dev/ttyACM0', '/dev/tty.usbmodem1'])
+
+          # /dev/ttyACM0 is chosen as available for this test.
+          SerialPort.should_receive(:new).with('/dev/ttyACM0', TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_not_receive(:new).with('/dev/tty.usbmodem1', TxRx::USBSerial::BAUD)
 
           subject.io.should == mock_serial
         end
       end
 
       it 'should use the existing io instance if set' do
-        subject.should_not_receive(:tty_devices)
+        subject.should_receive(:tty_devices).once.and_return(['/dev/tty.ACM0', '/dev/tty.usbmodem1'])
         SerialPort.stub(:new).and_return(mock_serial = mock)
 
-        subject.io = '/dev/tty1.usb'
+        3.times { subject.io }
         subject.io.should == mock_serial
       end
 
       it 'should raise a BoardNotFound exception if there is no board connected' do
         SerialPort.stub(:new).and_raise
         expect { subject.io }.to raise_exception BoardNotFound
-      end
-    end
-
-    describe '#io=' do
-      it 'should set io to a new serial port with the specified device' do
-        SerialPort.should_receive(:new).with('/dev/tty1.usb', TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
-        subject.io = '/dev/tty1.usb'
-        subject.instance_variable_get(:@io).should == mock_serial
       end
     end
 

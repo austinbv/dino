@@ -14,7 +14,7 @@ def usage
   $stderr.puts "Usage: #{File.basename($0)} COMMAND [command-specific-options]"
   $stderr.puts
   $stderr.puts "Commands:"
-  $stderr.puts "  generate-sketch"
+  $stderr.puts "  generate-sketch SKETCH [options]"
   $stderr.puts
   $stderr.puts "    Sketches:"
   $stderr.puts "      serial"
