@@ -4,8 +4,8 @@
 # LED. The set_delay callback reads from the potentiometer
 # and changes the sleep delay for the LED on/off cycle.  
 #  
-
-require File.expand_path('../../lib/dino', __FILE__)
+require 'bundler/setup'
+require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
 led = Dino::Components::Led.new(pin: 13, board: board)
@@ -13,11 +13,9 @@ potentiometer = Dino::Components::Sensor.new(pin: 'A0', board: board)
 
 delay = 500.0
 
-set_delay = Proc.new do |data|
+potentiometer.when_data_received do |data|
   puts "DATA: #{delay = data.to_i}"
 end
-
-potentiometer.when_data_received(set_delay)
 
 [:on, :off].cycle do |switch|
   puts "DELAY: #{seconds = (delay / 1000.0)}"

@@ -4,7 +4,8 @@
 # sleep or in someway keep running or your program
 # will exit before any callbacks can be called
 #
-require File.expand_path('../../lib/dino', __FILE__)
+require 'bundler/setup'
+require 'dino'
 
 board = Dino::Board.new(Dino::TxRx.new)
 ir = Dino::Components::IrReceiver.new(pin: 2, board: board)

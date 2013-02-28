@@ -5,7 +5,8 @@ module Dino
     class USBSerial < Base
       BAUD = 115200
 
-      def initialize
+      def initialize(device = nil)
+        @device = device
         @first_write = true
       end
 
@@ -21,8 +22,11 @@ module Dino
       private
 
       def tty_devices
+        return [@device] if @device
         if RUBY_PLATFORM.include?("mswin") || RUBY_PLATFORM.include?("mingw")
-          ["COM1", "COM2", "COM3", "COM4"]
+          com_ports = []
+          1.upto(9) { |n| com_ports << "COM#{n}" }
+          com_ports
         else
           `ls /dev`.split("\n").grep(/usb|ACM/).map{|d| "/dev/#{d}"}
         end
