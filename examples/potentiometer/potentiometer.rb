@@ -7,7 +7,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx.new)
+board = Dino::Board.new(Dino::TxRx::Serial.new)
 led = Dino::Components::Led.new(pin: 13, board: board)
 potentiometer = Dino::Components::Sensor.new(pin: 'A0', board: board)
 

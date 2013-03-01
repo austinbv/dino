@@ -1,13 +1,15 @@
 require 'spec_helper'
 
 module Dino
-  describe TxRx::USBSerial do
+  describe TxRx::Serial do
     it { should be }
 
     describe '#initialize' do
       it 'should set first_write to false' do
-        TxRx::USBSerial.new.instance_variable_get(:@first_write).should == true
+        TxRx::Serial.new.instance_variable_get(:@first_write).should == true
       end
+      it 'should connect to the specified device'
+      it 'should connect at the specified baud rate'
     end
 
     describe '#io' do
@@ -18,9 +20,9 @@ module Dino
           subject.should_receive(:tty_devices).and_return(["COM1", "COM2", "COM3"])
 
           # COM2 is chosen as available for this test.
-          SerialPort.should_receive(:new).with("COM1", TxRx::USBSerial::BAUD).and_raise
-          SerialPort.should_receive(:new).with("COM2", TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
-          SerialPort.should_not_receive(:new).with("COM3", TxRx::USBSerial::BAUD)
+          SerialPort.should_receive(:new).with("COM1", TxRx::Serial::BAUD).and_raise
+          SerialPort.should_receive(:new).with("COM2", TxRx::Serial::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_not_receive(:new).with("COM3", TxRx::Serial::BAUD)
 
           subject.io.should == mock_serial
           Constants.redefine(:RUBY_PLATFORM, original_platform, :on => Object)
@@ -32,8 +34,8 @@ module Dino
           subject.should_receive(:tty_devices).and_return(['/dev/ttyACM0', '/dev/tty.usbmodem1'])
 
           # /dev/ttyACM0 is chosen as available for this test.
-          SerialPort.should_receive(:new).with('/dev/ttyACM0', TxRx::USBSerial::BAUD).and_return(mock_serial = mock)
-          SerialPort.should_not_receive(:new).with('/dev/tty.usbmodem1', TxRx::USBSerial::BAUD)
+          SerialPort.should_receive(:new).with('/dev/ttyACM0', TxRx::Serial::BAUD).and_return(mock_serial = mock)
+          SerialPort.should_not_receive(:new).with('/dev/tty.usbmodem1', TxRx::Serial::BAUD)
 
           subject.io.should == mock_serial
         end

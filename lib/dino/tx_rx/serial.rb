@@ -2,11 +2,11 @@ require 'serialport'
 
 module Dino
   module TxRx
-    class USBSerial < Base
+    class Serial < Base
       BAUD = 115200
 
-      def initialize(device = nil, options={})
-        @device = device
+      def initialize(options={})
+        @device = options[:device]
         @baud = options[:baud] || BAUD
         @first_write = true
       end

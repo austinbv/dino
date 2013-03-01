@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx.new)
+board = Dino::Board.new(Dino::TxRx::Serial.new)
 servo = Dino::Components::Servo.new(pin: 9, board: board)
 
 loop do

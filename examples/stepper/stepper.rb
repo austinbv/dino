@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx.new)
+board = Dino::Board.new(Dino::TxRx::Serial.new)
 stepper = Dino::Components::Stepper.new(board: board, pins: { step: 10, direction: 8 })
 
   1600.times do
