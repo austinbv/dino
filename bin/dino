@@ -2,6 +2,10 @@
 require "pathname"
 require "fileutils"
 
+SERIAL   = "du"
+ETHERNET = "du_ethernet"
+WIFI     = "du_wifi"
+
 $options = {}
 $options[:sketch_names] = []
 
@@ -16,37 +20,50 @@ def usage
   $stderr.puts "Commands:"
   $stderr.puts "  generate-sketch SKETCH [options]"
   $stderr.puts
-  $stderr.puts "    Sketches:"
-  $stderr.puts "      serial"
-  $stderr.puts "      ethernet"
+  $stderr.puts "    Available sketches and options:"
   $stderr.puts
-  $stderr.puts "    Options:"
-  $stderr.puts "      --baud BAUD"
-  $stderr.puts "      --mac XX:XX:XX:XX:XX:XX"
-  $stderr.puts "      --ip XXX.XXX.XXX.XXX"
-  $stderr.puts "      --port PORT"
-  $stderr.puts "      --debug"
+  $stderr.puts "      serial"
+  $stderr.puts "        --baud BAUD"
+  $stderr.puts "        --debug"
+  $stderr.puts
+  $stderr.puts "      ethernet"
+  $stderr.puts "        --mac XX:XX:XX:XX:XX:XX"
+  $stderr.puts "        --ip XXX.XXX.XXX.XXX"
+  $stderr.puts "        --port PORT"
+  $stderr.puts "        --debug"
+  $stderr.puts
+  $stderr.puts "      wifi"
+  $stderr.puts "        --ssid SSID"
+  $stderr.puts "        --password PASSWORD"
+  $stderr.puts "        --port PORT"
+  $stderr.puts "        --debug"
   $stderr.puts
   exit(2)
 end
 
 # Command must be the first argument.
 $options[:command] = ARGV.shift
-usage if $options[:command].match /help/
+usage if $options[:command].match /help|usage/ 
 
 # Parse the rest loosely.
 loop do
   case ARGV[0]
     when 'serial'
-      ARGV.shift; $options[:sketch_names] << "du" unless $options[:sketch_names].include? "du"
+      ARGV.shift; $options[:sketch_names] << SERIAL unless $options[:sketch_names].include? SERIAL
     when 'ethernet'
-      ARGV.shift; $options[:sketch_names] << "du_ethernet" unless $options[:sketch_names].include? "du_ethernet"
+      ARGV.shift; $options[:sketch_names] << ETHERNET unless $options[:sketch_names].include? ETHERNET
+    when 'wifi'
+      ARGV.shift; $options[:sketch_names] << WIFI unless $options[:sketch_names].include? WIFI
     when '--baud'
       ARGV.shift; $options[:baud] = ARGV.shift
-   when '--mac'
+    when '--mac'
       ARGV.shift; $options[:mac] = ARGV.shift
     when '--ip'
       ARGV.shift; $options[:ip] = ARGV.shift
+    when '--ssid'
+      ARGV.shift; $options[:ssid] = ARGV.shift
+    when '--password'
+      ARGV.shift; $options[:password] = ARGV.shift
     when '--port'
       ARGV.shift; $options[:port] = ARGV.shift
     when '--debug'
@@ -75,16 +92,22 @@ $options[:sketch_names].each do |sketch_name|
   sketch = File.read(src_sketch)
 
   # Modify them based on the arguments.
-  if $options[:baud]
+  if $options[:baud] && sketch_name == SERIAL
     sketch.gsub! "115200", $options[:baud]
   end
-  if $options[:mac]
+  if $options[:mac] && sketch_name == ETHERNET
     octets = $options[:mac].split(':')
     bytes = octets.map { |o| "0x#{o.upcase}" }
     sketch.gsub! "{ 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 }", bytes.inspect.gsub("[", "{").gsub("]", "}").gsub("\"", "")
   end
-  if $options[:ip]
+  if $options[:ip] && sketch_name == ETHERNET
     sketch.gsub! "192,168,0,77", $options[:ip].gsub(".", ",")
+  end
+  if $options[:ssid] && sketch_name == WIFI
+    sketch.gsub! "yourNetwork", $options[:ssid]
+  end
+  if $options[:password] && sketch_name == WIFI
+    sketch.gsub! "yourPassword", $options[:password]
   end
   if $options[:port]
     sketch.gsub! "int port = 3466", "int port = #{$options[:port]}"
