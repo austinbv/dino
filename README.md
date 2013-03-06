@@ -1,4 +1,4 @@
-# Welcome to Dino
+# Dino 0.11.1
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
 ## Get Started In No Time
@@ -7,7 +7,7 @@ Dino lets you start programming your Arduino with Ruby in minutes.
 
 #### Install the Gem
 
-```
+```shell
 gem install dino
 ```
 
@@ -15,7 +15,7 @@ gem install dino
 
 Use the included command line tool to create a folder with the Arduino sketch you want to use and optionally configure it.
 
-````
+```shell
 # If connecting via serial, USB or ser2net, this is all you should need:
 dino generate-sketch serial
 
@@ -24,7 +24,7 @@ dino generate-sketch ethernet --mac XX:XX:XX:XX:XX:XX --ip XXX.XXX.XXX.XXX
 
 # For more options:
 dino help
-````
+```
 
 __Note:__ Current Ethernet shields come with a sticker indicating the MAC address you should use with them. For older shields without a dedicated MAC address, inventing a random one should work, but don't use the same one for multiple boards. Valid IP addresses depend on the configuration of your network.
 
