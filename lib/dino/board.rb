@@ -77,13 +77,15 @@ module Dino
     end
       
     PIN_COMMANDS = {
-      digital_write:   01,
-      digital_read:    02,
-      analog_write:    03,
-      analog_read:     04,
-      digital_listen:  05,
-      analog_listen:   06,
-      stop_listener:   07,
+      digital_write:   '01',
+      digital_read:    '02',
+      analog_write:    '03',
+      analog_read:     '04',
+      digital_listen:  '05',
+      analog_listen:   '06',
+      stop_listener:   '07',
+      servo_toggle:    '08',
+      servo_write:     '09'
     }
 
     PIN_COMMANDS.each_key do |command|

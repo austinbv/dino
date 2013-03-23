@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.2
+
+* Make servos work better by using the existing Arduino Servo library.
+  * Up to 12 servos can be controlled, on digital pins 2-13 only.
+  * Flashing the updated sketch to the board is required.
+
 ## 0.11.1
  
 ### New Features

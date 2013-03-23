@@ -5,14 +5,18 @@ module Dino
 
       def after_initialize(options={})
         set_pin_mode(:out)
-        self.position = 0
+        board.servo_toggle(pin, 1)
+        position = options[:position] || 0
       end
 
-      def position=(new_position)
-        @position = new_position % 180
-        analog_write(@position)
+      def position=(value)
+        board.servo_write(pin, angle(value))
+        @position = value
+      end
+
+      def angle(value)
+        value == 180 ? value : value % 180
       end
     end
   end
 end
-

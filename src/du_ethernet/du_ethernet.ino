@@ -1,6 +1,7 @@
 #include "Dino.h"
 #include <SPI.h>
 #include <Ethernet.h>
+#include <Servo.h>
 
 // Configure your MAC address, IP address, and HTTP port here.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };

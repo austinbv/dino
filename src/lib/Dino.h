@@ -4,7 +4,9 @@
 
 #ifndef Dino_h
 #define Dino_h
+
 #include "Arduino.h"
+#include <Servo.h>
 
 // Allocate listener storage based on what board we're running.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -55,6 +57,8 @@ class Dino {
     void (*_writeCallback)(char *str);
     void writeResponse();
 
+    Servo servos[12];
+
     // API-accessible functions.
     void setMode               ();
     void dWrite                (); 
@@ -64,6 +68,8 @@ class Dino {
     void addDigitalListener    ();
     void addAnalogListener     ();
     void removeListener        ();
+    void servoToggle           ();
+    void servoWrite            ();
     void reset                 ();
     void setAnalogDivider      ();
     void setHeartRate          ();

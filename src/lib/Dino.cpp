@@ -43,6 +43,8 @@ void Dino::process() {
     case 5:  addDigitalListener  ();  break;
     case 6:  addAnalogListener   ();  break;
     case 7:  removeListener      ();  break;
+    case 8:  servoToggle         ();  break;
+    case 9:  servoWrite          ();  break;
     case 90: reset               ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
@@ -190,6 +192,32 @@ void Dino::removeListener() {
   #ifdef debug
     Serial.print("Removed listeners on pin "); Serial.println(pin);
   #endif
+}
+
+// CMD = 08
+// Attach the servo object to pin or detach it.
+void Dino::servoToggle() {
+  if (val == 0) {
+    #ifdef debug
+      Serial.print("Detaching servo"); Serial.print(" on pin "); Serial.println(pin);
+    #endif
+    servos[pin - 2].detach();
+  }
+  else {
+    #ifdef debug
+      Serial.print("Attaching servo"); Serial.print(" on pin "); Serial.println(pin);
+    #endif
+    servos[pin - 2].attach(pin);
+  }
+}
+
+// CMD = 09
+// Write a value to the servo object.
+void Dino::servoWrite() {
+  #ifdef debug
+    Serial.print("Servo write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
+  #endif
+  servos[pin - 2].write(val);
 }
 
 // CMD = 90
