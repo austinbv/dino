@@ -1,4 +1,6 @@
 #include <Servo.h>
+#include <LiquidCrystal.h>
+#include "DinoDisplay.h"
 
 bool debug = false;
 
@@ -11,6 +13,7 @@ char val[4];
 char aux[4];
 
 Servo servo;
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
   Serial.begin(115200);
@@ -64,6 +67,7 @@ void process() {
     case 2:  dr(pin,val);              break;
     case 3:  aw(pin,val);              break;
     case 4:  ar(pin,val);              break;
+    case 5:  handleDisplay(lcd, messageBuffer);          break;
     case 97: handlePing(pin,val,aux);  break;
     case 98: handleServo(pin,val,aux); break;
     case 99: toggleDebug(val);         break;
