@@ -2,6 +2,7 @@ module Dino
   class Board
     attr_reader :digital_hardware, :analog_hardware, :analog_zero
     LOW, HIGH = 000, 255
+    DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
     def initialize(io)
       @io, @digital_hardware, @analog_hardware = io, [], []
@@ -14,15 +15,15 @@ module Dino
     end
 
     def analog_divider=(value)
-      unless [1, 2, 4, 8, 16, 32, 64, 128].include? value
-        puts "Analog divider must be in 1, 2, 4, 8, 16, 32, 64, 128"
+      unless DIVIDERS.include? value
+        puts "Analog divider must be in #{DIVIDERS.inspect}"
       else
-        write "97.0.#{normalize_value(value)}"
+        write Dino::Message.encode(command: 97, value: value)
       end
     end
 
     def heart_rate=(value)
-      write "98.0.#{normalize_value(value)}"
+      write Dino::Message.encode(command: 98, value: value)
     end
 
     def start_read
@@ -34,12 +35,12 @@ module Dino
     end
 
     def write(msg)
-      @io.write("#{msg}\n")
+      @io.write(msg)
     end
 
     def update(pin, msg)
       (@digital_hardware + @analog_hardware).each do |part|
-        part.update(msg) if normalize_pin(pin) == normalize_pin(part.pin)
+        part.update(msg) if convert_pin(pin) == convert_pin(part.pin)
       end
     end
 
@@ -55,7 +56,7 @@ module Dino
     end
 
     def add_analog_hardware(part)
-      set_pin_mode(part.pin, :in)
+      set_pin_mode(part.pin, :in, part.pullup)
       analog_listen(part.pin)
       @analog_hardware << part
     end
@@ -66,58 +67,36 @@ module Dino
     end
 
     def set_pin_mode(pin, mode, pullup=nil)
-      pin, value = normalize_pin(pin), normalize_value(mode == :out ? 0 : 1)
-      write("00.#{pin}.#{value}")
+      pin, value = convert_pin(pin), mode == :out ? 0 : 1
+      write Dino::Message.encode(command: 0, pin: pin, value: value)
       set_pullup(pin, pullup) if mode == :in
     end
 
     def set_pullup(pin, pullup)
+      pin = convert_pin(pin)
       pullup ? digital_write(pin, HIGH) : digital_write(pin, LOW)
     end
-      
+
     PIN_COMMANDS = {
-      digital_write:   '01',
-      digital_read:    '02',
-      analog_write:    '03',
-      analog_read:     '04',
-      digital_listen:  '05',
-      analog_listen:   '06',
-      stop_listener:   '07',
-      servo_toggle:    '08',
-      servo_write:     '09'
+      digital_write:   '1',
+      digital_read:    '2',
+      analog_write:    '3',
+      analog_read:     '4',
+      digital_listen:  '5',
+      analog_listen:   '6',
+      stop_listener:   '7',
+      servo_toggle:    '8',
+      servo_write:     '9'
     }
 
     PIN_COMMANDS.each_key do |command|
       define_method(command) do |pin, value=nil|
-        cmd = normalize_cmd(PIN_COMMANDS[command])
-        write "#{cmd}.#{normalize_pin(pin)}.#{normalize_value(value)}"
+        write Dino::Message.encode(command: PIN_COMMANDS[command], pin: convert_pin(pin), value: value)
       end
     end
 
-    def normalize_pin(pin)
-      if pin.to_s.match /\Aa/i
-        int_pin = @analog_zero + pin.to_s.gsub(/\Aa/i, '').to_i
-      else
-        int_pin = pin
-      end
-      raise Exception.new('pin number must be in 0-99') if int_pin.to_i > 99
-      return normalize(int_pin, 2)
-    end
-
-    def normalize_cmd(cmd)
-      raise Exception.new('commands can only be two digits') if cmd.to_s.length > 2
-      normalize(cmd, 2)
-    end
-
-    def normalize_value(value)
-      raise Exception.new('values are limited to three digits') if value.to_s.length > 3
-      normalize(value, 3)
-    end
-
-    private
-
-    def normalize(pin, spaces)
-      pin.to_s.rjust(spaces, '0')
+    def convert_pin(pin)
+      pin.to_s.match(/\Aa/i) ? @analog_zero + pin.to_s.gsub(/\Aa/i, '').to_i : pin.to_i
     end
   end
 end

@@ -29,9 +29,9 @@ module Dino
     describe '#update' do
       context 'when the given pin connects to an analog hardware part' do
         it 'should call update with the message on the part' do
-          part = mock(:part, pin: 7)
+          part = mock(:part, pin: 7, pullup: nil)
           subject.add_analog_hardware(part)
-          other_part = mock(:part, pin: 9)
+          other_part = mock(:part, pin: 9, pullup: nil)
           subject.add_analog_hardware(other_part)
 
           part.should_receive(:update).with('wake up!')
@@ -82,11 +82,9 @@ module Dino
       end
 
       it 'should set the mode for the given pin to "in" and add a digital listener' do
-        subject
-        subject.should_receive(:write).with("00.12.001")
-        subject.should_receive(:write).with("01.12.000")
-        subject.should_receive(:write).with("05.12.000")
-        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
+        subject.should_receive(:set_pin_mode).with(12, :in, nil)
+        subject.should_receive(:digital_listen).with(12)
+        subject.add_digital_hardware(mock(:part1, pin: 12, pullup: nil))
       end
     end
 
@@ -107,10 +105,8 @@ module Dino
       end
 
       it 'should set the mode for the given pin to "in" and add an analog listener' do
-        subject
-        subject.should_receive(:write).with("00.12.001")
-        subject.should_receive(:write).with("01.12.000")
-        subject.should_receive(:write).with("06.12.000")
+        subject.should_receive(:set_pin_mode).with(12, :in, nil)
+        subject.should_receive(:analog_listen).with(12)
         subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end
     end
@@ -144,71 +140,88 @@ module Dino
         board = Board.new(io_mock(write: true))
         board.write('message').should == true
       end
-
-      it 'should append a new line to hte message' do
-        io_mock.should_receive(:write).with("hello\n")
-        subject.write('hello')
-      end
     end
 
     describe '#digital_write' do
-      it 'should append a append a write to the pin and value' do
-        io_mock.should_receive(:write).with("01.01.003\n")
+      it 'should write the value to the right pin' do
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 1, pin: 1, value: 3))
         subject.digital_write(01, 003)
       end
     end
 
     describe '#digital_read' do
       it 'should tell the board to read once from the given pin' do
-        io_mock.should_receive(:write).with("02.13.000\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 2, pin: 13))
         subject.digital_read(13)
       end
     end
 
     describe '#analog_write' do
       it 'should append a append a write to the pin and value' do
-        io_mock.should_receive(:write).with("03.01.003\n")
-        subject.analog_write(01, 003)
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 3, pin: 1, value: 3))
+        subject.analog_write(01, 3)
       end
     end
 
     describe '#analog_read' do
       it 'should tell the board to read once from the given pin' do
-        io_mock.should_receive(:write).with("04.13.000\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 4, pin: 13))
         subject.analog_read(13)
       end
     end
 
     describe '#digital_listen' do
       it 'should tell the board to continuously read from the given pin' do
-        io_mock.should_receive(:write).with("05.13.000\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 5, pin: 13))
         subject.digital_listen(13)
       end
     end
 
     describe '#analog_listen' do
       it 'should tell the board to continuously read from the given pin' do
-        io_mock.should_receive(:write).with("06.13.000\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 6, pin: 13))
         subject.analog_listen(13)
       end
     end
 
     describe '#stop_listener' do
       it 'should tell the board to stop sending values for the given pin' do
-        io_mock.should_receive(:write).with("07.13.000\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 7, pin: 13))
         subject.stop_listener(13)
       end
     end
 
     describe '#set_pin_mode' do
       it 'should send a value of 0 if the pin mode is set to out' do
-        io_mock.should_receive(:write).with("00.13.000\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 0, pin: 13, value: 0))
         subject.set_pin_mode(13, :out)
       end
 
       it 'should send a value of 1 if the pin mode is set to in' do
-        io_mock.should_receive(:write).with("00.13.001\n")
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 0, pin: 13, value: 1))
         subject.set_pin_mode(13, :in)
+      end
+
+      it 'should set the pullup correctly if mode is in' do
+        subject.should_receive(:set_pullup).with(13, nil)
+        subject.set_pin_mode(13, :in)
+      end
+
+      it 'shouldnt affect the pullup if mode is out' do
+        subject.should_not_receive(:set_pullup).with(13, nil)
+        subject.set_pin_mode(13, :out)
+      end
+    end
+
+    describe '#set_pullup' do
+      it 'should write high if pullup is enabled' do
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: Board::HIGH))
+        subject.set_pullup(13, true)
+      end
+
+      it 'should write low if pullup is disabled' do
+        io_mock.should_receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: Board::LOW))
+        subject.set_pullup(13, false)
       end
     end
 
@@ -219,31 +232,15 @@ module Dino
       end
     end
 
-    describe '#normalize_pin' do
-      it 'should normalize numbers so they are two digits' do
-        subject.normalize_pin(1).should == '01'
+    describe '#convert_pin' do
+      before(:each) { subject.instance_variable_set(:@analog_zero, 14) }
+
+      it 'should convert alphanumeric pins to numbers' do
+        subject.convert_pin('A1').should == 15
       end
 
-      it 'should not normalize numbers that are already two digits' do
-        subject.normalize_pin(10).should == '10'
-      end
-
-      it 'should raise if a number larger than two digits are given' do
-        expect { subject.normalize_pin(1000) }.to raise_exception 'pin number must be in 0-99'
-      end
-    end
-
-    describe '#normalize_value' do
-      it 'should normalize numbers so they are three digits' do
-        subject.normalize_value(1).should == '001'
-      end
-
-      it 'should not normalize numbers that are already three digits' do
-        subject.normalize_value(10).should == '010'
-      end
-
-      it 'should raise if a number larger than three digits are given' do
-        expect { subject.normalize_value(1000) }.to raise_exception 'values are limited to three digits'
+      it 'should leave numeric pins alone' do
+        subject.convert_pin('13').should == 13
       end
     end
   end
