@@ -30,10 +30,15 @@ void Dino::parse(char c) {
   }
 
   // If fragment delimiter, terminate current fragment and move to next.
+  // Unless we're in the extended message, then just append.
   else if (c == '.') {
-    append('\0');
-    if (fragmentIndex < 3) fragmentIndex++;
-    charIndex = 0;
+    if (fragmentIndex < 3) {
+      append('\0');
+      fragmentIndex++;
+      charIndex = 0;
+    } else {
+      append(c);
+    }
   }
 
   // Catch backslash so we can escape the next character.
@@ -42,7 +47,6 @@ void Dino::parse(char c) {
   // Else just append the character.
   else append(c);
 }
-
 
 void Dino::append(char c) {
   messageFragments[fragmentIndex][charIndex++] = c;
@@ -55,7 +59,6 @@ void Dino::process() {
   response[0] = '\0';
 
   #ifdef debug
-   // Serial.print("Received request - "); Serial.println(request);
    Serial.print("Command - ");          Serial.println(cmdStr);
    Serial.print("Pin - ");              Serial.println(pinStr);
    Serial.print("Value - ");            Serial.println(valStr);
