@@ -6,28 +6,56 @@
 #include "Dino.h"
 
 Dino::Dino(){
+  messageFragments[0] = cmdStr;
+  messageFragments[1] = pinStr;
+  messageFragments[2] = valStr;
+  messageFragments[3] = auxMsg;
   reset();
 }
 
 void Dino::parse(char c) {
-  if (c == '!') index = 0;        // Reset request
-  else if (c == '.') process();   // End request and process
-  else request[index++] = c;      // Append to request
+  // Handle escaped newlines.
+  if (backslash) {
+    if (c != '\n') append('\\');
+    append(c);
+    backslash = false;
+  }
+
+  // If EOL process and reset.
+  else if (c == '\n') {
+    append('\0');
+    process();
+    fragmentIndex = 0;
+    charIndex = 0;
+  }
+
+  // If fragment delimiter, terminate current fragment and move to next.
+  else if (c == '.') {
+    append('\0');
+    if (fragmentIndex < 3) fragmentIndex++;
+    charIndex = 0;
+  }
+
+  // Catch backslash so we can escape the next character.
+  else if (c == '\\') backslash = true;
+
+  // Else just append the character.
+  else append(c);
+}
+
+
+void Dino::append(char c) {
+  messageFragments[fragmentIndex][charIndex++] = c;
 }
 
 void Dino::process() {
-  response[0] = '\0';
-
-  // Parse the request.
-  strncpy(cmdStr, request, 2);      cmdStr[2] =  '\0';
-  strncpy(pinStr, request + 2, 2);  pinStr[2] =  '\0';
-  strncpy(valStr, request + 4, 3);  valStr[3] =  '\0';
   cmd = atoi(cmdStr);
   pin = atoi(pinStr);
   val = atoi(valStr);
+  response[0] = '\0';
 
   #ifdef debug
-   Serial.print("Received request - "); Serial.println(request);
+   // Serial.print("Received request - "); Serial.println(request);
    Serial.print("Command - ");          Serial.println(cmdStr);
    Serial.print("Pin - ");              Serial.println(pinStr);
    Serial.print("Value - ");            Serial.println(valStr);
@@ -229,7 +257,8 @@ void Dino::reset() {
   for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
   for (int i = 0; i < 22; i++)  analogListeners[i] = false;
   lastUpdate = micros();
-  index = 0;
+  fragmentIndex = 0;
+  charIndex = 0;
   #ifdef debug
     Serial.println("Reset the board to defaults.  pin ");
   #endif

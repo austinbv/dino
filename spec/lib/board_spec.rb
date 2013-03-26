@@ -83,9 +83,9 @@ module Dino
 
       it 'should set the mode for the given pin to "in" and add a digital listener' do
         subject
-        subject.should_receive(:write).with("0012001")
-        subject.should_receive(:write).with("0112000")
-        subject.should_receive(:write).with("0512000")
+        subject.should_receive(:write).with("00.12.001")
+        subject.should_receive(:write).with("01.12.000")
+        subject.should_receive(:write).with("05.12.000")
         subject.add_digital_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end
     end
@@ -108,9 +108,9 @@ module Dino
 
       it 'should set the mode for the given pin to "in" and add an analog listener' do
         subject
-        subject.should_receive(:write).with("0012001")
-        subject.should_receive(:write).with("0112000")
-        subject.should_receive(:write).with("0612000")
+        subject.should_receive(:write).with("00.12.001")
+        subject.should_receive(:write).with("01.12.000")
+        subject.should_receive(:write).with("06.12.000")
         subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
       end
     end
@@ -145,75 +145,69 @@ module Dino
         board.write('message').should == true
       end
 
-      it 'should wrap the message in a ! and a . by default' do
-        io_mock.should_receive(:write).with('!hello.')
+      it 'should append a new line to hte message' do
+        io_mock.should_receive(:write).with("hello\n")
         subject.write('hello')
-      end
-
-      it 'should not wrap the message if no_wrap is set to true' do
-        board = Board.new(io_mock)
-        io_mock.should_receive(:write).with('hello')
-        board.write('hello', no_wrap: true)
       end
     end
 
     describe '#digital_write' do
       it 'should append a append a write to the pin and value' do
-        io_mock.should_receive(:write).with('!0101003.')
+        io_mock.should_receive(:write).with("01.01.003\n")
         subject.digital_write(01, 003)
       end
     end
 
     describe '#digital_read' do
       it 'should tell the board to read once from the given pin' do
-        io_mock.should_receive(:write).with('!0213000.')
+        io_mock.should_receive(:write).with("02.13.000\n")
         subject.digital_read(13)
       end
     end
 
     describe '#analog_write' do
       it 'should append a append a write to the pin and value' do
-        io_mock.should_receive(:write).with('!0301003.')
+        io_mock.should_receive(:write).with("03.01.003\n")
         subject.analog_write(01, 003)
       end
     end
 
     describe '#analog_read' do
       it 'should tell the board to read once from the given pin' do
-        io_mock.should_receive(:write).with('!0413000.')
+        io_mock.should_receive(:write).with("04.13.000\n")
         subject.analog_read(13)
       end
     end
 
     describe '#digital_listen' do
       it 'should tell the board to continuously read from the given pin' do
-        io_mock.should_receive(:write).with('!0513000.')
+        io_mock.should_receive(:write).with("05.13.000\n")
         subject.digital_listen(13)
       end
     end
 
     describe '#analog_listen' do
       it 'should tell the board to continuously read from the given pin' do
-        io_mock.should_receive(:write).with('!0613000.')
+        io_mock.should_receive(:write).with("06.13.000\n")
         subject.analog_listen(13)
       end
     end
 
     describe '#stop_listener' do
       it 'should tell the board to stop sending values for the given pin' do
-        io_mock.should_receive(:write).with('!0713000.')
+        io_mock.should_receive(:write).with("07.13.000\n")
         subject.stop_listener(13)
       end
     end
 
     describe '#set_pin_mode' do
       it 'should send a value of 0 if the pin mode is set to out' do
-        io_mock.should_receive(:write).with('!0013000.')
+        io_mock.should_receive(:write).with("00.13.000\n")
         subject.set_pin_mode(13, :out)
       end
 
       it 'should send a value of 1 if the pin mode is set to in' do
-        io_mock.should_receive(:write).with('!0013001.')
+        io_mock.should_receive(:write).with("00.13.001\n")
         subject.set_pin_mode(13, :in)
       end
     end

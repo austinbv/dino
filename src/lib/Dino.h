@@ -33,24 +33,25 @@ class Dino {
     unsigned int loopCount;
     unsigned int analogDivider;
     
-    // Storage for enough analog and digital listeners for UNO or Nano board.
-    // Correspond to raw pin number by array index, and store boolean. false == disabled.
+    // Listeners correspond to raw pin number by array index, and store boolean. false == disabled.
     boolean analogListeners[PIN_COUNT];
     boolean digitalListeners[PIN_COUNT];
     
     // Keep track of the last read values for digital listeners. Only write responses when changed.
     byte digitalListenerValues[PIN_COUNT];
+
+    // Parsed message storage.
+    char cmdStr[5]; int cmd;
+    char pinStr[5]; int pin;
+    char valStr[5]; int val;
+    char auxMsg[256];
     
-    // Request storage.
-    char request[8];
-    int index;
-    char cmdStr[3];
-    byte cmd;
-    char pinStr[3];
-    byte pin;
-    char valStr[4];
-    int val;
-    
+    // Parser state storage.
+    char *messageFragments[4];
+    byte fragmentIndex;
+    int charIndex;
+    boolean backslash;
+
     // Value and response storage.
     int rval;
     char response[8];
@@ -75,6 +76,7 @@ class Dino {
     void setHeartRate          ();
 
     // Internal functions.
+    void append                 (char c);
     long timeSince              (long event);
     void updateDigitalListeners ();
     void updateAnalogListeners  ();

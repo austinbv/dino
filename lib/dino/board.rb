@@ -17,12 +17,12 @@ module Dino
       unless [1, 2, 4, 8, 16, 32, 64, 128].include? value
         puts "Analog divider must be in 1, 2, 4, 8, 16, 32, 64, 128"
       else
-        write "9700#{normalize_value(value)}"
+        write "97.0.#{normalize_value(value)}"
       end
     end
 
     def heart_rate=(value)
-      write "9800#{normalize_value(value)}"
+      write "98.0.#{normalize_value(value)}"
     end
 
     def start_read
@@ -33,9 +33,8 @@ module Dino
       @io.close_read
     end
 
-    def write(msg, opts = {})
-      formatted_msg = opts.delete(:no_wrap) ? msg : "!#{msg}."
-      @io.write(formatted_msg)
+    def write(msg)
+      @io.write("#{msg}\n")
     end
 
     def update(pin, msg)
@@ -68,7 +67,7 @@ module Dino
 
     def set_pin_mode(pin, mode, pullup=nil)
       pin, value = normalize_pin(pin), normalize_value(mode == :out ? 0 : 1)
-      write("00#{pin}#{value}")
+      write("00.#{pin}.#{value}")
       set_pullup(pin, pullup) if mode == :in
     end
 
@@ -91,7 +90,7 @@ module Dino
     PIN_COMMANDS.each_key do |command|
       define_method(command) do |pin, value=nil|
         cmd = normalize_cmd(PIN_COMMANDS[command])
-        write "#{cmd}#{normalize_pin(pin)}#{normalize_value(value)}"
+        write "#{cmd}.#{normalize_pin(pin)}.#{normalize_value(value)}"
       end
     end
 

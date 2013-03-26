@@ -37,7 +37,7 @@ module Dino
         flush_read
         100.times do
           begin
-            write("!9000000.")
+            write("90.00.000\n")
             Timeout::timeout(0.1) do
               line = gets.to_s
               if line.match /ACK:/
