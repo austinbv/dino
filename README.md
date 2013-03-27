@@ -43,3 +43,4 @@ gem install dino
 ## Contribute
 
 * Chat - Join us on freenode #dino-rb  
+* Read chat history: http://bit.ly/dino-rb-logs
