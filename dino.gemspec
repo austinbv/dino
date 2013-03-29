@@ -17,4 +17,8 @@ Gem::Specification.new do |gem|
   gem.executables   = ["dino"]
 
   gem.add_dependency 'serialport'
+  gem.add_dependency 'trollop'
+
+  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'rspec'
 end
