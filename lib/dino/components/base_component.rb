@@ -5,8 +5,8 @@ module Dino
       alias :pins :pin
 
       def initialize(options={})
-        self.board = options[:board]
-        self.pin = options[:pin] || options[:pins]
+        self.board  = options[:board]
+        self.pin    = options[:pin] || options[:pins]
         self.pullup = options[:pullup]
 
         raise 'board and pin or pins are required for a component' if self.board.nil? || self.pin.nil?

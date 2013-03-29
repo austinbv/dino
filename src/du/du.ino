@@ -1,5 +1,8 @@
 #include "Dino.h"
+#include "DinoDisplay.h"
 #include <Servo.h>
+#include <LiquidCrystal.h>
+
 Dino dino;
 
 // Dino.h doesn't handle TXRX. Setup a function to tell it to write to Serial.

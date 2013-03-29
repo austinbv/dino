@@ -32,6 +32,7 @@ module Dino
         Dino::Message.encode(command: 1).should == "1\n"
         Dino::Message.encode(command: 1, pin: 1, value: 1, aux_message: "Some Text").should == "1.1.1.Some Text\n"
         Dino::Message.encode(command: 1, aux_message: "Some Text").should == "1...Some Text\n"
+        Dino::Message.encode(command: 1, value: 1, aux_message: "Some Text").should == "1..1.Some Text\n"
       end
 
       it 'should insert a backslash before any newline inside the aux message' do

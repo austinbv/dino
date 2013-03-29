@@ -22,7 +22,7 @@ module Dino
         message << ".#{val}"
       end
       if aux
-        message << "." unless pin
+        message << "." unless pin || val
         message << "." unless val
         message << ".#{aux}"
       end

@@ -6,7 +6,9 @@
 #define Dino_h
 
 #include "Arduino.h"
+#include "DinoDisplay.h"
 #include <Servo.h>
+#include <LiquidCrystal.h>
 
 // Allocate listener storage based on what board we're running.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -71,6 +73,8 @@ class Dino {
     void removeListener        ();
     void servoToggle           ();
     void servoWrite            ();
+    void setDisplayPins        ();
+    void displayCommand        ();
     void reset                 ();
     void setAnalogDivider      ();
     void setHeartRate          ();
