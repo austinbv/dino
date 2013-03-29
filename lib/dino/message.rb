@@ -13,21 +13,16 @@ module Dino
       raise Exception.new('values can only be four digits') if val.to_s.length > 4
       raise Exception.new('auxillary messages are limited to 255 characters') if aux.to_s.length > 255
 
-      message = "#{cmd}"
-      if pin
-        message << ".#{pin}"
+      message = ""
+      [aux, val, pin].each do |fragment|
+        if fragment
+          message = ".#{fragment}" << message
+        elsif !message.empty?
+          message = "." << message
+        end
       end
-      if val
-        message << "." unless pin
-        message << ".#{val}"
-      end
-      if aux
-        message << "." unless pin
-        message << "." unless val
-        message << ".#{aux}"
-      end
+      message = "#{cmd}" << message
       message << "\n"
-      message
     end
   end
 end
