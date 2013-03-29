@@ -5,6 +5,8 @@
 #include "Arduino.h"
 #include "Dino.h"
 
+LiquidCrystal display(12,11,5,4,3,2);
+
 Dino::Dino(){
   messageFragments[0] = cmdStr;
   messageFragments[1] = pinStr;
@@ -76,6 +78,8 @@ void Dino::process() {
     case 7:  removeListener      ();  break;
     case 8:  servoToggle         ();  break;
     case 9:  servoWrite          ();  break;
+    case 10: setDisplayPins      ();  break;
+    case 11: displayCommand      ();  break;
     case 90: reset               ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
@@ -249,6 +253,28 @@ void Dino::servoWrite() {
     Serial.print("Servo write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
   #endif
   servos[pin - 2].write(val);
+}
+
+// CMD = 10
+// Initialize a display object.
+void Dino::setDisplayPins() {
+  DinoDisplay dd;
+  int *pins = dd.parse(auxMsg);
+  LiquidCrystal lcd(pins[0],pins[1],pins[2],pins[3],pins[4],pins[5]);
+  display = lcd;
+  #ifdef debug
+    Serial.print("Initialize display: "); Serial.println(pin);
+  #endif
+}
+
+// CMD = 11
+// Performs a display operation.
+void Dino::displayCommand() {
+  DinoDisplay lcd;
+  lcd.performOperation(display, val, auxMsg);
+  #ifdef debug
+    Serial.print("display op: "); Serial.println(val);
+  #endif
 }
 
 // CMD = 90
