@@ -4,6 +4,7 @@
 
 #include "Arduino.h"
 #include "Dino.h"
+DinoLCD dinoLCD;
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -76,6 +77,7 @@ void Dino::process() {
     case 7:  removeListener      ();  break;
     case 8:  servoToggle         ();  break;
     case 9:  servoWrite          ();  break;
+    case 10: handleLCD           ();  break;
     case 90: reset               ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
@@ -249,6 +251,15 @@ void Dino::servoWrite() {
     Serial.print("Servo write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
   #endif
   servos[pin - 2].write(val);
+}
+
+// CMD = 10
+// Write a value to the servo object.
+void Dino::handleLCD() {
+  #ifdef debug
+    Serial.print("DinoLCD command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  dinoLCD.process(val, auxMsg);
 }
 
 // CMD = 90

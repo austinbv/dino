@@ -1,5 +1,6 @@
 #include "Dino.h"
 #include <Servo.h>
+#include <LiquidCrystal.h>
 Dino dino;
 
 // Dino.h doesn't handle TXRX. Setup a function to tell it to write to Serial.
@@ -16,4 +17,3 @@ void loop() {
   dino.updateListeners();
   Serial.flush();
 }
-
