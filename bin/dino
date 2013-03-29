@@ -79,17 +79,14 @@ error "No sketches or invalid sketches specified" if $options[:sketch_names].emp
 
 $options[:sketch_names].each do |sketch_name|
   # Define the sources.
-  sketch_dir = sketch_name
-  sketch_file = sketch_name + ".ino"
   src_dir = Pathname.new(__FILE__).realpath.to_s.chomp("/bin/dino") + "/src"
-  src_header = File.join src_dir, "lib", "Dino.h"
-  src_implementation = File.join src_dir, "lib", "Dino.cpp"
-  src_sketch = File.join src_dir, sketch_dir, sketch_file
+  sketch_dir = sketch_name
+  sketch_filename = sketch_name + ".ino"
+  lib_filenames = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp"]
 
   # Read the files.
-  header = File.read(src_header)
-  implementation = File.read(src_implementation)
-  sketch = File.read(src_sketch)
+  libs = lib_filenames.map { |f| File.read(File.join(src_dir, "lib", f)) }
+  sketch = File.read(File.join(src_dir, sketch_dir, sketch_filename))
 
   # Modify them based on the arguments.
   if $options[:baud] && sketch_name == SERIAL
@@ -113,19 +110,19 @@ $options[:sketch_names].each do |sketch_name|
     sketch.gsub! "int port = 3466", "int port = #{$options[:port]}"
   end
   if $options[:debug]
-    header.gsub! "// #define debug true", "#define debug true"
+    libs[0].gsub! "// #define debug true", "#define debug true"
   end
 
   # Define the destinations.
   working_dir = Dir.pwd
   dest_dir = File.join working_dir, sketch_dir
   Dir::mkdir dest_dir
-  dest_header = File.join dest_dir, "Dino.h"
-  dest_implementation = File.join dest_dir, "Dino.cpp"
-  dest_sketch = File.join dest_dir, sketch_file
+  dest_sketch = File.join(dest_dir, sketch_filename)
+  dest_libs = lib_filenames.map { |f| File.join(dest_dir, f)}
 
   # Write the files.
-  File.open(dest_header, 'w')         { |f| f.write header }
-  File.open(dest_implementation, 'w') { |f| f.write implementation }
-  File.open(dest_sketch, 'w')         { |f| f.write sketch }
+  File.open(dest_sketch, 'w') { |f| f.write sketch }
+  dest_libs.each_with_index do |file, index|
+    File.open(file, 'w') { |f| f.write libs[index]}
+  end
 end

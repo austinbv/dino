@@ -1,6 +1,8 @@
 #include "Dino.h"
 #include <SPI.h>
 #include <WiFi.h>
+#include <Servo.h>
+#include <LiquidCrystal.h>
 
 // Configure your WiFi options here. MAC address and IP address are not configurable.
 int port = 3466;
