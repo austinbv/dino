@@ -146,13 +146,13 @@ long Dino::timeSince(long event) {
 // CMD = 00 // Pin Mode
 void Dino::setMode() {
   if (val == 0) {
+    removeListener();
     pinMode(pin, OUTPUT);
     #ifdef debug
       Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("OUTPUT mode");
     #endif
   }
   else {
-    removeListener();
     pinMode(pin, INPUT);
     #ifdef debug
       Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("INPTUT mode");
@@ -234,13 +234,13 @@ void Dino::servoToggle() {
     #ifdef debug
       Serial.print("Detaching servo"); Serial.print(" on pin "); Serial.println(pin);
     #endif
-    servos[pin - 2].detach();
+    servos[pin - SERVO_OFFSET].detach();
   }
   else {
     #ifdef debug
       Serial.print("Attaching servo"); Serial.print(" on pin "); Serial.println(pin);
     #endif
-    servos[pin - 2].attach(pin);
+    servos[pin - SERVO_OFFSET].attach(pin);
   }
 }
 
@@ -250,7 +250,7 @@ void Dino::servoWrite() {
   #ifdef debug
     Serial.print("Servo write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
   #endif
-  servos[pin - 2].write(val);
+  servos[pin - SERVO_OFFSET].write(val);
 }
 
 // CMD = 10
