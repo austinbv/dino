@@ -89,7 +89,7 @@ module Dino
         IO.should_receive(:select).and_return(true)
 
         subject.stub(:io).and_return(mock_serial = mock)
-        mock_serial.should_receive(:puts).with('a message')
+        mock_serial.should_receive(:syswrite).with('a message')
         subject.write('a message')
       end
     end
