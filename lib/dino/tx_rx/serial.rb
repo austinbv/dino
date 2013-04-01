@@ -15,6 +15,14 @@ module Dino
         @io ||= connect
       end
 
+      def handshake
+        if on_windows?
+          io; sleep 3
+        end
+        
+        super
+      end
+
       private
 
       def connect
@@ -24,8 +32,12 @@ module Dino
 
       def tty_devices
         return [@device] if @device
-        return (1..9).map { |n| "COM#{n}" } if RUBY_PLATFORM.match /mswin|mingw/i
+        return (1..9).map { |n| "COM#{n}" } if on_windows?
         `ls /dev`.split("\n").grep(/usb|ACM/).map{ |d| "/dev/#{d}" }
+      end
+
+      def on_windows?
+        RUBY_PLATFORM.match /mswin|mingw/i
       end
     end
   end

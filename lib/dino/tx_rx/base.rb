@@ -27,7 +27,7 @@ module Dino
       def write(message)
         loop do
           if IO.select(nil, [io], nil)
-            io.puts(message)
+            io.syswrite(message)
             break
           end
         end
