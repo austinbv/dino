@@ -14,6 +14,7 @@ int *DinoLCD::parse(char *aux){
     values[index] = atoi(str);
     index++;
   }
+  parseSize = index;
   return values;
 }
 
@@ -43,8 +44,17 @@ void DinoLCD::process(int cmd, char *message) {
 
 void DinoLCD::setPins(char *aux) {
   int *pins = parse(aux);
-  LiquidCrystal newLCD(pins[0],pins[1],pins[2],pins[3],pins[4],pins[5]);
-  lcd = newLCD;
+  if(parseSize > 6) {
+    // 8 bits mode
+    LiquidCrystal newLCD(pins[0],pins[1],pins[2],pins[3],pins[4],pins[5],
+                         pins[6], pins[7], pins[8], pins[9]);
+    lcd = newLCD;
+  }
+  else {
+    // 4 bits mode
+    LiquidCrystal newLCD(pins[0],pins[1],pins[2],pins[3],pins[4],pins[5]);
+    lcd = newLCD;
+  }
 }
 
 void DinoLCD::beginLCD(char *aux) {

@@ -2,8 +2,22 @@ module Dino
   module Components
     class LCD < BaseComponent
 
+      # Initialize in 4 bits mode
+      #
+      # Dino::Componentes::LCD.new(
+      #       board: board,
+      #       pins: { rs: 12, enable: 11, d4: 4, d5: 5, d6: 6, d7: 7 }
+      # )
+      #
+      # Initialize in 8 bits mode
+      #
+      # Dino::Componentes::LCD.new(
+      #       board: board,
+      #       pins: { rs: 12, enable: 11, d0: 0, d1: 1, d2: 2, d3: 3, d4: 4, d5: 5, d6: 6, d7: 7 }
+      # )
+      #
       def after_initialize(options)
-        board.write Dino::Message.encode command: 10, value: 0, aux_message: pins
+        board.write Dino::Message.encode command: 10, value: 0, aux_message: encoded_pins
       end
 
       def begin(cols, rows)
@@ -75,6 +89,14 @@ module Dino
         board.write Dino::Message.encode command: 10, value: 17
       end
 
+      private
+
+      def encoded_pins
+        encoded = [pins[:rs], pins[:enable], pins[:d0],
+                   pins[:d1], pins[:d2], pins[:d3], pins[:d4],
+                   pins[:d5], pins[:d6], pins[:d7]]
+        encoded.compact.join(',')
+      end
     end
   end
 end

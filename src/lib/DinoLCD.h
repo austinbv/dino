@@ -14,6 +14,7 @@ class DinoLCD {
     void setPins(char *aux);
     void beginLCD(char *aux);
     void setLCDCursor(char *aux);
+    int parseSize;
 };
 
 #endif
