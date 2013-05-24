@@ -54,7 +54,7 @@ module Dino
           1.upto(9) { |n| com_ports << "COM#{n}" }
           com_ports
         else
-          `ls /dev`.split("\n").grep(/usb|ACM/).map{|d| "/dev/#{d}"}
+          `ls /dev`.split("\n").grep(/usb|ACM/i).map{|d| "/dev/#{d}"}
         end
       end
 
