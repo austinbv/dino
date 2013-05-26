@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["austinbv@gmail.com"]
   gem.description   = %q{A utility library for interfacting with an Arduino.
   Designed for control, expansion, and with love.}
-  gem.summary       = %q{Control your arduino through a serial port}
+  gem.summary       = %q{Control your Arduino with Ruby.}
   gem.homepage      = 'https://github.com/austinbv/dino'
 
   gem.files         = `git ls-files`.split($\)
@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "dino"
   gem.require_paths = ["lib"]
   gem.version       = Dino::VERSION
+  gem.executables   = ["dino"]
 
   gem.add_dependency 'serialport'
 end

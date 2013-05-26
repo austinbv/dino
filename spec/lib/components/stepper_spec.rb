@@ -25,8 +25,8 @@ module Dino
         end
 
         it 'should set the pins to out' do
-          board.should_receive(:set_pin_mode).with(13, :out)
-          board.should_receive(:set_pin_mode).with(12, :out)
+          board.should_receive(:set_pin_mode).with(13, :out, nil)
+          board.should_receive(:set_pin_mode).with(12, :out, nil)
           Stepper.new(pins: {step: 13, direction: 12}, board: board)
         end
 

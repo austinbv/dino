@@ -7,7 +7,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx.new)
+board = Dino::Board.new(Dino::TxRx::Serial.new)
 ir = Dino::Components::IrReceiver.new(pin: 2, board: board)
 led = Dino::Components::Led.new(pin: 13, board: board)
 

@@ -1,10 +1,11 @@
 module Dino
   module TxRx
-    require 'dino/tx_rx/usb_serial'
-    require 'dino/tx_rx/telnet'
+    require 'dino/tx_rx/base'
+    require 'dino/tx_rx/serial'
+    require 'dino/tx_rx/tcp'
 
-    def self.new(device = nil)
-      self::USBSerial.new(device)
+    def self.new(options={})
+      self::Serial.new(options)
     end
   end
 end

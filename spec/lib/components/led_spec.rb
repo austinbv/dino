@@ -19,7 +19,7 @@ module Dino
         end
 
         it 'should set the pin to out' do
-          board.should_receive(:set_pin_mode).with(13, :out)
+          board.should_receive(:set_pin_mode).with(13, :out, nil)
           Led.new(pin: 13, board: board)
         end
 
