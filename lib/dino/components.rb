@@ -6,6 +6,7 @@ module Dino
     autoload :Sensor,     'dino/components/sensor'
     autoload :RgbLed,     'dino/components/rgb_led'
     autoload :Servo,      'dino/components/servo'
+    autoload :SSD,        'dino/components/ssd'
     autoload :Stepper,    'dino/components/stepper'
     autoload :IrReceiver, 'dino/components/ir_receiver'
     autoload :LCD,        'dino/components/lcd'
