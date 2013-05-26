@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe Servo do
-      let(:board) { mock(:board, analog_write: true, set_pin_mode: true) }
+      let(:board) { mock(:board, analog_write: true, set_pin_mode: true, servo_toggle: true, servo_write: true) }
 
       describe '#initialize' do
         it 'should raise if it does not receive a pin' do
@@ -19,7 +19,7 @@ module Dino
         end
 
         it 'should set the pins to out' do
-          board.should_receive(:set_pin_mode).with(13, :out)
+          board.should_receive(:set_pin_mode).with(13, :out, nil)
           Servo.new(pin: 13, board: board)
         end
 
@@ -37,13 +37,18 @@ module Dino
           servo.instance_variable_get(:@position).should == 90
         end
 
-        it 'should modulate the position at 180' do
+        it 'should let you write up to 180' do
+          servo.position = 180
+          servo.instance_variable_get(:@position).should == 180
+        end
+
+        it 'should modulate when position > 180' do
           servo.position = 190
           servo.instance_variable_get(:@position).should == 10
         end
 
         it 'should write the new position to the board' do
-          servo.should_receive(:analog_write).with(10)
+          board.should_receive(:servo_write).with(13, 10)
           servo.position = 190
         end
       end

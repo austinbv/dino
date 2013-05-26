@@ -1,12 +1,13 @@
 module Dino
   module Components
     class BaseComponent
-      attr_reader :pin, :board
+      attr_reader :board, :pin, :pullup
       alias :pins :pin
 
       def initialize(options={})
-        self.pin = options[:pin] || options[:pins]
         self.board = options[:board]
+        self.pin = options[:pin] || options[:pins]
+        self.pullup = options[:pullup]
 
         raise 'board and pin or pins are required for a component' if self.board.nil? || self.pin.nil?
         after_initialize(options)
@@ -23,19 +24,19 @@ module Dino
 
       protected
 
-      attr_writer :pin, :board
+      attr_writer :board, :pin, :pullup
       alias :pins= :pin=
 
-      def digital_write(value, pin = self.pin)
+      def digital_write(pin=self.pin, value)
         self.board.digital_write(pin, value)
       end
 
-      def analog_write(value, pin = self.pin)
+      def analog_write(pin=self.pin, value)
         self.board.analog_write(pin, value)
       end
 
-      def set_pin_mode(mode, pin = self.pin)
-        self.board.set_pin_mode(pin, mode)
+      def set_pin_mode(pin=self.pin, mode)
+        self.board.set_pin_mode(pin, mode, pullup)
       end
     end
   end

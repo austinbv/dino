@@ -8,8 +8,8 @@ module Dino
         raise 'missing pins[:blue] pin' unless self.pins[:blue]
 
         pins.each do |color, pin|
-          set_pin_mode(:out, pin)
-          analog_write(Board::LOW, pin)
+          set_pin_mode(pin, :out)
+          analog_write(pin, Board::LOW)
         end
       end
 
@@ -27,9 +27,9 @@ module Dino
 
       COLORS.each_key do |color|
         define_method(color) do
-          analog_write(COLORS[color][0],  pins[:red])
-          analog_write(COLORS[color][1],  pins[:green])
-          analog_write(COLORS[color][2],  pins[:blue])
+          analog_write(pins[:red], COLORS[color][0])
+          analog_write(pins[:green], COLORS[color][1])
+          analog_write(pins[:blue], COLORS[color][2])
         end 
       end
 
