@@ -5,11 +5,15 @@ module Dino
     it { should be }
 
     describe '#initialize' do
-      it 'should set first_write to false' do
+      it 'should set first_write to true' do
         TxRx::Serial.new.instance_variable_get(:@first_write).should == true
       end
-      it 'should connect to the specified device'
-      it 'should connect at the specified baud rate'
+
+      it 'should set the device and buad if specified' do
+        txrx = TxRx::Serial.new({device: "/dev/ttyACM0", baud: 9600})
+        txrx.instance_variable_get(:@baud).should == 9600
+        txrx.instance_variable_get(:@device).should == "/dev/ttyACM0"
+      end
     end
 
     describe '#io' do
@@ -39,6 +43,16 @@ module Dino
 
           subject.io.should == mock_serial
         end
+      end
+
+      it 'should connect to the specified device at the specified baud rate' do
+        subject.should_receive(:tty_devices).and_return(["/dev/ttyACM0"])
+        SerialPort.should_receive(:new).with('/dev/ttyACM0', 9600).and_return(mock_serial = mock)
+
+        subject.instance_variable_set(:@device, "/dev/ttyACM0")
+        subject.instance_variable_set(:@baud, 9600)
+
+        subject.io.should == mock_serial
       end
 
       it 'should use the existing io instance if set' do

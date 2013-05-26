@@ -32,8 +32,8 @@ module Dino
 
       def tty_devices
         return [@device] if @device
-        return (1..9).map { |n| "COM#{n}" } if on_windows?
-        `ls /dev`.split("\n").grep(/usb|ACM/).map{ |d| "/dev/#{d}" }
+        return (1..256).map { |n| "COM#{n}" } if on_windows?
+        `ls /dev`.split("\n").grep(/usb|ACM/i).map{ |d| "/dev/#{d}" }
       end
 
       def on_windows?

@@ -1,4 +1,4 @@
-# Dino 0.11.1
+# Dino 0.11.2
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
 ## Get Started In No Time
