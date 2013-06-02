@@ -5,18 +5,11 @@ module Dino
     describe LCD do
       let(:board) { mock(:board, digital_write: true, set_pin_mode: true) }
 
-      subject { LCD.new board: board, pins: { rs: 12, enable: 11, d4: 5, d5: 4, d6: 3, d7: 2 } }
+      subject { LCD.new board: board, pins: { rs: 12, enable: 11, d4: 5, d5: 4, d6: 3, d7: 2 }, cols: 16, rows: 2 }
 
       before do
         board.should_receive(:write).with("10..0.12,11,5,4,3,2\n")
-      end
-
-      describe '#begin' do
-        it 'should initialize the display sending the command "10..1.16,2\n" to the board' do
-          board.should_receive(:write).with "10..1.16,2\n"
-          subject.should_receive(:sleep).with 2
-          subject.begin(16,2)
-        end
+        board.should_receive(:write).with("10..1.16,2\n")
       end
 
       describe '#clear' do

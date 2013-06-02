@@ -6,23 +6,28 @@ module Dino
       #
       # Dino::Componentes::LCD.new(
       #       board: board,
-      #       pins: { rs: 12, enable: 11, d4: 4, d5: 5, d6: 6, d7: 7 }
+      #       pins: { rs: 12, enable: 11, d4: 4, d5: 5, d6: 6, d7: 7 },
+      #       cols: 16,
+      #       rows: 2
       # )
       #
       # Initialize in 8 bits mode
       #
       # Dino::Componentes::LCD.new(
       #       board: board,
-      #       pins: { rs: 12, enable: 11, d0: 0, d1: 1, d2: 2, d3: 3, d4: 4, d5: 5, d6: 6, d7: 7 }
+      #       pins: { rs: 12, enable: 11, d0: 0, d1: 1, d2: 2, d3: 3, d4: 4, d5: 5, d6: 6, d7: 7 },
+      #       cols: 16,
+      #       rows: 2
       # )
       #
       def after_initialize(options)
         board.write Dino::Message.encode command: 10, value: 0, aux_message: encoded_pins
+        @cols, @rows = options[:cols], options[:rows]
+        board.write Dino::Message.encode command: 10, value: 1, aux_message: "#{@cols},#{@rows}"
       end
 
-      def begin(cols, rows)
-        board.write Dino::Message.encode command: 10, value: 1, aux_message: "#{cols},#{rows}"
-        sleep 2
+      def puts(string)
+        board.write Dino::Message.encode command: 10, value: 5, aux_message: string
       end
 
       def clear
@@ -35,10 +40,6 @@ module Dino
 
       def set_cursor(col, row)
         board.write Dino::Message.encode command: 10, value: 4, aux_message: "#{col},#{row}"
-      end
-
-      def puts(string)
-        board.write Dino::Message.encode command: 10, value: 5, aux_message: string
       end
 
       def show_cursor
@@ -92,10 +93,9 @@ module Dino
       private
 
       def encoded_pins
-        encoded = [pins[:rs], pins[:enable], pins[:d0],
-                   pins[:d1], pins[:d2], pins[:d3], pins[:d4],
-                   pins[:d5], pins[:d6], pins[:d7]]
-        encoded.compact.join(',')
+        [pins[:rs], pins[:enable], pins[:d0],
+         pins[:d1], pins[:d2], pins[:d3], pins[:d4],
+         pins[:d5], pins[:d6], pins[:d7]].compact.join(',')
       end
     end
   end
