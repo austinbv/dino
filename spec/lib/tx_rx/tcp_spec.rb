@@ -4,7 +4,7 @@ module Dino
   describe TxRx::TCP do
     before :each do
       @host = "127.0.0.1"
-      @port = 3466
+      @port = 3467
       @instance = TxRx::TCP.new(@host, @port)
     end
 
@@ -14,7 +14,7 @@ module Dino
       end
 
       it 'should return the TCPSocket if connected' do
-        @server = TCPServer.new 3466
+        @server = TCPServer.new @port
         @instance.io.should be_a TCPSocket
         @server.close
       end
@@ -27,7 +27,7 @@ module Dino
       end
 
       it 'should use the existing io instance if set' do
-        @server = TCPServer.new 3466
+        @server = TCPServer.new @port
         socket = @instance.io
         @instance.io.should be socket
         @server.close
