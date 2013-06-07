@@ -7,9 +7,9 @@ module Dino
         raise 'missing pins[:clock] pin' unless self.pins[:clock]
         raise 'missing pins[:data] pin' unless self.pins[:data]
 
-        pins.each do |pin|
+        pins.each_value do |pin|
           set_pin_mode(pin, :out)
-          analog_write(pin, Board::LOW)
+          digital_write(pin, Board::LOW)
         end
       end
 
@@ -21,9 +21,15 @@ module Dino
         digital_write(pins[:latch], Board::HIGH)
       end
 
-      def write(byte)
+      def write(bytes)
+        bytes = [bytes] unless bytes.class == Array
+        data_pin = board.convert_pin(pins[:data])
+        clock_pin = board.convert_pin(pins[:clock])
+
         latch_off
-        board.write(Dino::Message.encode command: 11, pin: convert_pin(pins[:data]), value: byte, aux_message: convert_pin(pins[:clock])})
+        bytes.each do |byte|
+          board.write Dino::Message.encode( command: 11, pin: data_pin, value: byte, aux_message: clock_pin)
+        end
         latch_on
       end
     end
