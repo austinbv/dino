@@ -31,7 +31,7 @@ void Dino::parse(char c) {
   }
 
   // If fragment delimiter, terminate current fragment and move to next.
-  // Unless we're in the extended message, then just append.
+  // Unless we're in the auxillary message fragment, then just append.
   else if (c == '.') {
     if (fragmentIndex < 3) {
       append('\0');
@@ -78,6 +78,7 @@ void Dino::process() {
     case 8:  servoToggle         ();  break;
     case 9:  servoWrite          ();  break;
     case 10: handleLCD           ();  break;
+    case 11: shiftWrite          ();  break;
     case 90: reset               ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
@@ -260,6 +261,16 @@ void Dino::handleLCD() {
     Serial.print("DinoLCD command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
   #endif
   dinoLCD.process(val, auxMsg);
+}
+
+// CMD = 11
+// Write to a shift register.
+void Dino::shiftWrite() {
+  #ifdef debug
+    Serial.print("Shift write :"); Serial.print(val); Serial.print(" to pin "); Serial.print(pin); Serial.print(". Clock pin: "); Serial.println(auxMsg);
+  #endif
+  // auxMsg should be the clock pin.
+  shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
 }
 
 // CMD = 90
