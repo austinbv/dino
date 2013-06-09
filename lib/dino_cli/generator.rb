@@ -1,7 +1,7 @@
 class DinoCLI::Generator
   require "fileutils"
   LIB_FILENAMES = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp"]
-  attr_reader :options
+  attr_accessor :options
 
   def initialize(options={})
     @options = options
@@ -57,11 +57,12 @@ class DinoCLI::Generator
       File.open(file, 'w') { |f| f.write @libs[index]}
     end
 
-    sketch
+    options[:sketch_file] = sketch
+    options
   end
 
   def output_dir
-    @output_dir ||= make_output_dir
+    options[:output_dir] ||= make_output_dir
   end
 
   def make_output_dir
@@ -77,6 +78,6 @@ class DinoCLI::Generator
   end
 
   def sketch_filename
-    "#{options[:sketch_name]}.ino"
+    options[:sketch_filename] ||= "#{options[:sketch_name]}.ino"
   end
 end

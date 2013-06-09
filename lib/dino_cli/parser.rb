@@ -41,6 +41,8 @@ class DinoCLI::Parser
           args.shift; @options[:port] = args.shift
         when '--debug'
           args.shift; @options[:debug] = true
+        when '--compile'
+          args.shift; @options[:compile] = true
         when '--upload'
           args.shift; @options[:upload] = true
         when /^-/
