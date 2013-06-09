@@ -302,8 +302,7 @@ void Dino::setAnalogDivider() {
 // CMD = 98
 // Set the heart rate in milliseconds. Store it in microseconds.
 void Dino::setHeartRate() {
-  int rate = val;
-  heartRate = (rate * 1000);
+  heartRate = atoi(auxMsg);
   #ifdef debug
     Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
   #endif

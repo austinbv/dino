@@ -23,7 +23,7 @@ module Dino
     end
 
     def heart_rate=(value)
-      write Dino::Message.encode(command: 98, value: value)
+      write Dino::Message.encode(command: 98, aux_message: value)
     end
 
     def start_read
