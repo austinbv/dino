@@ -26,68 +26,35 @@ module Dino
         board.write Dino::Message.encode command: 10, value: 1, aux_message: "#{@cols},#{@rows}"
       end
 
-      def puts(string)
-        board.write Dino::Message.encode command: 10, value: 5, aux_message: string
-      end
+      LIBRARY_COMMANDS = {
+        clear:              '2',
+        home:               '3',
+        show_cursor:        '6',
+        hide_cursor:        '7',
+        blink:              '8',
+        no_blink:           '9',
+        on:                '10',
+        off:               '11',
+        scroll_left:       '12',
+        scroll_right:      '13',
+        enable_autoscroll: '14',
+        disable_autoscroll:'15',
+        left_to_right:     '16',
+        right_to_left:     '17'
+      }
 
-      def clear
-        board.write Dino::Message.encode command: 10, value: 2
-      end
-
-      def home
-        board.write Dino::Message.encode command: 10, value: 3
+      LIBRARY_COMMANDS.each_pair do |command, command_id|
+        define_method(command) do
+          board.write Dino::Message.encode(command: 10, value: command_id)
+        end
       end
 
       def set_cursor(col, row)
         board.write Dino::Message.encode command: 10, value: 4, aux_message: "#{col},#{row}"
       end
 
-      def show_cursor
-        board.write Dino::Message.encode command: 10, value: 6
-      end
-
-      def hide_cursor
-        board.write Dino::Message.encode command: 10, value: 7
-      end
-
-      def blink
-        board.write Dino::Message.encode command: 10, value: 8
-      end
-
-      def no_blink
-        board.write Dino::Message.encode command: 10, value: 9
-      end
-
-      def on
-        board.write Dino::Message.encode command: 10, value: 10
-      end
-
-      def off
-        board.write Dino::Message.encode command: 10, value: 11
-      end
-
-      def scroll_left
-        board.write Dino::Message.encode command: 10, value: 12
-      end
-
-      def scroll_right
-        board.write Dino::Message.encode command: 10, value: 13
-      end
-
-      def enable_autoscroll
-        board.write Dino::Message.encode command: 10, value: 14
-      end
-
-      def disable_autoscroll
-        board.write Dino::Message.encode command: 10, value: 15
-      end
-
-      def left_to_right
-        board.write Dino::Message.encode command: 10, value: 16
-      end
-
-      def right_to_left
-        board.write Dino::Message.encode command: 10, value: 17
+      def puts(string)
+        board.write Dino::Message.encode command: 10, value: 5, aux_message: string
       end
 
       private

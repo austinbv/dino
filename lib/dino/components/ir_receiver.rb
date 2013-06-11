@@ -1,30 +1,11 @@
 module Dino
   module Components
-    class IrReceiver < Core::Base
-      STABLE = "01"
-
-      def after_initialize(options={})
-        @flash_callbacks = []
-
-        self.board.add_digital_hardware(self)
-        self.board.start_read
-      end
-
-      def flash(callback)
-        @flash_callbacks << callback
-      end
+    class IrReceiver < Core::DigitalInput
+      alias :flash :on_low
 
       def update(data)
-        return if data == STABLE
-        light_flashed
-      end
-
-      private
-
-      def light_flashed
-        @flash_callbacks.each do |callback|
-          callback.call
-        end
+        return if data.to_i == HIGH
+        super data
       end
     end
   end
