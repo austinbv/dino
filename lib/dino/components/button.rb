@@ -7,8 +7,9 @@ module Dino
       def after_initialize(options={})
         @down_callbacks, @up_callbacks, @state = [], [], UP
 
-        self.board.add_digital_hardware(self)
-        self.board.start_read
+        board.add_input_hardware(self)
+        board.start_read
+        board.digital_listen(self.pin)
       end
 
       def down(&callback)

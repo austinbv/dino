@@ -7,7 +7,7 @@ module Dino
       aux = options[:aux_message]
       aux.to_s.gsub!("\n", "\\\n") if aux
 
-      raise Exception.new('commands must be specified') unless cmd
+      raise Exception.new('command must be specified') unless cmd
       raise Exception.new('commands can only be four digits') if cmd.to_s.length > 4
       raise Exception.new('pins can only be four digits') if pin.to_s.length > 4
       raise Exception.new('values can only be four digits') if val.to_s.length > 4

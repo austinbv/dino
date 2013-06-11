@@ -1,16 +1,12 @@
 module Dino
   class Board
-    attr_reader :digital_hardware, :analog_hardware, :analog_zero
+    attr_reader :input_hardware, :analog_zero
     LOW, HIGH = 000, 255
     DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
     def initialize(io)
-      @io, @digital_hardware, @analog_hardware = io, [], []
+      @io, @input_hardware = io, []
       io.add_observer(self)
-      handshake
-    end
-
-    def handshake
       @analog_zero = @io.handshake
     end
 
@@ -39,31 +35,19 @@ module Dino
     end
 
     def update(pin, msg)
-      (@digital_hardware + @analog_hardware).each do |part|
+      @input_hardware.each do |part|
         part.update(msg) if convert_pin(pin) == convert_pin(part.pin)
       end
     end
 
-    def add_digital_hardware(part)
+    def add_input_hardware(part)
+      @input_hardware << part
       set_pin_mode(part.pin, :in, part.pullup)
-      digital_listen(part.pin)
-      @digital_hardware << part
     end
 
-    def remove_digital_hardware(part)
+    def remove_input_hardware(part)
       stop_listener(part.pin)
-      @digital_hardware.delete(part)
-    end
-
-    def add_analog_hardware(part)
-      set_pin_mode(part.pin, :in, part.pullup)
-      analog_listen(part.pin)
-      @analog_hardware << part
-    end
-
-    def remove_analog_hardware(part)
-      stop_listener(part.pin)
-      @analog_hardware.delete(part)
+      @input_hardware.delete(part)
     end
 
     def set_pin_mode(pin, mode, pullup=nil)

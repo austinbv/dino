@@ -27,29 +27,15 @@ module Dino
     end
 
     describe '#update' do
-      context 'when the given pin connects to an analog hardware part' do
+      context 'when the given pin connects to input hardware part' do
         it 'should call update with the message on the part' do
           part = mock(:part, pin: 7, pullup: nil)
-          subject.add_analog_hardware(part)
+          subject.add_input_hardware(part)
           other_part = mock(:part, pin: 9, pullup: nil)
-          subject.add_analog_hardware(other_part)
+          subject.add_input_hardware(other_part)
 
           part.should_receive(:update).with('wake up!')
           subject.update(7, 'wake up!')
-        end
-      end
-
-      context 'when the given pin connects to an digital hardware part' do
-        it 'should call update with the message on the part' do
-          part = mock(:part, pin: 5, pullup: nil)
-          subject.add_digital_hardware(part)
-          other_part = mock(:part, pin: 11, pullup: nil)
-          subject.add_digital_hardware(other_part)
-
-          part.should_receive(:update).with('wake up!')
-          other_part.should_not_receive(:update).with('wake up!')
-
-          subject.update(5, 'wake up!')
         end
       end
 
@@ -62,61 +48,34 @@ module Dino
       end
     end
 
-    describe '#digital_hardware' do
+    describe '#input_hardware' do
       it 'should initialize as empty' do
-        subject.digital_hardware.should == []
+        subject.input_hardware.should == []
       end
     end
 
-    describe '#analog_hardware' do
-      it 'should initialize as empty' do
-        subject.analog_hardware.should == []
-      end
-    end
-
-    describe '#add_digital_hardware' do
+    describe '#add_input_hardware' do
       it 'should add digital hardware to the board' do
-        subject.add_digital_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
-        subject.add_digital_hardware(mock2 = mock(:part2, pin: 14, pullup: nil))
-        subject.digital_hardware.should =~ [mock1, mock2]
+        subject.add_input_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
+        subject.add_input_hardware(mock2 = mock(:part2, pin: 14, pullup: nil))
+        subject.input_hardware.should =~ [mock1, mock2]
       end
 
-      it 'should set the mode for the given pin to "in" and add a digital listener' do
+      it 'should set the mode for the given pin to "in"' do
         subject.should_receive(:set_pin_mode).with(12, :in, nil)
-        subject.should_receive(:digital_listen).with(12)
-        subject.add_digital_hardware(mock(:part1, pin: 12, pullup: nil))
+        subject.add_input_hardware(mock(:part1, pin: 12, pullup: nil))
       end
     end
 
-    describe '#remove_digital_hardware' do
-      it 'should remove the given part from the hardware of the board' do
+    describe '#remove_input_hardware' do
+      it 'should remove the given part from the hardware of the board and stop listening' do
         mock = mock(:part1, pin: 12, pullup: nil)
-        subject.add_digital_hardware(mock)
-        subject.remove_digital_hardware(mock)
-        subject.digital_hardware.should == []
-      end
-    end
+        subject.add_input_hardware(mock)
 
-    describe '#add_analog_hardware' do
-      it 'should add analog hardware to the board' do
-        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
-        subject.add_analog_hardware(mock2 = mock(:part2, pin: 14, pullup: nil))
-        subject.analog_hardware.should =~ [mock1, mock2]
-      end
-
-      it 'should set the mode for the given pin to "in" and add an analog listener' do
-        subject.should_receive(:set_pin_mode).with(12, :in, nil)
-        subject.should_receive(:analog_listen).with(12)
-        subject.add_analog_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
-      end
-    end
-
-    describe '#remove_analog_hardware' do
-      it 'should remove the given part from the hardware of the board' do
-        mock = mock(:part1, pin: 12, pullup: nil)
-        subject.add_analog_hardware(mock)
-        subject.remove_analog_hardware(mock)
-        subject.analog_hardware.should == []
+        subject.should_receive(:stop_listener).with(12)
+        subject.remove_input_hardware(mock)
+        
+        subject.input_hardware.should == []
       end
     end
 
@@ -222,13 +181,6 @@ module Dino
       it 'should write low if pullup is disabled' do
         io_mock.should_receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: Board::LOW))
         subject.set_pullup(13, false)
-      end
-    end
-
-    describe '#handshake' do
-      it 'should tell the board to reset to defaults' do
-        io_mock.should_receive(:handshake)
-        subject.handshake
       end
     end
 
