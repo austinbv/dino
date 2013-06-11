@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class Stepper < BaseComponent
+    class Stepper < Core::Base
 
       def after_initialize(options={})
         raise 'missing pins[:step] pin' unless self.pins[:step]

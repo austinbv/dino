@@ -1,6 +1,6 @@
 module Dino
   module Components
-    require 'dino/components/base_component'
+    require 'dino/components/core'
     autoload :Led,            'dino/components/led'
     autoload :Button,         'dino/components/button'
     autoload :Sensor,         'dino/components/sensor'

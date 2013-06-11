@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class Servo < BaseComponent
+    class Servo < Core::Base
       attr_reader :position
 
       def after_initialize(options={})

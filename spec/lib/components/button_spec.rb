@@ -30,90 +30,48 @@ module Dino
         let(:board) { mock(:board, add_input_hardware: true, start_read: true, digital_listen: true) }
         let(:button) {Button.new(board: board, pin: mock)}
         describe '#down' do
-          it 'should add a callback to the down_callbacks array' do
+          it 'should add a callback to @callbacks[:low]' do
             callback = mock
             button.down do 
               callback.called
             end
-            down_callbacks = button.instance_variable_get(:@down_callbacks)
+            down_callbacks = button.instance_variable_get(:@callbacks)[:low]
             down_callbacks.size.should == 1
-            callback.should_receive(:called)
-            down_callbacks.first.call
           end
         end
 
         describe '#up' do
-          it 'should add a callback to the up_callbacks array' do
+          it 'should add a callback to @callbacks[:high]' do
             callback = mock
             button.up do 
               callback.called
             end
-            up_callbacks = button.instance_variable_get(:@up_callbacks)
+            up_callbacks = button.instance_variable_get(:@callbacks)[:high]
             up_callbacks.size.should == 1
-            callback.should_receive(:called)
-            up_callbacks.first.call
           end
         end
 
         describe '#update' do
-          it 'should call the down callbacks' do
-            callback_1 = mock
-            button.down do 
-              callback_1.called
-            end
+          it 'should call @callbacks[:high] only when HIGH' do
+            high_callback = mock
+            low_callback = mock
+            button.up   { high_callback.called }
+            button.down { low_callback.calles }
             
-            callback_2 = mock
-            button.down do 
-              callback_2.called
-            end
-            callback_1.should_receive(:called)
-            callback_2.should_receive(:called)
-            button.update(Button::DOWN)
+            high_callback.should_receive(:called)
+            low_callback.should_not_receive(:called)
+            button.update(1)
           end
 
-          it 'should call the up callbacks' do
-            callback_1 = mock
-            button.up do 
-              callback_1.called
-            end
+          it 'should call @callbacks[:low] only when LOW' do
+            high_callback = mock
+            low_callback = mock
+            button.up   { high_callback.called }
+            button.down { low_callback.called }
             
-            callback_2 = mock
-            button.up do 
-              callback_2.called
-            end
-
-            button.instance_variable_set(:@state, Button::DOWN)
-
-            callback_1.should_receive(:called)
-            callback_2.should_receive(:called)
-            button.update(Button::UP)
-          end
-
-          it 'should not call the callbacks if the state has not changed' do
-            callback = mock
-            button.up do
-              callback.called
-            end
-
-            callback.should_not_receive(:called)
-            button.update(Button::UP)
-            button.update(Button::UP)
-          end
-
-          it 'should not call the callbacks if the data is not UP or DOWN' do
-            callback_1 = mock
-            button.up do 
-              callback_1.called
-            end
-
-            callback_2 = mock
-            button.down do 
-              callback_2.called
-            end
-
-            callback_1.should_not_receive(:called)
-            callback_2.should_not_receive(:called)
-            button.update('foobarred')
+            high_callback.should_not_receive(:called)
+            low_callback.should_receive(:called)
+            button.update(0)
           end
         end
       end

@@ -9,7 +9,7 @@
 
 module Dino
   module Components
-    class SSD < BaseComponent
+    class SSD < Core::Base
       attr_reader :anode
 
       def after_initialize(options={})

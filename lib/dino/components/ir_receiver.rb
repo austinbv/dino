@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class IrReceiver < BaseComponent
+    class IrReceiver < Core::Base
       STABLE = "01"
 
       def after_initialize(options={})

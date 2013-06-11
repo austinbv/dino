@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class ShiftRegister < BaseComponent
+    class ShiftRegister < Core::Base
       # options = {board: my_board, pins: {latch: latch_pin, clock: clock_pin, data: data_pin}
       def after_initialize(options={})
         raise 'missing pins[:latch] pin' unless self.pins[:latch]
