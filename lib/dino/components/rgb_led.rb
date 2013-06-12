@@ -1,16 +1,13 @@
 module Dino
   module Components
-    class RgbLed < Core::Base
+    class RgbLed < Core::MultiPin
+      #
       # options = {board: my_board, pins: {red: red_pin, green: green_pin, blue: blue_pin}
+      #
       def after_initialize(options={})
-        raise 'missing pins[:red] pin' unless self.pins[:red]
-        raise 'missing pins[:green] pin' unless self.pins[:green]
-        raise 'missing pins[:blue] pin' unless self.pins[:blue]
-
-        pins.each do |color, pin|
-          set_pin_mode(pin, :out)
-          analog_write(pin, Board::LOW)
-        end
+        proxies red:   Core::BaseOutput,
+                green: Core::BaseOutput,
+                blue:  Core::BaseOutput 
       end
 
       # Format: [R, G, B]
@@ -25,17 +22,22 @@ module Dino
         off:     [000, 000, 000]
       }
 
-      COLORS.each_key do |color|
-        define_method(color) do
-          analog_write(pins[:red], COLORS[color][0])
-          analog_write(pins[:green], COLORS[color][1])
-          analog_write(pins[:blue], COLORS[color][2])
-        end 
+      def write(array)
+        red.write   array[0]
+        green.write array[1]
+        blue.write  array[2]
       end
 
-      def blinky
+      def color=(color)
+        return write(color) if color.class == Array
+        
+        color = color.to_sym
+        write(COLORS[color]) if COLORS.include? color
+      end
+
+      def cycle
         [:red, :green, :blue].cycle do |color|
-          self.send(color)
+          self.color = color
           sleep(0.01)
         end
       end

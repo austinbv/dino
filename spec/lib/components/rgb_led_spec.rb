@@ -3,119 +3,62 @@ require 'spec_helper'
 module Dino
   module Components
     describe RgbLed do
-      let(:board) { mock(:board, analog_write: true, set_pin_mode: true) }
-      let(:pins) { {red: 1, green: 2, blue: 3} }
-      let(:rgb) { RgbLed.new(pins: pins, board: board)}
+      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
+      let(:board) { Board.new(txrx) }
+      let(:options) { { board: board, pins: {red: 1, green: 2, blue: 3} } }
+      subject { RgbLed.new(options) }
 
       describe '#initialize' do
-        it 'should raise if it does not receive a pin' do
-          expect {
-            RgbLed.new(board: 'a board')
-          }.to raise_exception
-        end
-
-        it 'should raise if it does not receive a board' do
-          expect {
-            RgbLed.new(pins: pins)
-          }.to raise_exception
-        end
-
-        it 'should set the pin to out' do
-          board.should_receive(:set_pin_mode).with(1, :out, nil)
-          board.should_receive(:set_pin_mode).with(2, :out, nil)
-          board.should_receive(:set_pin_mode).with(3, :out, nil)
-
-          RgbLed.new(pins: pins, board: board)
-        end
-
-        it 'should set the pin to low' do
-          board.should_receive(:analog_write).with(1, Board::LOW)
-          board.should_receive(:analog_write).with(2, Board::LOW)
-          board.should_receive(:analog_write).with(3, Board::LOW)
-
-          RgbLed.new(pins: pins, board: board)
+        it 'should create a BaseOutput instance for each pin' do
+          led = RgbLed.new(options)
+          
+          led.red.class.should == Core::BaseOutput
+          led.green.class.should == Core::BaseOutput
+          led.blue.class.should == Core::BaseOutput
         end
       end
 
-      describe '#red' do
-        it 'should set red to high, blue and green to low' do
-          board.should_receive(:analog_write).with(1, Board::HIGH)
-          board.should_receive(:analog_write).with(2, Board::LOW)
-          board.should_receive(:analog_write).with(3, Board::LOW)
-          rgb.red
+      describe '#write' do
+        it 'should write the elements of the array to red, green and blue' do
+          subject.red.should_receive(:write).with(0)
+          subject.green.should_receive(:write).with(128)
+          subject.blue.should_receive(:write).with(0)
+
+          subject.write [0, 128, 0]
         end
       end
 
-      describe '#green' do
-        it 'should set green to high, red and blue to low' do
-          board.should_receive(:analog_write).with(1, Board::LOW)
-          board.should_receive(:analog_write).with(2, Board::HIGH)
-          board.should_receive(:analog_write).with(3, Board::LOW)
-          rgb.green
+      describe '#color=' do
+        it 'should write an array of values' do
+          subject.should_receive(:write).with([128, 0, 0])
+          subject.color = [128, 0, 0]
+        end
+
+        it 'should look up named colors in COLORS whether passed in as symbol or string' do
+          colors = {
+            red:     [255, 000, 000],
+            green:   [000, 255, 000],
+            blue:    [000, 000, 255],
+            cyan:    [000, 255, 255],
+            yellow:  [255, 255, 000],
+            magenta: [255, 000, 255],
+            white:   [255, 255, 255],
+            off:     [000, 000, 000]
+          }
+          colors.each_value { |color| subject.should_receive(:write).with(color).twice }
+
+          colors.each_key { |key| subject.color = key }
+          colors.each_key { |key| subject.color = key.to_s }
         end
       end
 
-      describe '#blue' do
-        it 'should set blue to high, red and green to low' do
-          board.should_receive(:analog_write).with(1, Board::LOW)
-          board.should_receive(:analog_write).with(2, Board::LOW)
-          board.should_receive(:analog_write).with(3, Board::HIGH)
-          rgb.blue
-        end
-      end
-
-      describe '#cyan' do
-        it 'should set blue and green to high, red to low' do
-          board.should_receive(:analog_write).with(1, Board::LOW)
-          board.should_receive(:analog_write).with(2, Board::HIGH)
-          board.should_receive(:analog_write).with(3, Board::HIGH)
-          rgb.cyan
-        end
-      end
-
-      describe '#yellow' do
-        it 'should set red and green to high, blue to low' do
-          board.should_receive(:analog_write).with(1, Board::HIGH)
-          board.should_receive(:analog_write).with(2, Board::HIGH)
-          board.should_receive(:analog_write).with(3, Board::LOW)
-          rgb.yellow
-        end
-      end
-
-      describe '#magenta' do
-        it 'should set red and blue to high, green to low' do
-          board.should_receive(:analog_write).with(1, Board::HIGH)
-          board.should_receive(:analog_write).with(2, Board::LOW)
-          board.should_receive(:analog_write).with(3, Board::HIGH)
-          rgb.magenta
-        end
-      end
-
-      describe '#white' do
-        it 'should set all to high' do
-          board.should_receive(:analog_write).with(1, Board::HIGH)
-          board.should_receive(:analog_write).with(2, Board::HIGH)
-          board.should_receive(:analog_write).with(3, Board::HIGH)
-          rgb.white
-        end
-      end
-
-      describe '#off' do
-        it 'should set all to low' do
-          board.should_receive(:analog_write).with(1, Board::LOW)
-          board.should_receive(:analog_write).with(2, Board::LOW)
-          board.should_receive(:analog_write).with(3, Board::LOW)
-          rgb.off
-        end
-      end
-
-      describe '#blinky' do
-        it 'should set blue to high, red and green to low' do
+      describe '#cycle' do
+        it 'should cycle through the 3 base colors' do
           Array.any_instance.should_receive(:cycle).and_yield(:red).and_yield(:green).and_yield(:blue)
-          rgb.should_receive(:red)
-          rgb.should_receive(:green)
-          rgb.should_receive(:blue)
-          rgb.blinky
+          subject.should_receive(:color=).with(:red)
+          subject.should_receive(:color=).with(:green)
+          subject.should_receive(:color=).with(:blue)
+          subject.cycle
         end
       end
     end

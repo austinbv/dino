@@ -1,39 +1,33 @@
 module Dino
   module Components
     module Core
-      class DigitalInput < Input
+      class DigitalInput < BaseInput
         HIGH = 1
         LOW = 0
 
         def initialize(options={})
-          super options
-          listen
+          super(options)
+          start_listening
         end
 
-        def read(&block)
-          super &block
-          board.digital_read(pin)
+        def poll
+          board.digital_read(self.pin)
         end
 
-        def listen(&block)
-          super &block
-          board.digital_listen(pin)
+        def start_listening
+          board.digital_listen(self.pin)
         end
 
         def on_high(&block)
           add_callback(:high) do |data|
-            block.call(data) if data == HIGH
+            block.call(data) if data.to_i == HIGH
           end
         end
 
         def on_low(&block)
           add_callback(:low) do |data|
-            block.call(data) if data == LOW
+            block.call(data) if data.to_i == LOW
           end
-        end
-
-        def update(data)
-          super(@state = data.to_i)
         end
       end
     end

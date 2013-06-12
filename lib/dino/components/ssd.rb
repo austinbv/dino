@@ -9,26 +9,22 @@
 
 module Dino
   module Components
-    class SSD < Core::Base
+    class SSD < Core::MultiPin
       attr_reader :anode
 
       def after_initialize(options={})
-        @anode = options[:anode]
+        raise Exception.new('anode must be specified') unless options[:anode]
+        @anode = Core::BaseOutput.new(board: board, pin: options[:anode])
 
-        raise Exception.new('anode must be specified') unless anode
+        # Create a Core::BaseOutput for every pin.
+        @pins.map! { |pin| Core::BaseOutput.new(board: board, pin: pin) }
 
-        # Set all pins to output
-        pins.each { |pin| set_pin_mode(pin, :out) }
-
-        # Clear the display
         clear
-
-        # Turn on the display
         on
       end
 
       def clear
-        7.times { |t| toggle t, 0 }
+        7.times { |pin| toggle pin, 0 }
       end
 
       def display(char)
@@ -47,11 +43,11 @@ module Dino
       end
 
       def on
-        digital_write anode, Board::HIGH
+        @anode.high
       end
 
       def off
-        digital_write anode, Board::LOW
+        @anode.low
       end
 
       CHARACTERS = {
@@ -110,7 +106,7 @@ module Dino
       end
 
       def toggle(number, state)
-        digital_write pins[number], state == 1 ? 0 : 1
+        @pins[number].write (state == 1 ? 0 : 1)
       end
     end
   end

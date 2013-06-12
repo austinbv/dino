@@ -1,16 +1,17 @@
 module Dino
   module Components
-    class Servo < Core::Base
-      attr_reader :position
-
+    class Servo < Core::BaseOutput
       def after_initialize(options={})
-        set_pin_mode(:out)
         board.servo_toggle(pin, 1)
-        self.position = options[:position] || 0
       end
 
       def position=(value)
-        board.servo_write(pin, @position = angle(value))
+        @state = angle(value)
+        board.servo_write(pin, @state)
+      end
+
+      def position
+        @state
       end
 
       def angle(value)

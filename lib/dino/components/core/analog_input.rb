@@ -1,20 +1,14 @@
 module Dino
   module Components
     module Core
-      class AnalogInput < Input
-        def read(&block)
-          super &block
-          board.analog_read(pin)
+      class AnalogInput < BaseInput
+        def poll
+          board.analog_read(self.pin)
         end
 
-        def listen(&block)
-          super &block
-          board.analog_listen(pin)
+        def start_listening
+          board.analog_listen(self.pin)
         end
-      end
-
-      def update(data)
-        super(data.to_i)
       end
     end
   end

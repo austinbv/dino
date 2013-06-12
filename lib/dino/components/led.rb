@@ -1,18 +1,8 @@
 module Dino
   module Components
-    class Led < Core::Base
-      def after_initialize(options={})
-        set_pin_mode(:out)
-        off
-      end
-
-      def on
-        digital_write(Board::HIGH)
-      end
-
-      def off
-        digital_write(Board::LOW)
-      end
+    class Led < Core::BaseOutput
+      alias :on  :high
+      alias :off :low
     end
   end
 end

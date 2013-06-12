@@ -2,45 +2,40 @@ module Dino
   module Components
     module Core
       class Base
-        attr_reader :board, :pin, :pullup
-        alias :pins :pin
+        attr_reader :board, :pin, :mode, :pullup, :state
 
         def initialize(options={})
-          self.board = options[:board]
-          self.pin = options[:pin] || options[:pins]
-          self.pullup = options[:pullup]
+          raise 'board and pin are required for a component' if options[:board].nil? || options[:pin].nil?
 
-          raise 'board and pin or pins are required for a component' if self.board.nil? || self.pin.nil?
+          self.board = options[:board]
+          self.pin = board.convert_pin(options[:pin])
+          @pullup = options[:pullup]
+
           after_initialize(options)
         end
 
+        protected
+
+        attr_writer :board, :pin
+
         #
-        # As BaseComponent does a lot of work for you with regarding to setting up, it is
-        # best not to override #initialize and instead define an #after_initialize method
-        # within your subclass.
+        # Components::Core::Base does a lot of setup work for you.
+        # Define #after_initialize in your subclass instead of overriding #initialize
         #
         # @note This method should be implemented in the BaseComponent subclass.
         #
         def after_initialize(options={}) ; end
 
-        protected
-
-        attr_writer :board, :pin, :pullup
-        alias :pins= :pin=
-
-        def digital_write(pin=self.pin, value)
-          self.board.digital_write(pin, value)
+        def mode=(mode)
+          @mode = mode
+          board.set_pin_mode(self.pin, mode, pullup)
         end
 
-        def analog_write(pin=self.pin, value)
-          self.board.analog_write(pin, value)
-        end
-
-        def set_pin_mode(pin=self.pin, mode)
-          self.board.set_pin_mode(pin, mode, pullup)
+        def pullup=(pullup)
+          @pullup = pullup
+          board.set_pullup(self.pin, pullup)
         end
       end
     end
   end
 end
-

@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class LCD < Core::Base
+    class LCD < Core::MultiPin
 
       # Initialize in 4 bits mode
       #
