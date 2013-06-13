@@ -1,8 +1,6 @@
-require 'spec_helper'
-
 module Dino
   module Components
-    describe Led do
+    class Relay < Core::BaseOutput
     end
   end
 end

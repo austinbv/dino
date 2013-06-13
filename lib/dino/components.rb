@@ -11,5 +11,6 @@ module Dino
     autoload :IrReceiver,     'dino/components/ir_receiver'
     autoload :LCD,            'dino/components/lcd'
     autoload :ShiftRegister,  'dino/components/shift_register'
+    autoload :Relay,          'dino/components/relay'
   end
 end

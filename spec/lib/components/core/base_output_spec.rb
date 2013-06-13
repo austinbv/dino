@@ -69,6 +69,22 @@ module Dino
             subject.low
           end
         end
+
+        describe '#toggle' do
+          it 'should call high if currently LOW' do
+            subject.low
+            subject.should_receive(:high)
+
+            subject.toggle
+          end
+
+          it 'should call LOW if anything else' do
+            subject.high
+            subject.should_receive(:low)
+
+            subject.toggle
+          end
+        end
       end
     end
   end

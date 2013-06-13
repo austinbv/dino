@@ -2,8 +2,6 @@ module Dino
   module Components
     module Core
       class BaseInput < Base
-        attr_reader :state
-
         def initialize(options={})
           super options
 

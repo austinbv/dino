@@ -2,7 +2,8 @@ module Dino
   module Components
     module Core
       class BaseOutput < Base
-        attr_reader :state
+        include Threaded
+        interrupt_with :digital_write, :analog_write
 
         def initialize(options={})
           super options
@@ -33,6 +34,10 @@ module Dino
 
         def high
           digital_write Board::HIGH
+        end
+
+        def toggle
+          state == Board::LOW ? high : low
         end
 
         alias :off :low
