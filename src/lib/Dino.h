@@ -13,6 +13,10 @@
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #  define PIN_COUNT 70
 #  define SERVO_OFFSET 22
+#elif defined(__SAM3X8E__)
+#  define PIN_COUNT 66
+#  define SERVO_OFFSET 22
+#  define ANALOG_RESOLUTION 12
 #else
 #  define PIN_COUNT 22
 #  define SERVO_OFFSET 2

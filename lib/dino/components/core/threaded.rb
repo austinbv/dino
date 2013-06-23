@@ -33,7 +33,7 @@ module Dino
         end
 
         def enable_interrupts
-          interrupts = self.class.class_eval('@@interrupts')
+          interrupts = self.class.class_eval('@@interrupts') rescue []
           interrupts.each do |method_name|
             standard_method = self.method(method_name)
 
