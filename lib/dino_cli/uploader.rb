@@ -28,7 +28,7 @@ class DinoCLI::Uploader
   end
 
   def upload
-    `#{executable} --upload '#{options[:sketch_file]}'"`
+    `#{executable} --upload '#{options[:sketch_file]}'`
   end
 
   def executable
