@@ -18,9 +18,9 @@ module Dino
 
       describe '#step_cc' do
         it 'should send high to the step pin with the direction pin high' do
-          subject.direction.should_receive(:digital_write).with(Board::HIGH)
-          subject.step.should_receive(:digital_write).with(Board::HIGH)
-          subject.step.should_receive(:digital_write).with(Board::LOW)
+          subject.direction.should_receive(:digital_write).with(board.high)
+          subject.step.should_receive(:digital_write).with(board.high)
+          subject.step.should_receive(:digital_write).with(board.low)
 
           subject.step_cc
         end
@@ -28,9 +28,9 @@ module Dino
 
       describe '#step_cw' do
         it 'should send high to the board with the direction pin low' do
-          subject.direction.should_receive(:digital_write).with(Board::LOW)
-          subject.step.should_receive(:digital_write).with(Board::HIGH)
-          subject.step.should_receive(:digital_write).with(Board::LOW)
+          subject.direction.should_receive(:digital_write).with(board.low)
+          subject.step.should_receive(:digital_write).with(board.high)
+          subject.step.should_receive(:digital_write).with(board.low)
 
           subject.step_cw
         end

@@ -45,7 +45,7 @@ module Dino
               subject.add_callback(:test) { mock }
               subject.remove_callback(:test)
 
-              subject.instance_variable_get(:@callbacks)[:test].should be_nil
+              subject.instance_variable_get(:@callbacks)[:test].should be_empty
             end
           end
         end
@@ -110,7 +110,7 @@ module Dino
             subject.add_callback(:read) { |data| first_block_data = data }
 
             subject.update("Some data")
-            subject.instance_variable_get(:@callbacks)[:read].should be_nil
+            subject.instance_variable_get(:@callbacks)[:read].should be_empty
           end
         end
       end

@@ -16,7 +16,6 @@
 #elif defined(__SAM3X8E__)
 #  define PIN_COUNT 66
 #  define SERVO_OFFSET 22
-#  define ANALOG_RESOLUTION 12
 #else
 #  define PIN_COUNT 22
 #  define SERVO_OFFSET 2
@@ -47,6 +46,7 @@ class Dino {
     void handleLCD             ();  //cmd = 10
     void shiftWrite            ();  //cmd = 11
     void reset                 ();  //cmd = 90
+    void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
     void setHeartRate          ();  //cmd = 98
   
@@ -66,7 +66,7 @@ class Dino {
 
     // Value and response storage.
     int rval;
-    char response[8];
+    char response[16];
     
     // Use a write callback from the main sketch to respond.
     void (*_writeCallback)(char *str);

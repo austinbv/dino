@@ -42,7 +42,7 @@ module Dino
               line = gets.to_s
               if line.match /ACK:/
                 flush_read
-                return line.chop.split(/:/)[1].to_i
+                return line.chop.split(/:/)[1]
               end
             end
           rescue

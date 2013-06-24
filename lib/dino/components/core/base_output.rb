@@ -21,7 +21,7 @@ module Dino
         end
 
         def write(value)
-          unless [Board::LOW, Board::HIGH].include? value
+          unless [board.low, board.high].include? value
             analog_write(value)
           else
             digital_write(value)
@@ -29,15 +29,15 @@ module Dino
         end
 
         def low
-          digital_write Board::LOW
+          digital_write(board.low)
         end
 
         def high
-          digital_write Board::HIGH
+          digital_write(board.high)
         end
 
         def toggle
-          state == Board::LOW ? high : low
+          state == board.low ? high : low
         end
 
         alias :off :low

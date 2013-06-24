@@ -41,14 +41,14 @@ module Dino
 
       describe '#on' do
         it 'should turn the ssd on' do
-          subject.anode.should_receive(:digital_write).with(Board::HIGH)
+          subject.anode.should_receive(:digital_write).with(board.high)
           subject.on
         end
       end
 
       describe '#off' do
         it 'should turn the ssd off' do
-          subject.anode.should_receive(:digital_write).with(Board::LOW)
+          subject.anode.should_receive(:digital_write).with(board.low)
           subject.off
         end
       end

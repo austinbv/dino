@@ -1,13 +1,25 @@
 module Dino
   class Board
-    attr_reader :input_hardware, :analog_zero
-    LOW, HIGH = 000, 255
+    attr_reader :high, :low, :input_hardware, :analog_zero, :dac_zero
     DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
-    def initialize(io)
+    def initialize(io, options={})
+      @bits = options[:bits] || 8
       @io, @input_hardware = io, []
       io.add_observer(self)
-      @analog_zero = @io.handshake
+
+      @analog_zero, @dac_zero = @io.handshake.to_s.split(",").map { |pin| pin.to_i }
+      define_logic
+    end
+
+    def define_logic
+      @low      = 0
+      @high     = (2 ** @bits) - 1
+      self.analog_resolution = @bits
+    end
+
+    def analog_resolution=(value)
+      write Dino::Message.encode(command: 96, value: value)
     end
 
     def analog_divider=(value)
@@ -58,7 +70,7 @@ module Dino
 
     def set_pullup(pin, pullup)
       pin = convert_pin(pin)
-      pullup ? digital_write(pin, HIGH) : digital_write(pin, LOW)
+      pullup ? digital_write(pin, @high) : digital_write(pin, @low)
     end
 
     PIN_COMMANDS = {
@@ -79,8 +91,26 @@ module Dino
       end
     end
 
+    DIGITAL_REGEX = /\A\d+\z/i
+    ANALOG_REGEX = /\A(a)\d+\z/i
+    DAC_REGEX = /\A(dac)\d+\z/i
+
     def convert_pin(pin)
-      pin.to_s.match(/\Aa/i) ? @analog_zero + pin.to_s.gsub(/\Aa/i, '').to_i : pin.to_i
+      pin = pin.to_s
+
+      return pin.to_i             if pin.match(DIGITAL_REGEX)
+      return analog_pin_to_i(pin) if pin.match(ANALOG_REGEX)
+      return dac_pin_to_i(pin)    if pin.match(DAC_REGEX)
+
+      nil
+    end
+
+    def analog_pin_to_i(pin)
+      @analog_zero + pin.gsub(/\Aa/i, '').to_i
+    end
+
+    def dac_pin_to_i(pin)
+      @dac_zero + pin.gsub(/\Aa/i, '').to_i
     end
   end
 end

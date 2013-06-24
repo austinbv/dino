@@ -80,6 +80,7 @@ void Dino::process() {
     case 10: handleLCD           ();  break;
     case 11: shiftWrite          ();  break;
     case 90: reset               ();  break;
+    case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
     default:                          break;
@@ -275,9 +276,6 @@ void Dino::shiftWrite() {
 
 // CMD = 90
 void Dino::reset() {
-  #ifdef ANALOG_RESOLUTION
-    analogReadResolution(ANALOG_RESOLUTION);
-  #endif
   heartRate = 4000; // Default heartRate is ~4ms.
   loopCount = 0;
   analogDivider = 4; // Update analog listeners every ~16ms.
@@ -287,7 +285,22 @@ void Dino::reset() {
   lastUpdate = micros();
   fragmentIndex = 0;
   charIndex = 0;
-  sprintf(response, "ACK:%02d", A0);
+
+  #if defined(__SAM3X8E__)
+    sprintf(response, "ACK:%d,%d", A0, DAC0);
+  #else
+    sprintf(response, "ACK:%d", A0);
+  #endif
+}
+
+// CMD = 97
+// Set the analog read and write resolution.
+void Dino::setAnalogResolution() {
+  analogReadResolution(val);
+  analogWriteResolution(val);
+  #ifdef debug
+    Serial.print("Analog R/W resolution set to "); Serial.println(val);
+  #endif
 }
 
 // CMD = 97

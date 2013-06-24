@@ -40,7 +40,7 @@ module Dino
         alias :on_data :add_callback
 
         def remove_callback(key=nil)
-          key ? @callbacks[key] = nil : @callbacks = {}
+          key ? @callbacks[key] = [] : @callbacks = {}
         end
 
         alias :remove_callbacks :remove_callback
