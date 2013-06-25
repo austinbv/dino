@@ -7,7 +7,7 @@ Dino dino;
 #if defined(__SAM3X8E__)
   Serial_ serial = SerialUSB;
 #else
-  UARTClass serial = Serial;
+  HardwareSerial serial = Serial;
 #endif
 
 // Dino.h doesn't handle TXRX. Setup a function to tell it to write to Serial.

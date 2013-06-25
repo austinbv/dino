@@ -296,10 +296,12 @@ void Dino::reset() {
 // CMD = 97
 // Set the analog read and write resolution.
 void Dino::setAnalogResolution() {
-  analogReadResolution(val);
-  analogWriteResolution(val);
-  #ifdef debug
-    Serial.print("Analog R/W resolution set to "); Serial.println(val);
+  #if defined(__SAM3X8E__)
+    analogReadResolution(val);
+    analogWriteResolution(val);
+    #ifdef debug
+      Serial.print("Analog R/W resolution set to "); Serial.println(val);
+    #endif
   #endif
 }
 
