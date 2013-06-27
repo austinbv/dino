@@ -15,14 +15,6 @@ module Dino
         @io ||= connect
       end
 
-      def handshake
-        if on_windows?
-          io; sleep 3
-        end
-        
-        super
-      end
-
       private
 
       def connect
