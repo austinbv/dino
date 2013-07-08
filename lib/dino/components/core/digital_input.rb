@@ -7,14 +7,14 @@ module Dino
 
         def initialize(options={})
           super(options)
-          start_listening
+          _listen
         end
 
-        def poll
+        def _read
           board.digital_read(self.pin)
         end
 
-        def start_listening
+        def _listen
           board.digital_listen(self.pin)
         end
 

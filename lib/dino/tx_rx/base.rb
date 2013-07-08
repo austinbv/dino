@@ -34,6 +34,7 @@ module Dino
       end
 
       def handshake
+        flush_read
         10.times do
           write Dino::Message.encode(command: 90)
           line = gets(1)

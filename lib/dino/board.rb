@@ -53,6 +53,7 @@ module Dino
     end
 
     def add_input_hardware(part)
+      start_read
       @input_hardware << part
       set_pin_mode(part.pin, :in, part.pullup)
     end

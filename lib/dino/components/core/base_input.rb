@@ -2,53 +2,62 @@ module Dino
   module Components
     module Core
       class BaseInput < Base
+        include Threaded
+
         def initialize(options={})
           super options
 
           remove_callbacks
           self.mode = :in
           board.add_input_hardware(self)
-          board.start_read
 
           after_initialize(options)
         end
         
         def read(&block)
           add_callback(:read, &block) if block_given?
-          poll
+          _read
+          loop { break if @callbacks[:read].empty? }
         end
         
         def listen(&block)
           add_callback(:listen, &block) if block_given?
-          start_listening
+          _listen
+        end
+
+        def poll(interval, &block)
+          add_callback(:poll, &block) if block_given?
+          threaded_loop do
+            _read; sleep interval
+          end
+        end
+
+        def stop
+          stop_thread
+          board.stop_listener(pin)
+          remove_callback :listen; remove_callback :poll
         end
 
         #
-        # Define these in your subclass.
-        # Should correspond to Board#digital_read, Board#digital_listen for digital
-        # and Board#analog_read, Board#analog_listen for analog components. 
+        # Defined in DigitalInput and AnalogInput subclasses.
+        # _read corresponds to Board#digital_read and Board#analog_read respectively.
+        # _listen corresponds to Board#digital_listen and Board#analog_listen respectively
         #
-        def poll ; end
-        def start_listening ; end
+        def _read; end
+        def _listen; end
 
         def add_callback(key=nil, &block)
           key ||= :persistent
           @callbacks[key] ||= []
           @callbacks[key] << block
         end
-
-        alias :on_data :add_callback
-
+        
         def remove_callback(key=nil)
           key ? @callbacks[key] = [] : @callbacks = {}
         end
 
+        alias :on_data :add_callback
         alias :remove_callbacks :remove_callback
-
-        def stop_listening
-          board.stop_listener(pin)
-          remove_callback :listen
-        end
 
         def update(data)
           @state = data

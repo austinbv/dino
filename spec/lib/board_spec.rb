@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   describe Dino::Board do
     def io_mock(methods = {})
-      @io ||= mock(:io, {write: nil, add_observer: nil, flush_read: nil, handshake: "14"}.merge(methods))
+      @io ||= mock(:io, {add_observer: true, handshake: 14, write: true, read: true, write: nil}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
@@ -63,7 +63,12 @@ module Dino
     end
 
     describe '#add_input_hardware' do
-      it 'should add digital hardware to the board' do
+      it 'should start the read thread' do
+        io_mock.should_receive(:read)
+        subject.add_input_hardware(mock(:part1, pin: 12, pullup: nil))
+      end
+
+      it 'should add input hardware to the board' do
         subject.add_input_hardware(mock1 = mock(:part1, pin: 12, pullup: nil))
         subject.add_input_hardware(mock2 = mock(:part2, pin: 14, pullup: nil))
         subject.input_hardware.should =~ [mock1, mock2]

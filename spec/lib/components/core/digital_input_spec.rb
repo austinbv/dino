@@ -17,20 +17,20 @@ module Dino
           end
         end
 
-        describe '#poll' do
+        describe '#_read' do
           it 'should send #digital_read to the board with its pin' do
             board.should_receive(:digital_read).with(subject.pin)
-            subject.read
+            subject._read
           end
         end
 
-        describe '#start_listening' do
+        describe '#_listen' do
           it 'should send #digital_listen to the board with its pin' do
             subject
-            subject.stop_listening
+            subject.stop
             board.should_receive(:digital_listen).with(subject.pin)
 
-            subject.start_listening
+            subject.listen
           end
         end
 

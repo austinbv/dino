@@ -9,17 +9,17 @@ module Dino
         let(:options) { { pin: 'A0', board: board } }
         subject { AnalogInput.new(options) }
 
-        describe '#poll' do
+        describe '#_read' do
           it 'should send #analog_read to the board with its pin' do
             board.should_receive(:analog_read).with(subject.pin)
-            subject.read
+            subject._read
           end
         end
 
-        describe '#start_listening' do
+        describe '#_listen' do
           it 'should send #analog_listen to the board with its pin' do
             board.should_receive(:analog_listen).with(subject.pin)
-            subject.start_listening
+            subject._listen
           end
         end
       end

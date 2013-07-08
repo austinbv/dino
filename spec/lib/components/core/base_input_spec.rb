@@ -13,7 +13,6 @@ module Dino
           it 'should add itself as input hardware, set mode to in and start read' do
             board.should_receive(:set_pin_mode).with(14, :in, nil)
             board.should_receive(:add_input_hardware)
-            board.should_receive(:start_read)
 
             BaseInput.new(options)
           end
@@ -54,12 +53,20 @@ module Dino
           describe '#read' do
             it 'should add the block given as a callback to the :read key' do
               subject.should_receive(:add_callback).with(:read)
+              subject.instance_variable_set(:@callbacks, {read: []})
               subject.read { mock }
             end
 
-            it 'should call #poll once' do
-              subject.should_receive(:poll)
+            it 'should call #_read once' do
+              subject.should_receive(:read)
               subject.read
+            end
+          end
+
+          describe '#poll' do
+            it 'should add the block given as a callback to the :poll key' do
+              subject.should_receive(:add_callback).with(:poll)
+              subject.poll(5) { mock }
             end
           end
 
@@ -69,23 +76,24 @@ module Dino
               subject.listen { mock }
             end
 
-            it 'should call #start_listening' do
-              subject.should_receive(:start_listening)
+            it 'should call #_listen' do
+              subject.should_receive(:_listen)
               subject.listen
             end
           end
 
-          describe '#stop_listening' do
+          describe '#stop' do
             it 'should tell the board to turn the listener off' do
               board.should_receive(:stop_listener).with(subject.pin)
-              subject.stop_listening
+              subject.stop
             end
 
-            it 'should remove all callbacks with the :listen key' do
-              subject.listen { mock }
+            it 'should remove all callbacks from the :listen and :poll keys and stop the read thread' do
               subject.should_receive(:remove_callback).with(:listen)
+              subject.should_receive(:remove_callback).with(:poll)
+              subject.should_receive(:stop_thread)
 
-              subject.stop_listening
+              subject.stop
             end
           end
         end
