@@ -1,3 +1,4 @@
+[![Stories in Ready](http://badge.waffle.io/austinbv/dino.png)](http://waffle.io/austinbv/dino)  
 # Dino 0.11.2
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
