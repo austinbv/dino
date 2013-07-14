@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include "Dino.h"
 DinoLCD dinoLCD;
+DinoSerial dinoSerial;
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -79,6 +80,7 @@ void Dino::process() {
     case 9:  servoWrite          ();  break;
     case 10: handleLCD           ();  break;
     case 11: shiftWrite          ();  break;
+    case 12: handleSerial        ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -272,6 +274,15 @@ void Dino::shiftWrite() {
   #endif
   // auxMsg should be the clock pin.
   shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
+}
+
+// CMD = 12
+// Write a value to the servo object.
+void Dino::handleSerial() {
+  #ifdef debug
+    Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  dinoSerial.process(val, auxMsg);
 }
 
 // CMD = 90
