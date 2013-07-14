@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "DinoSerial.h"
 
-SoftwareSerial serial(10,11);
+SoftwareSerial softSerial(10,11);
 
 DinoSerial::DinoSerial(){
 }
@@ -29,12 +29,12 @@ void DinoSerial::process(int cmd, char *message) {
 void DinoSerial::setPins(char *aux) {
   int *pins = parse(aux);
   SoftwareSerial newSerial(pins[0],pins[1]);
-  serial = newSerial;
+  softSerial = newSerial;
 
 }
 
 void DinoSerial::beginSerial(char *aux) {
   int *values = parse(aux);
   // set baud rate
-  serial.begin(values[0]);
+  softSerial.begin(values[0]);
 }
