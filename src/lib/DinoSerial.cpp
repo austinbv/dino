@@ -20,9 +20,11 @@ int *DinoSerial::parse(char *aux){
 
 void DinoSerial::process(int cmd, char *message) {
   switch(cmd) {
-    case 0:  setPins(message);           break;
-    case 1:  beginSerial(message);       break;
-    default:                             break;
+    case 0:  setPins(message);            break;
+    case 1:  beginSerial(message);        break;
+    case 2:  softSerial.print(message);   break;
+    case 3:  softserial.println(message); break;
+    default:                              break;
   }
 }
 
