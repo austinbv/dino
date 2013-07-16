@@ -12,5 +12,6 @@ module Dino
     autoload :LCD,            'dino/components/lcd'
     autoload :ShiftRegister,  'dino/components/shift_register'
     autoload :Relay,          'dino/components/relay'
+    autoload :SoftwareSerial, 'dino/components/softserial'
   end
 end

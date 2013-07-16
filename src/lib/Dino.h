@@ -8,6 +8,7 @@
 #include "Arduino.h"
 #include <Servo.h>
 #include "DinoLCD.h"
+#include "DinoSerial.h"
 
 // Allocate listener storage based on what board we're running.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -45,6 +46,7 @@ class Dino {
     void servoWrite            ();  //cmd = 9
     void handleLCD             ();  //cmd = 10
     void shiftWrite            ();  //cmd = 11
+    void handleSerial          ();  //cmd = 12
     void reset                 ();  //cmd = 90
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
