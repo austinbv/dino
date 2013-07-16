@@ -1,6 +1,8 @@
 module Dino
   module Components
     class SoftwareSerial < Core::MultiPin
+      attr_accessor :baud
+
       COMMAND = 12
       # Initialize
       #
@@ -11,8 +13,9 @@ module Dino
       # )
       #
       def after_initialize(options)
+        self.baud = options[:baud]
         board.write Dino::Message.encode command: COMMAND, value: 0, aux_message: encoded_pins
-        board.write Dino::Message.encode command: COMMAND, value: 1, aux_message: baud
+        board.write Dino::Message.encode command: COMMAND, value: 1, aux_message: self.baud
       end
       
       # A useful pattern to be implemented if needed
