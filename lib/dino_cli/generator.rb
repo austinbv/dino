@@ -1,6 +1,6 @@
 class DinoCLI::Generator
   require "fileutils"
-  LIB_FILENAMES = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp"]
+  LIB_FILENAMES = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp", "DinoSerial.cpp","DinoSerial.h"]
   attr_accessor :options
 
   def initialize(options={})
