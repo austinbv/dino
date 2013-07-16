@@ -11,7 +11,7 @@ class DinoSerial {
   private:
     int *parse(char *aux);
     void setPins(char *aux);
-    void beginSerial(char *aux);
+    void begin(char *aux);
     int parseSize;
 };
 

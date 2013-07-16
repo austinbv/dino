@@ -277,7 +277,7 @@ void Dino::shiftWrite() {
 }
 
 // CMD = 12
-// Write a value to the servo object.
+// Control the SoftwareSerial.
 void Dino::handleSerial() {
   #ifdef debug
     Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);

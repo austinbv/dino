@@ -5,6 +5,8 @@
 #ifndef Dino_h
 #define Dino_h
 
+#define debug
+
 #include "Arduino.h"
 #include <Servo.h>
 #include "DinoLCD.h"

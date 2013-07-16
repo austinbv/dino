@@ -21,9 +21,9 @@ int *DinoSerial::parse(char *aux){
 void DinoSerial::process(int cmd, char *message) {
   switch(cmd) {
     case 0:  setPins(message);            break;
-    case 1:  beginSerial(message);        break;
+    case 1:  begin(message);              break;
     case 2:  softSerial.print(message);   break;
-    case 3:  softserial.println(message); break;
+    case 3:  softSerial.println(message); break;
     default:                              break;
   }
 }
@@ -32,11 +32,9 @@ void DinoSerial::setPins(char *aux) {
   int *pins = parse(aux);
   SoftwareSerial newSerial(pins[0],pins[1]);
   softSerial = newSerial;
-
 }
 
-void DinoSerial::beginSerial(char *aux) {
-  int *values = parse(aux);
-  // set baud rate
-  softSerial.begin(values[0]);
+void DinoSerial::begin(char *aux) {
+  int baud = atoi(aux);
+  softSerial.begin(baud);
 }
