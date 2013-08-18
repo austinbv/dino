@@ -1,4 +1,4 @@
-# Dino 0.11.2
+# Dino 0.12.0
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
 ## Get Started In No Time
@@ -10,6 +10,14 @@ Dino lets you start programming your Arduino with Ruby in minutes.
 ```shell
 gem install dino
 ```
+
+#### Download the Arduino IDE
+
+Dino is all about writing Ruby, but we'll need to upload some C code to the Arduino so we can talk to it. You'll need the [Arduino IDE](http://arduino.cc/en/Main/Software) for that. Even though it's still in beta, version 1.5 is recommended since it lets you upload from the command line.
+
+#### Connect your Arduino
+
+Connect your board with a USB cable. Open the Arduino IDE and pull down the `Tools` menu. Make sure you have the right type of board, and the correct serial port selected.
 
 #### Prepare the Bootstrapper
 
