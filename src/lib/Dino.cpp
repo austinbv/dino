@@ -82,7 +82,7 @@ void Dino::updateListeners() {
   }
 }
 void Dino::updateDigitalListeners() {
-  for (int i = 0; i < 22; i++) {
+  for (int i = 0; i < PIN_COUNT; i++) {
     if (digitalListeners[i]) {
       pin = i;
       dRead();
@@ -94,7 +94,7 @@ void Dino::updateDigitalListeners() {
   }
 }
 void Dino::updateAnalogListeners() {
-  for (int i = 0; i < 22; i++) {
+  for (int i = 0; i < PIN_COUNT; i++) {
     if (analogListeners[i]) {
       pin = i;
       aRead();
@@ -225,13 +225,13 @@ void Dino::reset() {
   heartRate = 4000; // Default heartRate is ~4ms.
   loopCount = 0;
   analogDivider = 4; // Update analog listeners every ~16ms.
-  for (int i = 0; i < 22; i++) digitalListeners[i] = false;
-  for (int i = 0; i < 22; i++) digitalListenerValues[i] = 2;
-  for (int i = 0; i < 22; i++)  analogListeners[i] = false;
+  for (int i = 0; i < PIN_COUNT; i++) digitalListeners[i] = false;
+  for (int i = 0; i < PIN_COUNT; i++) digitalListenerValues[i] = 2;
+  for (int i = 0; i < PIN_COUNT; i++)  analogListeners[i] = false;
   lastUpdate = micros();
   index = 0;
   #ifdef debug
-    Serial.println("Reset the board to defaults.  pin ");
+    Serial.println("Reset the board to defaults.");
   #endif
   sprintf(response, "ACK:%02d", A0);
 }

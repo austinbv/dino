@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.3
+* Backport bug fixes from 0.12:
+  * Listeners weren't working properly on the Arduino MEGA.
+  * More reliable handshake.
+
 ## 0.11.2
 
 * Make servos work better by using the existing Arduino Servo library.
