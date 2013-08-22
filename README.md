@@ -38,7 +38,7 @@ __Note:__ Current Ethernet shields come with a sticker indicating the MAC addres
 #### Verify Install
 
 * Build the sample circuit [examples/led/led.png](https://raw.github.com/austinbv/dino/master/examples/led/led.png)
-* From your terminal, execute `ruby example/led/led.rb`
+* From your terminal, execute `ruby examples/led/led.rb`
 * Observe your LED blinking continuously
 
 ## Examples and Tutorials
