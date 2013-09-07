@@ -2,6 +2,7 @@
 #include <Servo.h>
 #include <LiquidCrystal.h>
 #include <SoftwareSerial.h>
+#include "DHT.h"
 Dino dino;
 
 // Use the native serial port on the Arduino Due
@@ -12,7 +13,7 @@ Dino dino;
 #endif
 
 // Dino.h doesn't handle TXRX. Setup a function to tell it to write to Serial.
-void writeResponse(char *response) { serial.print(response); serial.print("\n"); }
+void writeResponse(char *response) { serial.print(response); }
 void (*writeCallback)(char *str) = writeResponse;
 
 void setup() {

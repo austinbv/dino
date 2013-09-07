@@ -83,7 +83,8 @@ module Dino
       analog_listen:   '6',
       stop_listener:   '7',
       servo_toggle:    '8',
-      servo_write:     '9'
+      servo_write:     '9',
+      dht_read:        '13'
     }
 
     PIN_COMMANDS.each_key do |command|

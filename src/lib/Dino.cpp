@@ -6,6 +6,7 @@
 #include "Dino.h"
 DinoLCD dinoLCD;
 DinoSerial dinoSerial;
+DHT dht;
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -81,6 +82,7 @@ void Dino::process() {
     case 10: handleLCD           ();  break;
     case 11: shiftWrite          ();  break;
     case 12: handleSerial        ();  break;
+    case 13: handleDHT           ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -105,9 +107,8 @@ void Dino::setupWrite(void (*writeCallback)(char *str)) {
 }
 void Dino::writeResponse() {
   _writeCallback(response);
+  _writeCallback("\n");
 }
-
-
 
 // LISTNENERS
 void Dino::updateListeners() {
@@ -283,6 +284,29 @@ void Dino::handleSerial() {
     Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
   #endif
   dinoSerial.process(val, auxMsg);
+}
+
+// CMD = 13
+// Read a DHT sensor
+void Dino::handleDHT() {
+  #ifdef debug
+    Serial.print("DinoDHT command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  if (pin != dht.pin) dht.setup(pin);
+  float reading;
+  char readingBuff[10];
+  char prefix;
+  if (val == 0) {
+    reading = dht.getTemperature();
+    prefix = 'T';
+  } else {
+    reading = dht.getHumidity();
+    prefix = 'H';
+  }
+  if (! isnan(reading)) {
+    dtostrf(reading, 6, 4, readingBuff);
+    sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
+  }
 }
 
 // CMD = 90

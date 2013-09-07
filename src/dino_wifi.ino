@@ -3,6 +3,8 @@
 #include <WiFi.h>
 #include <Servo.h>
 #include <LiquidCrystal.h>
+#include <SoftwareSerial.h>
+#include "DHT.h"
 
 // Configure your WiFi options here. MAC address and IP address are not configurable.
 int port = 3466;
@@ -20,13 +22,8 @@ char responseBuffer[65];
 // Dino.h doesn't handle TXRX.
 // Setup a callback to buffer responses for writing.
 void bufferResponse(char *response) {
-   if (strlen(responseBuffer) > 56 ) {
-     writeResponses();
-     strcpy(responseBuffer, response);
-   } else {
-     strcat(responseBuffer, response);
-   }
-   strcat(responseBuffer, "\n");
+  if (strlen(responseBuffer) > 56 ) writeResponses();
+  strcpy(responseBuffer, response);
 }
 void (*writeCallback)(char *str) = bufferResponse;
 
