@@ -14,5 +14,6 @@ module Dino
     autoload :Relay,          'dino/components/relay'
     autoload :SoftwareSerial, 'dino/components/softserial'
     autoload :DHT,            'dino/components/dht'
+    autoload :HCSR04,         'dino/components/hcsr04'
   end
 end

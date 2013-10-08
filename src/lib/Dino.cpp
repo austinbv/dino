@@ -83,6 +83,7 @@ void Dino::process() {
     case 11: shiftWrite          ();  break;
     case 12: handleSerial        ();  break;
     case 13: handleDHT           ();  break;
+    case 14: ultrasonicRead      ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -308,6 +309,30 @@ void Dino::handleDHT() {
     sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
   }
 }
+
+// CMD = 14
+// Read an ultrasonic sensor
+void Dino::ultrasonicRead() {
+  #ifdef debug
+    Serial.print("Ultrasonic read: "); Serial.print(" on pin "); Serial.println(pin);
+  #endif
+
+  // Fire
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(pin, LOW);
+
+  // Read
+  pinMode(pin, INPUT);
+
+  unsigned long microseconds;
+  microseconds = pulseIn(pin, HIGH);
+  sprintf(response, "%02d:%d", pin, microseconds);
+}
+
 
 // CMD = 90
 void Dino::reset() {
