@@ -14,13 +14,13 @@ module Dino
         def update(data)
           return unless data.match /T/
           data.gsub!('T', '')
-          super(data)
+          super(data.to_f)
         end
       end
 
       class Humidity < Core::BaseInput
         #
-        # These components poll too slowly to poll often enough for a listener.
+        # These components work too slowly to poll often enough for a listener.
         #
         def listen; end
 
@@ -28,10 +28,10 @@ module Dino
           board.dht_read(self.pin, 1)
         end
 
-        def update
+        def update(data)
           return unless data.match /H/
-          data.gsub!('T', '')
-          super(data)
+          data.gsub!('H', '')
+          super(data.to_f)
         end
       end
     end
