@@ -1,8 +1,11 @@
 module Dino
   module Components
     class Sensor < BaseComponent
+      attr_reader :value
+
       def after_initialize(options={})
         @data_callbacks = []
+        @value = 0
         @board.add_analog_hardware(self)
         @board.start_read
       end
@@ -12,6 +15,7 @@ module Dino
       end
 
       def update(data)
+        @value = data
         @data_callbacks.each do |callback|
           callback.call(data)
         end

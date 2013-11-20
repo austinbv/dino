@@ -29,10 +29,15 @@ module Dino
           sensor = Sensor.new(board: board, pin: 'a pin')
           sensor.instance_variable_get(:@data_callbacks).should == []
         end
+
+        it 'should initialize value' do
+          sensor = Sensor.new(board: board, pin: 'a pin')
+          sensor.value.should == 0
+        end
       end
 
       describe '#when_data_received' do
-        
+
         it "should add a callback to the list of callbacks" do
           sensor = Sensor.new(board: board, pin: 'a pin')
           sensor.when_data_received { "this is a block" }
@@ -43,7 +48,7 @@ module Dino
       describe '#update' do
         it 'should call all callbacks passing in the given data' do
           sensor = Sensor.new(board: board, pin: 'a pin')
-          
+
           first_block_data = nil
           second_block_data = nil
           sensor.when_data_received do |data|
@@ -55,6 +60,13 @@ module Dino
 
           sensor.update('Some data')
           [first_block_data, second_block_data].each { |block_data| block_data.should == "Some data" }
+        end
+
+        it 'should update the value' do
+          sensor = Sensor.new(board: board, pin: 'a pin')
+
+          sensor.update('Some data')
+          sensor.value.should == 'Some data'
         end
       end
     end
