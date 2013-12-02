@@ -17,7 +17,7 @@ module Dino
         end
 
         it 'should add itself to the board and start reading' do
-          board = mock(:board)
+          board = double(:board)
           board.should_receive(:add_digital_hardware)
           board.should_receive(:start_read)
           Button.new(board: board, pin: 'a pin')
@@ -25,11 +25,11 @@ module Dino
       end
 
       context 'callbacks' do
-        let(:board) { mock(:board, add_digital_hardware: true, start_read: true) }
-        let(:button) {Button.new(board: board, pin: mock)}
+        let(:board) { double(:board, add_digital_hardware: true, start_read: true) }
+        let(:button) {Button.new(board: board, pin: double)}
         describe '#down' do
           it 'should add a callback to the down_callbacks array' do
-            callback = mock
+            callback = double
             button.down do 
               callback.called
             end
@@ -42,7 +42,7 @@ module Dino
 
         describe '#up' do
           it 'should add a callback to the up_callbacks array' do
-            callback = mock
+            callback = double
             button.up do 
               callback.called
             end
@@ -55,12 +55,12 @@ module Dino
 
         describe '#update' do
           it 'should call the down callbacks' do
-            callback_1 = mock
+            callback_1 = double
             button.down do 
               callback_1.called
             end
             
-            callback_2 = mock
+            callback_2 = double
             button.down do 
               callback_2.called
             end
@@ -70,12 +70,12 @@ module Dino
           end
 
           it 'should call the up callbacks' do
-            callback_1 = mock
+            callback_1 = double
             button.up do 
               callback_1.called
             end
             
-            callback_2 = mock
+            callback_2 = double
             button.up do 
               callback_2.called
             end
@@ -88,7 +88,7 @@ module Dino
           end
 
           it 'should not call the callbacks if the state has not changed' do
-            callback = mock
+            callback = double
             button.up do
               callback.called
             end
@@ -99,12 +99,12 @@ module Dino
           end
 
           it 'should not call the callbacks if the data is not UP or DOWN' do
-            callback_1 = mock
+            callback_1 = double
             button.up do 
               callback_1.called
             end
 
-            callback_2 = mock
+            callback_2 = double
             button.down do 
               callback_2.called
             end

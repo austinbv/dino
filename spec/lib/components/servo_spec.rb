@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe Servo do
-      let(:board) { mock(:board, analog_write: true, set_pin_mode: true, servo_toggle: true, servo_write: true) }
+      let(:board) { double(:board, analog_write: true, set_pin_mode: true, servo_toggle: true, servo_write: true) }
 
       describe '#initialize' do
         it 'should raise if it does not receive a pin' do
