@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe RgbLed do
-      let(:board) { mock(:board, analog_write: true, set_pin_mode: true) }
+      let(:board) { double(:board, analog_write: true, set_pin_mode: true) }
       let(:pins) { {red: 1, green: 2, blue: 3} }
       let(:rgb) { RgbLed.new(pins: pins, board: board)}
 

@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe Led do
-      let(:board) { mock(:board, digital_write: true, set_pin_mode: true) }
+      let(:board) { double(:board, digital_write: true, set_pin_mode: true) }
 
       describe '#initialize' do
         it 'should raise if it does not receive a pin' do

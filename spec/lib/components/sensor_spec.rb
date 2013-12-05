@@ -4,7 +4,7 @@ module Dino
   module Components
     describe Sensor do
 
-      let(:board){mock(:board).as_null_object}
+      let(:board){double(:board).as_null_object}
 
       describe '#initalize' do
         it 'should raise if it does not receive a pin' do
