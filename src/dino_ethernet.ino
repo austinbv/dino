@@ -3,8 +3,12 @@
 #include <Ethernet.h>
 #include <Servo.h>
 #include <LiquidCrystal.h>
-#include <SoftwareSerial.h>
 #include "DHT.h"
+
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  #include <SoftwareSerial.h>
+#endif
 
 // Configure your MAC address, IP address, and HTTP port here.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };
