@@ -8,8 +8,13 @@
 #include "Arduino.h"
 #include <Servo.h>
 #include "DinoLCD.h"
-#include "DinoSerial.h"
 #include "DHT.h"
+
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  #include "DinoSerial.h"
+#endif
+
 
 // Allocate listener storage based on what board we're running.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
