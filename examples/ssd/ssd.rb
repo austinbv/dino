@@ -7,8 +7,7 @@ require 'dino'
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 ssd   = Dino::Components::SSD.new(
   board: board,
-  pins:  [12,13,3,4,5,10,9],
-  anode: 11
+  pins:  { cathode: 10, a: 3, b: 4, c: 5, d: 6, e: 7, f: 8, g: 9 }
 )
 
 # Turn off the ssd on exit
