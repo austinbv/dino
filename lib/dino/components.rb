@@ -15,5 +15,6 @@ module Dino
     autoload :ShiftRegister,  'dino/components/shift_register'
     autoload :Relay,          'dino/components/relay'
     autoload :SoftwareSerial, 'dino/components/softserial'
+    autoload :DHT,            'dino/components/dht'
   end
 end

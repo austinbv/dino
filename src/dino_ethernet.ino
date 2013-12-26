@@ -3,6 +3,12 @@
 #include <Ethernet.h>
 #include <Servo.h>
 #include <LiquidCrystal.h>
+#include "DHT.h"
+
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  #include <SoftwareSerial.h>
+#endif
 
 // Configure your MAC address, IP address, and HTTP port here.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };
@@ -18,13 +24,8 @@ char responseBuffer[65];
 // Dino.h doesn't handle TXRX.
 // Setup a callback to buffer responses for writing.
 void bufferResponse(char *response) {
-   if (strlen(responseBuffer) > 56 ) {
-     writeResponses();
-     strcpy(responseBuffer, response);
-   } else {
-     strcat(responseBuffer, response);
-   }
-   strcat(responseBuffer, "\n");
+  if (strlen(responseBuffer) > 56 ) writeResponses();
+  strcpy(responseBuffer, response);
 }
 void (*writeCallback)(char *str) = bufferResponse;
 

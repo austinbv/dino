@@ -5,7 +5,12 @@
 #include "Arduino.h"
 #include "Dino.h"
 DinoLCD dinoLCD;
-DinoSerial dinoSerial;
+DHT dht;
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  DinoSerial dinoSerial;
+#endif  
+
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -81,6 +86,7 @@ void Dino::process() {
     case 10: handleLCD           ();  break;
     case 11: shiftWrite          ();  break;
     case 12: handleSerial        ();  break;
+    case 13: handleDHT           ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -105,9 +111,8 @@ void Dino::setupWrite(void (*writeCallback)(char *str)) {
 }
 void Dino::writeResponse() {
   _writeCallback(response);
+  _writeCallback("\n");
 }
-
-
 
 // LISTNENERS
 void Dino::updateListeners() {
@@ -276,14 +281,46 @@ void Dino::shiftWrite() {
   shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
 }
 
+
 // CMD = 12
 // Control the SoftwareSerial.
 void Dino::handleSerial() {
   #ifdef debug
     Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
   #endif
+  // SoftwareSerial doesn't work on the Due yet.
+  #if !defined(__SAM3X8E__)
   dinoSerial.process(val, auxMsg);
+  #endif
 }
+
+
+// CMD = 13
+// Read a DHT sensor
+void Dino::handleDHT() {
+  #ifdef debug
+    Serial.print("DinoDHT command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  // dtostrf doesn't work on the Due yet.
+  #if !defined(__SAM3X8E__)
+  if (pin != dht.pin) dht.setup(pin);
+  float reading;
+  char readingBuff[10];
+  char prefix;
+  if (val == 0) {
+    reading = dht.getTemperature();
+    prefix = 'T';
+  } else {
+    reading = dht.getHumidity();
+    prefix = 'H';
+  }
+  if (! isnan(reading)) {
+    dtostrf(reading, 6, 4, readingBuff);
+    sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
+  }
+  #endif
+}
+
 
 // CMD = 90
 void Dino::reset() {
