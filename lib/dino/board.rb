@@ -1,11 +1,11 @@
 module Dino
   class Board
-    attr_reader :high, :low, :input_hardware, :analog_zero, :dac_zero
+    attr_reader :high, :low, :components, :analog_zero, :dac_zero
     DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
     def initialize(io, options={})
       @bits = options[:bits] || 8
-      @io, @input_hardware = io, []
+      @io, @components = io, []
       io.add_observer(self)
 
       @analog_zero, @dac_zero = @io.handshake.to_s.split(",").map { |pin| pin.to_i }
@@ -47,26 +47,23 @@ module Dino
     end
 
     def update(pin, msg)
-      @input_hardware.each do |part|
+      @components.each do |part|
         part.update(msg) if convert_pin(pin) == convert_pin(part.pin)
       end
     end
 
-    def add_input_hardware(part)
-      start_read
-      @input_hardware << part
-      set_pin_mode(part.pin, :in, part.pullup)
+    def add_component(component)
+      @components << component
     end
 
-    def remove_input_hardware(part)
-      stop_listener(part.pin)
-      @input_hardware.delete(part)
+    def remove_component(component)
+      stop_listener(component.pin)
+      @components.delete(component)
     end
 
-    def set_pin_mode(pin, mode, pullup=nil)
+    def set_pin_mode(pin, mode)
       pin, value = convert_pin(pin), mode == :out ? 0 : 1
       write Dino::Message.encode(command: 0, pin: pin, value: value)
-      set_pullup(pin, pullup) if mode == :in
     end
 
     def set_pullup(pin, pullup)

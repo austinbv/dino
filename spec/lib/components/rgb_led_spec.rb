@@ -12,9 +12,9 @@ module Dino
         it 'should create a BaseOutput instance for each pin' do
           led = RgbLed.new(options)
           
-          led.red.class.should == Core::BaseOutput
-          led.green.class.should == Core::BaseOutput
-          led.blue.class.should == Core::BaseOutput
+          led.red.class.should == Basic::AnalogOutput
+          led.green.class.should == Basic::AnalogOutput
+          led.blue.class.should == Basic::AnalogOutput
         end
       end
 

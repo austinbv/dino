@@ -1,15 +1,12 @@
 module Dino
   module Components
-    class RgbLed < Core::MultiPin
-      #
-      # options = {board: my_board, pins: {red: red_pin, green: green_pin, blue: blue_pin}
-      #
-      def after_initialize(options={})
-        proxies red:   Core::BaseOutput,
-                green: Core::BaseOutput,
-                blue:  Core::BaseOutput 
-      end
+    class RgbLed
+      include Setup::MultiPin
 
+      proxy_pins red:   Basic::AnalogOutput,
+                 green: Basic::AnalogOutput,
+                 blue:  Basic::AnalogOutput 
+      
       # Format: [R, G, B]
       COLORS = {
         red:     [255, 000, 000],

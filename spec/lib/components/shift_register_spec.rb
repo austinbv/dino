@@ -10,9 +10,9 @@ module Dino
 
       describe '#initialize' do
         it 'should create a BaseOutput instance for each pin' do
-          subject.clock.class.should == Core::BaseOutput
-          subject.latch.class.should == Core::BaseOutput
-          subject.data.class.should == Core::BaseOutput
+          subject.clock.class.should == Basic::DigitalOutput
+          subject.latch.class.should == Basic::DigitalOutput
+          subject.data.class.should == Basic::DigitalOutput
         end
       end
 

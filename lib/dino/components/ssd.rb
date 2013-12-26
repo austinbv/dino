@@ -1,53 +1,52 @@
-# Connect to the Arduino and
-# take control of the SSD
-#
-# ssd = SevenSegmentDisplay.new(
-#   board: Board.new(TxRx.new),
-#   pins:  [12,13,3,4,5,10,9],
-#   anode: 11
-# )
-
 module Dino
   module Components
-    class SSD < Core::MultiPin
-      attr_reader :anode
+    class SSD
+      include Setup::MultiPin
+      
+      proxy_pins   cathode: Basic::DigitalOutput,
+                   anode:   Basic::DigitalOutput,
+                   optional: true
 
+      proxy_pins  a:     Basic::DigitalOutput,
+                  b:     Basic::DigitalOutput,
+                  c:     Basic::DigitalOutput,
+                  d:     Basic::DigitalOutput,
+                  e:     Basic::DigitalOutput,
+                  f:     Basic::DigitalOutput,
+                  g:     Basic::DigitalOutput
+
+      # ssd = SevenSegmentDisplay.new(
+      #   board: board,
+      #   pins:  {anode: 11, a: 12, b: 13, c: 3,d: 4,e: 5,f: 10,g: 9}
+      # )
       def after_initialize(options={})
-        raise Exception.new('anode must be specified') unless options[:anode]
-        @anode = Core::BaseOutput.new(board: board, pin: options[:anode])
-
-        # Create a Core::BaseOutput for every pin.
-        @pins.map! { |pin| Core::BaseOutput.new(board: board, pin: pin) }
-
-        clear
-        on
+        @segments = [a,b,c,d,e,f,g]
+        clear; on
       end
+
+      attr_reader :segments
 
       def clear
-        7.times { |pin| toggle pin, 0 }
-      end
-
-      def display(char)
-        key = char.to_s.upcase
-
-        return scroll(key) if key.length > 1
-
-        # Make sure the ssd is turned on.
-        on
-
-        if chars = CHARACTERS[key]
-          chars.each_with_index { |s,i| toggle i, s }
-        else
-          clear
+        segments.each do |pin|
+          pin.low if cathode
+          pin.high if anode
         end
       end
 
+      def display(char)
+        char = char.to_s
+        return scroll(char) if char.length > 1
+        off; write(char); on
+      end
+
       def on
-        @anode.high
+        anode.high if anode
+        cathode.low if cathode
       end
 
       def off
-        @anode.low
+        anode.low if anode
+        cathode.high if cathode
       end
 
       CHARACTERS = {
@@ -82,7 +81,7 @@ module Dino
         'P' => [1,1,0,0,1,1,1],
         'Q' => [1,1,1,0,0,1,1],
         'R' => [0,0,0,0,1,0,1],
-        'S' => [0,0,1,1,0,1,1],
+        'S' => [1,0,1,1,0,1,1],
         'T' => [0,0,0,1,1,1,1],
         'U' => [0,0,1,1,1,0,0],
         'V' => [0,1,1,1,1,1,0],
@@ -94,19 +93,25 @@ module Dino
 
       private
 
-      def scroll(string)
-        string.chars.each do |chr|
-          off
-          sleep 0.05
-          display chr
-          sleep 0.5
+      def write(char)
+        bits = CHARACTERS[char.to_s.upcase]
+        unless bits
+          clear
+        else
+          bits.each_with_index do |bit, index|
+            if anode
+              bit == 0 ? bit = 1 : bit = 0
+            end
+            segments[index].write(bit) unless (segments[index].state == bit)
+          end
         end
-
-        clear
       end
 
-      def toggle(number, state)
-        @pins[number].write (state == 1 ? 0 : 1)
+      def scroll(string)
+        string.chars.each do |char|
+          display(char)
+          sleep(0.5)
+        end
       end
     end
   end

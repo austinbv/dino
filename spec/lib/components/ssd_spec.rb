@@ -5,36 +5,33 @@ module Dino
     describe SSD do
       let(:txrx)  { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
       let(:board) { Board.new(txrx) }
-      let(:anode) { 11 }
-      let(:pins)  { [12,13,3,4,5,10,9] }
-      subject   { SSD.new(board: board, pins: pins, anode: anode) }
+      let(:pins)  { {anode: 11, a: 12, b: 13, c: 3, d: 4, e: 5, f: 10, g: 9} }
+      subject   { SSD.new(board: board, pins: pins) }
 
       describe '#initialize' do
-        it 'should raise if it does not receive an anode' do
-          expect { SSD.new(board: board, pins: pins) }.to raise_exception
-        end
-
-        it 'should create a Core::BaseOutput for the anode and each pin' do
+        it 'should create a digital output for pins a-g' do
           subject
 
-          subject.anode.class.should == Core::BaseOutput
-          subject.pins.each { |pin| pin.class.should == Core::BaseOutput}
+          segments = [:a, :b, :c, :d, :e, :f, :g]
+          segments.each { |segment| subject.proxies[segment].class.should == Basic::DigitalOutput}
         end
 
         it "should clear the display" do
           SSD.any_instance.should_receive(:clear).once
-          SSD.new(board: board, pins: pins, anode: anode)
+          SSD.new(board: board, pins: pins)
         end
 
         it "should turn on the display" do
           SSD.any_instance.should_receive(:on).once
-          SSD.new(board: board, pins: pins, anode: anode)
+          SSD.new(board: board, pins: pins)
         end
       end
 
       describe '#clear' do
         it 'should toggle all the seven leds to off' do
-          subject.should_receive(:toggle).exactly(7).with(anything, 0)
+          segments = [:a, :b, :c, :d, :e, :f, :g]
+          segments.each { |segment| subject.proxies[segment].should_receive(:high) }
+
           subject.clear
         end
       end
@@ -55,7 +52,7 @@ module Dino
 
       describe '#display' do
         it "should scroll on multiple characters" do
-          subject.should_receive(:scroll).with('FOO')
+          subject.should_receive(:scroll).with('foo')
           subject.display('foo')
         end
 
@@ -68,11 +65,10 @@ module Dino
           subject.should_receive(:clear)
           subject.display('+')
         end
+      end
 
-        it "should toggle all the segments in order to display a character" do
-          subject.should_receive(:toggle).exactly(7)
-          subject.display('7')
-        end
+      describe 'with a cathode' do
+        it 'should invert the logic'
       end
     end
   end

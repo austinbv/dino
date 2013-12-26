@@ -11,8 +11,8 @@ module Dino
 
       describe '#initialize' do
         it 'should create a BaseOutput instance for each pin' do          
-          subject.step.class.should == Core::BaseOutput
-          subject.direction.class.should == Core::BaseOutput
+          subject.step.class.should == Basic::DigitalOutput
+          subject.direction.class.should == Basic::DigitalOutput
         end
       end
 

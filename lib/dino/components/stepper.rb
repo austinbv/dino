@@ -1,11 +1,11 @@
 module Dino
   module Components
-    class Stepper < Core::MultiPin
-      def after_initialize(options={})
-        proxies step:      Core::BaseOutput,
-                direction: Core::BaseOutput
-      end
-
+    class Stepper
+      include Setup::MultiPin 
+      
+      proxy_pins  step:      Basic::DigitalOutput,
+                  direction: Basic::DigitalOutput
+    
       def step_cc
         direction.high
         step.high

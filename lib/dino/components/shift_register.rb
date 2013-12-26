@@ -1,15 +1,14 @@
 module Dino
   module Components
-    class ShiftRegister < Core::MultiPin
+    class ShiftRegister
       #
       # options = {board: my_board, pins: {clock: clock_pin, latch: latch_pin, data: data_pin}
       #
-      def after_initialize(options={})
-        proxy  clock: Core::BaseOutput,
-               latch: Core::BaseOutput,
-               data:  Core::BaseOutput
-      end
-
+      include Setup::MultiPin      
+      proxy_pins  clock: Basic::DigitalOutput,
+                  latch: Basic::DigitalOutput,
+                  data:  Basic::DigitalOutput
+            
       def write(bytes)
         bytes = [bytes] unless bytes.class == Array
 
