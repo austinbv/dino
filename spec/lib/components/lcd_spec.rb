@@ -3,8 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe LCD do
-      let(:txrx)  { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       subject { LCD.new board: board, pins: { rs: 12, enable: 11, d4: 5, d5: 4, d6: 3, d7: 2 }, cols: 16, rows: 2 }
 
       before do

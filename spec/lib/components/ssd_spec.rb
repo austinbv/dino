@@ -3,8 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe SSD do
-      let(:txrx)  { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       let(:pins)  { {anode: 11, a: 12, b: 13, c: 3, d: 4, e: 5, f: 10, g: 9} }
       subject   { SSD.new(board: board, pins: pins) }
 

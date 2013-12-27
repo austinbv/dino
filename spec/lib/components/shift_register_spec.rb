@@ -3,8 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe ShiftRegister do
-      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       let(:options) { { board: board, pins: {clock: 12, data: 11, latch: 8} } }
       subject { ShiftRegister.new(options)  }
 

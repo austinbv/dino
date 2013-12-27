@@ -3,8 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe RgbLed do
-      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       let(:options) { { board: board, pins: {red: 1, green: 2, blue: 3} } }
       subject { RgbLed.new(options) }
 

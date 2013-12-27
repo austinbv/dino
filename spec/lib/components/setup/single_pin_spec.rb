@@ -4,10 +4,12 @@ module Dino
   module Components
     module Setup
       describe SinglePin do
-        let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-        let(:board) { Board.new(txrx) }
+        include BoardMock
         let(:options) { { pin: 'A0', board: board } }
-        class SinglePinComponent; include SinglePin; end
+
+        class SinglePinComponent
+          include SinglePin
+        end
         subject { SinglePinComponent.new(options) }
         
         describe '#initialize' do

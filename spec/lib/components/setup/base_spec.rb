@@ -4,10 +4,12 @@ module Dino
   module Components
     module Setup
       describe Base do
-        let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-        let(:board) { Board.new(txrx) }
+        include BoardMock
         let(:options) { { pin: 'A0', board: board } }
-        class BaseComponent; include Base; end
+
+        class BaseComponent
+          include Base
+        end
         subject { BaseComponent.new(options) }
         
         describe '#initialize' do
@@ -17,7 +19,7 @@ module Dino
             }.to raise_exception
           end
 
-          it 'should add itself to the board' do
+          it 'should register itself as a component on the board' do
             board.should_receive(:add_component)
             BaseComponent.new(options)
           end

@@ -4,8 +4,7 @@ module Dino
   module Components
     module Basic
       describe AnalogInput do
-        let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-        let(:board) { Board.new(txrx) }
+        include BoardMock
         let(:options) { { pin: 'A0', board: board } }
         subject { AnalogInput.new(options) }
 

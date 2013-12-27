@@ -3,8 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe SoftwareSerial do
-      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
 
       subject { SoftwareSerial.new board: board, pins: { rx: 10, tx: 11 }, baud: 4800 }
 
