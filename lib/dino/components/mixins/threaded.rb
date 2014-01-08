@@ -1,19 +1,19 @@
 module Dino
   module Components
-    module Core
+    module Mixins
       module Threaded
         attr_reader :thread, :interrupts_enabled
-
-        def self.included(base)
-          base.extend(ClassMethods)
-        end
 
         module ClassMethods
           def interrupt_with(*args)
             interrupts = self.class_eval('@@interrupts') rescue []
-            args.each { |a| interrupts << a }
+            interrupts = (interrupts + args).uniq
             self.class_variable_set(:@@interrupts, interrupts)
           end
+        end
+
+        def self.included(base)
+          base.extend ClassMethods
         end
 
         def threaded(&block)

@@ -1,14 +1,19 @@
 module Dino
   module Components
-    module Core
-      class DigitalInput < BaseInput
-        HIGH = 1
-        LOW = 0
+    module Basic
+      class DigitalInput
+        include Setup::SinglePin
+        include Setup::Input
+        include Mixins::Reader
+        include Mixins::Poller
+        include Mixins::Listener
 
-        def initialize(options={})
-          super(options)
+        def after_initialize(options={})
           _listen
         end
+
+        HIGH = 1
+        LOW = 0
 
         def _read
           board.digital_read(self.pin)

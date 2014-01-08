@@ -1,6 +1,7 @@
 module Dino
   module Components
-    class SoftwareSerial < Core::MultiPin
+    class SoftwareSerial
+      include Setup::MultiPin
       attr_accessor :baud
 
       COMMAND = 12

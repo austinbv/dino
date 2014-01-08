@@ -10,3 +10,12 @@ module Constants
     opts[:on].const_set(const, value)
   end
 end
+
+module BoardMock
+  def self.included(base)
+    base.class_eval do 
+      let(:txrx)  { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
+      let(:board) { Dino::Board.new(txrx) }
+    end
+  end
+end

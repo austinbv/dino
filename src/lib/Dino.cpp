@@ -5,8 +5,12 @@
 #include "Arduino.h"
 #include "Dino.h"
 DinoLCD dinoLCD;
-DinoSerial dinoSerial;
 DHT dht;
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  DinoSerial dinoSerial;
+#endif  
+
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -278,14 +282,19 @@ void Dino::shiftWrite() {
   shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
 }
 
+
 // CMD = 12
 // Control the SoftwareSerial.
 void Dino::handleSerial() {
   #ifdef debug
     Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
   #endif
+  // SoftwareSerial doesn't work on the Due yet.
+  #if !defined(__SAM3X8E__)
   dinoSerial.process(val, auxMsg);
+  #endif
 }
+
 
 // CMD = 13
 // Read a DHT sensor
@@ -293,6 +302,8 @@ void Dino::handleDHT() {
   #ifdef debug
     Serial.print("DinoDHT command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
   #endif
+  // dtostrf doesn't work on the Due yet.
+  #if !defined(__SAM3X8E__)
   if (pin != dht.pin) dht.setup(pin);
   float reading;
   char readingBuff[10];
@@ -308,6 +319,7 @@ void Dino::handleDHT() {
     dtostrf(reading, 6, 4, readingBuff);
     sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
   }
+  #endif
 }
 
 // CMD = 14
@@ -332,7 +344,6 @@ void Dino::ultrasonicRead() {
   microseconds = pulseIn(pin, HIGH);
   sprintf(response, "%02d:%d", pin, microseconds);
 }
-
 
 // CMD = 90
 void Dino::reset() {

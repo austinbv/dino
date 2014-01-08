@@ -1,6 +1,9 @@
 module Dino
   module Components
-    class Servo < Core::BaseOutput
+    class Servo
+      include Setup::SinglePin
+      include Mixins::Threaded
+      
       def after_initialize(options={})
         board.servo_toggle(pin, 1)
       end
@@ -10,9 +13,7 @@ module Dino
         board.servo_write(pin, @state)
       end
 
-      def position
-        @state
-      end
+      alias :position :state
 
       def angle(value)
         value == 180 ? value : value % 180

@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class Relay < Core::BaseOutput
+    class Relay < Basic::DigitalOutput
     end
   end
 end

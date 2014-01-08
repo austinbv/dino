@@ -3,16 +3,15 @@ require 'spec_helper'
 module Dino
   module Components
     describe Stepper do
-      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       let(:options) { { pins: {step: 9, direction: 10}, board: board } }
 
       subject { Stepper.new(options) }
 
       describe '#initialize' do
         it 'should create a BaseOutput instance for each pin' do          
-          subject.step.class.should == Core::BaseOutput
-          subject.direction.class.should == Core::BaseOutput
+          subject.step.class.should == Basic::DigitalOutput
+          subject.direction.class.should == Basic::DigitalOutput
         end
       end
 

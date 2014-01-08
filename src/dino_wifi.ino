@@ -3,8 +3,12 @@
 #include <WiFi.h>
 #include <Servo.h>
 #include <LiquidCrystal.h>
-#include <SoftwareSerial.h>
 #include "DHT.h"
+
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  #include <SoftwareSerial.h>
+#endif
 
 // Configure your WiFi options here. MAC address and IP address are not configurable.
 int port = 3466;

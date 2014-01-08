@@ -1,7 +1,9 @@
 module Dino
   module Components
-    class LCD < Core::MultiPin
+    class LCD
+      include Setup::MultiPin
 
+      require_pins :rs, :enable, :d4, :d5, :d6, :d7
       # Initialize in 4 bits mode
       #
       # Dino::Componentes::LCD.new(

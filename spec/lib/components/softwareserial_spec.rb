@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe SoftwareSerial do
-      let(:board) { mock(:board, digital_write: true, set_pin_mode: true) }
+      include BoardMock
 
       subject { SoftwareSerial.new board: board, pins: { rx: 10, tx: 11 }, baud: 4800 }
 

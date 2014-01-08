@@ -3,8 +3,7 @@ require 'spec_helper'
 module Dino
   module Components
     describe RgbLed do
-      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       let(:options) { { board: board, pins: {red: 1, green: 2, blue: 3} } }
       subject { RgbLed.new(options) }
 
@@ -12,9 +11,9 @@ module Dino
         it 'should create a BaseOutput instance for each pin' do
           led = RgbLed.new(options)
           
-          led.red.class.should == Core::BaseOutput
-          led.green.class.should == Core::BaseOutput
-          led.blue.class.should == Core::BaseOutput
+          led.red.class.should == Basic::AnalogOutput
+          led.green.class.should == Basic::AnalogOutput
+          led.blue.class.should == Basic::AnalogOutput
         end
       end
 

@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class Sensor < Core::AnalogInput      
+    class Sensor < Basic::AnalogInput
     end
   end
 end

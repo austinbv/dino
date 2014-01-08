@@ -3,16 +3,15 @@ require 'spec_helper'
 module Dino
   module Components
     describe ShiftRegister do
-      let(:txrx) { mock(:txrx, add_observer: true, handshake: 14, write: true, read: true) }
-      let(:board) { Board.new(txrx) }
+      include BoardMock
       let(:options) { { board: board, pins: {clock: 12, data: 11, latch: 8} } }
       subject { ShiftRegister.new(options)  }
 
       describe '#initialize' do
         it 'should create a BaseOutput instance for each pin' do
-          subject.clock.class.should == Core::BaseOutput
-          subject.latch.class.should == Core::BaseOutput
-          subject.data.class.should == Core::BaseOutput
+          subject.clock.class.should == Basic::DigitalOutput
+          subject.latch.class.should == Basic::DigitalOutput
+          subject.data.class.should == Basic::DigitalOutput
         end
       end
 
