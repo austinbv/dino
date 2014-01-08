@@ -1,11 +1,10 @@
 module Dino
   module Components
     module DHT
-      class Temperature < Core::BaseInput
-        #
-        # These components work too slowly to poll often enough for a listener.
-        #
-        def listen; end
+      class Temperature
+        include Setup::SinglePin
+        include Setup::Input
+        include Mixins::Poller
 
         def _read
           board.dht_read(self.pin, 0)
@@ -18,11 +17,10 @@ module Dino
         end
       end
 
-      class Humidity < Core::BaseInput
-        #
-        # These components work too slowly to poll often enough for a listener.
-        #
-        def listen; end
+      class Humidity
+        include Setup::SinglePin
+        include Setup::Input
+        include Mixins::Poller
 
         def _read
           board.dht_read(self.pin, 1)
