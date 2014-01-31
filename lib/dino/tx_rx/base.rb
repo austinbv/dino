@@ -1,5 +1,4 @@
 require 'observer'
-require 'timeout'
 
 module Dino
   module TxRx
@@ -51,7 +50,14 @@ module Dino
       end
 
       def gets(timeout=0.005)
-        IO.select([io], nil, nil, timeout) && io.gets
+        return nil unless IO.select([io], nil, nil, timeout)
+        io.read_timeout = (timeout * 1000).to_i
+        bytes = []
+        until (x = io.getbyte).nil?
+          bytes.push(x)
+        end
+        return nil if bytes.empty?
+        bytes.pack("C*")
       end
     end
   end
