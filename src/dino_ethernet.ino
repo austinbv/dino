@@ -4,6 +4,7 @@
 #include <Servo.h>
 #include <LiquidCrystal.h>
 #include "DHT.h"
+#include "OneWire.h"
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
