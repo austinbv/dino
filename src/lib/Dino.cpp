@@ -87,6 +87,8 @@ void Dino::process() {
     case 11: shiftWrite          ();  break;
     case 12: handleSerial        ();  break;
     case 13: handleDHT           ();  break;
+    case 20: tone                ();  break;
+    case 21: noTone              ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -319,6 +321,18 @@ void Dino::handleDHT() {
     sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
   }
   #endif
+}
+
+// CMD = 20
+void Dino::tone() {
+    unsigned int duration = atoi(auxMsg);
+    ::tone(pin, val, duration);
+}
+
+
+// CMD = 21
+void Dino::noTone() {
+    ::noTone(pin);
 }
 
 

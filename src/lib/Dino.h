@@ -54,6 +54,8 @@ class Dino {
     void shiftWrite            ();  //cmd = 11
     void handleSerial          ();  //cmd = 12
     void handleDHT             ();  //cmd = 13
+    void tone                  ();  //cmd = 20
+    void noTone                ();  //cmd = 21
     void reset                 ();  //cmd = 90
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
