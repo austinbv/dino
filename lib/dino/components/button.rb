@@ -8,5 +8,6 @@ module Dino
           update HIGH
           update LOW
       end
+    end
   end
 end
