@@ -14,23 +14,31 @@ module Dino
         def digital_write(value)
           board.digital_write(pin, @state = value)
         end
-
         alias :write :digital_write
 
         def low
           digital_write(board.low)
         end
+        alias :off :low
+
+        def low?
+          state == board.low
+        end
+        alias :off? :low?
 
         def high
           digital_write(board.high)
         end
+        alias :on  :high
+
+        def high?
+          state == board.high
+        end
+        alias :on?  :high?
 
         def toggle
-          state == board.low ? high : low
+          board.low? ? high : low
         end
-
-        alias :off :low
-        alias :on  :high
       end
     end
   end
