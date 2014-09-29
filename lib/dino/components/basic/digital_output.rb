@@ -37,7 +37,7 @@ module Dino
         alias :on?  :high?
 
         def toggle
-          board.low? ? high : low
+          low? ? high : low
         end
       end
     end
