@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dino
   describe Dino::Board do
     def io_mock(methods = {})
-      @io ||= mock(:io, {add_observer: true, handshake: 14, write: true, read: true, write: nil}.merge(methods))
+      @io ||= double(:io, {add_observer: true, handshake: 14, write: true, read: true, write: nil}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
@@ -37,9 +37,9 @@ module Dino
     describe '#update' do
       context 'when a component is connected to the pin' do
         it 'should call update with the message on the component' do
-          part = mock(:part, pin: 7, pullup: nil)
+          part = double(:part, pin: 7, pullup: nil)
           subject.add_component(part)
-          other_part = mock(:part, pin: 9, pullup: nil)
+          other_part = double(:part, pin: 9, pullup: nil)
           subject.add_component(other_part)
 
           part.should_receive(:update).with('wake up!')
@@ -58,20 +58,20 @@ module Dino
 
     describe '#add_component' do
       it 'should add the component to the board' do
-        subject.add_component(mock1 = mock(:part1, pin: 12, pullup: nil))
-        subject.add_component(mock2 = mock(:part2, pin: 14, pullup: nil))
+        subject.add_component(mock1 = double(:part1, pin: 12, pullup: nil))
+        subject.add_component(mock2 = double(:part2, pin: 14, pullup: nil))
         subject.components.should =~ [mock1, mock2]
       end
     end
 
     describe '#remove_component' do
       it 'should remove the given part from the hardware of the board and stop listening' do
-        mock = mock(:part1, pin: 12, pullup: nil)
+        mock = double(:part1, pin: 12, pullup: nil)
         subject.add_component(mock)
 
         subject.should_receive(:stop_listener).with(12)
         subject.remove_component(mock)
-        
+
         subject.components.should == []
       end
     end

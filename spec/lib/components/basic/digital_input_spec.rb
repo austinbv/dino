@@ -34,8 +34,8 @@ module Dino
 
         context 'callbacks' do
           before :each do
-            @low_callback = mock
-            @high_callback = mock
+            @low_callback = double
+            @high_callback = double
             subject.on_low { @low_callback.called }
             subject.on_high { @high_callback.called }
           end
@@ -46,7 +46,7 @@ module Dino
               @high_callback.should_not_receive(:called)
 
               subject.update(DigitalInput::LOW)
-            end 
+            end
           end
 
           describe '#on_high' do
@@ -55,7 +55,7 @@ module Dino
               @high_callback.should_receive(:called)
 
               subject.update(DigitalInput::HIGH)
-            end 
+            end
           end
         end
       end
