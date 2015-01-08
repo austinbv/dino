@@ -81,7 +81,9 @@ module Dino
       stop_listener:   '7',
       servo_toggle:    '8',
       servo_write:     '9',
-      dht_read:        '13'
+      dht_read:        '13',
+      tone:            '20',
+      no_tone:         '21'
     }
 
     PIN_COMMANDS.each_key do |command|
@@ -90,6 +92,14 @@ module Dino
       end
     end
 
+    # Redefinition of tone, no_tone
+    def tone(pin, value, duration)
+        write Dino::Message.encode(command: PIN_COMMANDS[:tone], pin: convert_pin(pin), value: value, aux_message: duration)
+    end
+    def no_tone(pin)
+        write Dino::Message.encode(command: PIN_COMMANDS[:no_tone], pin: convert_pin(pin))
+    end
+    
     DIGITAL_REGEX = /\A\d+\z/i
     ANALOG_REGEX = /\A(a)\d+\z/i
     DAC_REGEX = /\A(dac)\d+\z/i

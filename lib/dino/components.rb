@@ -16,5 +16,6 @@ module Dino
     autoload :Relay,          'dino/components/relay'
     autoload :SoftwareSerial, 'dino/components/softserial'
     autoload :DHT,            'dino/components/dht'
+    autoload :Piezo,          'dino/components/piezo'
   end
 end
