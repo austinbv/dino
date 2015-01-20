@@ -3,10 +3,10 @@
 # every half a second
 #
 require 'bundler/setup'
-require 'dino'
+require 'smalrubot'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-led = Dino::Components::Led.new(pin: 13, board: board)
+board = Smalrubot::Board.new(Smalrubot::TxRx::Serial.new)
+led = Smalrubot::Components::Led.new(pin: 13, board: board)
 
 [:on, :off].cycle do |switch|
   led.send(switch)

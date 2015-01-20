@@ -77,4 +77,6 @@ src/lib/Dino.h
 
   These were forked from Dino ( https://github.com/austinbv/dino/tree/15cd48e849faeb08c7dc017ff39ff16ff2e165a3 ).
   After that we modified.
-  These license is MIT: https://github.com/austinbv/dino/blob/master/LICENSE .
+  Copyright (c) 2012 Austin
+  These files were released under the MIT license:
+  https://github.com/austinbv/dino/blob/master/LICENSE .

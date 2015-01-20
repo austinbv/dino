@@ -2,10 +2,10 @@
 # This is an example of how to use the servo class
 #
 require 'bundler/setup'
-require 'dino'
+require 'smalrubot'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-servo = Dino::Components::Servo.new(pin: 9, board: board)
+board = Smalrubot::Board.new(Dino::TxRx::Serial.new)
+servo = Smalrubot::Components::Servo.new(pin: 9, board: board)
 
 # Add different angles (in degrees) to the array below to try out your servo.
 # Note: Some servos may not have a full 180 degree sweep.

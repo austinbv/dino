@@ -1,6 +1,6 @@
 require 'socket'
 
-module Dino
+module Smalrubot
   module TxRx
     class TCP < Base
       def initialize(host, port=3466)

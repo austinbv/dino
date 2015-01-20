@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   class Board
     attr_reader :digital_hardware, :analog_hardware, :analog_zero
     LOW, HIGH = 000, 255

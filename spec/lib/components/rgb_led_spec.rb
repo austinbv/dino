@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   module Components
     describe RgbLed do
       let(:board) { double(:board, analog_write: true, set_pin_mode: true) }

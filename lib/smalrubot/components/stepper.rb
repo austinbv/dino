@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   module Components
     class Stepper < BaseComponent
 

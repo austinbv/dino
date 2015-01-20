@@ -5,11 +5,11 @@
 # will exit before any callbacks can be called
 #
 require 'bundler/setup'
-require 'dino'
+require 'smalrubot'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-ir = Dino::Components::IrReceiver.new(pin: 2, board: board)
-led = Dino::Components::Led.new(pin: 13, board: board)
+board = Smalrubot::Board.new(Smalrubot::TxRx::Serial.new)
+ir = Smalrubot::Components::IrReceiver.new(pin: 2, board: board)
+led = Smalrubot::Components::Led.new(pin: 13, board: board)
 
 n = 0
 

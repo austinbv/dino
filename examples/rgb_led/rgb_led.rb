@@ -3,11 +3,11 @@
 # every half a second
 #
 require 'bundler/setup'
-require 'dino'
+require 'smalrubot'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-led = Dino::Components::RgbLed.new(pins: {red: 11, green: 10, blue: 9}, board: board)
-potentiometer = Dino::Components::Sensor.new(pin: 'A0', board: board)
+board = Smalrubot::Board.new(Smalrubot::TxRx::Serial.new)
+led = Smalrubot::Components::RgbLed.new(pins: {red: 11, green: 10, blue: 9}, board: board)
+potentiometer = Smalrubot::Components::Sensor.new(pin: 'A0', board: board)
 
 
 delay = 500.0

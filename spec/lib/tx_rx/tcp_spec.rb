@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   describe TxRx::TCP do
     before :each do
       @host = "127.0.0.1"

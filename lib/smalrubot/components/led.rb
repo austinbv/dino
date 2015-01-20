@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   module Components
     class Led < BaseComponent
       def after_initialize(options={})

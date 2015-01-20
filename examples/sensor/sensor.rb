@@ -5,10 +5,10 @@
 # will exit before any callbacks can be called
 #
 require 'bundler/setup'
-require 'dino'
+require 'smalrubot'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-sensor = Dino::Components::Sensor.new(pin: 'A0', board: board)
+board = Smalrubot::Board.new(Smalrubot::TxRx::Serial.new)
+sensor = Smalrubot::Components::Sensor.new(pin: 'A0', board: board)
 
 sensor.when_data_received do |data|
   puts data

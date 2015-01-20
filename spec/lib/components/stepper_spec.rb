@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   module Components
     describe Stepper do
       let(:board) { double(:board, digital_write: true, set_pin_mode: true) }

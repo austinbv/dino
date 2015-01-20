@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   module Components
     class RgbLed < BaseComponent
       # options = {board: my_board, pins: {red: red_pin, green: green_pin, blue: blue_pin}

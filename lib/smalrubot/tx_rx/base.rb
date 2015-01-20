@@ -1,7 +1,7 @@
 require 'observer'
 require 'timeout'
 
-module Dino
+module Smalrubot
   module TxRx
     class Base
       include Observable

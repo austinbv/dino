@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   describe TxRx::Serial do
     it { should be }
 

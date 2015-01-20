@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   module Components
     class Button < BaseComponent
       UP = "01"

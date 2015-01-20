@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   module Components
     describe Servo do
       let(:board) { double(:board, analog_write: true, set_pin_mode: true, servo_toggle: true, servo_write: true) }

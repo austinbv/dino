@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   module Components
     class BaseComponent
       attr_reader :board, :pin, :pullup

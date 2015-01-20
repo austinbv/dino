@@ -1,4 +1,4 @@
-module Dino
+module Smalrubot
   module Components
     class Servo < BaseComponent
       attr_reader :position

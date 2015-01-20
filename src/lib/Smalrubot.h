@@ -1,9 +1,9 @@
 /*
-  Library for dino ruby gem.
+  Library for smalrubot ruby gem.
 */
 
-#ifndef Dino_h
-#define Dino_h
+#ifndef Smalrubot_h
+#define Smalrubot_h
 
 #include "Arduino.h"
 #include <Servo.h>
@@ -20,9 +20,9 @@
 // Uncomment this line to enable debugging mode.
 // #define debug true
 
-class Dino {
+class Smalrubot {
   public:
-    Dino();
+    Smalrubot();
     void setupWrite(void (*writeCallback)(char *str));
     void parse(char c);
     void process();

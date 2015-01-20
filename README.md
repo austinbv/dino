@@ -1,57 +1,48 @@
-# Dino 0.11.3
-[![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
+# smalrubot
 
-## Get Started In No Time
+The smalrubot is a library and an Arduino sketch for Smalruby.
 
-Dino lets you start programming your Arduino with Ruby in minutes.
+This is a part of the Smalruby ([http://smalruby.jp](http://smalruby.jp)) Project.
 
-#### Install the Gem
+This was forked from Dino ([austinbv/dino:15cd48e8](https://github.com/austinbv/dino/tree/15cd48e849faeb08c7dc017ff39ff16ff2e165a3)).
 
-```shell
-gem install dino
+## Installation
+
+requirements:
+
+ * Windows or UNIX like OS (Mac OS X, Linux, etc...)
+ * Ruby 2.0.0-p481 or higher.
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'smalrubot'
 ```
 
-#### Prepare the Bootstrapper
-
-Use the included command line tool to create a folder with the Arduino sketch you want to use and optionally configure it.
+And then execute:
 
 ```shell
-# If connecting via serial, USB or ser2net, this is all you should need:
-dino generate-sketch serial
-
-# If usng the ethernet shield, you'll want to specify unique MAC and IP addresses:
-dino generate-sketch ethernet --mac XX:XX:XX:XX:XX:XX --ip XXX.XXX.XXX.XXX
-
-# For more options:
-dino help
+$ bundle
 ```
 
-__Note:__ Current Ethernet shields come with a sticker indicating the MAC address you should use with them. For older shields without a dedicated MAC address, inventing a random one should work, but don't use the same one for multiple boards. Valid IP addresses depend on the configuration of your network.
+Or install it yourself as:
 
-#### Upload The Bootstrapper
+```shell
+$ gem install smalrubot
+```
 
-* Connect the Arduino to a USB port on your machine, regardless of which sketch you're using.
-* Open [the normal Arduino IDE](http://arduino.cc/en/Main/Software)
-* Open the `.ino` file in the sketch folder you just generated.
-* Click the upload button (an arrow).
+## Usage
 
-#### Verify Install
+TODO: Write usage instructions here
 
-* Build the sample circuit [examples/led/led.png](https://raw.github.com/austinbv/dino/master/examples/led/led.png)
-* From your terminal, execute `ruby examples/led/led.rb`
-* Observe your LED blinking continuously
+## Contributing
 
-## Examples and Tutorials
+1. Fork it ( https://github.com/smalruby/smalrubot/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
 
-### Circuits and Programs
+## License
 
-* Take a look in [the example directory](https://github.com/austinbv/dino/tree/master/examples) for small component examples
-* Try [Getting Started with Arduino and Dino](http://tutorials.jumpstartlab.com/projects/arduino/introducing_arduino.html) from [Jumpstart Lab](http://jumpstartlab.com), building a number-guessing game and a simple nightlight
-* An example [rails app using Dino and Pusher](https://github.com/austinbv/dino_rails_example)
-* For a Sinatra example look at the [site used to shoot the cannon at RubyConf2012](https://github.com/austinbv/dino_cannon)
-
-### Explanatory Talks
-
-* "Arduino the Ruby Way" at RubyConf 2012
-  * [Video by ConFreaks](http://confreaks.com/videos/1294-rubyconf2012-arduino-the-ruby-way)
-  * [Slides on SpeakerDeck](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
+MIT (see [LICENSE](link:LICENSE))

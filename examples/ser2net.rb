@@ -17,13 +17,13 @@
 # http://sourceforge.net/projects/ser2net/ for more info on installing and configuring ser2net.
 #
 
-require File.expand_path('../../lib/dino', __FILE__)
+require File.expand_path('../../lib/smalrubot', __FILE__)
 
 # The remote ser2net host is the first argument for a new TxRx::TCP.
 # The second argument, port number, is optional. 3466 is default. This must match the port ser2net uses on the remote machine.
-connection = Dino::TxRx::TCP.new("127.0.0.1", 3466)
-board = Dino::Board.new(connection)
-led = Dino::Components::Led.new(pin: 13, board: board)
+connection = Smalrubot::TxRx::TCP.new("127.0.0.1", 3466)
+board = Smalrubot::Board.new(connection)
+led = Smalrubot::Components::Led.new(pin: 13, board: board)
 
 [:on, :off].cycle do |switch|
   led.send(switch)

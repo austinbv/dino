@@ -1,6 +1,6 @@
 require 'serialport'
 
-module Dino
+module Smalrubot
   module TxRx
     class Serial < Base
       BAUD = 115200

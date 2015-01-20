@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-module Dino
-  describe Dino::Board do
+module Smalrubot
+  describe Smalrubot::Board do
     def io_mock(methods = {})
       @io ||= double(:io, {write: nil, add_observer: nil, flush_read: nil, handshake: "14"}.merge(methods))
     end

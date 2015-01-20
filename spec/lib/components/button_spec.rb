@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   module Components
     describe Button do
       describe '#initialize' do

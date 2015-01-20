@@ -1,21 +1,21 @@
 /*
-  Library for dino ruby gem.
+  Library for smalrubot ruby gem.
 */
 
 #include "Arduino.h"
-#include "Dino.h"
+#include "Smalrubot.h"
 
-Dino::Dino(){
+Smalrubot::Smalrubot(){
   reset();
 }
 
-void Dino::parse(char c) {
+void Smalrubot::parse(char c) {
   if (c == '!') index = 0;        // Reset request
   else if (c == '.') process();   // End request and process
   else request[index++] = c;      // Append to request
 }
 
-void Dino::process() {
+void Smalrubot::process() {
   response[0] = '\0';
 
   // Parse the request.
@@ -63,17 +63,17 @@ void Dino::process() {
 
 
 // WRITE CALLBACK
-void Dino::setupWrite(void (*writeCallback)(char *str)) {
+void Smalrubot::setupWrite(void (*writeCallback)(char *str)) {
   _writeCallback = writeCallback;
 }
-void Dino::writeResponse() {
+void Smalrubot::writeResponse() {
   _writeCallback(response);
 }
 
 
 
 // LISTNENERS
-void Dino::updateListeners() {
+void Smalrubot::updateListeners() {
   if (timeSince(lastUpdate) > heartRate || timeSince(lastUpdate) < 0) {
     lastUpdate = micros();
     loopCount++;
@@ -81,7 +81,7 @@ void Dino::updateListeners() {
     if (loopCount % analogDivider == 0) updateAnalogListeners();
   }
 }
-void Dino::updateDigitalListeners() {
+void Smalrubot::updateDigitalListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
     if (digitalListeners[i]) {
       pin = i;
@@ -93,7 +93,7 @@ void Dino::updateDigitalListeners() {
     }
   }
 }
-void Dino::updateAnalogListeners() {
+void Smalrubot::updateAnalogListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
     if (analogListeners[i]) {
       pin = i;
@@ -102,7 +102,7 @@ void Dino::updateAnalogListeners() {
     }
   }
 }
-long Dino::timeSince(long event) {
+long Smalrubot::timeSince(long event) {
  long time = micros() - event;
  return time;
 }
@@ -111,7 +111,7 @@ long Dino::timeSince(long event) {
 
 // API FUNCTIONS
 // CMD = 00 // Pin Mode
-void Dino::setMode() {
+void Smalrubot::setMode() {
   if (val == 0) {
     removeListener();
     pinMode(pin, OUTPUT);
@@ -128,7 +128,7 @@ void Dino::setMode() {
 }
 
 // CMD = 01 // Digital Write
-void Dino::dWrite() {
+void Smalrubot::dWrite() {
   if (val == 0) {
     digitalWrite(pin, LOW);
     #ifdef debug
@@ -144,13 +144,13 @@ void Dino::dWrite() {
 }
 
 // CMD = 02 // Digital Read
-void Dino::dRead() { 
+void Smalrubot::dRead() { 
   rval = digitalRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
 
 // CMD = 03 // Analog (PWM) Write
-void Dino::aWrite() {
+void Smalrubot::aWrite() {
   analogWrite(pin,val);
   #ifdef debug
     Serial.print("Analog write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
@@ -158,14 +158,14 @@ void Dino::aWrite() {
 }
 
 // CMD = 04 // Analog Read
-void Dino::aRead() {
+void Smalrubot::aRead() {
   rval = analogRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
 
 // CMD = 05
 // Listen for a digital signal on any pin.
-void Dino::addDigitalListener() {
+void Smalrubot::addDigitalListener() {
   removeListener();
   digitalListeners[pin] = true;
   digitalListenerValues[pin] = 2;
@@ -176,7 +176,7 @@ void Dino::addDigitalListener() {
 
 // CMD = 06
 // Listen for an analog signal on analog pins only.
-void Dino::addAnalogListener() {
+void Smalrubot::addAnalogListener() {
   removeListener();
   analogListeners[pin] = true;
   #ifdef debug
@@ -186,7 +186,7 @@ void Dino::addAnalogListener() {
 
 // CMD = 07
 // Remove analog and digital listeners from any pin.
-void Dino::removeListener() {
+void Smalrubot::removeListener() {
   analogListeners[pin] = false;
   digitalListeners[pin] = false;
   #ifdef debug
@@ -196,7 +196,7 @@ void Dino::removeListener() {
 
 // CMD = 08
 // Attach the servo object to pin or detach it.
-void Dino::servoToggle() {
+void Smalrubot::servoToggle() {
   if (val == 0) {
     #ifdef debug
       Serial.print("Detaching servo"); Serial.print(" on pin "); Serial.println(pin);
@@ -213,7 +213,7 @@ void Dino::servoToggle() {
 
 // CMD = 09
 // Write a value to the servo object.
-void Dino::servoWrite() {
+void Smalrubot::servoWrite() {
   #ifdef debug
     Serial.print("Servo write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
   #endif
@@ -221,7 +221,7 @@ void Dino::servoWrite() {
 }
 
 // CMD = 90
-void Dino::reset() {
+void Smalrubot::reset() {
   heartRate = 4000; // Default heartRate is ~4ms.
   loopCount = 0;
   analogDivider = 4; // Update analog listeners every ~16ms.
@@ -238,7 +238,7 @@ void Dino::reset() {
 
 // CMD = 97
 // Set the analog divider. Powers of 2 up to 128 are valid.
-void Dino::setAnalogDivider() {
+void Smalrubot::setAnalogDivider() {
   analogDivider = val;
   #ifdef debug
     Serial.print("Analog divider set to "); Serial.println(analogDivider);
@@ -247,7 +247,7 @@ void Dino::setAnalogDivider() {
 
 // CMD = 98
 // Set the heart rate in milliseconds. Store it in microseconds.
-void Dino::setHeartRate() {
+void Smalrubot::setHeartRate() {
   int rate = val;
   heartRate = (rate * 1000);
   #ifdef debug

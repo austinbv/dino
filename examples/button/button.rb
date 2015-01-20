@@ -5,10 +5,10 @@
 # will exit before any callbacks can be called
 #
 require 'bundler/setup'
-require 'dino'
+require 'smalrubot'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-button = Dino::Components::Button.new(pin: 13, board: board)
+board = Smalrubot::Board.new(Smalrubot::TxRx::Serial.new)
+button = Smalrubot::Components::Button.new(pin: 13, board: board)
 
 button.down do
   puts "button down"
