@@ -1,27 +1,15 @@
 module Smalrubot
   class Board
-    attr_reader :digital_hardware, :analog_hardware, :analog_zero
+    attr_reader :analog_zero
     LOW, HIGH = 000, 255
 
     def initialize(io)
-      @io, @digital_hardware, @analog_hardware = io, [], []
+      @io = io
       handshake
     end
 
     def handshake
       @analog_zero = @io.handshake
-    end
-
-    def analog_divider=(value)
-      unless [1, 2, 4, 8, 16, 32, 64, 128].include? value
-        puts "Analog divider must be in 1, 2, 4, 8, 16, 32, 64, 128"
-      else
-        write "9700#{normalize_value(value)}"
-      end
-    end
-
-    def heart_rate=(value)
-      write "9800#{normalize_value(value)}"
     end
 
     def write(msg, opts = {})
