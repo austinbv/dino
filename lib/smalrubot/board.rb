@@ -75,7 +75,7 @@ module Smalrubot
     def set_pullup(pin, pullup)
       pullup ? digital_write(pin, HIGH) : digital_write(pin, LOW)
     end
-      
+
     PIN_COMMANDS = {
       digital_write:   '01',
       digital_read:    '02',

@@ -19,7 +19,7 @@ module Smalrubot
         if on_windows?
           io; sleep 3
         end
-        
+
         super
       end
 
