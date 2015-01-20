@@ -29,7 +29,7 @@ module Smalrubot
         tty_devices.each do |device|
           begin
             return ::Serial.new(device, @baud)
-          rescue
+          rescue Exception
             Smalrubot.show_backtrace($!)
           end
         end
