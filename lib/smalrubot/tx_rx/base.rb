@@ -18,7 +18,7 @@ module Smalrubot
         n = io.write(message)
         Smalrubot.debug_log('write: %s(A:%d, E:%d)', message, n, message.length)
         if n != message.length
-          raise "FATAL: n(#{n}) != message.length(#{message.length}) "
+          raise "FATAL: n(#{n}) != message.length(#{message.length})"
         end
       end
 
