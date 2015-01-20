@@ -18,7 +18,7 @@ module Smalrubot
   def show_backtrace(exception)
     if debug?
       puts(exception)
-      print('    ' + exception.backtrace.join("\n    "))
+      puts('    ' + exception.backtrace.join("\n    "))
     end
   end
 
