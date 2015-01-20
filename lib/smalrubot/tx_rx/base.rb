@@ -16,22 +16,22 @@ module Smalrubot
 
       def write(message)
         n = io.write(message)
-        Smalrubot.debug_log("write: %s(A:%d, E:%d)", message, n, message.length)
+        Smalrubot.debug_log('write: %s(A:%d, E:%d)', message, n, message.length)
         if n != message.length
           raise "FATAL: n(#{n}) != message.length(#{message.length}) "
         end
       end
 
       def handshake
-        10.times do
+        5.times do
           write("!9000000.")
           line = gets(1)
           if line && line.match(/ACK:/)
             flush_read
-            return line.chop.split(/:/)[1].to_i
+            return line.chomp.split(/:/)[1].to_i
           end
         end
-       raise BoardNotFound
+      raise BoardNotFound
       end
 
       def flush_read

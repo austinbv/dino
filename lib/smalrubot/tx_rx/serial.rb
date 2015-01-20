@@ -16,20 +16,32 @@ module Smalrubot
       end
 
       def handshake
-        if on_windows?
-          io; sleep 3
-        end
+        while tty_devices.length > 0
+          begin
+            if on_windows?
+              io; sleep 3
+            end
 
-        super
+            return super
+          rescue BoardNotFound
+            @tty_devices.shift
+            @io.close
+            @io = nil
+          end
+        end
       end
 
       private
 
       def connect
-        tty_devices.each do |device|
+        tty_devices.dup.each do |device|
           begin
-            return ::Serial.new(device, @baud)
+            serial = ::Serial.new(device, @baud)
+            Smalrubot.debug_log('found board: %s (%d)', device, @baud)
+            return serial
           rescue Exception
+            @tty_devices.shift
+            Smalrubot.debug_log('could not access: %s', device)
             Smalrubot.show_backtrace($!)
           end
         end
@@ -37,9 +49,17 @@ module Smalrubot
       end
 
       def tty_devices
-        return [@device] if @device
-        return (1..256).map { |n| "COM#{n}" } if on_windows?
-        `ls /dev`.split("\n").grep(/usb|ACM/i).map{ |d| "/dev/#{d}" }
+        if !@tty_devices
+          if @device
+            @tty_devices = [@device]
+          elsif on_windows?
+            @tty_devices = (1..256).map { |n| "COM#{n}" }
+          else
+            @tty_devices =
+              `ls /dev`.split("\n").grep(/usb|ACM/i).map{ |d| "/dev/#{d}" }
+          end
+        end
+        @tty_devices
       end
 
       def on_windows?
