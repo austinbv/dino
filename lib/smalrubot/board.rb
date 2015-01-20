@@ -29,32 +29,8 @@ module Smalrubot
       @io.write(formatted_msg)
     end
 
-    def update(pin, msg)
-      (@digital_hardware + @analog_hardware).each do |part|
-        part.update(msg) if normalize_pin(pin) == normalize_pin(part.pin)
-      end
-    end
-
-    def add_digital_hardware(part)
-      set_pin_mode(part.pin, :in, part.pullup)
-      digital_listen(part.pin)
-      @digital_hardware << part
-    end
-
-    def remove_digital_hardware(part)
-      stop_listener(part.pin)
-      @digital_hardware.delete(part)
-    end
-
-    def add_analog_hardware(part)
-      set_pin_mode(part.pin, :in)
-      analog_listen(part.pin)
-      @analog_hardware << part
-    end
-
-    def remove_analog_hardware(part)
-      stop_listener(part.pin)
-      @analog_hardware.delete(part)
+    def read
+      @io.read(1)
     end
 
     def set_pin_mode(pin, mode, pullup=nil)
@@ -67,22 +43,36 @@ module Smalrubot
       pullup ? digital_write(pin, HIGH) : digital_write(pin, LOW)
     end
 
-    PIN_COMMANDS = {
+    WRITE_COMMANDS = {
       digital_write:   '01',
-      digital_read:    '02',
       analog_write:    '03',
-      analog_read:     '04',
-      digital_listen:  '05',
-      analog_listen:   '06',
-      stop_listener:   '07',
       servo_toggle:    '08',
       servo_write:     '09'
     }
 
-    PIN_COMMANDS.each_key do |command|
+    WRITE_COMMANDS.each_key do |command|
       define_method(command) do |pin, value=nil|
-        cmd = normalize_cmd(PIN_COMMANDS[command])
-        write "#{cmd}#{normalize_pin(pin)}#{normalize_value(value)}"
+        cmd = normalize_cmd(WRITE_COMMANDS[command])
+        write("#{cmd}#{normalize_pin(pin)}#{normalize_value(value)}")
+      end
+    end
+
+    READ_COMMANDS = {
+      digital_read:    '02',
+      analog_read:     '04',
+    }
+
+    READ_COMMANDS.each_key do |command|
+      define_method(command) do |pin|
+        cmd = normalize_cmd(READ_COMMANDS[command])
+        write("#{cmd}#{normalize_pin(pin)}#{normalize_value(0)}")
+        res_pin, message = *read
+        if res_pin && message
+          if res_pin.to_i != pin
+            raise "FATAL: request and response pins are differece: request #{pin}, response: #{res_pin}"
+          end
+          message.to_i
+        end
       end
     end
 
