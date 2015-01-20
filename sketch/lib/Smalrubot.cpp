@@ -40,14 +40,9 @@ void Smalrubot::process() {
     case 2:  dRead               ();  break;
     case 3:  aWrite              ();  break;
     case 4:  aRead               ();  break;
-    case 5:  addDigitalListener  ();  break;
-    case 6:  addAnalogListener   ();  break;
-    case 7:  removeListener      ();  break;
     case 8:  servoToggle         ();  break;
     case 9:  servoWrite          ();  break;
     case 90: reset               ();  break;
-    case 97: setAnalogDivider    ();  break;
-    case 98: setHeartRate        ();  break;
     default:                          break;
   }
   
@@ -72,40 +67,6 @@ void Smalrubot::writeResponse() {
 
 
 
-// LISTNENERS
-void Smalrubot::updateListeners() {
-  if (timeSince(lastUpdate) > heartRate || timeSince(lastUpdate) < 0) {
-    lastUpdate = micros();
-    loopCount++;
-    updateDigitalListeners();
-    if (loopCount % analogDivider == 0) updateAnalogListeners();
-  }
-}
-void Smalrubot::updateDigitalListeners() {
-  for (int i = 0; i < PIN_COUNT; i++) {
-    if (digitalListeners[i]) {
-      pin = i;
-      dRead();
-      if (rval != digitalListenerValues[i]) {
-        digitalListenerValues[i] = rval;
-        writeResponse();
-      } 
-    }
-  }
-}
-void Smalrubot::updateAnalogListeners() {
-  for (int i = 0; i < PIN_COUNT; i++) {
-    if (analogListeners[i]) {
-      pin = i;
-      aRead();
-      writeResponse();
-    }
-  }
-}
-long Smalrubot::timeSince(long event) {
- long time = micros() - event;
- return time;
-}
 
 
 
@@ -113,7 +74,6 @@ long Smalrubot::timeSince(long event) {
 // CMD = 00 // Pin Mode
 void Smalrubot::setMode() {
   if (val == 0) {
-    removeListener();
     pinMode(pin, OUTPUT);
     #ifdef debug
       Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("OUTPUT mode");
@@ -144,7 +104,7 @@ void Smalrubot::dWrite() {
 }
 
 // CMD = 02 // Digital Read
-void Smalrubot::dRead() { 
+void Smalrubot::dRead() {
   rval = digitalRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
@@ -161,37 +121,6 @@ void Smalrubot::aWrite() {
 void Smalrubot::aRead() {
   rval = analogRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
-}
-
-// CMD = 05
-// Listen for a digital signal on any pin.
-void Smalrubot::addDigitalListener() {
-  removeListener();
-  digitalListeners[pin] = true;
-  digitalListenerValues[pin] = 2;
-  #ifdef debug
-    Serial.print("Added digital listener on pin "); Serial.println(pin);
-  #endif
-}
-
-// CMD = 06
-// Listen for an analog signal on analog pins only.
-void Smalrubot::addAnalogListener() {
-  removeListener();
-  analogListeners[pin] = true;
-  #ifdef debug
-    Serial.print("Added analog listener on pin "); Serial.println(pin);
-  #endif
-}
-
-// CMD = 07
-// Remove analog and digital listeners from any pin.
-void Smalrubot::removeListener() {
-  analogListeners[pin] = false;
-  digitalListeners[pin] = false;
-  #ifdef debug
-    Serial.print("Removed listeners on pin "); Serial.println(pin);
-  #endif
 }
 
 // CMD = 08
@@ -222,36 +151,8 @@ void Smalrubot::servoWrite() {
 
 // CMD = 90
 void Smalrubot::reset() {
-  heartRate = 4000; // Default heartRate is ~4ms.
-  loopCount = 0;
-  analogDivider = 4; // Update analog listeners every ~16ms.
-  for (int i = 0; i < PIN_COUNT; i++) digitalListeners[i] = false;
-  for (int i = 0; i < PIN_COUNT; i++) digitalListenerValues[i] = 2;
-  for (int i = 0; i < PIN_COUNT; i++)  analogListeners[i] = false;
-  lastUpdate = micros();
-  index = 0;
   #ifdef debug
     Serial.println("Reset the board to defaults.");
   #endif
   sprintf(response, "ACK:%02d", A0);
 }
-
-// CMD = 97
-// Set the analog divider. Powers of 2 up to 128 are valid.
-void Smalrubot::setAnalogDivider() {
-  analogDivider = val;
-  #ifdef debug
-    Serial.print("Analog divider set to "); Serial.println(analogDivider);
-  #endif
-}
-
-// CMD = 98
-// Set the heart rate in milliseconds. Store it in microseconds.
-void Smalrubot::setHeartRate() {
-  int rate = val;
-  heartRate = (rate * 1000);
-  #ifdef debug
-    Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
-  #endif
-}
-
