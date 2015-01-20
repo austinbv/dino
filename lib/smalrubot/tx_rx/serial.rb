@@ -1,4 +1,4 @@
-require 'serialport'
+require 'rubyserial'
 
 module Smalrubot
   module TxRx
@@ -26,7 +26,13 @@ module Smalrubot
       private
 
       def connect
-        tty_devices.each { |device| return SerialPort.new(device, @baud) rescue nil }
+        tty_devices.each do |device|
+          begin
+            return ::Serial.new(device, @baud)
+          rescue
+            Smalrubot.show_backtrace($!)
+          end
+        end
         raise BoardNotFound
       end
 

@@ -4,32 +4,21 @@ require 'timeout'
 module Smalrubot
   module TxRx
     class Base
-      include Observable
-
-      def read
-        @thread ||= Thread.new do
-          loop do
-            line = gets
-            if line && line.match(/\A\d+:/)
-              pin, message = line.chop.split(/:/)
-              pin && message && changed && notify_observers(pin, message)
-            end
+      def read(timeout = 0.005)
+        line = gets(timeout)
+        if line && line.match(/\A\d+:/)
+          pin, message = line.chomp.split(/:/)
+          if pin && message
+            return pin, message
           end
         end
       end
 
-      def close_read
-        return nil if @thread.nil?
-        Thread.kill(@thread)
-        @thread = nil
-      end
-
       def write(message)
-        loop do
-          if IO.select(nil, [io], nil)
-            io.syswrite(message)
-            break
-          end
+        n = io.write(message)
+        Smalrubot.debug_log("write: %s(A:%d, E:%d)", message, n, message.length)
+        if n != message.length
+          raise "FATAL: n(#{n}) != message.length(#{message.length}) "
         end
       end
 
@@ -49,8 +38,16 @@ module Smalrubot
         gets until gets == nil
       end
 
+      RETURN_CODE = "\n".ord
+
       def gets(timeout=0.005)
-        IO.select([io], nil, nil, timeout) && io.gets
+        Timeout.timeout(timeout) do
+          s = io.gets
+          Smalrubot.debug_log("gets: %s", s)
+          return s
+        end
+      rescue Exception
+        nil
       end
     end
   end

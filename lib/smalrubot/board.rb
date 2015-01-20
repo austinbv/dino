@@ -5,7 +5,6 @@ module Smalrubot
 
     def initialize(io)
       @io, @digital_hardware, @analog_hardware = io, [], []
-      io.add_observer(self)
       handshake
     end
 
@@ -23,14 +22,6 @@ module Smalrubot
 
     def heart_rate=(value)
       write "9800#{normalize_value(value)}"
-    end
-
-    def start_read
-      @io.read
-    end
-
-    def stop_read
-      @io.close_read
     end
 
     def write(msg, opts = {})
