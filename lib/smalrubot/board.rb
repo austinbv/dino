@@ -5,11 +5,14 @@ module Smalrubot
 
     def initialize(io)
       @io = io
+      @mutex = Mutex.new
       handshake
     end
 
     def handshake
-      @analog_zero = @io.handshake
+      @mutex.synchronize do
+        @analog_zero = @io.handshake
+      end
     end
 
     def write(msg, opts = {})
@@ -53,13 +56,19 @@ module Smalrubot
     READ_COMMANDS.each_key do |command|
       define_method(command) do |pin|
         cmd = normalize_cmd(READ_COMMANDS[command])
-        write("#{cmd}#{normalize_pin(pin)}#{normalize_value(0)}")
-        res_pin, message = *read
+        res_pin = nil
+        message = nil
+        @mutex.synchronize do
+          write("#{cmd}#{normalize_pin(pin)}#{normalize_value(0)}")
+          res_pin, message = *read
+        end
         if res_pin && message
           if res_pin.to_i != pin
             raise "FATAL: request and response pins are differece: request #{pin}, response: #{res_pin}"
           end
           message.to_i
+        else
+          nil
         end
       end
     end
