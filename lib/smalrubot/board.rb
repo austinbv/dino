@@ -56,21 +56,21 @@ module Smalrubot
     READ_COMMANDS.each_key do |command|
       define_method(command) do |pin|
         cmd = normalize_cmd(READ_COMMANDS[command])
-        req_pin = nil
-        res_pin = nil
-        message = nil
         @mutex.synchronize do
           req_pin = normalize_pin(pin)
           write("#{cmd}#{req_pin}#{normalize_value(0)}")
-          res_pin, message = *read
-        end
-        if res_pin && message
-          if res_pin != req_pin
-            raise "FATAL: request and response pins are differece: request #{req_pin}, response: #{res_pin}"
+          loop do
+            res_pin, message = *read
+            if res_pin && message
+              if res_pin == req_pin
+                return message.to_i
+              else
+                Smalrubot.debug_log('detected noise!')
+              end
+            else
+              return nil
+            end
           end
-          message.to_i
-        else
-          nil
         end
       end
     end
