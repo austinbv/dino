@@ -50,8 +50,8 @@ module Smalrubot
     describe '#digital_read' do
       it 'should tell the board to read once from the given pin' do
         io_mock.should_receive(:write).with('!0213000.')
-        io_mock.should_receive(:read).with(1).and_return([13, 256])
-        subject.digital_read(13)
+        io_mock.should_receive(:read).with(1).and_return(['13', Smalrubot::Board::HIGH.to_s])
+        expect(subject.digital_read(13)).to eq(Smalrubot::Board::HIGH)
       end
     end
 
@@ -65,8 +65,8 @@ module Smalrubot
     describe '#analog_read' do
       it 'should tell the board to read once from the given pin' do
         io_mock.should_receive(:write).with('!0413000.')
-        io_mock.should_receive(:read).with(1).once.and_return([13, 256])
-        subject.analog_read(13)
+        io_mock.should_receive(:read).with(1).once.and_return(['13', '256'])
+        expect(subject.analog_read(13)).to eq(256)
       end
     end
 
