@@ -44,11 +44,6 @@ module Smalrubot
           @led.off
         end
       end
-
-      describe '#blink' do
-        it 'should turn the led off if it is on'
-        it 'should not block'
-      end
     end
   end
 end
