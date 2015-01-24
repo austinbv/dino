@@ -65,7 +65,7 @@ module Smalrubot
               if res_pin == req_pin
                 return message.to_i
               else
-                Smalrubot.debug_log('detected noise!')
+                Smalrubot.debug_log('WARN: detected noise!')
               end
             else
               return nil
