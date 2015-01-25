@@ -33,6 +33,19 @@ void Smalrubot::process() {
    Serial.print("Value - ");            Serial.println(valStr);
   #endif
 
+  processCommand();
+  
+  // Write the response.
+  if (response[0] != '\0') writeResponse();
+  
+  #ifdef debug
+   Serial.print("Responded with - "); Serial.println(response);
+   Serial.println();
+  #endif
+}
+
+
+void Smalrubot::processCommand() {
   // Call the command.
   switch(cmd) {
     case 0:  setMode             ();  break;
@@ -45,16 +58,7 @@ void Smalrubot::process() {
     case 90: reset               ();  break;
     default:                          break;
   }
-  
-  // Write the response.
-  if (response[0] != '\0') writeResponse();
-  
-  #ifdef debug
-   Serial.print("Responded with - "); Serial.println(response);
-   Serial.println();
-  #endif
 }
-
 
 
 // WRITE CALLBACK

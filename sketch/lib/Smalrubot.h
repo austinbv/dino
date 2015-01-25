@@ -27,7 +27,7 @@ class Smalrubot {
     void parse(char c);
     void process();
 
-  private:
+  protected:
     // Request storage.
     char request[8];
     int index;
@@ -45,6 +45,8 @@ class Smalrubot {
     void writeResponse();
 
     Servo servos[12];
+
+    virtual void processCommand();
 
     // API-accessible functions.
     void setMode               ();
