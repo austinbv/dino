@@ -38,7 +38,14 @@ module Smalrubot
       digital_write:   '01',
       analog_write:    '03',
       servo_toggle:    '08',
-      servo_write:     '09'
+      servo_write:     '09',
+
+      set_dc_motor_calibration: '20',
+      init_dc_motor_port: '22',
+      init_sensor_port: '25',
+
+      dc_motor_power: '42',
+      dc_motor_control: '43',
     }
 
     WRITE_COMMANDS.each_key do |command|
@@ -51,6 +58,10 @@ module Smalrubot
     READ_COMMANDS = {
       digital_read:    '02',
       analog_read:     '04',
+
+      get_touch_sensor_value: '61',
+      get_light_sensor_value: '62',
+      get_ir_photoreflector_value: '64',
     }
 
     READ_COMMANDS.each_key do |command|
