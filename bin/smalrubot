@@ -14,7 +14,11 @@ def usage
   $stderr.puts "Usage: #{File.basename($0)} COMMAND [command-specific-options]"
   $stderr.puts
   $stderr.puts "Commands:"
-  $stderr.puts "  generate-sketch [options]"
+  $stderr.puts "  generate-sketch SKETCH [options]"
+  $stderr.puts
+  $stderr.puts "    Sketches:"
+  $stderr.puts "      sr"
+  $stderr.puts "      sr_studu"
   $stderr.puts
   $stderr.puts "    Options:"
   $stderr.puts "      --baud BAUD"
@@ -25,11 +29,15 @@ end
 
 # Command must be the first argument.
 $options[:command] = ARGV.shift
-usage if $options[:command].match /help/
+usage if !$options[:command] || $options[:command].match(/help/)
 
 # Parse the rest loosely.
 loop do
   case ARGV[0]
+    when 'sr'
+      $options[:sketch_names] << ARGV.shift
+    when 'sr_studu'
+      $options[:sketch_names] << ARGV.shift
     when '--baud'
       ARGV.shift; $options[:baud] = ARGV.shift
     when '--debug'
@@ -40,12 +48,10 @@ loop do
   end
 end
 
-$options[:sketch_names] = ['sr']
-
 error "Invalid command '#{$options[:command]}'" unless $options[:command] == "generate-sketch"
 error "No sketches or invalid sketches specified" if $options[:sketch_names].empty?
 
-$options[:sketch_names].each do |sketch_name|
+$options[:sketch_names].uniq.each do |sketch_name|
   # Define the sources.
   sketch_dir = sketch_name
   sketch_file = sketch_name + ".ino"
@@ -61,7 +67,7 @@ $options[:sketch_names].each do |sketch_name|
 
   # Modify them based on the arguments.
   if $options[:baud]
-    sketch.gsub! "115200", $options[:baud]
+    sketch.gsub! "19200", $options[:baud]
   end
   if $options[:debug]
     header.gsub! "// #define debug true", "#define debug true"
@@ -79,4 +85,10 @@ $options[:sketch_names].each do |sketch_name|
   File.open(dest_header, 'w')         { |f| f.write header }
   File.open(dest_implementation, 'w') { |f| f.write implementation }
   File.open(dest_sketch, 'w')         { |f| f.write sketch }
+
+  if sketch_name == 'sr_studu'
+    %w(SrStuduino.cpp SrStuduino.h).each do |name|
+      FileUtils.cp(File.join(src_dir, 'lib', name), File.join(dest_dir, name))
+    end
+  end
 end
