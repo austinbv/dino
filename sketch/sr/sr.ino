@@ -7,7 +7,7 @@ void writeResponse(char *response) { Serial.println(response); }
 void (*writeCallback)(char *str) = writeResponse;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(19200);
   smalrubot.setupWrite(writeCallback);
 }
 
