@@ -1,6 +1,6 @@
 require 'rspec'
 
-require File.expand_path(File.join('../..', 'lib/dino'), __FILE__)
+require File.expand_path(File.join('../..', 'lib/smalrubot'), __FILE__)
 
 # Nice little helper module to redefine constants quietly.
 module Constants

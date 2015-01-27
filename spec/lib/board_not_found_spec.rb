@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   describe BoardNotFound do
     it { should be }
     it { should be_a Exception }

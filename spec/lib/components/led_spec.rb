@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Dino
+module Smalrubot
   module Components
     describe Led do
       let(:board) { double(:board, digital_write: true, set_pin_mode: true) }
@@ -43,11 +43,6 @@ module Dino
           board.should_receive(:digital_write).with(13, Board::LOW)
           @led.off
         end
-      end
-
-      describe '#blink' do
-        it 'should turn the led off if it is on'
-        it 'should not block'
       end
     end
   end

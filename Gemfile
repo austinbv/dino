@@ -1,6 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in dino.gemspec
+# Specify your gem's dependencies in smalrubot.gemspec
 gemspec
-
-gem 'rspec'

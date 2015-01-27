@@ -19,3 +19,5 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
+/sr
+/sr_studu

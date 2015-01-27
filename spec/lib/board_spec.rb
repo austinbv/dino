@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-module Dino
-  describe Dino::Board do
+module Smalrubot
+  describe Smalrubot::Board do
     def io_mock(methods = {})
-      @io ||= double(:io, {write: nil, add_observer: nil, flush_read: nil, handshake: "14"}.merge(methods))
+      @io ||= double(:io, {write: nil, flush_read: nil, handshake: "14"}.merge(methods))
     end
 
     subject { Board.new(io_mock) }
@@ -15,126 +15,9 @@ module Dino
         }.to_not raise_exception
       end
 
-      it 'should observe the io' do
-        io_mock.should_receive(:add_observer).with(subject)
-        subject.send(:initialize, io_mock)
-      end
-
       it 'should initiate the handshake' do
         io_mock.should_receive(:handshake)
         subject
-      end
-    end
-
-    describe '#update' do
-      context 'when the given pin connects to an analog hardware part' do
-        it 'should call update with the message on the part' do
-          part = double(:part, pin: 7)
-          subject.add_analog_hardware(part)
-          other_part = double(:part, pin: 9)
-          subject.add_analog_hardware(other_part)
-
-          part.should_receive(:update).with('wake up!')
-          subject.update(7, 'wake up!')
-        end
-      end
-
-      context 'when the given pin connects to an digital hardware part' do
-        it 'should call update with the message on the part' do
-          part = double(:part, pin: 5, pullup: nil)
-          subject.add_digital_hardware(part)
-          other_part = double(:part, pin: 11, pullup: nil)
-          subject.add_digital_hardware(other_part)
-
-          part.should_receive(:update).with('wake up!')
-          other_part.should_not_receive(:update).with('wake up!')
-
-          subject.update(5, 'wake up!')
-        end
-      end
-
-      context 'when the given pin is not connected' do
-        it 'should not do anything' do
-          expect {
-            subject.update(5, 'wake up!')
-          }.to_not raise_exception
-        end
-      end
-    end
-
-    describe '#digital_hardware' do
-      it 'should initialize as empty' do
-        subject.digital_hardware.should == []
-      end
-    end
-
-    describe '#analog_hardware' do
-      it 'should initialize as empty' do
-        subject.analog_hardware.should == []
-      end
-    end
-
-    describe '#add_digital_hardware' do
-      it 'should add digital hardware to the board' do
-        subject.add_digital_hardware(mock1 = double(:part1, pin: 12, pullup: nil))
-        subject.add_digital_hardware(mock2 = double(:part2, pin: 14, pullup: nil))
-        subject.digital_hardware.should =~ [mock1, mock2]
-      end
-
-      it 'should set the mode for the given pin to "in" and add a digital listener' do
-        subject
-        subject.should_receive(:write).with("0012001")
-        subject.should_receive(:write).with("0112000")
-        subject.should_receive(:write).with("0512000")
-        subject.add_digital_hardware(mock1 = double(:part1, pin: 12, pullup: nil))
-      end
-    end
-
-    describe '#remove_digital_hardware' do
-      it 'should remove the given part from the hardware of the board' do
-        double = double(:part1, pin: 12, pullup: nil)
-        subject.add_digital_hardware(double)
-        subject.remove_digital_hardware(double)
-        subject.digital_hardware.should == []
-      end
-    end
-
-    describe '#add_analog_hardware' do
-      it 'should add analog hardware to the board' do
-        subject.add_analog_hardware(mock1 = double(:part1, pin: 12, pullup: nil))
-        subject.add_analog_hardware(mock2 = double(:part2, pin: 14, pullup: nil))
-        subject.analog_hardware.should =~ [mock1, mock2]
-      end
-
-      it 'should set the mode for the given pin to "in" and add an analog listener' do
-        subject
-        subject.should_receive(:write).with("0012001")
-        subject.should_receive(:write).with("0112000")
-        subject.should_receive(:write).with("0612000")
-        subject.add_analog_hardware(mock1 = double(:part1, pin: 12, pullup: nil))
-      end
-    end
-
-    describe '#remove_analog_hardware' do
-      it 'should remove the given part from the hardware of the board' do
-        double = double(:part1, pin: 12, pullup: nil)
-        subject.add_analog_hardware(double)
-        subject.remove_analog_hardware(double)
-        subject.analog_hardware.should == []
-      end
-    end
-
-    describe '#start_read' do
-      it 'should tell the io to read' do
-        io_mock.should_receive(:read)
-        Board.new(io_mock).start_read
-      end
-    end
-
-    describe '#stop_read' do
-      it 'should tell the io to read' do
-        io_mock.should_receive(:close_read)
-        Board.new(io_mock).stop_read
       end
     end
 
@@ -167,7 +50,8 @@ module Dino
     describe '#digital_read' do
       it 'should tell the board to read once from the given pin' do
         io_mock.should_receive(:write).with('!0213000.')
-        subject.digital_read(13)
+        io_mock.should_receive(:read).with(1).and_return(['13', Smalrubot::Board::HIGH.to_s])
+        expect(subject.digital_read(13)).to eq(Smalrubot::Board::HIGH)
       end
     end
 
@@ -181,28 +65,8 @@ module Dino
     describe '#analog_read' do
       it 'should tell the board to read once from the given pin' do
         io_mock.should_receive(:write).with('!0413000.')
-        subject.analog_read(13)
-      end
-    end
-
-    describe '#digital_listen' do
-      it 'should tell the board to continuously read from the given pin' do
-        io_mock.should_receive(:write).with('!0513000.')
-        subject.digital_listen(13)
-      end
-    end
-
-    describe '#analog_listen' do
-      it 'should tell the board to continuously read from the given pin' do
-        io_mock.should_receive(:write).with('!0613000.')
-        subject.analog_listen(13)
-      end
-    end
-
-    describe '#stop_listener' do
-      it 'should tell the board to stop sending values for the given pin' do
-        io_mock.should_receive(:write).with('!0713000.')
-        subject.stop_listener(13)
+        io_mock.should_receive(:read).with(1).once.and_return(['13', '256'])
+        expect(subject.analog_read(13)).to eq(256)
       end
     end
 

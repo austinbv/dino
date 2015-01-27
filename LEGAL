@@ -1,0 +1,82 @@
+LEGAL NOTICE INFORMATION
+------------------------
+
+All the files in this distribution are covered under either the
+smalrubot license (see the file LICENSE) except some files
+mentioned below.
+
+.gitignore
+.rvmrc
+.travis.yml
+bin/dino
+CHANGELOG.md
+dino.gemspec
+examples/button
+examples/button/button.png
+examples/button/button.rb
+examples/ethernet.rb
+examples/ir_receiver
+examples/ir_receiver/ir_receiver.rb
+examples/led
+examples/led/led.png
+examples/led/led.rb
+examples/potentiometer
+examples/potentiometer/potentiometer.rb
+examples/rgb_led
+examples/rgb_led/rgb_led.rb
+examples/sensor
+examples/sensor/sensor.rb
+examples/ser2net.rb
+examples/servo
+examples/servo/servo.rb
+examples/stepper
+examples/stepper/stepper.png
+examples/stepper/stepper.rb
+Gemfile
+lib/dino/board.rb
+lib/dino/board_not_found.rb
+lib/dino/components
+lib/dino/components/base_component.rb
+lib/dino/components/button.rb
+lib/dino/components/ir_receiver.rb
+lib/dino/components/led.rb
+lib/dino/components/rgb_led.rb
+lib/dino/components/sensor.rb
+lib/dino/components/servo.rb
+lib/dino/components/stepper.rb
+lib/dino/components.rb
+lib/dino/tx_rx
+lib/dino/tx_rx/base.rb
+lib/dino/tx_rx/serial.rb
+lib/dino/tx_rx/tcp.rb
+lib/dino/tx_rx.rb
+lib/dino/version.rb
+lib/dino.rb
+LICENSE
+Rakefile
+README.md
+spec/lib/board_not_found_spec.rb
+spec/lib/board_spec.rb
+spec/lib/components
+spec/lib/components/base_component_spec.rb
+spec/lib/components/button_spec.rb
+spec/lib/components/led_spec.rb
+spec/lib/components/rgb_led_spec.rb
+spec/lib/components/sensor_spec.rb
+spec/lib/components/servo_spec.rb
+spec/lib/components/stepper_spec.rb
+spec/lib/tx_rx
+spec/lib/tx_rx/serial_spec.rb
+spec/lib/tx_rx/tcp_spec.rb
+spec/spec_helper.rb
+src/du/du.ino
+src/du_ethernet
+src/du_ethernet/du_ethernet.ino
+src/lib/Dino.cpp
+src/lib/Dino.h
+
+  These were forked from Dino ( https://github.com/austinbv/dino/tree/15cd48e849faeb08c7dc017ff39ff16ff2e165a3 ).
+  After that we modified.
+  Copyright (c) 2012 Austin
+  These files were released under the MIT license:
+  https://github.com/austinbv/dino/blob/master/LICENSE .
