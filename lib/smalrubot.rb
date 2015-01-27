@@ -2,6 +2,7 @@ require 'smalrubot/board_not_found'
 require 'smalrubot/version'
 require 'smalrubot/tx_rx'
 require 'smalrubot/board'
+require 'smalrubot/board/studuino'
 require 'smalrubot/components'
 
 module Smalrubot
