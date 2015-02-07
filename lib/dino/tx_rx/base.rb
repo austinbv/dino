@@ -37,6 +37,7 @@ module Dino
               loop do
                 line = gets
                 if line && line.match(/ACK:/)
+                  puts "Connected to board..."
                   flush_read
                   return line.chop.split(/:/)[1]
                 end
