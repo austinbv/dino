@@ -11,12 +11,16 @@ class DinoCLI::Parser
   end
 
   def parse
+    # Ensure we have arguments.
     args = @options[:args].dup
+    error("No arguments given") if args.empty?
 
-    # Command must be the first arg.
-    @options[:command] = args.shift
-    usage if @options[:command].match /help|usage/
-    error "Invalid command '#{@options[:command]}'"  unless DinoCLI::COMMANDS.include? @options[:command]
+    # Ensure task is the first argument
+    @options[:task] = args.shift
+    usage if @options[:task].match /help|usage/
+
+    # Ensure there's only one task
+    error "Invalid task '#{@options[:task]}'" unless DinoCLI::TASKS.include? @options[:task]
 
     # Parse the rest loosely.
     loop do
@@ -27,26 +31,22 @@ class DinoCLI::Parser
           args.shift; set_sketch("ethernet")
         when 'wifi'
           args.shift; set_sketch("wifi")
-        when '--baud'
+        when '-baud'
           args.shift; @options[:baud] = args.shift
-        when '--mac'
+        when '-mac'
           args.shift; @options[:mac] = args.shift
-        when '--ip'
+        when '-ip'
           args.shift; @options[:ip] = args.shift
-        when '--ssid'
+        when '-ssid'
           args.shift; @options[:ssid] = args.shift
-        when '--password'
+        when '-password'
           args.shift; @options[:password] = args.shift
-        when '--port'
+        when '-port'
           args.shift; @options[:port] = args.shift
-        when '--debug'
+        when '-debug'
           args.shift; @options[:debug] = true
-        when '--compile'
-          args.shift; @options[:compile] = true
-        when '--upload'
-          args.shift; @options[:upload] = true
         when /^-/
-          error "Invalid argument '#{ARGV[0]}'"
+          error "Invalid argument '#{args[0]}'"
         else break
       end
     end
