@@ -3,6 +3,7 @@ module Dino
     module Mixins
       module Callbacks
         def initialize
+          super
           @callbacks = {}
           @callback_mutex = Mutex.new
         end
