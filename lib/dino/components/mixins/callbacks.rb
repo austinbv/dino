@@ -17,7 +17,7 @@ module Dino
 
         def remove_callback(key=nil)
           @callback_mutex.synchronize {
-            key ? @new_callbacks[key] = [] : @new_callbacks = {}
+            key ? @callbacks[key] = [] : @callbacks = {}
           }
         end
 
@@ -25,13 +25,13 @@ module Dino
         alias :remove_callbacks :remove_callback
 
         def update(data)
+          @state = data
           @callback_mutex.synchronize {
-            @state = data
-            callbacks.each_value do |array|
+            @callbacks.each_value do |array|
               array.each { |callback| callback.call(@state) }
             end
-            remove_callback :read
           }
+          remove_callback :read
         end
       end
     end
