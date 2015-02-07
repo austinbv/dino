@@ -4,13 +4,17 @@
 
 #include "Arduino.h"
 #include "Dino.h"
+#if defined(__SAM3X8E__)
+  #include <avr/dtostrf.h>
+#endif
+
 DinoLCD dinoLCD;
 DHT dht;
+
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
   DinoSerial dinoSerial;
-#endif  
-
+#endif
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -94,10 +98,10 @@ void Dino::process() {
     case 98: setHeartRate        ();  break;
     default:                          break;
   }
-  
+
   // Write the response.
   if (response[0] != '\0') writeResponse();
-  
+
   #ifdef debug
    Serial.print("Responded with - "); Serial.println(response);
    Serial.println();
@@ -132,7 +136,7 @@ void Dino::updateDigitalListeners() {
       if (rval != digitalListenerValues[i]) {
         digitalListenerValues[i] = rval;
         writeResponse();
-      } 
+      }
     }
   }
 }
@@ -187,7 +191,7 @@ void Dino::dWrite() {
 }
 
 // CMD = 02 // Digital Read
-void Dino::dRead() { 
+void Dino::dRead() {
   rval = digitalRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
@@ -327,7 +331,7 @@ void Dino::ds18Read() {
 
   byte data[12];
   byte addr[8];
-  
+
   if ( !ds.search(addr)) {
     ds.reset_search();
     return;
@@ -348,15 +352,15 @@ void Dino::ds18Read() {
   ds.write(0x44,1); // start conversion, with parasite power on at the end
 
   byte present = ds.reset();
-  ds.select(addr);  
+  ds.select(addr);
   ds.write(0xBE); // Read Scratchpad
 
   for (int i = 0; i < 9; i++) { // we need 9 bytes
     data[i] = ds.read();
   }
- 
+
   ds.reset_search();
- 
+
   byte MSB = data[1];
   byte LSB = data[0];
 
@@ -419,4 +423,3 @@ void Dino::setHeartRate() {
     Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
   #endif
 }
-
