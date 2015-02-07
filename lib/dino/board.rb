@@ -81,7 +81,8 @@ module Dino
       stop_listener:   '7',
       servo_toggle:    '8',
       servo_write:     '9',
-      dht_read:        '13'
+      dht_read:        '13',
+      ds18b20_read:    '15'
     }
 
     PIN_COMMANDS.each_key do |command|
