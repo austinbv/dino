@@ -2,7 +2,7 @@ module Dino
   module Components
     module Mixins
       module Callbacks
-        def initialize
+        def after_initialize(options={})
           super
           @callbacks = {}
           @callback_mutex = Mutex.new
