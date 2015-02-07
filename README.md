@@ -25,10 +25,10 @@ Use the included command line tool to create a folder with the Arduino sketch yo
 
 ```shell
 # If connecting via serial, USB or ser2net, this is all you should need:
-dino generate-sketch serial
+dino sketch serial
 
 # If usng the ethernet shield, you'll want to specify unique MAC and IP addresses:
-dino generate-sketch ethernet --mac XX:XX:XX:XX:XX:XX --ip XXX.XXX.XXX.XXX
+dino sketch ethernet -mac XX:XX:XX:XX:XX:XX -ip XXX.XXX.XXX.XXX
 
 # For more options:
 dino help
@@ -38,7 +38,7 @@ __Note:__ Current Ethernet shields come with a sticker indicating the MAC addres
 
 #### Upload The Bootstrapper
 
-* Connect the Arduino to a USB port on your machine, regardless of which sketch you're using.
+* Connect the Arduino to a USB port on your machine, (even if using the ethernet sketch).
 * Open [the normal Arduino IDE](http://arduino.cc/en/Main/Software)
 * Open the `.ino` file in the sketch folder you just generated.
 * Click the upload button (an arrow).
