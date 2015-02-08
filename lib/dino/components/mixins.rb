@@ -6,6 +6,7 @@ module Dino
       require 'dino/components/mixins/reader'
       require 'dino/components/mixins/poller'
       require 'dino/components/mixins/listener'
+      require 'dino/components/mixins/board_proxy'
     end
   end
 end
