@@ -1,6 +1,7 @@
 #
-# This is a simple example to write to a shift register.
-# Writing a byte of 255 sets all the output pins to high.
+# This examples sets up a shift register, and an SSD that is connected to its 8 output pins.
+# The shift register is passed in as the 'board' when setting up the SSD.
+# The individual pins on the register are accessible by the SSD instance, so it works as usual.
 #
 require 'bundler/setup'
 require 'dino'
@@ -18,11 +19,3 @@ trap("SIGINT") { exit !ssd.off }
 
 # Display each new line on the ssd
 loop { ssd.display(gets.chomp) }
-
-# Write a single byte
-# shift_register.write_byte(255)
-
-# Write an array of bytes (for multiple registers).
-# shift_register.write_bytes([255, 0])
-
-# sleep

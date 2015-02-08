@@ -4,53 +4,27 @@ module Dino
       #
       # options = {board: my_board, pins: {clock: clock_pin, latch: latch_pin, data: data_pin}
       #
-      include Setup::MultiPin      
+      include Setup::MultiPin
       proxy_pins  clock: Basic::DigitalOutput,
                   latch: Basic::DigitalOutput,
                   data:  Basic::DigitalOutput
-      
-      attr_reader :high, :low, :components
 
       def after_initialize(options={})
-        @high = 1
-        @low = 0
-        @components = []
-
-        @state = [0,0,0,0,0,0,0,0]
+        @bytes = options[:bytes] || 1
+        @state = Array.new(@bytes*8) {|i| 0}
         write_state
+        super
       end
-
-      def add_component(component)
-        @components << component
-      end
-
-      def remove_component(component)
-        @components.delete(component)
-      end
-
-      def convert_pin(pin)
-        pin = pin.to_i
-      end
-
-      def set_pin_mode(pin, mode)
-        nil
-      end
-
-      def digital_write(pin, value)
-        @state[pin] = value
-        write_state
-      end
-
-      alias :write :digital_write
 
       def write_state
-        byte = @state.join("").reverse.to_i(2)
-        write_bytes(byte)
+        bytes = []
+        @state.each_slice(8) do |slice|
+          bytes << slice.join("").reverse.to_i(2)
+        end
+        write_bytes(bytes)
       end
 
       def write_bytes(bytes)
-        bytes = [bytes] unless bytes.class == Array
-
         latch.low
         bytes.each do |byte|
           board.write Dino::Message.encode(command: 11, pin: data.pin, value: byte, aux_message: clock.pin)
@@ -59,6 +33,37 @@ module Dino
       end
 
       alias :write_byte :write_bytes
+
+      #
+      # Make the shift register behave like a board.
+      # We can use each output pin on it individually for digital out components.
+      # To set up component, use the register object as the 'board', and the corresponding pin numbers.
+      #
+      include Mixins::BoardProxy
+      include Mixins::Threaded
+
+      def digital_write(pin, value)
+        @last_input = Time.now
+        @state[pin] = value
+        start_write
+      end
+
+      alias :write :digital_write
+
+      #
+      # Wait until we have not had a digital_write for 1ms before writing to the board.
+      # Reduces the amount of wrting required for things like SSDs that change many bits in sequence.
+      #
+      def start_write
+        return if @thread
+        @last_output = Time.now
+        threaded_loop do
+          if ((Time.now - @last_input) > 0.001) && (@last_input > @last_output)
+            write_state
+            @last_output = Time.now
+          end
+        end
+      end
     end
   end
 end
