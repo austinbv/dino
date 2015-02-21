@@ -65,7 +65,7 @@ module Dino
 
       it 'should raise a BoardNotFound exception if there is no board connected' do
         ::Serial.stub(:new).and_raise
-        expect { subject.io }.to raise_exception BoardNotFound
+        expect { subject.io }.to raise_exception Dino::TxRx::BoardNotFound
       end
     end
 

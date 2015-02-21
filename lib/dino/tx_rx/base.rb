@@ -3,6 +3,8 @@ require 'timeout'
 
 module Dino
   module TxRx
+    class BoardNotFound < StandardError; end
+    
     class Base
       include Observable
 

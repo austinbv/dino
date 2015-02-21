@@ -4,22 +4,18 @@ module Dino
     DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
     def initialize(io, options={})
-      @bits = options[:bits] || 8
       @io, @components = io, []
       io.add_observer(self)
 
       @analog_zero, @dac_zero = @io.handshake.to_s.split(",").map { |pin| pin.to_i }
-      define_logic
-    end
-
-    def define_logic
-      @low      = 0
-      @high     = (2 ** @bits) - 1
-      self.analog_resolution = @bits
+      self.analog_resolution = options[:bits]
     end
 
     def analog_resolution=(value)
-      write Dino::Message.encode(command: 96, value: value)
+      @bits = value || 8
+      write Dino::Message.encode(command: 96, value: @bits)
+      @low  = 0
+      @high = (2 ** @bits) - 1
     end
 
     def analog_divider=(value)
@@ -97,12 +93,10 @@ module Dino
 
     def convert_pin(pin)
       pin = pin.to_s
-
       return pin.to_i             if pin.match(DIGITAL_REGEX)
       return analog_pin_to_i(pin) if pin.match(ANALOG_REGEX)
       return dac_pin_to_i(pin)    if pin.match(DAC_REGEX)
-
-      nil
+      raise "Incorrect pin format"
     end
 
     def analog_pin_to_i(pin)
@@ -110,7 +104,8 @@ module Dino
     end
 
     def dac_pin_to_i(pin)
-      @dac_zero + pin.gsub(/\Aa/i, '').to_i
+      raise "The board did not specify any DAC pins" unless @dac_zero
+      @dac_zero + pin.gsub(/\Adac/i, '').to_i
     end
   end
 end

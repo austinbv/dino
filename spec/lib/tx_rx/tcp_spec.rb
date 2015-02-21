@@ -10,7 +10,7 @@ module Dino
 
     describe "#connect" do
       it 'should raise a BoardNotFound exception if it cannot connect to the server' do
-        expect { @instance.io }.to raise_exception BoardNotFound
+        expect { @instance.io }.to raise_exception Dino::TxRx::BoardNotFound
       end
 
       it 'should return the TCPSocket if connected' do

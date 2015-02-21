@@ -11,7 +11,7 @@ module Dino
         describe '#after_initialize' do
           it 'should set mode to out and go low' do
             board.should_receive(:digital_write).with(13, board.low)
-            DigitalOutput.new(options)
+            subject
           end
         end
 
@@ -42,14 +42,12 @@ module Dino
           it 'should call high if currently LOW' do
             subject.low
             subject.should_receive(:high)
-
             subject.toggle
           end
 
           it 'should call LOW if anything else' do
             subject.high
             subject.should_receive(:low)
-
             subject.toggle
           end
         end
