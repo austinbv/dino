@@ -8,32 +8,33 @@ module Dino
         let(:options) { { pin: 'A0', board: board } }
         subject { DigitalInput.new(options) }
 
-        describe '#initialize' do
-          it 'should start listening immediately' do
-            board.should_receive(:digital_listen).with(14)
-
-            component = DigitalInput.new(options)
-          end
+        it 'should start listening immediately' do
+          expect(board).to receive(:digital_listen).with(14)
+          component = DigitalInput.new(options)
         end
 
         describe '#_read' do
-          it 'should send #digital_read to the board with its pin' do
-            board.should_receive(:digital_read).with(subject.pin)
+          it 'should call board#digital_read with its pin once' do
+            expect(board).to receive(:digital_read).with(subject.pin).once
             subject._read
           end
         end
 
         describe '#_listen' do
-          it 'should send #digital_listen to the board with its pin' do
-            subject.stop
-            board.should_receive(:digital_listen).with(subject.pin)
-
+          it 'should call board#digital_listen with its pin once' do
+            expect(board).to receive(:digital_listen).with(subject.pin).once
             subject._listen
           end
         end
 
         context 'callbacks' do
           before :each do
+            # Simulate the mutex
+            mutex = double
+            allow(mutex).to receive(:synchronize).and_yield
+            subject.instance_variable_set(:@callback_mutex, mutex)
+            subject.instance_variable_set(:@callbacks, {}) 
+
             @low_callback = double
             @high_callback = double
             subject.on_low { @low_callback.called }
@@ -42,8 +43,8 @@ module Dino
 
           describe '#on_low' do
             it 'should add a callback that only gets fired when LOW' do
-              @low_callback.should_receive(:called)
-              @high_callback.should_not_receive(:called)
+              expect(@low_callback).to receive(:called)
+              expect(@high_callback).not_to receive(:called)
 
               subject.update(DigitalInput::LOW)
             end
@@ -51,8 +52,8 @@ module Dino
 
           describe '#on_high' do
             it 'should add a callback that only gets fired when HIGH' do
-              @low_callback.should_not_receive(:called)
-              @high_callback.should_receive(:called)
+              expect(@high_callback).to receive(:called)
+              expect(@low_callback).not_to receive(:called)
 
               subject.update(DigitalInput::HIGH)
             end

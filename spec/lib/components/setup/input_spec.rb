@@ -29,8 +29,8 @@ module Dino
           end
 
           it 'should set the pulllup if included in options' do
-            board.should_receive(:set_pullup).with(subject.pin, true)
-            subject
+            expect(board).to receive(:set_pullup).with(subject.pin, true)
+            InputComponent.new(options)
           end
 
           it 'should tell the board to start reading' do

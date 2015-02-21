@@ -24,20 +24,21 @@ module Dino
         write_bytes(bytes)
       end
 
-      def write_bytes(bytes)
+      def write_bytes(*bytes)
         latch.low
-        bytes.each do |byte|
+        bytes.flatten.each do |byte|
           board.write Dino::Message.encode(command: 11, pin: data.pin, value: byte, aux_message: clock.pin)
         end
         latch.high
       end
 
       alias :write_byte :write_bytes
+      alias :write :write_bytes
 
       #
       # Make the shift register behave like a board.
       # We can use each output pin on it individually for digital out components.
-      # To set up component, use the register object as the 'board', and the corresponding pin numbers.
+      # To instantiate a component, pass the register as a 'board' and the corresponding pin numbers on the register.
       #
       include Mixins::BoardProxy
       include Mixins::Threaded
@@ -47,8 +48,6 @@ module Dino
         @state[pin] = value
         start_write
       end
-
-      alias :write :digital_write
 
       #
       # Wait until we have not had a digital_write for 1ms before writing to the board.

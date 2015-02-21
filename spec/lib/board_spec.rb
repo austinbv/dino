@@ -16,7 +16,7 @@ module Dino
       end
 
       it 'should observe the io' do
-        io_mock.should_receive(:add_observer).with(subject)
+        expect(io_mock).to receive(:add_observer).with(subject)
         subject.send(:initialize, io_mock)
       end
 
@@ -26,11 +26,10 @@ module Dino
       end
 
       it 'should define the logic properly' do
-        subject.should_receive(:analog_resolution=).with(8)
-
+        expect(subject).to receive(:analog_resolution=).with(8)
         subject.send(:initialize, io_mock)
-        subject.high.should == 255
-        subject.low.should == 0
+        expect(subject.high).to equal(255)
+        expect(subject.low).to equal(0)
       end
     end
 
@@ -164,12 +163,12 @@ module Dino
 
     describe '#set_pullup' do
       it 'should write high if pullup is enabled' do
-        io_mock.should_receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: subject.high))
+        expect(io_mock).to receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: subject.high))
         subject.set_pullup(13, true)
       end
 
       it 'should write low if pullup is disabled' do
-        io_mock.should_receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: subject.low))
+        expect(io_mock).to receive(:write).with(Dino::Message.encode(command: 1, pin: 13, value: subject.low))
         subject.set_pullup(13, false)
       end
     end
