@@ -4,7 +4,7 @@ require 'timeout'
 module Dino
   module TxRx
     class BoardNotFound < StandardError; end
-    
+
     class Base
       include Observable
 
@@ -19,6 +19,8 @@ module Dino
             if line && line.match(/\A\d+:/)
               pin, message = line.chop.split(/:/)
               pin && message && changed && notify_observers(pin, message)
+            else
+              sleep 0.005
             end
           end
         end
