@@ -9,6 +9,7 @@ module Dino
         include Mixins::Listener
 
         def after_initialize(options={})
+          super(options)
           _listen
         end
 
