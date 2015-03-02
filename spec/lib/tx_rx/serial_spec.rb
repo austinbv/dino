@@ -69,19 +69,19 @@ module Dino
       end
     end
 
-    describe '#read' do
-      it 'should create a new thread' do
-        Thread.should_receive :new
-        subject.read
-      end
-
-      it 'should start a loop and notify observers on changes' do
-        Thread.should_receive(:new).and_yield
-        subject.should_receive(:loop).and_yield
+    describe '#_read' do
+      it 'should notify observers on change' do
         subject.should_receive(:gets).and_return("02:00\n")
         subject.should_receive(:changed).and_return(true)
         subject.should_receive(:notify_observers).with('02','00')
+        subject._read
+      end
+    end
 
+    describe '#read' do
+      it 'should create a new thread and start looping' do
+        Thread.should_receive(:new).and_yield.and_return(double("abort_on_exception=" => true))
+        subject.should_receive(:loop)
         subject.read
       end
     end

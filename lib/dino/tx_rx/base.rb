@@ -12,19 +12,18 @@ module Dino
         @io ||= connect
       end
 
-      def read
-        @thread ||= Thread.new do
-          loop do
-            line = gets
-            if line && line.match(/\A\d+:/)
-              pin, message = line.chop.split(/:/)
-              pin && message && changed && notify_observers(pin, message)
-            else
-              sleep 0.005
-            end
-          end
+      def _read
+        line = gets
+        if line && line.match(/\A\d+:/)
+          pin, message = line.chop.split(/:/)
+          pin && message && changed && notify_observers(pin, message)
+        else
+          sleep 0.005
         end
-        @thread.abort_on_exception = true
+      end
+
+      def read
+        @thread ||= Thread.new { loop { _read } }.abort_on_exception = true
       end
 
       def close_read
