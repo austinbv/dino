@@ -44,7 +44,7 @@ module Dino
 
     def update(pin, msg)
       @components.each do |part|
-        part.update(msg) if convert_pin(pin) == convert_pin(part.pin)
+        part.update(msg) if pin.to_i == part.pin
       end
     end
 

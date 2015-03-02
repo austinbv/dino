@@ -6,7 +6,7 @@ module Dino
         # Build complex components by modeling them as separate single pin subcomponents.
         #
         include Base
-        attr_reader :pins, :pullups, :proxies
+        attr_reader :pin, :pins, :pullups, :proxies
 
         #
         # Return a hash with the state of each proxy component.
@@ -58,7 +58,7 @@ module Dino
               require_pins(*options.keys)
             end
 
-            proxied_pins = self.class_eval('@@proxied_pins') rescue {}         
+            proxied_pins = self.class_eval('@@proxied_pins') rescue {}
             proxied_pins.merge!(options)
             self.class_variable_set(:@@proxied_pins, proxied_pins)
           end
