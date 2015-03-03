@@ -15,7 +15,7 @@ module Dino
           end
         end
       end
-    
+
     private
 
       def connect
@@ -25,7 +25,7 @@ module Dino
       end
 
       def gets(timeout=0.005)
-        IO.select([io], nil, nil, timeout) && io.gets
+        IO.select([io], nil, nil, timeout) && io.gets.gsub(/\n\z/, "")
       end
     end
   end
