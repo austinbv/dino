@@ -3,7 +3,7 @@ module Dino
     module Mixins
       module Callbacks
         def after_initialize(options={})
-          super(options)
+          super(options) if defined?(super)
           @callbacks = {}
           @callback_mutex = Mutex.new
         end

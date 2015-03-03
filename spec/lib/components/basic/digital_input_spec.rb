@@ -29,12 +29,6 @@ module Dino
 
         context 'callbacks' do
           before :each do
-            # Simulate the mutex
-            mutex = double
-            allow(mutex).to receive(:synchronize).and_yield
-            subject.instance_variable_set(:@callback_mutex, mutex)
-            subject.instance_variable_set(:@callbacks, {}) 
-
             @low_callback = double
             @high_callback = double
             subject.on_low { @low_callback.called }
