@@ -53,7 +53,7 @@ module Dino
 
     describe '#_read' do
       it 'should notify observers on change' do
-        expect(subject).to receive(:gets).and_return("02:00\n")
+        expect(subject).to receive(:gets).and_return("02:00")
         expect(subject).to receive(:changed).and_return(true)
         expect(subject).to receive(:notify_observers).with('02','00')
         subject._read

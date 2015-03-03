@@ -15,7 +15,7 @@ module Dino
       def _read
         line = gets
         if line && line.match(/\A\d+:/)
-          pin, message = line.chop.split(/:/)
+          pin, message = line.split(/:/)
           pin && message && changed && notify_observers(pin, message)
         else
           sleep 0.005
@@ -43,7 +43,7 @@ module Dino
                 if line && line.match(/ACK:/)
                   puts "Connected to board..."
                   flush_read
-                  return line.chop.split(/:/)[1]
+                  return line.split(/:/)[1]
                 end
               end
             end
