@@ -46,7 +46,7 @@ module Dino
       end
 
       it 'should raise a BoardNotFound exception if there is no board connected' do
-        expect(::Serial).to receive(:new).at_least(:once).and_raise
+        allow(::Serial).to receive(:new).and_raise
         expect { subject.io }.to raise_exception Dino::TxRx::BoardNotFound
       end
     end
