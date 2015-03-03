@@ -25,19 +25,23 @@ Dino::Dino(){
 }
 
 void Dino::parse(char c) {
-  // Handle escaped newlines.
-  if (backslash) {
-    if (c != '\n') append('\\');
-    append(c);
-    backslash = false;
-  }
+  if ((c == '\n') || (c == '\\')) {
+    // If last char was a \, this \ or \n is escaped.
+    if(backslash){
+      append(c);
+      backslash = false;
+    }
 
-  // If EOL process and reset.
-  else if (c == '\n') {
-    append('\0');
-    process();
-    fragmentIndex = 0;
-    charIndex = 0;
+    // If EOL, process and reset.
+    else if (c == '\n'){
+      append('\0');
+      process();
+      fragmentIndex = 0;
+      charIndex = 0;
+    }
+
+    // Backslash is the escape character.
+    else if (c == '\\') backslash = true;
   }
 
   // If fragment delimiter, terminate current fragment and move to next.
@@ -51,9 +55,6 @@ void Dino::parse(char c) {
       append(c);
     }
   }
-
-  // Catch backslash so we can escape the next character.
-  else if (c == '\\') backslash = true;
 
   // Else just append the character.
   else append(c);

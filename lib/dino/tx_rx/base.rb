@@ -54,12 +54,12 @@ module Dino
         raise BoardNotFound
       end
 
-      def write(message); raise "#write should be defined in TxRX subclasses"; end
+      def write(message); raise "#write should be defined in TxRx subclasses"; end
 
     private
 
-      def connect(message); raise "#connect should be defined in TxRX subclasses"; end
-      def gets(message); raise "#gets should be defined in TxRX subclasses"; end
+      def connect(message); raise "#connect should be defined in TxRx subclasses"; end
+      def gets(message); raise "#gets should be defined in TxRx subclasses"; end
 
       def flush_read
         gets until gets == nil

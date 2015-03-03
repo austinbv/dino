@@ -15,21 +15,21 @@ module Dino
 
       it 'should return the TCPSocket if connected' do
         @server = TCPServer.new @port
-        @instance.io.should be_a TCPSocket
+        expect(@instance.io).to be_a(TCPSocket)
         @server.close
       end
     end
 
     describe '#io' do
       it 'should set io to a new TCPSocket with the specified host and port' do
-        TCPSocket.should_receive(:open).with(@host, @port)
+        expect(TCPSocket).to receive(:open).with(@host, @port)
         @instance.io
       end
 
       it 'should use the existing io instance if set' do
         @server = TCPServer.new @port
         socket = @instance.io
-        @instance.io.should be socket
+        expect(@instance.io).to equal(socket)
         @server.close
       end
     end

@@ -8,7 +8,6 @@ module Dino
       def initialize(options={})
         @device = options[:device]
         @baud = options[:baud] || BAUD
-        @first_write = true
       end
 
       def write(message)
@@ -33,11 +32,22 @@ module Dino
       end
 
       def gets(timeout=0)
-        buff = io.read(1)
-        return nil if buff.empty?
+        buff, escaped = "", false
         loop do
-          buff << io.read(1)
-          return buff if buff[-1] == "\n"
+          char = io.read(1)
+          if ["\n", "\\"].include? char
+            if escaped
+              buff << char
+              escaped = false
+            elsif (char == "\n")
+              return buff
+            elsif (char == "\\")
+              escaped = true
+            end
+          else
+            buff << char
+          end
+          return nil if (buff.empty? && !escaped)
         end
       end
     end
