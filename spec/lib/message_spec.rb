@@ -26,21 +26,21 @@ module Dino
       end
 
       it 'should build messages correctly' do
-        Dino::Message.encode(command: 1, pin: 1, value: 1).should == "1.1.1\n"
-        Dino::Message.encode(command: 1, pin: 1).should == "1.1\n"
-        Dino::Message.encode(command: 1, value: 1).should == "1..1\n"
-        Dino::Message.encode(command: 1).should == "1\n"
-        Dino::Message.encode(command: 1, pin: 1, value: 1, aux_message: "Some Text").should == "1.1.1.Some Text\n"
-        Dino::Message.encode(command: 1, aux_message: "Some Text").should == "1...Some Text\n"
-        Dino::Message.encode(command: 1, value: 1, aux_message: "Some Text").should == "1..1.Some Text\n"
+        expect(Dino::Message.encode command: 1, pin: 1, value: 1  ).to eq("1.1.1\n")
+        expect(Dino::Message.encode command: 1, pin: 1            ).to eq("1.1\n")
+        expect(Dino::Message.encode command: 1, value: 1          ).to eq("1..1\n")
+        expect(Dino::Message.encode command: 1                    ).to eq("1\n")
+        expect(Dino::Message.encode command: 1, pin: 1, value: 1, aux_message: "Some Text" ).to eq("1.1.1.Some Text\n")
+        expect(Dino::Message.encode command: 1, aux_message: "Some Text"                   ).to eq("1...Some Text\n")
+        expect(Dino::Message.encode command: 1, value: 1, aux_message: "Some Text"         ).to eq("1..1.Some Text\n")
       end
 
       it 'should escape newlines inside aux message' do
-        Dino::Message.encode(command: 1, aux_message: "line1\nline2").should == "1...line1\\\nline2\n"
+        expect(Dino::Message.encode command: 1, aux_message: "line1\nline2").to eq("1...line1\\\nline2\n")
       end
 
       it 'should escape backslashes inside aux message' do
-        Dino::Message.encode(command: 1, aux_message: "line1\\line2").should == "1...line1\\\\line2\n"
+        expect(Dino::Message.encode command: 1, aux_message: "line1\\line2").to eq("1...line1\\\\line2\n")
       end
     end
   end

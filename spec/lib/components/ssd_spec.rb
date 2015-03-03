@@ -12,24 +12,28 @@ module Dino
           subject
 
           segments = [:a, :b, :c, :d, :e, :f, :g]
-          segments.each { |segment| subject.proxies[segment].class.should == Basic::DigitalOutput}
+          segments.each do |segment|
+            expect(subject.proxies[segment].class).to equal(Basic::DigitalOutput)
+          end
         end
 
         it "should clear the display" do
-          SSD.any_instance.should_receive(:clear).once
-          SSD.new(board: board, pins: pins)
+          expect(subject).to receive(:clear).once
+          subject.send(:initialize, {board: board, pins: pins})
         end
 
         it "should turn on the display" do
-          SSD.any_instance.should_receive(:on).once
-          SSD.new(board: board, pins: pins)
+          expect(subject).to receive(:on).once
+          subject.send(:initialize, {board: board, pins: pins})
         end
       end
 
       describe '#clear' do
         it 'should toggle all the seven leds to off' do
           segments = [:a, :b, :c, :d, :e, :f, :g]
-          segments.each { |segment| subject.proxies[segment].should_receive(:high) }
+          segments.each do |segment|
+            expect(subject.proxies[segment]).to receive(:high)
+          end
 
           subject.clear
         end
@@ -37,31 +41,31 @@ module Dino
 
       describe '#on' do
         it 'should turn the ssd on' do
-          subject.anode.should_receive(:digital_write).with(board.high)
+          expect(subject.anode).to receive(:digital_write).with(board.high)
           subject.on
         end
       end
 
       describe '#off' do
         it 'should turn the ssd off' do
-          subject.anode.should_receive(:digital_write).with(board.low)
+          expect(subject.anode).to receive(:digital_write).with(board.low)
           subject.off
         end
       end
 
       describe '#display' do
         it "should scroll on multiple characters" do
-          subject.should_receive(:scroll).with('foo')
+          expect(subject).to receive(:scroll).with('foo')
           subject.display('foo')
         end
 
         it "should make sure the ssd is turned on" do
-          subject.should_receive(:on)
+          expect(subject).to receive(:on)
           subject.display(1)
         end
 
         it "should clear the display on unknown character" do
-          subject.should_receive(:clear)
+          expect(subject).to receive(:clear)
           subject.display('+')
         end
       end

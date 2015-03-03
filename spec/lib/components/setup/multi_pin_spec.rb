@@ -17,17 +17,17 @@ module Dino
 
         describe "::require_pins" do
           it 'should add required pins to the @@required_pins class variable' do
-            MultiPinComponent.class_eval('@@required_pins').should == [:one, :two]
+            expect(MultiPinComponent.class_eval('@@required_pins')).to eq([:one, :two])
           end
         end
 
         describe "::proxy_pins" do
           it 'should automatically require the pin unless :optional is true' do
-            MultiPinComponent.class_eval('@@required_pins').should == [:one, :two]
+            expect(MultiPinComponent.class_eval('@@required_pins')).to eq([:one, :two])
           end
 
           it 'should add the pins to the @@proxied_pins class variable with the right classes' do
-            MultiPinComponent.class_eval('@@proxied_pins').should == {two: Basic::DigitalOutput, maybe: Basic::DigitalInput}
+            expect(MultiPinComponent.class_eval('@@proxied_pins')).to eq({two: Basic::DigitalOutput, maybe: Basic::DigitalInput})
           end
         end
 
@@ -47,25 +47,24 @@ module Dino
 
         describe '#build_proxies' do
           it 'should create the correct proxy subcomponents' do
-            subject.proxies[:two].class.should == Basic::DigitalOutput
-            subject.proxies[:maybe].class.should == Basic::DigitalInput
+            expect(subject.proxies[:two].class).to equal(Basic::DigitalOutput)
+            expect(subject.proxies[:maybe].class).to equal(Basic::DigitalInput)
           end
 
           it 'should create an attr_accessor for each proxy' do
-            subject.two.class.should == Basic::DigitalOutput
-            subject.maybe.class.should == Basic::DigitalInput
+            expect(subject.two).to equal(subject.proxies[:two])
+            expect(subject.maybe).to equal(subject.proxies[:maybe])
           end
 
           it 'should attach the subcomponents to the right pins' do
-            subject.two.pin.should == 10
-            subject.maybe.pin.should == 11
-          end
+            expect(subject.two.pin).to eq(10)
+            expect(subject.maybe.pin).to eq(11)          end
         end
 
         describe '#states' do
           it 'should return a hash with the state of each subcomponent' do
             subject.two.high
-            subject.state.should == {two: board.high, maybe: nil}
+            expect(subject.state).to eq({two: board.high, maybe: nil})
           end
         end
       end

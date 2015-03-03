@@ -9,7 +9,7 @@ module Dino
 
       describe '#initialize' do
         it 'should toggle the servo library on for the pin' do
-          board.should_receive(:servo_toggle).with(options[:pin], 1)
+          expect(board).to receive(:servo_toggle).with(options[:pin], 1)
           subject
         end
       end
@@ -19,25 +19,24 @@ module Dino
 
         it 'should set the position of the Servo' do
           servo.position = 90
-          servo.position.should == 90
+          expect(servo.position).to eq(90)
         end
 
         it 'should let you write up to 180' do
           servo.position = 180
-          servo.position.should == 180
+          expect(servo.position).to eq(180)
         end
 
         it 'should modulate when position > 180' do
           servo.position = 190
-          servo.position.should == 10
+          expect(servo.position).to eq(10)
         end
 
         it 'should write the new position to the board' do
-          board.should_receive(:servo_write).with(13, 10)
+          expect(board).to receive(:servo_write).with(13, 10)
           servo.position = 190
         end
       end
     end
   end
 end
-

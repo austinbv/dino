@@ -11,7 +11,7 @@ module Dino
           include Base
         end
         subject { BaseComponent.new(options) }
-        
+
         describe '#initialize' do
           it 'should require a board' do
             expect {
@@ -20,7 +20,7 @@ module Dino
           end
 
           it 'should register itself as a component on the board' do
-            board.should_receive(:add_component)
+            expect(board).to receive(:add_component)
             BaseComponent.new(options)
           end
         end

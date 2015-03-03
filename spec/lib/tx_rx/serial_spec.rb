@@ -42,7 +42,7 @@ module Dino
         expect(subject).to receive(:tty_devices).once.and_return(['/dev/tty.ACM0'])
         expect(::Serial).to receive(:new).and_return(mock_serial = double)
         3.times { subject.io }
-        subject.io.should == mock_serial
+        expect(subject.io).to equal(mock_serial)
       end
 
       it 'should raise a BoardNotFound exception if there is no board connected' do

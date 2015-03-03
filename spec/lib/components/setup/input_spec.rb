@@ -16,15 +16,15 @@ module Dino
         describe '#pullup=' do
           it 'should tell the board to set the pullup mode correctly' do
             subject
-            board.should_receive(:set_pullup).with(subject.pin, false)
+            expect(board).to receive(:set_pullup).with(subject.pin, false)
             subject.pullup = false
-            subject.pullup.should == false
+            expect(subject.pullup).to be(false)
           end
         end
 
         describe '#initialize_pins' do
           it 'should set the pin mode to in' do
-            board.should_receive(:set_pin_mode).with(board.convert_pin(options[:pin]), :in)
+            expect(board).to receive(:set_pin_mode).with(board.convert_pin(options[:pin]), :in)
             subject
           end
 
@@ -34,7 +34,7 @@ module Dino
           end
 
           it 'should tell the board to start reading' do
-            board.should_receive(:start_read)
+            expect(board).to receive(:start_read)
             subject
           end
         end

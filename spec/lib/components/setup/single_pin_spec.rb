@@ -11,7 +11,7 @@ module Dino
           include SinglePin
         end
         subject { SinglePinComponent.new(options) }
-        
+
         describe '#initialize' do
           it 'should require a pin' do
             expect {
@@ -20,17 +20,17 @@ module Dino
           end
 
           it 'should convert the pin to an integer' do
-            board.should_receive(:convert_pin).with(options[:pin])
+            expect(board).to receive(:convert_pin).with(options[:pin])
             component = SinglePinComponent.new(options)
           end
         end
 
         describe '#mode=' do
           it 'should tell the board to set the pin mode' do
-            board.should_receive(:set_pin_mode).with(subject.pin, :out)
+            expect(board).to receive(:set_pin_mode).with(subject.pin, :out)
 
             subject.send(:mode=, :out)
-            subject.mode.should == :out
+            expect(subject.mode).to eq(:out)
           end
         end
       end

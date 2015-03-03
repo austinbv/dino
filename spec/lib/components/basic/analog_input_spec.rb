@@ -10,14 +10,14 @@ module Dino
 
         describe '#_read' do
           it 'should send #analog_read to the board with its pin' do
-            board.should_receive(:analog_read).with(subject.pin)
+            expect(board).to receive(:analog_read).with(subject.pin)
             subject._read
           end
         end
 
         describe '#_listen' do
           it 'should send #analog_listen to the board with its pin' do
-            board.should_receive(:analog_listen).with(subject.pin)
+            expect(board).to receive(:analog_listen).with(subject.pin)
             subject._listen
           end
         end

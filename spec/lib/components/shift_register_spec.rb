@@ -9,9 +9,9 @@ module Dino
 
       describe '#initialize' do
         it 'should create a BaseOutput instance for each pin' do
-          subject.clock.class.should == Basic::DigitalOutput
-          subject.latch.class.should == Basic::DigitalOutput
-          subject.data.class.should == Basic::DigitalOutput
+          expect(subject.clock.class).to eq(Basic::DigitalOutput)
+          expect(subject.latch.class).to eq(Basic::DigitalOutput)
+          expect(subject.data.class).to eq(Basic::DigitalOutput)
         end
       end
 
@@ -19,18 +19,18 @@ module Dino
         before(:each) { subject }
 
         it 'should write a single byte as value and clock pin as aux to the data pin' do
-          subject.latch.should_receive(:digital_write).with(board.low)
-          board.should_receive(:write).with "11.11.255.12\n"
-          subject.latch.should_receive(:digital_write).with(board.high)
+          expect(subject.latch).to receive(:digital_write).with(board.low)
+          expect(board).to receive(:write).with "11.11.255.12\n"
+          expect(subject.latch).to receive(:digital_write).with(board.high)
 
           subject.write(255)
         end
 
         it 'should write an array of bytes as value and clock pin as aux to the data pin' do
-          subject.latch.should_receive(:digital_write).with(board.low)
-          board.should_receive(:write).with "11.11.255.12\n"
-          board.should_receive(:write).with "11.11.0.12\n"
-          subject.latch.should_receive(:digital_write).with(board.high)
+          expect(subject.latch).to receive(:digital_write).with(board.low)
+          expect(board).to receive(:write).with "11.11.255.12\n"
+          expect(board).to receive(:write).with "11.11.0.12\n"
+          expect(subject.latch).to receive(:digital_write).with(board.high)
 
           subject.write([255,0])
         end
