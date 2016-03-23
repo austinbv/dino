@@ -1,6 +1,6 @@
 class DinoCLI::Generator
   require "fileutils"
-  LIB_FILENAMES = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp", "DinoSerial.cpp","DinoSerial.h", "DHT.cpp", "DHT.h"]
+  LIB_FILENAMES = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp", "DinoSerial.cpp","DinoSerial.h", "DHT.cpp", "DHT.h", "OneWire.cpp", "OneWire.h"]
   attr_accessor :options
 
   def initialize(options={})
@@ -16,7 +16,7 @@ class DinoCLI::Generator
   end
 
   def read
-    @libs = LIB_FILENAMES.map do |f| 
+    @libs = LIB_FILENAMES.map do |f|
       File.read(File.join(options[:src_dir], "lib", f))
     end
     @sketch = File.read File.join(options[:src_dir], sketch_filename)
