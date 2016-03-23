@@ -17,6 +17,7 @@ DHT dht;
 #endif
 
 Dino::Dino(){
+  newline[0] = '\n'; newline[1] = '\0';
   messageFragments[0] = cmdStr;
   messageFragments[1] = pinStr;
   messageFragments[2] = valStr;
@@ -117,7 +118,7 @@ void Dino::setupWrite(void (*writeCallback)(char *str)) {
 }
 void Dino::writeResponse() {
   _writeCallback(response);
-  _writeCallback("\n");
+  _writeCallback(newline);
 }
 
 // LISTNENERS

@@ -38,7 +38,7 @@ class Dino {
     void setupWrite(void (*writeCallback)(char *str));
     void parse(char c);
     void updateListeners();
-    
+
   private:
     // API-accessible functions.
     void setMode               ();  //cmd = 0
@@ -60,7 +60,7 @@ class Dino {
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
     void setHeartRate          ();  //cmd = 98
-  
+
     // Parser state storage and utility functions.
     char *messageFragments[4];
     byte fragmentIndex;
@@ -68,7 +68,7 @@ class Dino {
     boolean backslash;
     void append(char c);
     void process();
-    
+
     // Parsed message storage.
     char cmdStr[5]; int cmd;
     char pinStr[5]; int pin;
@@ -78,7 +78,8 @@ class Dino {
     // Value and response storage.
     int rval;
     char response[16];
-    
+    char newline[2];
+
     // Use a write callback from the main sketch to respond.
     void (*_writeCallback)(char *str);
     void writeResponse();
@@ -92,11 +93,11 @@ class Dino {
     unsigned int loopCount;
     unsigned int analogDivider;
     long timeSince (long event);
-    
+
     // Listeners correspond to raw pin number by array index, and store boolean. false == disabled.
     boolean analogListeners[PIN_COUNT];
     boolean digitalListeners[PIN_COUNT];
-    
+
     // Keep track of the last read values for digital listeners. Only write responses when changed.
     byte digitalListenerValues[PIN_COUNT];
 
