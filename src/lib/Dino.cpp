@@ -4,30 +4,74 @@
 
 #include "Arduino.h"
 #include "Dino.h"
+#if defined(__SAM3X8E__)
+  #include <avr/dtostrf.h>
+#endif
+
+DinoLCD dinoLCD;
+DHT dht;
+
+// SoftwareSerial doesn't work on the Due yet.
+#if !defined(__SAM3X8E__)
+  DinoSerial dinoSerial;
+#endif
 
 Dino::Dino(){
+  newline[0] = '\n'; newline[1] = '\0';
+  messageFragments[0] = cmdStr;
+  messageFragments[1] = pinStr;
+  messageFragments[2] = valStr;
+  messageFragments[3] = auxMsg;
   reset();
 }
 
 void Dino::parse(char c) {
-  if (c == '!') index = 0;        // Reset request
-  else if (c == '.') process();   // End request and process
-  else request[index++] = c;      // Append to request
+  if ((c == '\n') || (c == '\\')) {
+    // If last char was a \, this \ or \n is escaped.
+    if(backslash){
+      append(c);
+      backslash = false;
+    }
+
+    // If EOL, process and reset.
+    else if (c == '\n'){
+      append('\0');
+      process();
+      fragmentIndex = 0;
+      charIndex = 0;
+    }
+
+    // Backslash is the escape character.
+    else if (c == '\\') backslash = true;
+  }
+
+  // If fragment delimiter, terminate current fragment and move to next.
+  // Unless we're in the auxillary message fragment, then just append.
+  else if (c == '.') {
+    if (fragmentIndex < 3) {
+      append('\0');
+      fragmentIndex++;
+      charIndex = 0;
+    } else {
+      append(c);
+    }
+  }
+
+  // Else just append the character.
+  else append(c);
+}
+
+void Dino::append(char c) {
+  messageFragments[fragmentIndex][charIndex++] = c;
 }
 
 void Dino::process() {
-  response[0] = '\0';
-
-  // Parse the request.
-  strncpy(cmdStr, request, 2);      cmdStr[2] =  '\0';
-  strncpy(pinStr, request + 2, 2);  pinStr[2] =  '\0';
-  strncpy(valStr, request + 4, 3);  valStr[3] =  '\0';
   cmd = atoi(cmdStr);
   pin = atoi(pinStr);
   val = atoi(valStr);
+  response[0] = '\0';
 
   #ifdef debug
-   Serial.print("Received request - "); Serial.println(request);
    Serial.print("Command - ");          Serial.println(cmdStr);
    Serial.print("Pin - ");              Serial.println(pinStr);
    Serial.print("Value - ");            Serial.println(valStr);
@@ -45,15 +89,21 @@ void Dino::process() {
     case 7:  removeListener      ();  break;
     case 8:  servoToggle         ();  break;
     case 9:  servoWrite          ();  break;
+    case 10: handleLCD           ();  break;
+    case 11: shiftWrite          ();  break;
+    case 12: handleSerial        ();  break;
+    case 13: handleDHT           ();  break;
+    case 15: ds18Read            ();  break;
     case 90: reset               ();  break;
+    case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
     default:                          break;
   }
-  
+
   // Write the response.
   if (response[0] != '\0') writeResponse();
-  
+
   #ifdef debug
    Serial.print("Responded with - "); Serial.println(response);
    Serial.println();
@@ -68,9 +118,8 @@ void Dino::setupWrite(void (*writeCallback)(char *str)) {
 }
 void Dino::writeResponse() {
   _writeCallback(response);
+  _writeCallback(newline);
 }
-
-
 
 // LISTNENERS
 void Dino::updateListeners() {
@@ -89,7 +138,7 @@ void Dino::updateDigitalListeners() {
       if (rval != digitalListenerValues[i]) {
         digitalListenerValues[i] = rval;
         writeResponse();
-      } 
+      }
     }
   }
 }
@@ -144,7 +193,7 @@ void Dino::dWrite() {
 }
 
 // CMD = 02 // Digital Read
-void Dino::dRead() { 
+void Dino::dRead() {
   rval = digitalRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
@@ -220,6 +269,114 @@ void Dino::servoWrite() {
   servos[pin - SERVO_OFFSET].write(val);
 }
 
+// CMD = 10
+// Write a value to the servo object.
+void Dino::handleLCD() {
+  #ifdef debug
+    Serial.print("DinoLCD command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  dinoLCD.process(val, auxMsg);
+}
+
+// CMD = 11
+// Write to a shift register.
+void Dino::shiftWrite() {
+  #ifdef debug
+    Serial.print("Shift write :"); Serial.print(val); Serial.print(" to pin "); Serial.print(pin); Serial.print(". Clock pin: "); Serial.println(auxMsg);
+  #endif
+  // auxMsg should be the clock pin.
+  shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
+}
+
+
+// CMD = 12
+// Control the SoftwareSerial.
+void Dino::handleSerial() {
+  #ifdef debug
+    Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  // SoftwareSerial doesn't work on the Due yet.
+  #if !defined(__SAM3X8E__)
+  dinoSerial.process(val, auxMsg);
+  #endif
+}
+
+
+// CMD = 13
+// Read a DHT sensor
+void Dino::handleDHT() {
+  #ifdef debug
+    Serial.print("DinoDHT command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
+  #endif
+  // dtostrf doesn't work on the Due yet.
+  #if !defined(__SAM3X8E__)
+  if (pin != dht.pin) dht.setup(pin);
+  float reading;
+  char readingBuff[10];
+  char prefix;
+  if (val == 0) {
+    reading = dht.getTemperature();
+    prefix = 'T';
+  } else {
+    reading = dht.getHumidity();
+    prefix = 'H';
+  }
+  if (! isnan(reading)) {
+    dtostrf(reading, 6, 4, readingBuff);
+    sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
+  }
+  #endif
+}
+
+void Dino::ds18Read() {
+  OneWire ds(pin);
+
+  byte data[12];
+  byte addr[8];
+
+  if ( !ds.search(addr)) {
+    ds.reset_search();
+    return;
+   }
+
+  if ( OneWire::crc8( addr, 7) != addr[7]) {
+    // Serial.println("CRC is not valid!");
+    return;
+  }
+
+  if ( addr[0] != 0x10 && addr[0] != 0x28) {
+    // Serial.print("Device is not recognized");
+    return;
+  }
+
+  ds.reset();
+  ds.select(addr);
+  ds.write(0x44,1); // start conversion, with parasite power on at the end
+
+  byte present = ds.reset();
+  ds.select(addr);
+  ds.write(0xBE); // Read Scratchpad
+
+  for (int i = 0; i < 9; i++) { // we need 9 bytes
+    data[i] = ds.read();
+  }
+
+  ds.reset_search();
+
+  byte MSB = data[1];
+  byte LSB = data[0];
+
+  float tempRead = ((MSB << 8) | LSB); //using two's compliment
+  float reading = tempRead / 16;
+  char readingBuff[10];
+
+  if (! isnan(reading)) {
+    dtostrf(reading, 6, 4, readingBuff);
+    sprintf(response, "%d:%s", pin, readingBuff);
+  }
+}
+
+
 // CMD = 90
 void Dino::reset() {
   heartRate = 4000; // Default heartRate is ~4ms.
@@ -229,11 +386,26 @@ void Dino::reset() {
   for (int i = 0; i < PIN_COUNT; i++) digitalListenerValues[i] = 2;
   for (int i = 0; i < PIN_COUNT; i++)  analogListeners[i] = false;
   lastUpdate = micros();
-  index = 0;
-  #ifdef debug
-    Serial.println("Reset the board to defaults.");
+  fragmentIndex = 0;
+  charIndex = 0;
+
+  #if defined(__SAM3X8E__)
+    sprintf(response, "ACK:%d,%d", A0, DAC0);
+  #else
+    sprintf(response, "ACK:%d", A0);
   #endif
-  sprintf(response, "ACK:%02d", A0);
+}
+
+// CMD = 97
+// Set the analog read and write resolution.
+void Dino::setAnalogResolution() {
+  #if defined(__SAM3X8E__)
+    analogReadResolution(val);
+    analogWriteResolution(val);
+    #ifdef debug
+      Serial.print("Analog R/W resolution set to "); Serial.println(val);
+    #endif
+  #endif
 }
 
 // CMD = 97
@@ -248,10 +420,8 @@ void Dino::setAnalogDivider() {
 // CMD = 98
 // Set the heart rate in milliseconds. Store it in microseconds.
 void Dino::setHeartRate() {
-  int rate = val;
-  heartRate = (rate * 1000);
+  heartRate = atoi(auxMsg);
   #ifdef debug
     Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
   #endif
 }
-

@@ -1,4 +1,4 @@
-# Dino 0.11.3
+# Dino 0.12.0
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
 ## Get Started In No Time
@@ -11,16 +11,24 @@ Dino lets you start programming your Arduino with Ruby in minutes.
 gem install dino
 ```
 
+#### Download the Arduino IDE
+
+Dino is all about writing Ruby, but we'll need to upload some C code to the Arduino so we can talk to it. You'll need the [Arduino IDE](http://arduino.cc/en/Main/Software) for that. Even though it's still in beta, version 1.5 is recommended since it lets you upload from the command line.
+
+#### Connect your Arduino
+
+Connect your board with a USB cable. Open the Arduino IDE and pull down the `Tools` menu. Make sure you have the right type of board, and the correct serial port selected.
+
 #### Prepare the Bootstrapper
 
 Use the included command line tool to create a folder with the Arduino sketch you want to use and optionally configure it.
 
 ```shell
 # If connecting via serial, USB or ser2net, this is all you should need:
-dino generate-sketch serial
+dino sketch serial
 
 # If usng the ethernet shield, you'll want to specify unique MAC and IP addresses:
-dino generate-sketch ethernet --mac XX:XX:XX:XX:XX:XX --ip XXX.XXX.XXX.XXX
+dino sketch ethernet -mac XX:XX:XX:XX:XX:XX -ip XXX.XXX.XXX.XXX
 
 # For more options:
 dino help
@@ -30,7 +38,7 @@ __Note:__ Current Ethernet shields come with a sticker indicating the MAC addres
 
 #### Upload The Bootstrapper
 
-* Connect the Arduino to a USB port on your machine, regardless of which sketch you're using.
+* Connect the Arduino to a USB port on your machine, (even if using the ethernet sketch).
 * Open [the normal Arduino IDE](http://arduino.cc/en/Main/Software)
 * Open the `.ino` file in the sketch folder you just generated.
 * Click the upload button (an arrow).
@@ -38,7 +46,7 @@ __Note:__ Current Ethernet shields come with a sticker indicating the MAC addres
 #### Verify Install
 
 * Build the sample circuit [examples/led/led.png](https://raw.github.com/austinbv/dino/master/examples/led/led.png)
-* From your terminal, execute `ruby examples/led/led.rb`
+* From your terminal, execute `ruby example/led/led.rb`
 * Observe your LED blinking continuously
 
 ## Examples and Tutorials

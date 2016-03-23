@@ -29,6 +29,6 @@ Thread.new do
 end
 
 sleep 4
-ir.flash(flash)
+ir.on_flash(flash)
 
 sleep

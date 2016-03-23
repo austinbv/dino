@@ -1,4 +1,4 @@
-require 'serialport'
+require 'rubyserial'
 
 module Dino
   module TxRx
@@ -8,25 +8,16 @@ module Dino
       def initialize(options={})
         @device = options[:device]
         @baud = options[:baud] || BAUD
-        @first_write = true
       end
 
-      def io
-        @io ||= connect
+      def write(message)
+        io.write(message)
       end
 
-      def handshake
-        if on_windows?
-          io; sleep 3
-        end
-        
-        super
-      end
-
-      private
+    private
 
       def connect
-        tty_devices.each { |device| return SerialPort.new(device, @baud) rescue nil }
+        tty_devices.each { |device| return ::Serial.new(device, @baud) rescue nil }
         raise BoardNotFound
       end
 
@@ -38,6 +29,26 @@ module Dino
 
       def on_windows?
         RUBY_PLATFORM.match /mswin|mingw/i
+      end
+
+      def gets(timeout=0)
+        buff, escaped = "", false
+        loop do
+          char = io.read(1)
+          if ["\n", "\\"].include? char
+            if escaped
+              buff << char
+              escaped = false
+            elsif (char == "\n")
+              return buff
+            elsif (char == "\\")
+              escaped = true
+            end
+          else
+            buff << char
+          end
+          return nil if (buff.empty? && !escaped)
+        end
       end
     end
   end

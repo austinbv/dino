@@ -12,7 +12,7 @@ potentiometer = Dino::Components::Sensor.new(pin: 'A0', board: board)
 
 delay = 500.0
 
-potentiometer.when_data_received do |data|
+potentiometer.on_data do |data|
   sleep 0.5
   puts "DATA: #{delay = data.to_i}"
 end
@@ -21,13 +21,13 @@ end
 loop do
   puts "DELAY: #{seconds = (delay / 1000.0)}"
   p 'red'
-  led.red
+  led.color = :red
   sleep(seconds)
-  led.blue
   p 'blue'
+  led.color = :blue
   sleep(seconds)
-  led.green
   p 'green'
+  led.color = :green
   sleep(seconds)
 end
 #led.color(224, 27, 106)
