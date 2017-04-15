@@ -55,3 +55,8 @@ __Note:__ Current Ethernet shields come with a sticker indicating the MAC addres
 * "Arduino the Ruby Way" at RubyConf 2012
   * [Video by ConFreaks](http://confreaks.com/videos/1294-rubyconf2012-arduino-the-ruby-way)
   * [Slides on SpeakerDeck](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
+
+## Contribute
+
+* Chat - Join us on freenode #dino-rb  
+* Read chat history: http://bit.ly/dino-rb-logs
