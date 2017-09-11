@@ -1,6 +1,24 @@
 class DinoCLI::Generator
   require "fileutils"
-  LIB_FILENAMES = ["Dino.h", "Dino.cpp", "DinoLCD.h", "DinoLCD.cpp", "DinoSerial.cpp","DinoSerial.h", "DHT.cpp", "DHT.h", "OneWire.cpp", "OneWire.h"]
+  LIB_FILENAMES =  [
+                    "lib/Dino.cpp",
+                    "lib/Dino.h",
+                    "lib/DinoLCD.cpp",
+                    "lib/DinoLCD.h",
+                    "lib/DinoSerial.cpp",
+                    "lib/DinoSerial.h",
+
+                    "vendor/DHT/DHT.cpp",
+                    "vendor/DHT/DHT.h",
+                    "vendor/OneWire/OneWire.cpp",
+                    "vendor/OneWire/OneWire.h",
+                    "vendor/Arduino-IRremote/boarddefs.h",
+                    "vendor/Arduino-IRremote/IRremote.cpp",
+                    "vendor/Arduino-IRremote/IRremote.h",
+                    "vendor/Arduino-IRremote/IRremoteInt.h",
+                    "vendor/Arduino-IRremote/irSend.cpp"
+                  ]
+
   attr_accessor :options
 
   def initialize(options={})
@@ -17,7 +35,7 @@ class DinoCLI::Generator
 
   def read
     @libs = LIB_FILENAMES.map do |f|
-      File.read(File.join(options[:src_dir], "lib", f))
+      File.read(File.join(options[:src_dir], f))
     end
     @sketch = File.read File.join(options[:src_dir], sketch_filename)
   end
@@ -52,7 +70,7 @@ class DinoCLI::Generator
     sketch = File.join(output_dir, sketch_filename)
     File.open(sketch, 'w') { |f| f.write @sketch }
 
-    libs = LIB_FILENAMES.map { |f| File.join(output_dir, f)}
+    libs = LIB_FILENAMES.map { |f| File.join(output_dir, f.split('/')[-1])}
     libs.each_with_index do |file, index|
       File.open(file, 'w') { |f| f.write @libs[index]}
     end

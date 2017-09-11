@@ -10,6 +10,7 @@
 #include "DinoLCD.h"
 #include "DHT.h"
 #include "OneWire.h"
+#include "IRremote.h"
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
@@ -56,6 +57,7 @@ class Dino {
     void handleSerial          ();  //cmd = 12
     void handleDHT             ();  //cmd = 13
     void ds18Read              ();  //cmd = 15
+    void irSend                ();  //cmd = 16
     void reset                 ();  //cmd = 90
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
@@ -73,7 +75,7 @@ class Dino {
     char cmdStr[5]; int cmd;
     char pinStr[5]; int pin;
     char valStr[5]; int val;
-    char auxMsg[256];
+    char auxMsg[512];
 
     // Value and response storage.
     int rval;
