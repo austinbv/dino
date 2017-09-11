@@ -95,6 +95,7 @@ void Dino::process() {
     case 12: handleSerial        ();  break;
     case 13: handleDHT           ();  break;
     case 15: ds18Read            ();  break;
+    case 16: irSend              ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
