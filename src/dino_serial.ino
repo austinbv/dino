@@ -1,8 +1,6 @@
 #include "Dino.h"
 #include <Servo.h>
 #include <LiquidCrystal.h>
-#include "DHT.h"
-#include "OneWire.h"
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
@@ -27,7 +25,7 @@ void (*writeCallback)(char *str) = writeResponse;
 
 void setup() {
   serial.begin(115200);
-  
+
   // Wait for Leonardo serial port to connect.
   #if defined(__AVR_ATmega32U4__)
     while(!serial);
