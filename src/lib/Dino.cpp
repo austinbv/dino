@@ -383,7 +383,7 @@ void Dino::ds18Read() {
 
 // CMD = 16
 void Dino::irSend(){
-  irsend.sendRawChar(auxMsg, val);
+  irsend.sendRaw((uint16_t*)&auxMsg[1], auxMsg[0], val);
 }
 
 
