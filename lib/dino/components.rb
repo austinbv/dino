@@ -17,5 +17,6 @@ module Dino
     autoload :SoftwareSerial, 'dino/components/softserial'
     autoload :DHT,            'dino/components/dht'
     autoload :DS18B20,        'dino/components/ds18b20'
+    autoload :IREmitter,      'dino/components/ir_emitter'
   end
 end
