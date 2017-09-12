@@ -21,8 +21,8 @@ module Dino
         expect { Dino::Message.encode(command:90, value:90000) }.to raise_exception(/four/)
       end
 
-      it 'should not allow values longer than 4 digits' do
-        expect { Dino::Message.encode(command:90, aux_message: "0" * 256) }.to raise_exception(/255/)
+      it 'should not allow aux messages longer than 512' do
+        expect { Dino::Message.encode(command:90, aux_message: "0" * 513) }.to raise_exception(/512/)
       end
 
       it 'should build messages correctly' do

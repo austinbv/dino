@@ -78,7 +78,7 @@ module Dino
       servo_toggle:    '8',
       servo_write:     '9',
       dht_read:        '13',
-      ds18b20_read:    '15'
+      ds18b20_read:    '15',
       tone:            '20',
       no_tone:         '21'
     }
