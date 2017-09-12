@@ -58,6 +58,8 @@ class Dino {
     void handleDHT             ();  //cmd = 13
     void ds18Read              ();  //cmd = 15
     void irSend                ();  //cmd = 16
+    void tone                  ();  //cmd = 20
+    void noTone                ();  //cmd = 21
     void reset                 ();  //cmd = 90
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97

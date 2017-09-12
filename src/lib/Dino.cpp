@@ -96,6 +96,8 @@ void Dino::process() {
     case 13: handleDHT           ();  break;
     case 15: ds18Read            ();  break;
     case 16: irSend              ();  break;
+    case 20: tone                ();  break;
+    case 21: noTone              ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -386,6 +388,16 @@ void Dino::irSend(){
   irsend.sendRaw((uint16_t*)&auxMsg[1], auxMsg[0], val);
 }
 
+// CMD = 20
+void Dino::tone() {
+  unsigned int duration = atoi(auxMsg);
+  ::tone(pin, val, duration);
+}
+
+// CMD = 21
+void Dino::noTone() {
+   ::noTone(pin);
+}
 
 // CMD = 90
 void Dino::reset() {

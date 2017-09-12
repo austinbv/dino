@@ -79,12 +79,19 @@ module Dino
       servo_write:     '9',
       dht_read:        '13',
       ds18b20_read:    '15'
+      tone:            '20',
+      no_tone:         '21'
     }
 
     PIN_COMMANDS.each_key do |command|
       define_method(command) do |pin, value=nil|
         write Dino::Message.encode(command: PIN_COMMANDS[command], pin: convert_pin(pin), value: value)
       end
+    end
+
+    # Redefinition tone to accept duration.
+    def tone(pin, value, duration)
+      write Dino::Message.encode(command: PIN_COMMANDS[:tone], pin: convert_pin(pin), value: value, aux_message: duration)
     end
 
     DIGITAL_REGEX = /\A\d+\z/i
