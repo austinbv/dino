@@ -10,6 +10,7 @@
 
 DinoLCD dinoLCD;
 DHT dht;
+IRsend irsend;
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
@@ -94,6 +95,7 @@ void Dino::process() {
     case 12: handleSerial        ();  break;
     case 13: handleDHT           ();  break;
     case 15: ds18Read            ();  break;
+    case 16: irSend              ();  break;
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -328,6 +330,8 @@ void Dino::handleDHT() {
   #endif
 }
 
+
+// CMD = 15
 void Dino::ds18Read() {
   OneWire ds(pin);
 
@@ -374,6 +378,12 @@ void Dino::ds18Read() {
     dtostrf(reading, 6, 4, readingBuff);
     sprintf(response, "%d:%s", pin, readingBuff);
   }
+}
+
+
+// CMD = 16
+void Dino::irSend(){
+  irsend.sendRaw((uint16_t*)&auxMsg[1], auxMsg[0], val);
 }
 
 

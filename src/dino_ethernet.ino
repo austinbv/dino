@@ -3,8 +3,6 @@
 #include <Ethernet.h>
 #include <Servo.h>
 #include <LiquidCrystal.h>
-#include "DHT.h"
-#include "OneWire.h"
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
@@ -66,7 +64,7 @@ void setup() {
 void loop() {
   // Listen for connections.
   client = server.available();
-  
+
   // Handle a connection.
   if (client) {
     while (client.connected()) {
