@@ -1,6 +1,4 @@
 #include "Dino.h"
-#include <Servo.h>
-#include <LiquidCrystal.h>
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
