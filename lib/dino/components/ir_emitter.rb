@@ -9,7 +9,7 @@ module Dino
         end
 
         # Default to 38kHz
-        frequency = options[:freqency] || 38
+        frequency = options[:frequency] || 38
 
         message = Dino::Message.encode(
           command: 16,
