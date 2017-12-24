@@ -385,18 +385,18 @@ void Dino::ds18Read() {
 
 // CMD = 16
 void Dino::irSend(){
-  irsend.sendRaw((uint16_t*)&auxMsg[1], auxMsg[0], val);
+  irsend.sendRaw((uint16_t*)&auxMsg[1], (uint8_t)auxMsg[0], val);
 }
 
 // CMD = 20
 void Dino::tone() {
-  unsigned int duration = atoi(auxMsg);
-  ::tone(pin, val, duration);
+  //unsigned int duration = atoi(auxMsg);
+  //::tone(pin, val, duration);
 }
 
 // CMD = 21
 void Dino::noTone() {
-   ::noTone(pin);
+  //::noTone(pin);
 }
 
 // CMD = 90
