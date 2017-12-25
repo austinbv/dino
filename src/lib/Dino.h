@@ -77,7 +77,7 @@ class Dino {
     char cmdStr[5]; int cmd;
     char pinStr[5]; int pin;
     char valStr[5]; int val;
-    char auxMsg[512];
+    byte auxMsg[512];
 
     // Value and response storage.
     int rval;
