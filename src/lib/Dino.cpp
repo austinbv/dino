@@ -80,24 +80,34 @@ void Dino::process() {
 
   // Call the command.
   switch(cmd) {
-    case 0:  setMode             ();  break;
-    case 1:  dWrite              ();  break;
-    case 2:  dRead               ();  break;
-    case 3:  aWrite              ();  break;
-    case 4:  aRead               ();  break;
-    case 5:  addDigitalListener  ();  break;
-    case 6:  addAnalogListener   ();  break;
-    case 7:  removeListener      ();  break;
-    case 8:  servoToggle         ();  break;
-    case 9:  servoWrite          ();  break;
-    case 10: handleLCD           ();  break;
-    case 11: shiftWrite          ();  break;
-    case 12: handleSerial        ();  break;
-    case 13: handleDHT           ();  break;
-    case 15: ds18Read            ();  break;
-    case 16: irSend              ();  break;
-    case 20: tone                ();  break;
-    case 21: noTone              ();  break;
+    case 0:  setMode             ();    break;
+    case 1:  dWrite              ();    break;
+    case 2:  dRead               (pin); break;
+    case 3:  aWrite              ();    break;
+    case 4:  aRead               (pin); break;
+    case 5:  addDigitalListener  ();    break;
+    case 6:  addAnalogListener   ();    break;
+    case 7:  removeListener      ();    break;
+    case 8:  servoToggle         ();    break;
+    case 9:  servoWrite          ();    break;
+    case 10: handleLCD           ();    break;
+    case 12: handleSerial        ();    break;
+    case 13: handleDHT           ();    break;
+    case 15: ds18Read            ();    break;
+    case 16: irSend              ();    break;
+    case 20: tone                ();    break;
+    case 21: noTone              ();    break;
+
+    // Request format for shift register read, write and add listener functions.
+    // pin        = data pin (int)
+    // val        = clock pin (int)
+    // auxMsg[0]  = latch pin (byte)
+    // auxMsg[1]  = send clock high before reading (byte) (0/1) (read func only)
+    // auxMsg[2]  = length (byte)
+    // auxMsg[3]+ = data (bytes) (write func only)
+    case 22: shiftWrite (pin, val, auxMsg[0], auxMsg[2], &auxMsg[3]);  break;
+    case 23: shiftRead  (pin, val, auxMsg[0], auxMsg[2], auxMsg[1]);   break;
+
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
@@ -113,7 +123,6 @@ void Dino::process() {
    Serial.println();
   #endif
 }
-
 
 
 // WRITE CALLBACK
@@ -137,20 +146,19 @@ void Dino::updateListeners() {
 void Dino::updateDigitalListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
     if (digitalListeners[i]) {
-      pin = i;
-      dRead();
+      dRead(i);
       if (rval != digitalListenerValues[i]) {
         digitalListenerValues[i] = rval;
         writeResponse();
       }
     }
   }
+  shiftRead(14, 16, 15, 2, 1);
 }
 void Dino::updateAnalogListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
     if (analogListeners[i]) {
-      pin = i;
-      aRead();
+      aRead(i);
       writeResponse();
     }
   }
@@ -197,7 +205,7 @@ void Dino::dWrite() {
 }
 
 // CMD = 02 // Digital Read
-void Dino::dRead() {
+void Dino::dRead(int pin) {
   rval = digitalRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
@@ -211,7 +219,7 @@ void Dino::aWrite() {
 }
 
 // CMD = 04 // Analog Read
-void Dino::aRead() {
+void Dino::aRead(int pin) {
   rval = analogRead(pin);
   sprintf(response, "%02d:%02d", pin, rval);
 }
@@ -280,16 +288,6 @@ void Dino::handleLCD() {
     Serial.print("DinoLCD command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
   #endif
   dinoLCD.process(val, auxMsg);
-}
-
-// CMD = 11
-// Write to a shift register.
-void Dino::shiftWrite() {
-  #ifdef debug
-    Serial.print("Shift write :"); Serial.print(val); Serial.print(" to pin "); Serial.print(pin); Serial.print(". Clock pin: "); Serial.println(auxMsg);
-  #endif
-  // auxMsg should be the clock pin.
-  shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
 }
 
 
@@ -385,7 +383,7 @@ void Dino::ds18Read() {
 
 // CMD = 16
 void Dino::irSend(){
-  irsend.sendRaw((uint16_t*)&auxMsg[1], (uint8_t)auxMsg[0], val);
+  irsend.sendRaw((uint16_t)&auxMsg[1], (uint8_t)auxMsg[0], val);
 }
 
 // CMD = 20
@@ -398,6 +396,58 @@ void Dino::tone() {
 void Dino::noTone() {
   //::noTone(pin);
 }
+
+
+// CMD = 22
+// Write to a shift register.
+void Dino::shiftWrite(int dataPin, int clockPin, byte latchPin, byte len, byte data[]) {
+  // Set latch pin low to begin serial write.
+  digitalWrite(latchPin, LOW);
+
+  // Write one byte at a time.
+  for (uint8_t i = 0;  i < len;  i++) {
+    shiftOut(dataPin, clockPin, MSBFIRST, data[i]);
+  }
+
+  // Set latch pin high so register writes to parallel output.
+  digitalWrite(latchPin, HIGH);
+}
+
+
+// CMD = 23
+// Read from a shift register.
+void Dino::shiftRead(int dataPin, int clockPin, byte latchPin, byte len, byte clockHighFirst) {
+  // Send clock pin high if using a register that clocks on rising edges.
+  // If not, the MSB will not be read on those registers (always 1),
+  // and all other bits will be shifted by 1 towards the LSB.
+  if (clockHighFirst > 0) digitalWrite(clockPin, HIGH);
+
+  // Latch high to read parallel state, then low again to stop.
+  digitalWrite(latchPin, HIGH);
+  digitalWrite(latchPin, LOW);
+
+  // Send the pin number and the colon alone for now.
+  sprintf(response, "%02d:", dataPin);
+  _writeCallback(response);
+
+  for (byte i = 1;  i <= len;  i++) {
+    // Read a single byte from the register.
+    byte reading = shiftIn(dataPin, clockPin, LSBFIRST);
+
+    // If we're on the last byte, append \n. If not, append a comma, then write.
+    if (i == len) {
+      sprintf(response, "%03d\n", reading);
+    } else {
+      sprintf(response, "%03d,", dataPin);
+    }
+    _writeCallback(response);
+  }
+
+  // Leave latch pin high and clear response so main loop doesn't send anything.
+  digitalWrite(latchPin, HIGH);
+  response[0] = "\0";
+}
+
 
 // CMD = 90
 void Dino::reset() {

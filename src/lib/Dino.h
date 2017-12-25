@@ -42,24 +42,26 @@ class Dino {
 
   private:
     // API-accessible functions.
-    void setMode               ();  //cmd = 0
-    void dWrite                ();  //cmd = 1
-    void dRead                 ();  //cmd = 2
-    void aWrite                ();  //cmd = 3
-    void aRead                 ();  //cmd = 4
-    void addDigitalListener    ();  //cmd = 5
-    void addAnalogListener     ();  //cmd = 6
-    void removeListener        ();  //cmd = 7
-    void servoToggle           ();  //cmd = 8
-    void servoWrite            ();  //cmd = 9
-    void handleLCD             ();  //cmd = 10
-    void shiftWrite            ();  //cmd = 11
-    void handleSerial          ();  //cmd = 12
-    void handleDHT             ();  //cmd = 13
-    void ds18Read              ();  //cmd = 15
-    void irSend                ();  //cmd = 16
-    void tone                  ();  //cmd = 20
-    void noTone                ();  //cmd = 21
+    void setMode               ();         //cmd = 0
+    void dWrite                ();         //cmd = 1
+    void dRead                 (int pin);  //cmd = 2
+    void aWrite                ();         //cmd = 3
+    void aRead                 (int pin);  //cmd = 4
+    void addDigitalListener    ();         //cmd = 5
+    void addAnalogListener     ();         //cmd = 6
+    void removeListener        ();         //cmd = 7
+    void servoToggle           ();         //cmd = 8
+    void servoWrite            ();         //cmd = 9
+    void handleLCD             ();         //cmd = 10
+    void shiftWrite            ();         //cmd = 11
+    void handleSerial          ();         //cmd = 12
+    void handleDHT             ();         //cmd = 13
+    void ds18Read              ();         //cmd = 15
+    void irSend                ();         //cmd = 16
+    void tone                  ();         //cmd = 20
+    void noTone                ();         //cmd = 21
+    void shiftWrite            (int dataPin, int clockPin, byte latchPin, byte len, byte data[]);         //cmd = 22
+    void shiftRead             (int dataPin, int clockPin, byte latchPin, byte len, byte clockHighFirst); //cmd = 23
     void reset                 ();  //cmd = 90
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
