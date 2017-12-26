@@ -153,7 +153,6 @@ void Dino::updateDigitalListeners() {
       }
     }
   }
-  shiftRead(14, 16, 15, 2, 1);
 }
 void Dino::updateAnalogListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
@@ -406,7 +405,7 @@ void Dino::shiftWrite(int dataPin, int clockPin, byte latchPin, byte len, byte d
 
   // Write one byte at a time.
   for (uint8_t i = 0;  i < len;  i++) {
-    shiftOut(dataPin, clockPin, MSBFIRST, data[i]);
+    shiftOut(dataPin, clockPin, LSBFIRST, data[i]);
   }
 
   // Set latch pin high so register writes to parallel output.
@@ -438,7 +437,7 @@ void Dino::shiftRead(int dataPin, int clockPin, byte latchPin, byte len, byte cl
     if (i == len) {
       sprintf(response, "%03d\n", reading);
     } else {
-      sprintf(response, "%03d,", dataPin);
+      sprintf(response, "%03d,", reading);
     }
     _writeCallback(response);
   }

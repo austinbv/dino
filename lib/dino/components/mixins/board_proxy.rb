@@ -3,6 +3,7 @@ module Dino
     module Mixins
       module BoardProxy
         def after_initialize(options={})
+          super(options) if defined?(super)
           @high = 1
           @low = 0
           @components = []
@@ -25,6 +26,12 @@ module Dino
         def set_pin_mode(pin, mode)
           nil
         end
+
+        def set_pullup(pin, pullup)
+          nil
+        end
+
+        def start_read; end
       end
     end
   end
