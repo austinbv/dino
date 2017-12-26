@@ -25,13 +25,13 @@ module Dino
         alias :remove_callbacks :remove_callback
 
         def update(data)
-          @state = data
           @callback_mutex.synchronize {
             @callbacks.each_value do |array|
               array.each { |callback| callback.call(@state) }
             end
           }
           remove_callback :read
+          @state = data
         end
       end
     end
