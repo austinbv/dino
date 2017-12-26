@@ -27,7 +27,7 @@ module Dino
         def update(data)
           @callback_mutex.synchronize {
             @callbacks.each_value do |array|
-              array.each { |callback| callback.call(@state) }
+              array.each { |callback| callback.call(data) }
             end
           }
           remove_callback :read
