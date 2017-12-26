@@ -29,7 +29,7 @@ module Dino
         # pin high before reading. Setting this instance var to 1 will include
         # that instruction on every call to read or listen.
         #
-        @clock_high_first = options[:clock_high_first] ? 1 : 0
+        @preclock_high = options[:preclock_high] ? 1 : 0
 
         super(options)
         bubble_callbacks
@@ -70,7 +70,7 @@ module Dino
 
       def read
         # Pack the extra parameters we need to send in the aux message then send.
-        aux = [latch.pin, @clock_high_first, @bytes]
+        aux = [latch.pin, @preclock_high, @bytes]
         aux = aux.pack('C*')
         board.write Dino::Message.encode(command: 23, pin: data.pin, value: clock.pin, aux_message: aux)
       end

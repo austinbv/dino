@@ -8,7 +8,7 @@ module Dino
       subject { ShiftRegisterOut.new(options)  }
 
       describe '#initialize' do
-        it 'should create a BaseOutput instance for each pin' do
+        it 'should create a DigitalOutput instance for each pin' do
           expect(subject.clock.class).to eq(Basic::DigitalOutput)
           expect(subject.latch.class).to eq(Basic::DigitalOutput)
           expect(subject.data.class).to eq(Basic::DigitalOutput)
