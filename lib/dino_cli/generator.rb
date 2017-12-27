@@ -1,8 +1,8 @@
 class DinoCLI::Generator
   require "fileutils"
   LIB_FILENAMES =  [
-                    "lib/Dino.cpp",
                     "lib/Dino.h",
+                    "lib/Dino.cpp",
                     "lib/DinoLCD.cpp",
                     "lib/DinoLCD.h",
                     "lib/DinoSerial.cpp",
@@ -63,6 +63,9 @@ class DinoCLI::Generator
     end
     if options[:debug]
       @libs[0].gsub! "// #define debug true", "#define debug true"
+    end
+    unless serial?
+      @libs[0].gsub! "#define TXRX_SPI false", "#define TXRX_SPI true"
     end
   end
 

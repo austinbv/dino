@@ -1,18 +1,22 @@
 #
-# This examples sets up a shift register, and an SSD that is connected to its 8 output pins.
-# The shift register is passed in as the 'board' when setting up the SSD.
-# The individual pins on the register are accessible by the SSD instance, so it works as usual.
+# Example showing how to use an output shift register to drive a seven segment display.
+#
+# The register implements #digital_write and other methods expected by Components,
+# and makes its parallel pins addressable (zero index), so it can proxy the Board class.
+#
+# The SSD object is created by passing the register instead of the board, and
+# the registers's parallel pin number that each SSD pin is connected to.
+#
 #
 require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-shift_register = Dino::Components::Register::ShiftOut.new(pins: {data: 11, latch: 8, clock: 12}, board: board)
+shift_register = Dino::Components::Register::ShiftOut.new  board: board,
+                                                           pins: {data: 6, clock: 7, latch: 8}
 
-ssd   = Dino::Components::SSD.new(
-  board: shift_register,
-  pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
-)
+ssd = Dino::Components::SSD.new   board: shift_register,
+                                  pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
 # Turn off the ssd on exit
 trap("SIGINT") { exit !ssd.off }

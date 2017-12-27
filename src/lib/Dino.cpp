@@ -98,7 +98,7 @@ void Dino::process() {
     case 20: tone                ();    break;
     case 21: noTone              ();    break;
 
-    // Request format for shift register read, write and add listener functions.
+    // Request format for shift register functions.
     // pin        = latch pin (int)
     // val        = length (int)
     // auxMsg[0]  = data pin (byte)
@@ -107,6 +107,14 @@ void Dino::process() {
     // auxMsg[3]+ = data (bytes) (write func only)
     case 22: shiftWrite (pin, val, auxMsg[0], auxMsg[1], &auxMsg[3]);  break;
     case 23: shiftRead  (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);   break;
+
+    // Request format for single direction SPI functions.
+    // pin         = slave select pin (int)
+    // val         = length (int)
+    // auxMsg[0]   = SPI mode (byte)
+    // auxMsg[1-4] = clock frequency (uint32_t as 4 bytes)
+    // auxMsg[5]+  = data (bytes) (write func only)
+    case 25: readSPI    (pin, val, auxMsg[0], (uint32_t)auxMsg[1]); break;
 
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
@@ -425,12 +433,12 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
   digitalWrite(latchPin, HIGH);
   digitalWrite(latchPin, LOW);
 
-  // Send the pin number and the colon alone for now.
-  // Send data as if coming from the latch pin.
+  // Send data as if coming from the latch pin so it's easy to identify.
+  // Start with just pin number and : for now.
   sprintf(response, "%02d:", latchPin);
   _writeCallback(response);
 
-  for (byte i = 1;  i <= len;  i++) {
+  for (int i = 1;  i <= len;  i++) {
     // Read a single byte from the register.
     byte reading = shiftIn(dataPin, clockPin, LSBFIRST);
 
@@ -445,6 +453,56 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
 
   // Leave latch pin high and clear response so main loop doesn't send anything.
   digitalWrite(latchPin, HIGH);
+  response[0] = "\0";
+}
+
+
+// CMD = 25
+// Read from an SPI device.
+void Dino::readSPI(int selectPin, int len, byte spiMode, uint32_t clockRate) {
+  // Start the SPI library if it isn't already being used by the main sketch.
+  SPI.begin();
+
+  // Set the mode we want.
+  switch(spiMode) {
+    case 0:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE0)); break;
+    case 1:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE1)); break;
+    case 2:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE2)); break;
+    case 3:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE3)); break;
+  }
+
+  // Select the device.
+  digitalWrite(selectPin, LOW);
+
+  // Send data as if coming from the slave select pin so it's easy to identify.
+  // Start with just pin number and : for now.
+  sprintf(response, "%02d:", selectPin);
+  _writeCallback(response);
+
+  for (int i = 1;  i <= len;  i++) {
+    // Read a single byte from the register.
+    byte reading = SPI.transfer(i);
+
+    // If we're on the last byte, append \n. If not, append a comma, then write.
+    if (i == len) {
+      sprintf(response, "%03d\n", reading);
+    } else {
+      sprintf(response, "%03d,", reading);
+    }
+    _writeCallback(response);
+  }
+
+  // End the SPI transaction, and then library if not in use by main sketch.
+  SPI.endTransaction();
+
+  // TXRX_SPI is set to false in Dino.h.
+  // CLI generator will auto set to true for any sketch other than serial.
+  #if !(TXRX_SPI)
+    SPI.end();
+  #endif
+
+  // Leave select high and clear response so main loop doesn't send anything.
+  digitalWrite(selectPin, HIGH);
   response[0] = "\0";
 }
 

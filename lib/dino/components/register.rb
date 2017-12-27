@@ -6,6 +6,7 @@ module Dino
       require 'dino/components/register/output'
       require 'dino/components/register/shift_in'
       require 'dino/components/register/shift_out'
+      require 'dino/components/register/spi_in'
     end
   end
 end

@@ -1,7 +1,7 @@
 module Dino
   module Components
     module Register
-      class Output
+      module Output
         include Setup::Base
 
         def after_initialize(options={})

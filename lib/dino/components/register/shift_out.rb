@@ -1,7 +1,8 @@
 module Dino
   module Components
     module Register
-      class ShiftOut < Output
+      class ShiftOut
+        include Output
         #
         # options = {board: my_board, pins: {clock: clock_pin, latch: latch_pin, data: data_pin}
         #

@@ -1,7 +1,7 @@
 module Dino
   module Components
     module Register
-      class Input
+      module Input
         include Setup::Base
         include Mixins::Callbacks
 
