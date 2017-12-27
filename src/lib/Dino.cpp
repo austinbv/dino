@@ -481,7 +481,7 @@ void Dino::readSPI(int selectPin, int len, byte spiMode, uint32_t clockRate) {
 
   for (int i = 1;  i <= len;  i++) {
     // Read a single byte from the register.
-    byte reading = SPI.transfer(i);
+    byte reading = SPI.transfer(0x00);
 
     // If we're on the last byte, append \n. If not, append a comma, then write.
     if (i == len) {
