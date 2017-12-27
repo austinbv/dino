@@ -99,14 +99,14 @@ void Dino::process() {
     case 21: noTone              ();    break;
 
     // Request format for shift register read, write and add listener functions.
-    // pin        = data pin (int)
-    // val        = clock pin (int)
-    // auxMsg[0]  = latch pin (byte)
-    // auxMsg[1]  = send clock high before reading (byte) (0/1) (read func only)
-    // auxMsg[2]  = length (byte)
+    // pin        = latch pin (int)
+    // val        = length (int)
+    // auxMsg[0]  = data pin (byte)
+    // auxMsg[1]  = clock pin (byte)
+    // auxMsg[2]  = send clock high before reading (byte) (0/1) (read func only)
     // auxMsg[3]+ = data (bytes) (write func only)
-    case 22: shiftWrite (pin, val, auxMsg[0], auxMsg[2], &auxMsg[3]);  break;
-    case 23: shiftRead  (pin, val, auxMsg[0], auxMsg[2], auxMsg[1]);   break;
+    case 22: shiftWrite (pin, val, auxMsg[0], auxMsg[1], &auxMsg[3]);  break;
+    case 23: shiftRead  (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);   break;
 
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
@@ -399,7 +399,7 @@ void Dino::noTone() {
 
 // CMD = 22
 // Write to a shift register.
-void Dino::shiftWrite(int dataPin, int clockPin, byte latchPin, byte len, byte data[]) {
+void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte data[]) {
   // Set latch pin low to begin serial write.
   digitalWrite(latchPin, LOW);
 
@@ -415,7 +415,7 @@ void Dino::shiftWrite(int dataPin, int clockPin, byte latchPin, byte len, byte d
 
 // CMD = 23
 // Read from a shift register.
-void Dino::shiftRead(int dataPin, int clockPin, byte latchPin, byte len, byte clockHighFirst) {
+void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte clockHighFirst) {
   // Send clock pin high if using a register that clocks on rising edges.
   // If not, the MSB will not be read on those registers (always 1),
   // and all other bits will be shifted by 1 towards the LSB.
@@ -426,7 +426,8 @@ void Dino::shiftRead(int dataPin, int clockPin, byte latchPin, byte len, byte cl
   digitalWrite(latchPin, LOW);
 
   // Send the pin number and the colon alone for now.
-  sprintf(response, "%02d:", dataPin);
+  // Send data as if coming from the latch pin.
+  sprintf(response, "%02d:", latchPin);
   _writeCallback(response);
 
   for (byte i = 1;  i <= len;  i++) {

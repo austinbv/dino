@@ -6,7 +6,7 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-shift_register = Dino::Components::ShiftRegisterOut.new(pins: {data: 11, latch: 8, clock: 12}, board: board)
+shift_register = Dino::Components::Register::ShiftOut.new(pins: {data: 11, latch: 8, clock: 12}, board: board)
 
 # Write a single byte
 shift_register.write(255)

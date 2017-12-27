@@ -6,7 +6,7 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-shift_register = Dino::Components::ShiftRegisterIn.new(bytes: 1, preclock_high: true, pins: {data: 14, latch: 15, clock: 16}, board: board)
+shift_register = Dino::Components::Register::ShiftIn.new(bytes: 1, preclock_high: true, pins: {data: 14, latch: 15, clock: 16}, board: board)
 
 button = Dino::Components::Button.new(pin: 7, board: shift_register)
 
