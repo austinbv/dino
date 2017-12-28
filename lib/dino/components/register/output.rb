@@ -39,6 +39,7 @@ module Dino
         #
         include Mixins::BoardProxy
         def digital_write(pin, value)
+          # puts @state.inspect
           @state[pin] = value
           delayed_write(@state)
         end

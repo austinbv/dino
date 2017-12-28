@@ -4,6 +4,9 @@ module Dino
       class ShiftIn
         include Input
         #
+        # Model registers that use the arduino shift functions as multi-pin
+        # components, specifying clock, data and latch pins.
+        #
         # options = {board: my_board, pins: {clock: clock_pin, latch: latch_pin, data: data_pin}
         #
         include Setup::MultiPin

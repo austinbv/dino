@@ -62,8 +62,9 @@ class Dino {
     void irSend                ();         //cmd = 16
     void tone                  ();         //cmd = 20
     void noTone                ();         //cmd = 21
-    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte data[]);         //cmd = 22
+    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte *data);          //cmd = 22
     void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 23
+    void writeSPI              (int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data);     //cmd = 24
     void readSPI               (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 25
     void reset                 ();  //cmd = 90
     void setAnalogResolution   ();  //cmd = 96

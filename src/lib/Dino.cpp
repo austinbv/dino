@@ -114,7 +114,8 @@ void Dino::process() {
     // auxMsg[0]   = SPI mode (byte)
     // auxMsg[1-4] = clock frequency (uint32_t as 4 bytes)
     // auxMsg[5]+  = data (bytes) (write func only)
-    case 25: readSPI    (pin, val, auxMsg[0], (uint32_t)auxMsg[1]); break;
+    case 24: writeSPI   (pin, val, auxMsg[0], (uint32_t)auxMsg[1], &auxMsg[5]); break;
+    case 25: readSPI    (pin, val, auxMsg[0], (uint32_t)auxMsg[1]            ); break;
 
     case 90: reset               ();  break;
     case 96: setAnalogResolution ();  break;
@@ -407,7 +408,7 @@ void Dino::noTone() {
 
 // CMD = 22
 // Write to a shift register.
-void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte data[]) {
+void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte *data) {
   // Set latch pin low to begin serial write.
   digitalWrite(latchPin, LOW);
 
@@ -454,6 +455,42 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
   // Leave latch pin high and clear response so main loop doesn't send anything.
   digitalWrite(latchPin, HIGH);
   response[0] = "\0";
+}
+
+
+// CMD = 24
+// Write to an SPI device.
+void Dino::writeSPI(int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data) {
+  // Start the SPI library if it isn't already being used by the main sketch.
+  SPI.begin();
+
+  // Set the mode we want.
+  switch(spiMode) {
+    case 0:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE0)); break;
+    case 1:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE1)); break;
+    case 2:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE2)); break;
+    case 3:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE3)); break;
+  }
+
+  // Select the device.
+  digitalWrite(selectPin, LOW);
+
+  // Write one byte at a time.
+  for (uint8_t i = 0;  i < len;  i++) {
+    SPI.transfer(data[i]);
+  }
+
+  // End the SPI transaction, and then library if not in use by main sketch.
+  SPI.endTransaction();
+
+  // TXRX_SPI is set to false in Dino.h.
+  // CLI generator will auto set to true for any sketch other than serial.
+  #if !(TXRX_SPI)
+    SPI.end();
+  #endif
+
+  // Leave select high.
+  digitalWrite(selectPin, HIGH);
 }
 
 

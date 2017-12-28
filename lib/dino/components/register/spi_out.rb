@@ -1,8 +1,8 @@
 module Dino
   module Components
     module Register
-      class SPIIn < Select
-        include Input
+      class SPIOut < Select
+        include Output
         #
         # Model SPI registers as single pin. Data comes back on the select pin,
         # so just inherit from Select.
@@ -11,24 +11,26 @@ module Dino
         #
 
         def after_initialize(options={})
-          super(options) if defined?(super)
-
           # Save SPI device settings in instance variables.
-          @spi_mode  = options[:spi_mode]  || 0
+          @spi_mode  = options[:spi_mode] || 0
 
           # No default value for clock frequency.
           raise 'SPI clock rate (Hz) required in :frequency option' unless options[:frequency]
           @frequency = options[:frequency]
+
+          super(options) if defined?(super)
         end
 
         #
-        # Read using a call to the native SPI library.
+        # Write using a call to the native SPI library.
         #
-        def read
+        def write(*bytes)
           # Pack the extra parameters we need to send in the aux message then send.
-          start_address = 0
-          aux = "#{[start_address, @spi_mode].pack('C*')}#{[@frequency].pack('V')}"
-          board.write Dino::Message.encode(command: 25, pin: pin, value: @bytes, aux_message: aux)
+          aux = bytes.flatten
+          length = aux.count
+          aux = "#{[@spi_mode].pack('C')}#{[@frequency].pack('V')}#{aux.pack('C*')}"
+
+          board.write Dino::Message.encode(command: 24, pin: pin, value: length, aux_message: aux)
         end
       end
     end
