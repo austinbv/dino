@@ -68,6 +68,21 @@ void setup() {
   dino.setupWrite(writeCallback);
 }
 
+
+// Keep count of bytes as we receive them and send a dino message with how many.
+uint8_t rcvBytes  = 0;
+uint8_t rcvBuffer = 60;
+long    lastRcv   = micros();
+long    rcvWindow = 1000000;
+
+void acknowledge() {
+  client.write("RCV:");
+  client.write(rcvBytes);
+  client.write("\n");
+  rcvBytes = 0;
+}
+
+
 void loop() {
   // Listen for connections.
   client = server.available();
@@ -75,7 +90,18 @@ void loop() {
   // Handle a connection.
   if (client) {
     while (client.connected()) {
-      while (client.available()) dino.parse(client.read());
+      while (client.available()){
+        dino.parse(client.read());
+
+        // Acknowledge when we've received as many bytes as the serial input buffer.
+        lastRcv = micros();
+        rcvBytes ++;
+        if (rcvBytes == rcvBuffer) acknowledge();
+      }
+
+      // Also acknowledge when the last byte received goes outside the receive window.
+      if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
+
       dino.updateListeners();
       writeResponses();
     }

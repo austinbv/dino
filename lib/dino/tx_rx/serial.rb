@@ -10,13 +10,10 @@ module Dino
         @baud = options[:baud] || BAUD
       end
 
-      def write(message)
-        io.write(message)
-      end
-
     private
 
       def connect
+        # ::Serial calls the rubyserial gem here.
         tty_devices.each { |device| return ::Serial.new(device, @baud) rescue nil }
         raise BoardNotFound
       end
@@ -29,6 +26,10 @@ module Dino
 
       def on_windows?
         RUBY_PLATFORM.match /mswin|mingw/i
+      end
+
+      def io_write(message)
+        io.write(message)
       end
 
       def gets(timeout=0)

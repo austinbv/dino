@@ -17,6 +17,7 @@ Dino dino;
   HardwareSerial &serial = Serial;
 #endif
 
+
 // Dino.h doesn't handle TXRX. Create a callback so it can write to serial.
 void writeResponse(char *response) { serial.print(response); }
 void (*writeCallback)(char *str) = writeResponse;
@@ -32,7 +33,34 @@ void setup() {
   dino.setupWrite(writeCallback);
 }
 
+
+// Keep count of bytes as we receive them and send a dino message with how many.
+uint8_t rcvBytes  = 0;
+uint8_t rcvBuffer = 60;
+long    lastRcv   = micros();
+long    rcvWindow = 1000000;
+
+void acknowledge() {
+  serial.print("RCV:");
+  serial.print(rcvBytes);
+  serial.print("\n");
+  rcvBytes = 0;
+}
+
+
 void loop() {
-  while(serial.available() > 0) dino.parse(serial.read());
+  while(serial.available() > 0) {
+    dino.parse(serial.read());
+
+    // Acknowledge when we've received as many bytes as the serial input buffer.
+    lastRcv = micros();
+    rcvBytes ++;
+    if (rcvBytes == rcvBuffer) acknowledge();
+  }
+
+  // Also acknowledge when the last byte received goes outside the receive window.
+  if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
+
+  // Run dino's listeners.
   dino.updateListeners();
 }

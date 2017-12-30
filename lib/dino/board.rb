@@ -9,6 +9,7 @@ module Dino
 
       @analog_zero, @dac_zero = @io.handshake.to_s.split(",").map { |pin| pin.to_i }
       self.analog_resolution = options[:bits]
+      start_read
     end
 
     def analog_resolution=(value)

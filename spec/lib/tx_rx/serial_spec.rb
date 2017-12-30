@@ -56,7 +56,7 @@ module Dino
         expect(subject).to receive(:gets).and_return("02:00")
         expect(subject).to receive(:changed).and_return(true)
         expect(subject).to receive(:notify_observers).with('02','00')
-        subject._read
+        subject.send(:_read)
       end
     end
 
@@ -81,8 +81,11 @@ module Dino
       it 'should write to the device' do
         expect(subject).to receive(:io).and_return(mock_serial = double)
         expect(mock_serial).to receive(:write).with('a message')
+        subject.send(:initialize_flow_control)
         subject.write('a message')
       end
+
+      it 'should break up messages larger than the board input buffer'
     end
 
     describe '#gets' do

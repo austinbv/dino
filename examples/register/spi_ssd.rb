@@ -18,7 +18,7 @@ shift_register = Dino::Components::Register::SPIOut.new  board: board,
                                                          spi_mode: 3
 
 ssd = Dino::Components::SSD.new   board: shift_register,
-                                 pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
+                                  pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
 # Turn off the ssd on exit
 trap("SIGINT") { exit !ssd.off }

@@ -7,21 +7,21 @@ module Dino
         @host, @port = host, port
       end
 
-      def write(message)
-        loop do
-          if IO.select(nil, [io], nil)
-            io.syswrite(message)
-            break
-          end
-        end
-      end
-
     private
 
       def connect
         Timeout::timeout(10) { TCPSocket.open(@host, @port) }
       rescue
         raise BoardNotFound
+      end
+
+      def io_write(message)
+        loop do
+          if IO.select(nil, [io], nil)
+            io.syswrite(message)
+            break
+          end
+        end
       end
 
       def gets(timeout=0.005)
