@@ -54,7 +54,6 @@ module Dino
     private
 
       def synced_write(message)
-        puts "currently #{@transit_bytes} in transit"
         message = message.split("")
         loop do
           @flow_control.synchronize do
