@@ -17,7 +17,7 @@ module Dino
 
         def remove_callback(key=nil)
           @callback_mutex.synchronize {
-            key ? @callbacks[key] = [] : @callbacks = {}
+            key ? @callbacks.delete(key) : @callbacks = {}
           }
         end
 
@@ -29,8 +29,9 @@ module Dino
             @callbacks.each_value do |array|
               array.each { |callback| callback.call(data) }
             end
+            # Remove the special :read callback while still inside the lock.
+            @callbacks.delete(:read)
           }
-          remove_callback :read
           @state = data
         end
       end

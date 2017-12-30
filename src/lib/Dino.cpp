@@ -107,7 +107,6 @@ void Dino::process() {
     // auxMsg[3]+ = data (bytes) (write func only)
     case 22: shiftWrite (pin, val, auxMsg[0], auxMsg[1], &auxMsg[3]);  break;
     case 23: shiftRead  (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);   break;
-
     // Request format for single direction SPI functions.
     // pin         = slave select pin (int)
     // val         = length (int)
@@ -116,8 +115,16 @@ void Dino::process() {
     // auxMsg[5]+  = data (bytes) (write func only)
     case 24: writeSPI   (pin, val, auxMsg[0], (uint32_t)auxMsg[1], &auxMsg[5]); break;
     case 25: readSPI    (pin, val, auxMsg[0], (uint32_t)auxMsg[1]            ); break;
+    // These add listeners for both shift in and SPI registers.
+    // They mirror the read function interfaces of the respective devices.
+    case 26: addShiftListener(pin, val, auxMsg[0], auxMsg[1], auxMsg[2]); break;
+    case 27: addSPIListener  (pin, val, auxMsg[0], (uint32_t)auxMsg[1]);  break;
+    // This removes either type of listener and frees its space in the cache.
+    // The only input it needs is the select/latch pin.
+    case 28: removeRegisterListener();
 
     case 90: reset               ();  break;
+    case 95: setAnalogDivider    ();  break;
     case 96: setAnalogResolution ();  break;
     case 97: setAnalogDivider    ();  break;
     case 98: setHeartRate        ();  break;
@@ -149,7 +156,8 @@ void Dino::updateListeners() {
     lastUpdate = micros();
     loopCount++;
     updateDigitalListeners();
-    if (loopCount % analogDivider == 0) updateAnalogListeners();
+    if (loopCount % registerDivider == 0) updateRegisterListeners();
+    if (loopCount % analogDivider   == 0) updateAnalogListeners();
   }
 }
 void Dino::updateDigitalListeners() {
@@ -160,6 +168,25 @@ void Dino::updateDigitalListeners() {
         digitalListenerValues[i] = rval;
         writeResponse();
       }
+    }
+  }
+}
+void Dino::updateRegisterListeners() {
+  for (int i = 0; i < SPI_LISTENER_COUNT; i++) {
+    if (spiListeners[i].enabled) {
+      readSPI(spiListeners[i].selectPin,
+              spiListeners[i].len,
+              spiListeners[i].spiMode,
+              spiListeners[i].clockRate);
+    }
+  }
+  for (int i = 0; i < SHIFT_LISTENER_COUNT; i++) {
+    if (shiftListeners[i].enabled) {
+      shiftRead(shiftListeners[i].latchPin,
+                shiftListeners[i].len,
+                shiftListeners[i].dataPin,
+                shiftListeners[i].clockPin,
+                shiftListeners[i].clockHighFirst);
     }
   }
 }
@@ -543,18 +570,82 @@ void Dino::readSPI(int selectPin, int len, byte spiMode, uint32_t clockRate) {
   response[0] = "\0";
 }
 
+// CMD = 26
+// Start listening to a register using the Arduino shiftIn function.
+// Overwrite the first disabled listener in the struct array.
+void Dino::addShiftListener(int latchPin, int len, byte dataPin, byte clockPin, byte clockHighFirst) {
+  for (int i = 0;  i < SHIFT_LISTENER_COUNT;  i++) {
+    if (shiftListeners[i].enabled == false) {
+      shiftListeners[i] = {
+        latchPin,
+        len,
+        dataPin,
+        clockPin,
+        clockHighFirst,
+        true
+      };
+      return;
+    } else {
+    // Should send some kind of error if all are in use.
+    }
+  }
+}
+
+// CMD = 26
+// Start listening to an SPI register.
+// Overwrite the first disabled listener in the struct array.
+void Dino::addSPIListener(int selectPin, int len, byte spiMode, uint32_t clockRate) {
+  for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
+    if (spiListeners[i].enabled == false) {
+      spiListeners[i] = {
+        selectPin,
+        len,
+        spiMode,
+        clockRate,
+        true
+      };
+      return;
+    } else {
+    // Should send some kind of error if all are in use.
+    }
+  }
+}
+
+
+// CMD = 27
+// Send a number for a select/latch pin to remove either type of register listener.
+void Dino::removeRegisterListener() {
+  for (int i = 0;  i < SHIFT_LISTENER_COUNT;  i++) {
+    if (shiftListeners[i].latchPin == pin) {
+      shiftListeners[i].enabled = false;
+    }
+  }
+  for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
+    if (spiListeners[i].selectPin == pin) {
+      spiListeners[i].enabled = false;
+    }
+  }
+}
+
 
 // CMD = 90
 void Dino::reset() {
-  heartRate = 4000; // Default heartRate is ~4ms.
-  loopCount = 0;
-  analogDivider = 4; // Update analog listeners every ~16ms.
+  // Clear the analog and digital pin listeners.
   for (int i = 0; i < PIN_COUNT; i++) digitalListeners[i] = false;
   for (int i = 0; i < PIN_COUNT; i++) digitalListenerValues[i] = 2;
-  for (int i = 0; i < PIN_COUNT; i++)  analogListeners[i] = false;
-  lastUpdate = micros();
+  for (int i = 0; i < PIN_COUNT; i++) analogListeners[i] = false;
+
+  // Disable the register listeners.
+  for (int i = 0; i < SHIFT_LISTENER_COUNT; i++) shiftListeners[i].enabled = false;
+  for (int i = 0; i < SPI_LISTENER_COUNT; i++)   spiListeners[i].enabled = false;
+
+  heartRate = 4000; // Update digital listeners every ~4ms.
+  analogDivider   = 4; // Update analog listeners every ~16ms.
+  registerDivider = 2; // Update register listeners every ~8ms.
   fragmentIndex = 0;
   charIndex = 0;
+  loopCount = 0;
+  lastUpdate = micros();
 
   #if defined(__SAM3X8E__)
     sprintf(response, "ACK:%d,%d", A0, DAC0);
@@ -563,15 +654,18 @@ void Dino::reset() {
   #endif
 }
 
-// CMD = 97
+// CMD = 95
+// Set the register read divider. Powers of 2 up to 128 are valid.
+void Dino::setRegisterDivider() {
+  registerDivider = val;
+}
+
+// CMD = 96
 // Set the analog read and write resolution.
 void Dino::setAnalogResolution() {
   #if defined(__SAM3X8E__)
     analogReadResolution(val);
     analogWriteResolution(val);
-    #ifdef debug
-      Serial.print("Analog R/W resolution set to "); Serial.println(val);
-    #endif
   #endif
 }
 
@@ -579,16 +673,10 @@ void Dino::setAnalogResolution() {
 // Set the analog divider. Powers of 2 up to 128 are valid.
 void Dino::setAnalogDivider() {
   analogDivider = val;
-  #ifdef debug
-    Serial.print("Analog divider set to "); Serial.println(analogDivider);
-  #endif
 }
 
 // CMD = 98
 // Set the heart rate in milliseconds. Store it in microseconds.
 void Dino::setHeartRate() {
   heartRate = atoi(auxMsg);
-  #ifdef debug
-    Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
-  #endif
 }

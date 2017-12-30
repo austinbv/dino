@@ -7,7 +7,7 @@ module Dino
         def read(&block)
           add_callback(:read, &block) if block_given?
           _read
-          loop { break if !@callbacks[:read] || @callbacks[:read].empty? }
+          loop { break if !@callbacks[:read] }
         end
 
         #

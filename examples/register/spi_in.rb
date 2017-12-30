@@ -34,7 +34,7 @@ button = Dino::Components::Button.new(pin: 0, board: shift_register)
 button.down { puts "down"}
 button.up   { puts "up"  }
 
-loop do
-  button.read
-  sleep 0.1
-end
+# Force callbacks to run at least once for the initial state.
+button.read
+
+sleep

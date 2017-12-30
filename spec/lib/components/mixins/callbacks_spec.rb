@@ -52,8 +52,8 @@ module Dino
 
             it 'should remove only callbacks for a specific key given' do
               subject.remove_callbacks(:read)
-              expect(subject.instance_variable_get(:@callbacks)[:read]).to eq([])
-              expect(subject.instance_variable_get(:@callbacks)[:persistent]).to_not eq([])
+              expect(subject.instance_variable_get(:@callbacks)[:read]).to eq(nil)
+              expect(subject.instance_variable_get(:@callbacks)[:persistent]).to_not eq(nil)
             end
           end
 
@@ -71,7 +71,7 @@ module Dino
 
             it 'should remove any callbacks saved with the key :read' do
               subject.update("data")
-              expect(subject.instance_variable_get(:@callbacks)[:read]).to eq([])
+              expect(subject.instance_variable_get(:@callbacks)[:read]).to eq(nil)
             end
           end
         end

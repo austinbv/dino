@@ -18,4 +18,7 @@ button.up do
   puts "button up"
 end
 
+# Force callbacks to run at least once for the initial state.
+button.read
+
 sleep

@@ -32,6 +32,10 @@
 #  define SERVO_OFFSET 2
 #endif
 
+// Allocate listener storage for serial registers.
+#define SPI_LISTENER_COUNT 4
+#define SHIFT_LISTENER_COUNT 4
+
 // Uncomment this line to enable debugging mode.
 // #define debug true
 
@@ -66,10 +70,20 @@ class Dino {
     void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 23
     void writeSPI              (int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data);     //cmd = 24
     void readSPI               (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 25
+    void addShiftListener      (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 26
+    void addSPIListener        (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 27
+    void removeRegisterListener();                                                                         //cmd = 28
     void reset                 ();  //cmd = 90
+    void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
     void setHeartRate          ();  //cmd = 98
+
+    // Serial flow control variables.
+    uint8_t rcvBytes = 0;
+    uint8_t rcvBuffer = 60;
+    long    lastRcv = micros();
+    long    rcvWindow  = 1000000;
 
     // Parser state storage and utility functions.
     char *messageFragments[4];
@@ -102,17 +116,40 @@ class Dino {
     long lastUpdate;
     unsigned int loopCount;
     unsigned int analogDivider;
+    unsigned int registerDivider;
     long timeSince (long event);
 
     // Listeners correspond to raw pin number by array index, and store boolean. false == disabled.
     boolean analogListeners[PIN_COUNT];
     boolean digitalListeners[PIN_COUNT];
 
+    // Create listeners for SPI registers.
+    struct spiListener{
+      byte     selectPin;
+      byte     len;
+      byte     spiMode;
+      uint32_t clockRate;
+      boolean  enabled;
+    };
+    spiListener spiListeners[SPI_LISTENER_COUNT];
+
+    // Create listeners for ShiftIn registers.
+    struct shiftListener{
+      byte     latchPin;
+      byte     len;
+      byte     dataPin;
+      byte     clockPin;
+      byte     clockHighFirst;
+      boolean  enabled;
+    };
+    shiftListener shiftListeners[SHIFT_LISTENER_COUNT];
+
     // Keep track of the last read values for digital listeners. Only write responses when changed.
     byte digitalListenerValues[PIN_COUNT];
 
     // Listener update functions.
-    void updateDigitalListeners ();
-    void updateAnalogListeners  ();
+    void updateDigitalListeners  ();
+    void updateRegisterListeners ();
+    void updateAnalogListeners   ();
 };
 #endif
