@@ -1,3 +1,6 @@
 [submodule "src/vendor/Arduino-IRremote"]
 	path = src/vendor/Arduino-IRremote
 	url = https://github.com/vickash/Arduino-IRremote.git
+[submodule "src/vendor/I2C-Master-Library"]
+	path = src/vendor/I2C-Master-Library
+	url = https://github.com/vickash/I2C-Master-Library.git

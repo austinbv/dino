@@ -13,6 +13,7 @@
 #include "DHT.h"
 #include "OneWire.h"
 #include "IRremote.h"
+#include "I2C.h"
 
 // SoftwareSerial doesn't work on the Due yet.
 #if !defined(__SAM3X8E__)
@@ -43,7 +44,7 @@ class Dino {
   public:
     Dino();
     void setupWrite(void (*writeCallback)(char *str));
-    void parse(char c);
+    void parse(byte c);
     void updateListeners();
 
   private:
@@ -73,6 +74,11 @@ class Dino {
     void addShiftListener      (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 26
     void addSPIListener        (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 27
     void removeRegisterListener();                                                                         //cmd = 28
+    void i2cBegin              (); //cmd = 30
+    void i2cEnd                (); //cmd = 31
+    void i2cScan               (); //cmd = 32
+    void i2cWrite              (); //cmd = 33
+    void i2cRead               (); //cmd = 34
     void reset                 ();  //cmd = 90
     void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
@@ -90,7 +96,7 @@ class Dino {
     byte fragmentIndex;
     int charIndex;
     boolean backslash;
-    void append(char c);
+    void append(byte c);
     void process();
 
     // Parsed message storage.

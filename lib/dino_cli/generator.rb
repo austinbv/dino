@@ -16,7 +16,10 @@ class DinoCLI::Generator
                     "vendor/Arduino-IRremote/IRremote.cpp",
                     "vendor/Arduino-IRremote/IRremote.h",
                     "vendor/Arduino-IRremote/IRremoteInt.h",
-                    "vendor/Arduino-IRremote/irSend.cpp"
+                    "vendor/Arduino-IRremote/irSend.cpp",
+
+                    "vendor/I2C-Master-Library/I2C.h",
+                    "vendor/I2C-Master-Library/I2C.cpp"
                   ]
 
   attr_accessor :options

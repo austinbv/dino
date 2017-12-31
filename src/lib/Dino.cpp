@@ -26,7 +26,7 @@ Dino::Dino(){
   reset();
 }
 
-void Dino::parse(char c) {
+void Dino::parse(byte c) {
   if ((c == '\n') || (c == '\\')) {
     // If last char was a \, this \ or \n is escaped.
     if(backslash){
@@ -62,7 +62,7 @@ void Dino::parse(char c) {
   else append(c);
 }
 
-void Dino::append(char c) {
+void Dino::append(byte c) {
   messageFragments[fragmentIndex][charIndex++] = c;
 }
 
@@ -122,6 +122,13 @@ void Dino::process() {
     // This removes either type of listener and frees its space in the cache.
     // The only input it needs is the select/latch pin.
     case 28: removeRegisterListener();
+
+    // I2C functions.
+    case 30: i2cBegin            ();  break;
+    case 31: i2cEnd              ();  break;
+    case 32: i2cScan             ();  break;
+    case 33: i2cWrite            ();  break;
+    case 34: i2cRead             ();  break;
 
     case 90: reset               ();  break;
     case 95: setAnalogDivider    ();  break;
@@ -242,7 +249,7 @@ void Dino::dWrite() {
 // CMD = 02 // Digital Read
 void Dino::dRead(int pin) {
   rval = digitalRead(pin);
-  sprintf(response, "%02d:%02d", pin, rval);
+  sprintf(response, "%d:%d", pin, rval);
 }
 
 // CMD = 03 // Analog (PWM) Write
@@ -256,7 +263,7 @@ void Dino::aWrite() {
 // CMD = 04 // Analog Read
 void Dino::aRead(int pin) {
   rval = analogRead(pin);
-  sprintf(response, "%02d:%02d", pin, rval);
+  sprintf(response, "%d:%d", pin, rval);
 }
 
 // CMD = 05
@@ -463,7 +470,7 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
 
   // Send data as if coming from the latch pin so it's easy to identify.
   // Start with just pin number and : for now.
-  sprintf(response, "%02d:", latchPin);
+  sprintf(response, "%d:", latchPin);
   _writeCallback(response);
 
   for (int i = 1;  i <= len;  i++) {
@@ -472,16 +479,16 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
 
     // If we're on the last byte, append \n. If not, append a comma, then write.
     if (i == len) {
-      sprintf(response, "%03d\n", reading);
+      sprintf(response, "%d\n", reading);
     } else {
-      sprintf(response, "%03d,", reading);
+      sprintf(response, "%d,", reading);
     }
     _writeCallback(response);
   }
 
   // Leave latch pin high and clear response so main loop doesn't send anything.
   digitalWrite(latchPin, HIGH);
-  response[0] = "\0";
+  response[0] = '\0';
 }
 
 
@@ -540,7 +547,7 @@ void Dino::readSPI(int selectPin, int len, byte spiMode, uint32_t clockRate) {
 
   // Send data as if coming from the slave select pin so it's easy to identify.
   // Start with just pin number and : for now.
-  sprintf(response, "%02d:", selectPin);
+  sprintf(response, "%d:", selectPin);
   _writeCallback(response);
 
   for (int i = 1;  i <= len;  i++) {
@@ -549,9 +556,9 @@ void Dino::readSPI(int selectPin, int len, byte spiMode, uint32_t clockRate) {
 
     // If we're on the last byte, append \n. If not, append a comma, then write.
     if (i == len) {
-      sprintf(response, "%03d\n", reading);
+      sprintf(response, "%d\n", reading);
     } else {
-      sprintf(response, "%03d,", reading);
+      sprintf(response, "%d,", reading);
     }
     _writeCallback(response);
   }
@@ -567,7 +574,7 @@ void Dino::readSPI(int selectPin, int len, byte spiMode, uint32_t clockRate) {
 
   // Leave select high and clear response so main loop doesn't send anything.
   digitalWrite(selectPin, HIGH);
-  response[0] = "\0";
+  response[0] = '\0';
 }
 
 // CMD = 26
@@ -628,6 +635,109 @@ void Dino::removeRegisterListener() {
 }
 
 
+// CMD = 30
+// Start I2C communication.
+void Dino::i2cBegin() {
+  I2c.begin();
+  // I2c.setSpeed(??);
+  // I2c.pullup(??);
+  // I2c.timeOut(??);
+  sprintf(response, "%d:I2C:1", SDA);
+}
+
+
+// CMD = 31
+// Stop I2C communication.
+void Dino::i2cEnd() {
+  I2c.end();
+  sprintf(response, "%d:I2C:0", SDA);
+}
+
+
+// CMD = 32
+// Scan for I2C devices.
+//
+// WARNING: This takes a long time! Try to record the device addresses
+// results and put them into your code.
+//
+// Returns each found address as if a separate reading from SDA pin, eg. "18:104".
+// Returns 128 as if read from SDA pin for search complete, eg. "18:128".
+// Returns 255 as if read from SDA pin for I2C errors, eg. "18:255".
+//
+void Dino::i2cScan() {
+  uint8_t address = 0;
+  while (address < 128) {
+    // Scan for the next device.
+    address = I2c.scanOne(address);
+
+    // Write whatever we get including address space end or errors.
+    sprintf(response, "%d:%d", SDA, address);
+    writeResponse();
+    address++;
+  }
+  // Clear the response to make sure it doesn't get sent twice.
+  response[0] = '\0';
+}
+
+
+// CMD = 33
+// Write to an I2C device.
+// All parameters need to be sent in binary in the auxMsg.
+//
+// auxMsg[0]  = device address
+// auxMsg[1]  = register start address
+// auxMsg[2]  = number of bytes
+// auxMsg[3]+ = data
+//
+// Limited to 255 bytes. Validate on remote end.
+//
+void Dino::i2cWrite() {
+  I2c.write(auxMsg[0], auxMsg[1], &auxMsg[3], auxMsg[2]);
+}
+
+
+// CMD = 34
+// Read from an I2C device.
+// All params need to be sent in binary in the auxMsg.
+//
+// auxMsg[0]  = device address
+// auxMsg[1]  = register start address
+// auxMsg[2]  = number of bytes
+//
+// Streams data back in comma delimited ASCII decimal for now,
+// matching shiftRead and readSPI. Limited to 32 bytes by I2C library buffer.
+// Validate on remote end.
+//
+void Dino::i2cRead() {
+  // Force length to be min 1, max 32.
+  if (auxMsg[2] > 32) auxMsg[2] = 32;
+  if (auxMsg[2] == 0) auxMsg[2] =  1;
+
+  // Read all the bytes into the library buffer.
+  I2c.read(auxMsg[0], auxMsg[1], auxMsg[2]);
+
+  // Send back the SDA pin, the device address, and start register address first.
+  sprintf(response, "%d:%d:%d:", SDA, auxMsg[0], auxMsg[1]);
+  _writeCallback(response);
+
+  // Send back the data bytes.
+  uint8_t currentByte = 0;
+  while(I2c.available()){
+    currentByte++;
+    // Append comma, but \n for last byte, then write.
+    if (currentByte == auxMsg[2]){
+      sprintf(response, "%d\n", I2c.receive());
+    } else {
+      sprintf(response, "%d,", I2c.receive());
+    }
+    _writeCallback(response);
+  }
+
+  // Clear the response to make sure it doesn't get sent twice.
+  response[0] = '\0';
+}
+
+
 // CMD = 90
 void Dino::reset() {
   // Clear the analog and digital pin listeners.
@@ -637,7 +747,7 @@ void Dino::reset() {
 
   // Disable the register listeners.
   for (int i = 0; i < SHIFT_LISTENER_COUNT; i++) shiftListeners[i].enabled = false;
-  for (int i = 0; i < SPI_LISTENER_COUNT; i++)   spiListeners[i].enabled = false;
+  for (int i = 0; i < SPI_LISTENER_COUNT;   i++) spiListeners[i].enabled = false;
 
   heartRate = 4000; // Update digital listeners every ~4ms.
   analogDivider   = 4; // Update analog listeners every ~16ms.
