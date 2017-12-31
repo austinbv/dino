@@ -58,6 +58,13 @@ module Dino
         expect(subject).to receive(:notify_observers).with('02','00')
         subject.send(:_read)
       end
+
+      it 'should not split messages into more than 2 parts on :' do
+        expect(subject).to receive(:gets).and_return("02:00:00")
+        expect(subject).to receive(:changed).and_return(true)
+        expect(subject).to receive(:notify_observers).with('02','00:00')
+        subject.send(:_read)
+      end
     end
 
     describe '#read' do

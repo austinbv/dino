@@ -80,7 +80,7 @@ module Dino
 
       def process_line(line)
         if line.match(/\A\d+:/)
-          pin, message = line.split(/:/)
+          pin, message = line.split(":", 2)
           pin && message && changed && notify_observers(pin, message)
         elsif line.match(/\ARCV:/)
           # This is acknowledgement from the board that bytes have been read
