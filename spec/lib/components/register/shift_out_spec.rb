@@ -23,13 +23,13 @@ module Dino
           before(:each) { subject }
 
           it 'should send message for single byte in the request format the board expects' do
-            expect(board).to receive(:write).with "22.8.1.#{[11,12,0,255].pack('C*')}\n"
+            expect(board).to receive(:write).with "21.8.1.#{[11,12,0,255].pack('C*')}\n"
 
             subject.write(255)
           end
 
           it 'should send message for array of bytes in the request format the board expects' do
-            expect(board).to receive(:write).with "22.8.2.#{[11,12,0,255,0].pack('C*')}\n"
+            expect(board).to receive(:write).with "21.8.2.#{[11,12,0,255,0].pack('C*')}\n"
 
             subject.write([255,0])
           end

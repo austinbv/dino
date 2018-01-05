@@ -28,19 +28,19 @@ module Dino
           # Pack the extra parameters we need to send in the aux message then send.
           start_address = 0
           aux = "#{[start_address, @spi_mode].pack('C*')}#{[@frequency].pack('V')}"
-          board.write Dino::Message.encode(command: 25, pin: pin, value: @bytes, aux_message: aux)
+          board.write Dino::Message.encode(command: 27, pin: pin, value: @bytes, aux_message: aux)
         end
 
         def listen
           # Pack the extra parameters we need to send in the aux message then send.
           start_address = 0
           aux = "#{[start_address, @spi_mode].pack('C*')}#{[@frequency].pack('V')}"
-          board.write Dino::Message.encode(command: 27, pin: pin, value: @bytes, aux_message: aux)
+          board.write Dino::Message.encode(command: 28, pin: pin, value: @bytes, aux_message: aux)
         end
 
         def stop
           # Just need to send the select pin to stop listening.
-          board.write Dino::Message.encode(command: 28, pin: pin)
+          board.write Dino::Message.encode(command: 29, pin: pin)
         end
       end
     end

@@ -40,19 +40,19 @@ module Dino
           before(:each) { subject }
 
           it 'should send message for single byte in the request format the board expects' do
-            expect(board).to receive(:write).with "23.8.1.#{[11,12,0].pack('C*')}\n"
+            expect(board).to receive(:write).with "22.8.1.#{[11,12,0].pack('C*')}\n"
             subject.read
           end
 
           it 'should request the correct number of bytes to be read' do
             subject = ShiftIn.new(options.merge(bytes: 2))
-            expect(board).to receive(:write).with "23.8.2.#{[11,12,0].pack('C*')}\n"
+            expect(board).to receive(:write).with "22.8.2.#{[11,12,0].pack('C*')}\n"
             subject.read
           end
 
           it 'should request clock pin to go high before reading if set' do
             subject = ShiftIn.new(options.merge(preclock_high: 1))
-            expect(board).to receive(:write).with "23.8.1.#{[11,12,1].pack('C*')}\n"
+            expect(board).to receive(:write).with "22.8.1.#{[11,12,1].pack('C*')}\n"
             subject.read
           end
         end

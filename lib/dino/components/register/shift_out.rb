@@ -24,7 +24,7 @@ module Dino
 
           # Prepend parameters we need to send in the aux message then pack and send.
           aux = [data.pin, clock.pin, 0].concat(aux).pack('C*')
-          board.write Dino::Message.encode(command: 22, pin: latch.pin, value: length, aux_message: aux)
+          board.write Dino::Message.encode(command: 21, pin: latch.pin, value: length, aux_message: aux)
         end
       end
     end

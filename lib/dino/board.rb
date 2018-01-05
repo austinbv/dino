@@ -69,6 +69,7 @@ module Dino
     end
 
     PIN_COMMANDS = {
+      # set_pin_mode:  '0'
       digital_write:   '1',
       digital_read:    '2',
       analog_write:    '3',
@@ -78,10 +79,15 @@ module Dino
       stop_listener:   '7',
       servo_toggle:    '8',
       servo_write:     '9',
+      # LCD            '10'
+      # Unused         '11'
+      # SoftSerial     '12'
       dht_read:        '13',
+      # HCSR04         '14'
       ds18b20_read:    '15',
-      tone:            '20',
-      no_tone:         '21'
+      # IR send:       '16'
+      tone:            '17',
+      no_tone:         '18'
     }
 
     PIN_COMMANDS.each_key do |command|

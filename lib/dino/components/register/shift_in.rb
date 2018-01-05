@@ -35,18 +35,18 @@ module Dino
         def read
           # Pack the extra parameters we need to send in the aux message then send.
           aux = [data.pin, clock.pin, @preclock_high].pack('C*')
-          board.write Dino::Message.encode(command: 23, pin: latch.pin, value: @bytes, aux_message: aux)
+          board.write Dino::Message.encode(command: 22, pin: latch.pin, value: @bytes, aux_message: aux)
         end
 
         def listen
           # Pack the extra parameters we need to send in the aux message then send.
           aux = [data.pin, clock.pin, @preclock_high].pack('C*')
-          board.write Dino::Message.encode(command: 26, pin: latch.pin, value: @bytes, aux_message: aux)
+          board.write Dino::Message.encode(command: 23, pin: latch.pin, value: @bytes, aux_message: aux)
         end
 
         def stop
           # Just need to send the latch pin to stop listening.
-          board.write Dino::Message.encode(command: 28, pin: latch.pin)
+          board.write Dino::Message.encode(command: 24, pin: latch.pin)
         end
       end
     end

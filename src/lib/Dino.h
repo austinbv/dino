@@ -1,44 +1,37 @@
 /*
   Library for dino ruby gem.
 */
-
 #ifndef Dino_h
 #define Dino_h
-#define TXRX_SPI false
+#include <Arduino.h>
 
-#include "Arduino.h"
-#include <Servo.h>
-#include <SPI.h>
-#include "DinoLCD.h"
-#include "DHT.h"
-#include "OneWire.h"
-#include "IRremote.h"
-#include "I2C.h"
-
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-  #include "DinoSerial.h"
-#endif
-
-
-// Allocate listener storage based on what board we're running.
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#  define PIN_COUNT 70
-#  define SERVO_OFFSET 22
-#elif defined(__SAM3X8E__)
-#  define PIN_COUNT 66
-#  define SERVO_OFFSET 22
-#else
-#  define PIN_COUNT 22
-#  define SERVO_OFFSET 2
-#endif
-
-// Allocate listener storage for serial registers.
-#define SPI_LISTENER_COUNT 4
-#define SHIFT_LISTENER_COUNT 4
+// If using Wi-Fi or Ethernet shield, uncomment this to let the SPI library know.
+// #define TXRX_SPI
 
 // Uncomment this line to enable debugging mode.
-// #define debug true
+// #define debug
+
+// Comment these out to exclude default features.
+// Arduino Due cannot use: SERIAL, IR, TONE, I2C
+#define DINO_SERVO
+#define DINO_LCD
+#define DINO_SERIAL
+#define DINO_DHT
+#define DINO_ONE_WIRE
+#define DINO_IR_OUT
+// #define DINO_TONE
+#define DINO_SHIFT
+#define DINO_SPI
+#define DINO_I2C
+
+// Figure out how many pins our hardware has.
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#  define PIN_COUNT 70
+#elif defined(__SAM3X8E__)
+#  define PIN_COUNT 66
+#else
+#  define PIN_COUNT 22
+#endif
 
 class Dino {
   public:
@@ -48,45 +41,78 @@ class Dino {
     void updateListeners();
 
   private:
-    // API-accessible functions.
+    // Functions with a cmd value can be called through the remote API.
+
+    // See explanation at top of DinoBugWorkaround.cpp
+    void bugWorkaround();
+
+    // Core IO Functions
     void setMode               ();         //cmd = 0
     void dWrite                ();         //cmd = 1
     void dRead                 (int pin);  //cmd = 2
     void aWrite                ();         //cmd = 3
     void aRead                 (int pin);  //cmd = 4
+
+    // Core IO Listeners
     void addDigitalListener    ();         //cmd = 5
     void addAnalogListener     ();         //cmd = 6
     void removeListener        ();         //cmd = 7
+    void updateDigitalListeners();
+    void updateAnalogListeners ();
+    void clearDigitalListeners ();
+    void clearAnalogListeners  ();
+    // Listener State and Storage
+    // Array indices mapped to board pins. true = listener enabled on that pin.
+    // Cache last value for digital listeners and only send on change.
+    boolean analogListeners[PIN_COUNT];
+    boolean digitalListeners[PIN_COUNT];
+    byte digitalListenerValues[PIN_COUNT];
+
+    // Included Libraries
     void servoToggle           ();         //cmd = 8
     void servoWrite            ();         //cmd = 9
     void handleLCD             ();         //cmd = 10
-    void shiftWrite            ();         //cmd = 11
     void handleSerial          ();         //cmd = 12
-    void handleDHT             ();         //cmd = 13
+    void dhtRead               ();         //cmd = 13
     void ds18Read              ();         //cmd = 15
     void irSend                ();         //cmd = 16
-    void tone                  ();         //cmd = 20
-    void noTone                ();         //cmd = 21
-    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte *data);          //cmd = 22
-    void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 23
-    void writeSPI              (int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data);     //cmd = 24
-    void readSPI               (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 25
-    void addShiftListener      (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 26
-    void addSPIListener        (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 27
-    void removeRegisterListener();                                                                         //cmd = 28
-    void i2cBegin              (); //cmd = 30
-    void i2cEnd                (); //cmd = 31
-    void i2cScan               (); //cmd = 32
-    void i2cWrite              (); //cmd = 33
-    void i2cRead               (); //cmd = 34
+    void tone                  ();         //cmd = 17
+    void noTone                ();         //cmd = 18
+
+    // Shift Registers
+    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte *data);          //cmd = 21
+    void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 22
+    void addShiftListener      (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 23
+    void removeShiftListener   ();                                                                         //cmd = 24
+    void updateShiftListeners    ();
+    void clearShiftListeners     ();
+
+    // SPI
+    void spiBegin              (byte spiMode, uint32_t clockRate);
+    void spiEnd                ();
+    void spiWrite              (int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data);     //cmd = 26
+    void spiRead               (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 27
+    void addSpiListener        (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 28
+    void removeSpiListener     ();                                                                         //cmd = 29
+    void updateSpiListeners    ();
+    void clearSpiListeners     ();
+
+    // I2C
+    void i2cBegin              (); //cmd = 31
+    void i2cEnd                (); //cmd = 32
+    void i2cScan               (); //cmd = 33
+    void i2cWrite              (); //cmd = 34
+    void i2cRead               (); //cmd = 35
+
+    // API access to timings, resolutions and reset.
     void reset                 ();  //cmd = 90
     void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
     void setHeartRate          ();  //cmd = 98
-    
+
     // Parser state storage and utility functions.
-    char *messageFragments[4];
+    byte *messageFragments[4];
     byte fragmentIndex;
     int charIndex;
     boolean backslash;
@@ -94,22 +120,27 @@ class Dino {
     void process();
 
     // Parsed message storage.
-    char cmdStr[5]; int cmd;
-    char pinStr[5]; int pin;
-    char valStr[5]; int val;
-    byte auxMsg[512];
+    byte cmdStr[5]; int cmd;
+    byte pinStr[5]; int pin;
+    byte valStr[5]; int val;
+    // Scale aux message allocation based on enabled features.
+    #if defined(DINO_IR_OUT)
+      byte auxMsg[528];
+    #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
+      byte auxMsg[272];
+    #elif defined (DINO_LCD)
+      byte auxMsg[144];
+    #else
+      byte auxMsg[48];
+    #endif
 
     // Value and response storage.
     int rval;
     char response[16];
-    char newline[2];
 
     // Use a write callback from the main sketch to respond.
     void (*_writeCallback)(char *str);
     void writeResponse();
-
-    // Arduino native library variables.
-    Servo servos[12];
 
     // Internal timing variables and utility functions.
     long heartRate;
@@ -118,38 +149,5 @@ class Dino {
     unsigned int analogDivider;
     unsigned int registerDivider;
     long timeSince (long event);
-
-    // Listeners correspond to raw pin number by array index, and store boolean. false == disabled.
-    boolean analogListeners[PIN_COUNT];
-    boolean digitalListeners[PIN_COUNT];
-
-    // Create listeners for SPI registers.
-    struct spiListener{
-      byte     selectPin;
-      byte     len;
-      byte     spiMode;
-      uint32_t clockRate;
-      boolean  enabled;
-    };
-    spiListener spiListeners[SPI_LISTENER_COUNT];
-
-    // Create listeners for ShiftIn registers.
-    struct shiftListener{
-      byte     latchPin;
-      byte     len;
-      byte     dataPin;
-      byte     clockPin;
-      byte     clockHighFirst;
-      boolean  enabled;
-    };
-    shiftListener shiftListeners[SHIFT_LISTENER_COUNT];
-
-    // Keep track of the last read values for digital listeners. Only write responses when changed.
-    byte digitalListenerValues[PIN_COUNT];
-
-    // Listener update functions.
-    void updateDigitalListeners  ();
-    void updateRegisterListeners ();
-    void updateAnalogListeners   ();
 };
 #endif

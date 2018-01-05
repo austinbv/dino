@@ -3,10 +3,23 @@ class DinoCLI::Generator
   LIB_FILENAMES =  [
                     "lib/Dino.h",
                     "lib/Dino.cpp",
+                    "lib/DinoCoreIO.cpp",
+                    "lib/DinoIncludes.cpp",
                     "lib/DinoLCD.cpp",
                     "lib/DinoLCD.h",
                     "lib/DinoSerial.cpp",
                     "lib/DinoSerial.h",
+                    "lib/DinoServo.cpp",
+                    "lib/DinoDHT.cpp",
+                    "lib/DinoOneWire.cpp",
+                    "lib/DinoIROut.cpp",
+                    "lib/DinoTone.cpp",
+                    "lib/DinoShift.cpp",
+                    "lib/DinoSPI.cpp",
+                    "lib/DinoI2C.cpp",
+
+                    # See explanation at top of src/lib/DinoBugWorkaround.cpp
+                    "lib/DinoBugWorkaround.cpp",
 
                     "vendor/DHT/DHT.cpp",
                     "vendor/DHT/DHT.h",
@@ -65,10 +78,10 @@ class DinoCLI::Generator
       @sketch.gsub! "int port = 3466", "int port = #{options[:port]}"
     end
     if options[:debug]
-      @libs[0].gsub! "// #define debug true", "#define debug true"
+      @libs[0].gsub! "// #define debug",    "#define debug"
     end
     unless serial?
-      @libs[0].gsub! "#define TXRX_SPI false", "#define TXRX_SPI true"
+      @libs[0].gsub! "// #define TXRX_SPI", "#define TXRX_SPI"
     end
   end
 

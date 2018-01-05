@@ -30,7 +30,7 @@ module Dino
           length = aux.count
           aux = "#{[@spi_mode].pack('C')}#{[@frequency].pack('V')}#{aux.pack('C*')}"
 
-          board.write Dino::Message.encode(command: 24, pin: pin, value: length, aux_message: aux)
+          board.write Dino::Message.encode(command: 26, pin: pin, value: length, aux_message: aux)
         end
       end
     end
