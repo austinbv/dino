@@ -8,6 +8,8 @@ Dino dino;
   Serial_ &serial = SerialUSB;
 #elif defined(__AVR_ATmega32U4__)
   Serial_ &serial = Serial;
+#elif defined(__AVR_ATtiny85__)
+  TinyDebugSerial &serial = Serial;
 #else
   HardwareSerial &serial = Serial;
 #endif
