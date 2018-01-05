@@ -84,13 +84,7 @@ class Dino {
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
     void setHeartRate          ();  //cmd = 98
-
-    // Serial flow control variables.
-    uint8_t rcvBytes = 0;
-    uint8_t rcvBuffer = 60;
-    long    lastRcv = micros();
-    long    rcvWindow  = 1000000;
-
+    
     // Parser state storage and utility functions.
     char *messageFragments[4];
     byte fragmentIndex;

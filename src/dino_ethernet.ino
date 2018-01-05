@@ -2,11 +2,6 @@
 #include <SPI.h>
 #include <Ethernet.h>
 
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-  #include <SoftwareSerial.h>
-#endif
-
 // Configure your MAC address, IP address, and HTTP port here.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };
 IPAddress ip(192,168,0,77);
@@ -62,7 +57,7 @@ void setup() {
 
 // Keep count of bytes as we receive them and send a dino message with how many.
 uint8_t rcvBytes  = 0;
-uint8_t rcvBuffer = 60;
+uint8_t rcvThreshold = 30;
 long    lastRcv   = micros();
 long    rcvWindow = 1000000;
 
@@ -86,7 +81,7 @@ void loop() {
         // Acknowledge when we've received as many bytes as the serial input buffer.
         lastRcv = micros();
         rcvBytes ++;
-        if (rcvBytes == rcvBuffer) acknowledge();
+        if (rcvBytes == rcvThreshold) acknowledge();
       }
 
       // Also acknowledge when the last byte received goes outside the receive window.

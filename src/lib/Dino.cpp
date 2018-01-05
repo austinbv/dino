@@ -73,9 +73,9 @@ void Dino::process() {
   response[0] = '\0';
 
   #ifdef debug
-   Serial.print("Command - ");          Serial.println(cmdStr);
-   Serial.print("Pin - ");              Serial.println(pinStr);
-   Serial.print("Value - ");            Serial.println(valStr);
+   Serial.print("Received - Command: "); Serial.print(cmdStr);
+   Serial.print(" Pin: ");               Serial.print(pinStr);
+   Serial.print(" Value: ");             Serial.print(valStr); Serial.print("\n")
   #endif
 
   // Call the command.
@@ -142,8 +142,7 @@ void Dino::process() {
   if (response[0] != '\0') writeResponse();
 
   #ifdef debug
-   Serial.print("Responded with - "); Serial.println(response);
-   Serial.println();
+   Serial.print("Responded with - "); Serial.print(response); Serial.print("\n\n");
   #endif
 }
 
@@ -211,89 +210,104 @@ long Dino::timeSince(long event) {
 }
 
 
-
 // API FUNCTIONS
-// CMD = 00 // Pin Mode
+
+// CMD = 00
+// Set a pin to output (0), or input (1).
 void Dino::setMode() {
   if (val == 0) {
     removeListener();
     pinMode(pin, OUTPUT);
-    #ifdef debug
-      Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("OUTPUT mode");
-    #endif
   }
   else {
     pinMode(pin, INPUT);
-    #ifdef debug
-      Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("INPTUT mode");
-    #endif
   }
-}
 
-// CMD = 01 // Digital Write
-void Dino::dWrite() {
-  if (val == 0) {
-    digitalWrite(pin, LOW);
-    #ifdef debug
-      Serial.print("Digital write "); Serial.print(LOW); Serial.print(" to pin "); Serial.println(pin);
-    #endif
-  }
-  else {
-    digitalWrite(pin, HIGH);
-    #ifdef debug
-      Serial.print("Digital write "); Serial.print(HIGH); Serial.print(" to pin "); Serial.println(pin);
-    #endif
-  }
-}
-
-// CMD = 02 // Digital Read
-void Dino::dRead(int pin) {
-  rval = digitalRead(pin);
-  sprintf(response, "%d:%d", pin, rval);
-}
-
-// CMD = 03 // Analog (PWM) Write
-void Dino::aWrite() {
-  analogWrite(pin,val);
   #ifdef debug
-    Serial.print("Analog write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
+    Serial.print("Called Dino::setMode()\n");
   #endif
 }
 
-// CMD = 04 // Analog Read
+// CMD = 01
+// Write a digital output pin. 0 for LOW, 1 or >0 for HIGH.
+void Dino::dWrite() {
+  if (val == 0) {
+    digitalWrite(pin, LOW);
+  }
+  else {
+    digitalWrite(pin, HIGH);
+  }
+
+  #ifdef debug
+    Serial.print("Called Dino::dWrite()\n");
+  #endif
+}
+
+// CMD = 02
+// Read a digital input pin. 0 for LOW, 1 for HIGH.
+void Dino::dRead(int pin) {
+  rval = digitalRead(pin);
+  sprintf(response, "%d:%d", pin, rval);
+
+  #ifdef debug
+    Serial.print("Called Dino::dRead()\n");
+  #endif
+}
+
+// CMD = 03
+// Write an analog output pin. 0 for LOW, up to 255 for HIGH @ 8-bit resolution.
+void Dino::aWrite() {
+  analogWrite(pin,val);
+
+  #ifdef debug
+    Serial.print("Called Dino::aWrite()\n");
+  #endif
+}
+
+// CMD = 04
+// Read an analog input pin. 0 for LOW, up to 1023 for HIGH @ 10-bit resolution.
 void Dino::aRead(int pin) {
   rval = analogRead(pin);
   sprintf(response, "%d:%d", pin, rval);
+
+  #ifdef debug
+    Serial.print("Called Dino::aRead()\n");
+  #endif
 }
 
 // CMD = 05
-// Listen for a digital signal on any pin.
+// Set a flag to periodically read a digital pin without further requests.
+// Runs around other requests in the main loop. Only sends value when changed.
 void Dino::addDigitalListener() {
   removeListener();
   digitalListeners[pin] = true;
   digitalListenerValues[pin] = 2;
+
   #ifdef debug
-    Serial.print("Added digital listener on pin "); Serial.println(pin);
+    Serial.print("Called Dino::addDigitalListener()\n");
   #endif
 }
 
 // CMD = 06
-// Listen for an analog signal on analog pins only.
+// Set a flag to periodically read an analog pin without further requests.
+// Runs around other requests in the main loop. Sends value on every read.
 void Dino::addAnalogListener() {
   removeListener();
   analogListeners[pin] = true;
+
   #ifdef debug
-    Serial.print("Added analog listener on pin "); Serial.println(pin);
+    Serial.print("Called Dino::addAnalogListener()\n");
   #endif
 }
 
 // CMD = 07
-// Remove analog and digital listeners from any pin.
+// Remove analog and digital listen flags on the pin.
 void Dino::removeListener() {
   analogListeners[pin] = false;
   digitalListeners[pin] = false;
+
   #ifdef debug
-    Serial.print("Removed listeners on pin "); Serial.println(pin);
+    Serial.print("Called Dino::removeListener()\n");
   #endif
 }
 

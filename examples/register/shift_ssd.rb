@@ -13,7 +13,7 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 shift_register = Dino::Components::Register::ShiftOut.new  board: board,
-                                                           pins: {data: 12, clock: 13, latch: 9}
+                                                           pins: {data: 11, clock: 13, latch: 9}
 
 ssd = Dino::Components::SSD.new   board: shift_register,
                                   pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
