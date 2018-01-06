@@ -84,8 +84,8 @@ class Dino {
     void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 22
     void addShiftListener      (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 23
     void removeShiftListener   ();                                                                         //cmd = 24
-    void updateShiftListeners    ();
-    void clearShiftListeners     ();
+    void updateShiftListeners  ();
+    void clearShiftListeners   ();
 
     // SPI
     void spiBegin              (byte spiMode, uint32_t clockRate);
@@ -123,15 +123,19 @@ class Dino {
     byte cmdStr[5]; int cmd;
     byte pinStr[5]; int pin;
     byte valStr[5]; int val;
-    // Scale aux message allocation based on enabled features.
-    #if defined(DINO_IR_OUT)
-      byte auxMsg[528];
-    #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
-      byte auxMsg[272];
-    #elif defined (DINO_LCD)
-      byte auxMsg[144];
+    // Scale aux message allocation based on enabled features and chip.
+    #if !defined (__AVR_ATmega168__)
+      #if defined(DINO_IR_OUT)
+        byte auxMsg[528];
+      #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
+        byte auxMsg[272];
+      #elif defined (DINO_LCD)
+        byte auxMsg[144];
+      #else
+        byte auxMsg[48];
+      #endif
     #else
-      byte auxMsg[48];
+      byte auxMsg[40];
     #endif
 
     // Value and response storage.
