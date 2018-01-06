@@ -27,14 +27,6 @@ module Dino
           @reading_pins   = Array.new(@bytes*8) {|i| false}
           @listening_pins = Array.new(@bytes*8) {|i| false}
 
-          #
-          # Certain registers which use rising edges for clock signals produce
-          # errors with the native Arduino shiftIn function unless you set the clock
-          # pin high before reading. Setting this instance var to 1 will include
-          # that instruction on every call to read or listen.
-          #
-          @preclock_high = options[:preclock_high] ? 1 : 0
-
           enable_proxy
         end
 
