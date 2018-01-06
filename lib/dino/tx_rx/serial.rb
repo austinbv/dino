@@ -18,13 +18,16 @@ module Dino
 
       def connect
         tty_devices.each do |device|
-          @device = device
-          print "Trying serial device: #{self.to_s}... "
-          connection = ::Serial.new(@device, @baud)
-          puts "Connected"
-          return connection
-        rescue RubySerial::Exception => error
-          handle_error(error); next
+          begin
+            @device = device
+            print "Trying serial device: #{self.to_s}... "
+            connection = ::Serial.new(@device, @baud)
+            puts "Connected"
+            return connection
+          rescue RubySerial::Error => error
+            puts error
+            handle_error(error); next
+          end
         end
         raise SerialConnectError, "Could not connect to a serial device."
       end

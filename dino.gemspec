@@ -16,8 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Dino::VERSION
   gem.executables   = ["dino"]
 
-  gem.add_dependency 'rubyserial'
-  gem.add_dependency 'trollop'
+  gem.add_dependency 'rubyserial', '~> 0.5.0'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
