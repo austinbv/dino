@@ -36,23 +36,25 @@ module Dino
         initialize_flow_control
         flush_read
         HANDSHAKE_TRIES.times do |retries|
-          Timeout.timeout(HANDSHAKE_TIMEOUT) do
-            print "Sending handshake to: #{self.to_s}... "
-            write Dino::Message.encode(command: 90)
-            loop do
-              line = gets
-              if line && line.match(/\AACK:/)
-                flush_read
-                ignore_retry_bytes(retries)
-                puts "Acknowledged. Hardware ready...\n\n"
-                return line.split(":", 2)[1]
+          begin
+            Timeout.timeout(HANDSHAKE_TIMEOUT) do
+              print "Sending handshake to: #{self.to_s}... "
+              write Dino::Message.encode(command: 90)
+              loop do
+                line = gets
+                if line && line.match(/\AACK:/)
+                  flush_read
+                  ignore_retry_bytes(retries)
+                  puts "Acknowledged. Hardware ready...\n\n"
+                  return line.split(":", 2)[1]
+                end
               end
             end
+          rescue Timeout::Error
+            print "No response, "
+            puts (retries + 1 < HANDSHAKE_TRIES ? "retrying..." : "exiting...")
+            next
           end
-        rescue Timeout::Error
-          print "No response, "
-          puts (retries + 1 < HANDSHAKE_TRIES ? "retrying..." : "exiting...")
-          next
         end
         raise HandshakeError, "Connected to wrong device, or device not running dino"
       end
