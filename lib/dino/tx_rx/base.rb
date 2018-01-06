@@ -3,11 +3,16 @@ require 'timeout'
 
 module Dino
   module TxRx
-    class BoardNotFound < StandardError; end
+    class SerialConnectError < StandardError; end
+    class TCPConnectError    < StandardError; end
+    class HandshakeError     < StandardError; end
+    class RxFlushTimeout     < StandardError; end
 
     class Base
       include Observable
       BOARD_BUFFER = 60
+      HANDSHAKE_TRIES = 3
+      HANDSHAKE_TIMEOUT = 2
 
       def io
         @io ||= connect
@@ -30,28 +35,37 @@ module Dino
       def handshake
         initialize_flow_control
         flush_read
-        10.times do |retries|
-          begin
-            Timeout.timeout(1) do
-              write Dino::Message.encode(command: 90)
-              loop do
-                line = gets
-                if line && line.match(/ACK:/)
-                  flush_read
-                  ignore_retry_bytes(retries)
-                  puts "Connected to board..."
-                  return line.split(/:/)[1]
-                end
+        HANDSHAKE_TRIES.times do |retries|
+          Timeout.timeout(HANDSHAKE_TIMEOUT) do
+            print "Sending handshake to: #{self.to_s}... "
+            write Dino::Message.encode(command: 90)
+            loop do
+              line = gets
+              if line && line.match(/\AACK:/)
+                flush_read
+                ignore_retry_bytes(retries)
+                puts "Acknowledged. Hardware ready...\n\n"
+                return line.split(":", 2)[1]
               end
             end
-          rescue Timeout::Error
-            puts "Could not find board. Retrying..."
           end
+        rescue Timeout::Error
+          print "No response, "
+          puts (retries + 1 < HANDSHAKE_TRIES ? "retrying..." : "exiting...")
+          next
         end
-        raise BoardNotFound
+        raise HandshakeError, "Connected to wrong device, or device not running dino"
       end
 
     private
+
+      def flush_read
+        Timeout.timeout(5) do
+          gets until gets == nil
+        end
+      rescue Timeout::Error
+        raise RxFlushTimeout "Cannot read from device, or device not running dino"
+      end
 
       def synced_write(message)
         message = message.split("")
@@ -71,7 +85,9 @@ module Dino
         end
       end
 
-      def io_write(message); raise "#io_write should be defined in TxRx subclasses"; end
+      def connect(message); raise "#connect should be defined in TxRx subclasses"; end
+      def gets(message);    raise "#gets should be defined in TxRx subclasses";    end
+      def _write(message);  raise "#_write should be defined in TxRx subclasses";  end
 
       def _read
         line = gets
@@ -90,6 +106,13 @@ module Dino
         end
       end
 
+      # Subtract bytes for failed handshakes from the total in transit bytes.
+      # The board likely reset, dropping these bytes, and causing the retries.
+      def ignore_retry_bytes(retries)
+        retry_bytes = Dino::Message.encode(command: 90).length * retries
+        remove_transit_bytes(retry_bytes)
+      end
+
       def initialize_flow_control
         @flow_control  ||= Mutex.new
         @write_mutex   ||= Mutex.new
@@ -106,20 +129,6 @@ module Dino
 
       def remove_transit_bytes(value)
         @flow_control.synchronize { @transit_bytes = @transit_bytes - value }
-      end
-
-      # Subtract bytes for failed handshakes from the total in transit bytes.
-      # The board will never acknowledge these.
-      def ignore_retry_bytes(retries)
-        retry_bytes = Dino::Message.encode(command: 90).length * retries
-        remove_transit_bytes(retry_bytes)
-      end
-
-      def connect(message); raise "#connect should be defined in TxRx subclasses"; end
-      def gets(message); raise "#gets should be defined in TxRx subclasses"; end
-
-      def flush_read
-        gets until gets == nil
       end
     end
   end

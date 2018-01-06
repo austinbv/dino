@@ -17,7 +17,7 @@ module Dino
 
           # Simulate 3 COM ports with COM2 connected.
           expect(subject).to receive(:tty_devices).and_return(["COM1", "COM2", "COM3"])
-          expect(::Serial).to receive(:new).with("COM1", TxRx::Serial::BAUD).and_raise
+          expect(::Serial).to receive(:new).with("COM1", TxRx::Serial::BAUD).and_raise(RubySerial::Exception)
           expect(::Serial).to receive(:new).with("COM2", TxRx::Serial::BAUD).and_return(mock_serial = double)
           expect(::Serial).to_not receive(:new).with("COM3", TxRx::Serial::BAUD)
           expect(subject.io).to equal(mock_serial)
@@ -45,9 +45,9 @@ module Dino
         expect(subject.io).to equal(mock_serial)
       end
 
-      it 'should raise a BoardNotFound exception if there is no board connected' do
-        allow(::Serial).to receive(:new).and_raise
-        expect { subject.io }.to raise_exception Dino::TxRx::BoardNotFound
+      it 'should raise SerialConnectError if it cannot connect to a board' do
+        allow(::Serial).to receive(:new).and_raise(RubySerial::Exception)
+        expect { subject.io }.to raise_exception Dino::TxRx::SerialConnectError
       end
     end
 

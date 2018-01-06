@@ -10,12 +10,31 @@ module Dino
         @baud = options[:baud] || BAUD
       end
 
+      def to_s
+        "#{@device} @ #{@baud} baud"
+      end
+
     private
 
       def connect
-        # ::Serial calls the rubyserial gem here.
-        tty_devices.each { |device| return ::Serial.new(device, @baud) rescue nil }
-        raise BoardNotFound
+        tty_devices.each do |device|
+          @device = device
+          print "Trying serial device: #{self.to_s}... "
+          connection = ::Serial.new(@device, @baud)
+          puts "Connected"
+          return connection
+        rescue RubySerial::Exception => error
+          handle_error(error); next
+        end
+        raise SerialConnectError, "Could not connect to a serial device."
+      end
+
+      def handle_error(error)
+        if error.message == "EBUSY"
+          puts "Device Busy! (EBUSY)"
+        else
+          puts "RubySerial Error (#{error.message})"
+        end
       end
 
       def tty_devices
@@ -28,7 +47,7 @@ module Dino
         RUBY_PLATFORM.match /mswin|mingw/i
       end
 
-      def io_write(message)
+      def _write(message)
         io.write(message)
       end
 
