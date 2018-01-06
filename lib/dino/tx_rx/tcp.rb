@@ -7,15 +7,21 @@ module Dino
         @host, @port = host, port
       end
 
-    private
-
-      def connect
-        Timeout::timeout(10) { TCPSocket.open(@host, @port) }
-      rescue
-        raise BoardNotFound
+      def to_s
+        "#{@host}:#{@port}"
       end
 
-      def io_write(message)
+    private
+      def connect
+        print "Connecting to TCP at: #{self.to_s}... "
+        connection = Timeout::timeout(10) { TCPSocket.open @host, @port }
+        puts "Connected"
+        connection
+      rescue => error
+        raise TCPConnectError, error.message
+      end
+
+      def _write(message)
         loop do
           if IO.select(nil, [io], nil)
             io.syswrite(message)
