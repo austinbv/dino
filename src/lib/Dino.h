@@ -49,6 +49,9 @@ class Dino {
     boolean analogListeners[PIN_COUNT];
     boolean digitalListeners[PIN_COUNT];
     byte digitalListenerValues[PIN_COUNT];
+    // Storage and response func for features following the pin:rval pattern.
+    int rval;
+    void coreResponse(int p, int v);
 
     // Included Libraries
     void servoToggle           ();         //cmd = 8
@@ -126,10 +129,6 @@ class Dino {
 
     // Save a pointer to any stream so we can call ->print and ->write on it.
     Stream* stream;
-
-    // Storage and response func for features following the pin:rval pattern.
-    int rval;
-    void coreResponse();
 
     // Internal timing variables and utility functions.
     long heartRate;

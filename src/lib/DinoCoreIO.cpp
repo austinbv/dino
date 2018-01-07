@@ -35,7 +35,7 @@ void Dino::dWrite() {
 // Read a digital input pin. 0 for LOW, 1 for HIGH.
 void Dino::dRead(int pin) {
   rval = digitalRead(pin);
-  coreResponse();
+  coreResponse(pin, rval);
 
   #ifdef debug
     Serial.print("Called Dino::dRead()\n");
@@ -56,7 +56,7 @@ void Dino::aWrite() {
 // Read an analog input pin. 0 for LOW, up to 1023 for HIGH @ 10-bit resolution.
 void Dino::aRead(int pin) {
   rval = analogRead(pin);
-  coreResponse();
+  coreResponse(pin, rval);
 
   #ifdef debug
     Serial.print("Called Dino::aRead()\n");
@@ -67,10 +67,10 @@ void Dino::aRead(int pin) {
 // Send current value of pin and reading value (rval), following the protocol.
 // This is for core reads and listeners, but can be used for any function
 // following the pin:rval pattern. Set those variables correctly before calling.
-void Dino::coreResponse(){
-  stream->print(pin);
+void Dino::coreResponse(int p, int v){
+  stream->print(p);
   stream->print(':');
-  stream->print(rval);
+  stream->print(v);
   stream->print('\n');
 }
 
@@ -119,7 +119,6 @@ void Dino::updateDigitalListeners() {
       dRead(i);
       if (rval != digitalListenerValues[i]) {
         digitalListenerValues[i] = rval;
-        coreResponse();
       }
     }
   }
@@ -131,7 +130,6 @@ void Dino::updateAnalogListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
     if (analogListeners[i]) {
       aRead(i);
-      coreResponse();
     }
   }
 }
