@@ -10,23 +10,7 @@ int port = 3466;
 Dino dino;
 EthernetServer server(port);
 EthernetClient client;
-char responseBuffer[65];
 
-
-// Dino.h doesn't handle TXRX.
-// Setup a callback to buffer responses for writing.
-void bufferResponse(char *response) {
-  if (strlen(responseBuffer) > 56 ) writeResponses();
-  strcpy(responseBuffer, response);
-}
-void (*writeCallback)(char *str) = bufferResponse;
-
-// Write the buffered responses to the client.
-void writeResponses() {
-  if (responseBuffer[0] != '\0')
-    client.write(responseBuffer);
-    responseBuffer[0] = '\0';
-}
 
 void printEthernetStatus() {
   // Print ethernet status.
@@ -50,8 +34,8 @@ void setup() {
   server.begin();
   printEthernetStatus();
 
-  // Attach the write callback.
-  dino.setupWrite(writeCallback);
+  // Pass a client pointer to dino, so it can write too.
+  dino.setOutputStream(&client);
 }
 
 
@@ -62,9 +46,9 @@ long    lastRcv   = micros();
 long    rcvWindow = 1000000;
 
 void acknowledge() {
-  client.write("RCV:");
-  client.write(rcvBytes);
-  client.write("\n");
+  client.print("RCV:");
+  client.print(rcvBytes);
+  client.print("\n");
   rcvBytes = 0;
 }
 
@@ -85,10 +69,9 @@ void loop() {
       }
 
       // Also acknowledge when the last byte received goes outside the receive window.
-      if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
+      if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvThreshold)) acknowledge();
 
       dino.updateListeners();
-      writeResponses();
     }
   }
   client.stop();
