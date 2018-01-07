@@ -1,3 +1,4 @@
+#ifdef DINO_SERIAL
 #include "Arduino.h"
 #include "DinoSerial.h"
 
@@ -38,3 +39,4 @@ void DinoSerial::begin(char *aux) {
   int baud = atoi(aux);
   softSerial.begin(baud);
 }
+#endif

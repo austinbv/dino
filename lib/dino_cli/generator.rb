@@ -1,62 +1,56 @@
 class DinoCLI::Generator
   require "fileutils"
-  LIB_FILENAMES =  [
-                    "lib/Dino.h",
-                    "lib/Dino.cpp",
-                    "lib/DinoCoreIO.cpp",
-                    "lib/DinoIncludes.cpp",
-                    "lib/DinoLCD.cpp",
-                    "lib/DinoLCD.h",
-                    "lib/DinoSerial.cpp",
-                    "lib/DinoSerial.h",
-                    "lib/DinoServo.cpp",
-                    "lib/DinoDHT.cpp",
-                    "lib/DinoOneWire.cpp",
-                    "lib/DinoIROut.cpp",
-                    "lib/DinoTone.cpp",
-                    "lib/DinoShift.cpp",
-                    "lib/DinoSPI.cpp",
-                    "lib/DinoI2C.cpp",
-
-                    # See explanation at top of src/lib/DinoBugWorkaround.cpp
-                    "lib/DinoBugWorkaround.cpp",
-
-                    "vendor/DHT/DHT.cpp",
-                    "vendor/DHT/DHT.h",
-                    "vendor/OneWire/OneWire.cpp",
-                    "vendor/OneWire/OneWire.h",
-                    "vendor/Arduino-IRremote/boarddefs.h",
-                    "vendor/Arduino-IRremote/IRremote.cpp",
-                    "vendor/Arduino-IRremote/IRremote.h",
-                    "vendor/Arduino-IRremote/IRremoteInt.h",
-                    "vendor/Arduino-IRremote/irSend.cpp",
-
-                    "vendor/I2C-Master-Library/I2C.h",
-                    "vendor/I2C-Master-Library/I2C.cpp"
-                  ]
-
+  require "dino_cli/packages"
+  require "dino_cli/targets"
   attr_accessor :options
 
   def initialize(options={})
     @options = options
+    append_target
+  end
+
+  def append_target
+    # Default to generating the mega sketch.
+    options[:target] = :mega unless options[:target]
+    # Preserve the source sketch name, since we need to copy that file.
+    options[:src_sketch_name] = options[:sketch_name].dup
+    # Append the target to the output sketch name/folder when not using :mega.
+    options[:sketch_name] << "_#{options[:target]}" unless options[:target] == :mega
   end
 
   def self.run!(options={})
     instance = self.new(options)
 
     instance.read
-    instance.modify
+    instance.target_config
+    instance.user_config
     instance.write
   end
 
   def read
-    @libs = LIB_FILENAMES.map do |f|
-      File.read(File.join(options[:src_dir], f))
+    # Start by just copying the PACKAGES hash.
+    @packages = PACKAGES
+
+    # Now replace each filepath with a hash containing the filepath and contents.
+    @packages.each_key do |k|
+      @packages[k][:files].map! do |f|
+        contents = File.read(File.join(options[:src_dir], f))
+        # If the file is in src/vendor, it gets wrapped in an #ifdef
+        # corresponding to the package directive. The entire package can now
+        # be toggled in DinoDefines.h. Without this, IDE would try to compile anyway.
+        if f.match /\Avendor/
+          directive = @packages[k][:directive]
+          contents = "#include \"DinoDefines.h\"\n#ifdef #{directive}\n" << contents << "\n#endif\n"
+        end
+        { path: f, contents: contents }
+      end
     end
-    @sketch = File.read File.join(options[:src_dir], sketch_filename)
+
+    # Read in the sketch itself.
+    @sketch = File.read File.join(options[:src_dir], "#{options[:src_sketch_name]}.ino")
   end
 
-  def modify
+  def user_config
     if options[:baud] && serial?
       @sketch.gsub! "115200", options[:baud]
     end
@@ -78,22 +72,50 @@ class DinoCLI::Generator
       @sketch.gsub! "int port = 3466", "int port = #{options[:port]}"
     end
     if options[:debug]
-      @libs[0].gsub! "// #define debug",    "#define debug"
+      define("debug")
     end
     unless serial?
-      @libs[0].gsub! "// #define TXRX_SPI", "#define TXRX_SPI"
+      define("TXRX_SPI")
+    end
+  end
+
+  def target_config
+    target_packages = TARGETS[options[:target]]
+    target_packages.each do |t|
+      directive = PACKAGES[t][:directive]
+      define(directive) if directive
+    end
+  end
+
+  def define(directive)
+    gsub_defines "// #define #{directive}", "#define #{directive}"
+  end
+
+  # Run gsub! on contents of src/lib/Dino.h specifically.
+  def gsub_defines(from, to)
+    @packages[:core][:files].each do |f|
+      if f[:path] == "lib/DinoDefines.h"
+        f[:contents].gsub!(from, to)
+      end
     end
   end
 
   def write
+    # Write the sketch itself first.
     sketch = File.join(output_dir, sketch_filename)
     File.open(sketch, 'w') { |f| f.write @sketch }
 
-    libs = LIB_FILENAMES.map { |f| File.join(output_dir, f.split('/')[-1])}
-    libs.each_with_index do |file, index|
-      File.open(file, 'w') { |f| f.write @libs[index]}
+    # Go through the @packages hash and copy all the source files regardless of target.
+    # Append source file basename to the output dir to get output file path.
+    # Then write the file contents to the destination path.
+    @packages.each_key do |k|
+      @packages[k][:files].each do |file|
+        dest_path = File.join(output_dir, file[:path].split('/')[-1])
+        File.open(dest_path, 'w') { |f| f.write file[:contents] }
+      end
     end
 
+    # Return the location of the sketch file.
     options[:sketch_file] = sketch
     options
   end
@@ -115,6 +137,6 @@ class DinoCLI::Generator
   end
 
   def sketch_filename
-    options[:sketch_filename] ||= "#{options[:sketch_name]}.ino"
+    "#{options[:sketch_name]}.ino"
   end
 end

@@ -1,3 +1,4 @@
+#ifdef DINO_SERIAL
 #ifndef DinoSerial_h
 #define DinoSerial_h
 
@@ -15,4 +16,5 @@ class DinoSerial {
     int parseSize;
 };
 
+#endif
 #endif

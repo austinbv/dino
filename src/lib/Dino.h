@@ -4,25 +4,7 @@
 #ifndef Dino_h
 #define Dino_h
 #include <Arduino.h>
-
-// If using Wi-Fi or Ethernet shield, uncomment this to let the SPI library know.
-// #define TXRX_SPI
-
-// Uncomment this line to enable debugging mode.
-// #define debug
-
-// Comment these out to exclude default features.
-// Arduino Due cannot use: SERIAL, IR, TONE, I2C
-#define DINO_SERVO
-#define DINO_LCD
-#define DINO_SERIAL
-#define DINO_DHT
-#define DINO_ONE_WIRE
-#define DINO_IR_OUT
-// #define DINO_TONE
-#define DINO_SHIFT
-#define DINO_SPI
-#define DINO_I2C
+#include "DinoDefines.h"
 
 // Figure out how many pins our hardware has.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)

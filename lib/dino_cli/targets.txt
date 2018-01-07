@@ -1,0 +1,60 @@
+
+  Valid targets:
+
+    mega (default)
+
+      Covers the popular Atmel chips on Arduino boards listed below, and many more.
+      This is the primary target and all features will be included. Default setting.
+
+      Chips:  ATmega328p, ATmega32u4, ATmega1280, ATmega2560
+      Boards: UNO, Nano, Mini, Ethernet
+              Leonardo, Micro, Esplora, Leonardo ETH
+              Mega 1280, Mega 2560, Mega ADK
+              Most Lilypads (excluding ones with an ATmega168)
+
+    core
+
+      This includes only the core feature set of dino:
+        Set Pin Mode
+        Digital Read/Write/Listen
+        Analog Read/Write/Listen
+
+      This is useful if you're getting errors when trying to upload, want to
+      include specific features by hand, trying to squeeze onto something with
+      low memory, or testing a new chip. This is the smallest the dino sketch
+      can get for now, and should be universally compatible.
+
+    mega168
+
+      This specifically targets the older ATmega168 chip used in early Arduinos.
+      They have half the RAM and flash available, so we need to cut the sketch down.
+      Beyond core IO functionality, it ONLY includes the following features:
+          Servo, LCD, SPI, I2C
+
+      Chips:  ATmega168
+      Boards: Duemilanove, Diecimila, Pro, Pro Mini
+              (Later versions of these may carry an ATmega328)
+
+      Note: While you can generate this sketch using any communication type,
+      it will only fit on the board when generated for serial communication.
+      There is not enough memory available for Wi-Fi or Ethernet. You can
+      try the core target to tradeoff the features for networking.
+
+      Note: Aux message length is always limited to 40 bytes on this chip.
+
+    arm
+
+      This is the same as mega, but omits libraries specifically known to be
+      incompatible with the Atmel SAMD (ARM Cortex M0) chips. Use this when
+      you need to load a sketch on the Arduino Due or similar boards.
+      This option excludes the following features:
+          Serial, Tone, IR Out, I2C
+
+      Chips:  AT91SAM3X8E
+      Boards: Due
+
+  NOTE: While different targets include different libraries, you can manually
+  control which libraries are included at compile time by editing DinoDefines.h.
+  All the library files (even the unused ones) are copied to the destination sketch
+  folder to enable this. Uncomment a corresponding #define in DinoDefines.h to
+  include a library in the sketch. Comment it out to exclude that library.

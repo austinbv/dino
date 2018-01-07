@@ -12,7 +12,7 @@ module DinoCLI
   end
 
   def self.sketch(options)
-    options = DinoCLI::Generator.run!(options)
-    $stdout.puts options[:sketch_file]
+    result = DinoCLI::Generator.run!(options)
+    $stdout.puts result[:sketch_file]
   end
 end
