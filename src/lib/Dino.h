@@ -108,21 +108,17 @@ class Dino {
     void process();
 
     // Parsed message storage.
-    byte cmdStr[5]; int cmd;
-    byte pinStr[5]; int pin;
-    byte valStr[5]; int val;
+    byte cmdStr[4]; int cmd;
+    byte pinStr[4]; int pin;
+    byte valStr[4]; int val;
 
     // Scale aux message allocation based on enabled features and chip.
-    #if !defined (__AVR_ATmega168__)
-      #if defined(DINO_IR_OUT)
-        byte auxMsg[528];
-      #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
-        byte auxMsg[272];
-      #elif defined (DINO_LCD)
-        byte auxMsg[144];
-      #else
-        byte auxMsg[48];
-      #endif
+    #if defined(DINO_IR_OUT) && !defined (__AVR_ATmega168__)
+      byte auxMsg[528];
+    #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
+      byte auxMsg[264];
+    #elif defined (DINO_LCD)
+      byte auxMsg[136];
     #else
       byte auxMsg[40];
     #endif

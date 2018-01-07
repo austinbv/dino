@@ -6,8 +6,14 @@
 
 #include <Servo.h>
 
-// Maximum 12 servos on most boards. Could be up to 48 on Arduino Mega.
-#define SERVO_COUNT 12
+// 12 servos on most boards. 6 on the ATmega168.
+// Could be up to 48 on Arduino Mega.
+#if defined (__AVR_ATmega168__)
+  #define SERVO_COUNT 6
+#else
+  #define SERVO_COUNT 12
+#endif
+
 
 // Create an array of wrapper structs that link pins to servo objects.
 struct ServoWrapper{

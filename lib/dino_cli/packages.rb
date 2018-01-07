@@ -15,7 +15,7 @@ PACKAGES = {
   },
   servo: {
     description: "Servo support",
-    directive: "DINO_LCD",
+    directive: "DINO_SERVO",
     files: [
       "lib/DinoServo.cpp",
     ]

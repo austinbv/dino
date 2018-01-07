@@ -28,26 +28,32 @@
 
       This specifically targets the older ATmega168 chip used in early Arduinos.
       They have half the RAM and flash available, so we need to cut the sketch down.
-      Beyond core IO functionality, it ONLY includes the following features:
-          Servo, LCD, SPI, I2C
+      This option includes core functionality AND:
+          Servo (6 maxmium), DHT, OneWire, IR Out, SPI, I2C
 
       Chips:  ATmega168
       Boards: Duemilanove, Diecimila, Pro, Pro Mini
               (Later versions of these may carry an ATmega328)
 
       Note: While you can generate this sketch using any communication type,
-      it will only fit on the board when generated for serial communication.
+      it will only fit on the ATmega168 when generated for serial communication.
       There is not enough memory available for Wi-Fi or Ethernet. You can
-      try the core target to tradeoff the features for networking.
+      try the core target to tradeoff features for networking instead.
 
-      Note: Aux message length is always limited to 40 bytes on this chip.
+      You can also try to create a serial over Wi-Fi bridge with:
+      https://github.com/jeelabs/esp-link, if you have an ESP8266 handy.
+
+      Note: Aux message is always limited to 264 bytes or less for the ATmega168.
+            Servo count is always limited to 6 (normally 12) for the ATmega168 chip.
+            These limits apply regardless of using this build target, as long as
+            a board with that chip is selected in the IDE.
 
     arm
 
       This is the same as mega, but omits libraries specifically known to be
       incompatible with the Atmel SAMD (ARM Cortex M0) chips. Use this when
       you need to load a sketch on the Arduino Due or similar boards.
-      This option excludes the following features:
+      This option includes all features EXCEPT:
           Serial, Tone, IR Out, I2C
 
       Chips:  AT91SAM3X8E
@@ -57,4 +63,4 @@
   control which libraries are included at compile time by editing DinoDefines.h.
   All the library files (even the unused ones) are copied to the destination sketch
   folder to enable this. Uncomment a corresponding #define in DinoDefines.h to
-  include a library in the sketch. Comment it out to exclude that library.
+  include everything needed for that library. Comment it out to exclude the library.
