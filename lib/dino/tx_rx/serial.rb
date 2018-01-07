@@ -68,6 +68,7 @@ module Dino
               escaped = true
             end
           else
+            escaped = false
             buff << char
           end
           return nil if (buff.empty? && !escaped)

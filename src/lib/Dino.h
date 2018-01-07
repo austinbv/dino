@@ -97,7 +97,7 @@ class Dino {
     byte *messageFragments[4];
     byte fragmentIndex;
     int charIndex;
-    boolean backslash;
+    boolean escaping;
     void append(byte c);
     void process();
 

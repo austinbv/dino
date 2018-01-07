@@ -14,9 +14,9 @@ Dino::Dino(){
 void Dino::parse(byte c) {
   if ((c == '\n') || (c == '\\')) {
     // If last char was a \, this \ or \n is escaped.
-    if(backslash){
+    if(escaping){
       append(c);
-      backslash = false;
+      escaping = false;
     }
 
     // If EOL, process and reset.
@@ -28,13 +28,14 @@ void Dino::parse(byte c) {
     }
 
     // Backslash is the escape character.
-    else if (c == '\\') backslash = true;
+    else if (c == '\\') escaping = true;
   }
 
   // If fragment delimiter, terminate current fragment and move to next.
   // Unless we're in the auxillary message fragment, then just append.
   else if (c == '.') {
     if (fragmentIndex < 3) {
+      escaping = false;
       append('\0');
       fragmentIndex++;
       charIndex = 0;
@@ -44,7 +45,10 @@ void Dino::parse(byte c) {
   }
 
   // Else just append the character.
-  else append(c);
+  else {
+    escaping = false;
+    append(c);
+  }
 }
 
 void Dino::append(byte c) {
