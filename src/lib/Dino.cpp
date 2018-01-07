@@ -8,8 +8,9 @@ Dino::Dino(){
   messageFragments[1] = pinStr;
   messageFragments[2] = valStr;
   messageFragments[3] = auxMsg;
-  reset();
+  resetState();
 }
+
 
 void Dino::parse(byte c) {
   if ((c == '\n') || (c == '\\')) {
@@ -59,7 +60,6 @@ void Dino::process() {
   cmd = atoi((char *)cmdStr);
   pin = atoi((char *)pinStr);
   val = atoi((char *)valStr);
-  response[0] = '\0';
 
   #ifdef debug
    Serial.print("Received - Command: "); Serial.print(cmdStr);
@@ -155,27 +155,16 @@ void Dino::process() {
     default:                          break;
   }
 
-  // Write the response.
-  if (response[0] != '\0') writeResponse();
-
   #ifdef debug
    Serial.print("Responded with - "); Serial.print(response); Serial.print("\n\n");
   #endif
 }
 
 
-// Let the sketch pass a function that it wants us to use to write output.
-// Store it as a callback and call that when we need to write.
-void Dino::setupWrite(void (*writeCallback)(char *str)) {
-  _writeCallback = writeCallback;
-}
-
-
-// Write the response variable using the callback function from the sketch.
-// Always terminate with a newline.
-void Dino::writeResponse() {
-  _writeCallback(response);
-  _writeCallback("\n");
+// Expect the sketch to pass a pointer to something that inherits from Stream.
+// Store it and call ->print, ->write, etc on it to send data.
+void Dino::setOutputStream(Stream* callback){
+  stream = callback;
 }
 
 
@@ -214,6 +203,19 @@ void Dino::updateListeners() {
 
 // CMD = 90
 void Dino::reset() {
+  resetState();
+
+  stream->print("ACK:");
+  stream->print(A0);
+  #if defined(__SAM3X8E__)
+    stream->print(',');
+    stream->print(DAC0);
+  #endif
+  stream->print('\n');
+}
+
+
+void Dino::resetState() {
   // Disable all the types of listeners.
   clearDigitalListeners();
   clearAnalogListeners();
@@ -223,7 +225,6 @@ void Dino::reset() {
   #ifdef DINO_SHIFT
     clearShiftListeners();
   #endif
-
   heartRate = 4000;    // Update digital listeners every ~4ms.
   analogDivider   = 4; // Update analog listeners every ~16ms.
   registerDivider = 2; // Update register listeners every ~8ms.
@@ -231,12 +232,6 @@ void Dino::reset() {
   charIndex = 0;
   loopCount = 0;
   lastUpdate = micros();
-
-  #if defined(__SAM3X8E__)
-    sprintf(response, "ACK:%d,%d", A0, DAC0);
-  #else
-    sprintf(response, "ACK:%d", A0);
-  #endif
 }
 
 

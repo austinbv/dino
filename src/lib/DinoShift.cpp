@@ -56,25 +56,20 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
 
   // Send data as if coming from the latch pin so it's easy to identify.
   // Start with just pin number and : for now.
-  sprintf(response, "%d:", latchPin);
-  _writeCallback(response);
+  stream->print(latchPin);
+  stream->print(':');
 
   for (int i = 1;  i <= len;  i++) {
     // Read a single byte from the register.
     byte reading = shiftIn(dataPin, clockPin, LSBFIRST);
 
-    // If we're on the last byte, append \n. If not, append a comma, then write.
-    if (i == len) {
-      sprintf(response, "%d\n", reading);
-    } else {
-      sprintf(response, "%d,", reading);
-    }
-    _writeCallback(response);
+    // Print it, then a comma or \n if it's the last byte.
+    stream->print(reading);
+    stream->print((i==len) ? '\n' : ',');
   }
 
-  // Leave latch pin high and clear response so main loop doesn't send anything.
+  // Leave latch pin high.
   digitalWrite(latchPin, HIGH);
-  response[0] = '\0';
 }
 
 

@@ -4,10 +4,6 @@
 #include "Dino.h"
 #ifdef DINO_ONE_WIRE
 
-// Include dtostrf for ARM.
-#if defined(__SAM3X8E__)
-  #include <avr/dtostrf.h>
-#endif
 #include "OneWire.h"
 
 // CMD = 15
@@ -54,8 +50,10 @@ void Dino::ds18Read() {
   char readingBuff[10];
 
   if (! isnan(reading)) {
-    dtostrf(reading, 6, 4, readingBuff);
-    sprintf(response, "%d:%s", pin, readingBuff);
+    stream->print(pin);
+    stream->print(':');
+    stream->print(reading, 4);
+    stream->print('\n');
   }
 }
 

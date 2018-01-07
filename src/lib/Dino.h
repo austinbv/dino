@@ -18,7 +18,7 @@
 class Dino {
   public:
     Dino();
-    void setupWrite(void (*writeCallback)(char *str));
+    void setOutputStream(Stream* callback);
     void parse(byte c);
     void updateListeners();
 
@@ -88,6 +88,7 @@ class Dino {
 
     // API access to timings, resolutions and reset.
     void reset                 ();  //cmd = 90
+    void resetState            ();
     void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
     void setAnalogDivider      ();  //cmd = 97
@@ -99,12 +100,15 @@ class Dino {
     int charIndex;
     boolean escaping;
     void append(byte c);
+
+    // Mostly a switch statement that decides what to run.
     void process();
 
     // Parsed message storage.
     byte cmdStr[5]; int cmd;
     byte pinStr[5]; int pin;
     byte valStr[5]; int val;
+
     // Scale aux message allocation based on enabled features and chip.
     #if !defined (__AVR_ATmega168__)
       #if defined(DINO_IR_OUT)
@@ -120,13 +124,12 @@ class Dino {
       byte auxMsg[40];
     #endif
 
-    // Value and response storage.
-    int rval;
-    char response[16];
+    // Save a pointer to any stream so we can call ->print and ->write on it.
+    Stream* stream;
 
-    // Use a write callback from the main sketch to respond.
-    void (*_writeCallback)(char *str);
-    void writeResponse();
+    // Storage and response func for features following the pin:rval pattern.
+    int rval;
+    void coreResponse();
 
     // Internal timing variables and utility functions.
     long heartRate;

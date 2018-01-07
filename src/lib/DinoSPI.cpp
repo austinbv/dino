@@ -79,26 +79,21 @@ void Dino::spiRead(int selectPin, int len, byte spiMode, uint32_t clockRate) {
 
   // Send data as if coming from the slave select pin so it's easy to identify.
   // Start with just pin number and : for now.
-  sprintf(response, "%d:", selectPin);
-  _writeCallback(response);
+  stream->print(selectPin);
+  stream->print(':');
 
   for (int i = 1;  i <= len;  i++) {
     // Read a single byte from the register.
     byte reading = SPI.transfer(0x00);
 
-    // If we're on the last byte, append \n. If not, append a comma, then write.
-    if (i == len) {
-      sprintf(response, "%d\n", reading);
-    } else {
-      sprintf(response, "%d,", reading);
-    }
-    _writeCallback(response);
+    // Print it, then a comma or \n if it's the last byte.
+    stream->print(reading);
+    stream->print((i==len) ? '\n' : ',');
   }
   spiEnd();
 
-  // Leave select high and clear response so main loop doesn't send anything.
+  // Leave select high.
   digitalWrite(selectPin, HIGH);
-  response[0] = '\0';
 }
 
 // CMD = 28

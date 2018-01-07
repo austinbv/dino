@@ -6,7 +6,7 @@ module Dino
       include Mixins::Poller
 
       def _read
-        board.ds18b20_read(self.pin, 0)
+        board.ds18b20_read(self.pin)
       end
     end
   end

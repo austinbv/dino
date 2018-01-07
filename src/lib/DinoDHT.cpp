@@ -5,11 +5,6 @@
 #include "Dino.h"
 #ifdef DINO_DHT
 
-// Include dtostrf for ARM.
-#if defined(__SAM3X8E__)
-  #include <avr/dtostrf.h>
-#endif
-
 // Include the DHT library and create an instance.
 #include "DHT.h"
 DHT dht;
@@ -17,22 +12,20 @@ DHT dht;
 // CMD = 13
 // Read a DHT sensor
 void Dino::dhtRead() {
+  // Can't access pin to check this in latest DHT library.
+  // Assuming safe to repeatedly call setup for now.
   // if (pin != dht.pin)
   dht.setup(pin);
-  float reading;
-  char readingBuff[10];
-  char prefix;
-  if (val == 0) {
-    reading = dht.getTemperature();
-    prefix = 'T';
-  } else {
-    reading = dht.getHumidity();
-    prefix = 'H';
-  }
-  if (! isnan(reading)) {
-    dtostrf(reading, 6, 4, readingBuff);
-    sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
-  }
+
+  // Always read both values
+  float temperature = dht.getTemperature();
+  float humidity = dht.getHumidity();
+
+  stream->print(pin); stream->print(':');
+  // Send the values as a comma delimited printed decimals with 1dp precision.
+  stream->print(temperature, 1); stream->print(',');
+  stream->print(humidity, 1);
+  stream->print('\n');
 
   #ifdef debug
     Serial.print("Called Dino::dhtRead()\n");

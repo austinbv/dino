@@ -2,32 +2,29 @@
 
 Dino dino;
 
-// Use 'serial' to reference the right interface depending on the device.
+// Use 'serial' as a pointer to the serial interface depending on device.
 // Uses native USB connection on the Due by default.
 #if defined(__SAM3X8E__)
-  Serial_ &serial = SerialUSB;
+  Serial_* serial = &SerialUSB;
 #elif defined(__AVR_ATmega32U4__)
-  Serial_ &serial = Serial;
+  Serial_* serial = &Serial;
 #elif defined(__AVR_ATtiny85__)
-  TinyDebugSerial &serial = Serial;
+  TinyDebugSerial* serial = &Serial;
 #else
-  HardwareSerial &serial = Serial;
+  HardwareSerial* serial = &Serial;
 #endif
 
 
-// Dino.h doesn't handle TXRX. Create a callback so it can write to serial.
-void writeResponse(char *response) { serial.print(response); }
-void (*writeCallback)(char *str) = writeResponse;
-
 void setup() {
-  serial.begin(115200);
+  serial->begin(115200);
 
   // Wait for Leonardo serial port to connect.
   #if defined(__AVR_ATmega32U4__)
     while(!serial);
   #endif
 
-  dino.setupWrite(writeCallback);
+  // Pass the serial pointer to dino, so it can write too.
+  dino.setOutputStream(serial);
 }
 
 
@@ -38,16 +35,16 @@ long    lastRcv   = micros();
 long    rcvWindow = 1000000;
 
 void acknowledge() {
-  serial.print("RCV:");
-  serial.print(rcvBytes);
-  serial.print("\n");
+  serial->print("RCV:");
+  serial->print(rcvBytes);
+  serial->print("\n");
   rcvBytes = 0;
 }
 
 
 void loop() {
-  while(serial.available() > 0) {
-    dino.parse(serial.read());
+  while(serial->available() > 0) {
+    dino.parse(serial->read());
 
     // Acknowledge when we've received as many bytes as the serial input buffer.
     lastRcv = micros();

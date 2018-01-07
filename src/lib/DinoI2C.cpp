@@ -14,7 +14,11 @@ void Dino::i2cBegin() {
   // I2c.setSpeed(??);
   // I2c.pullup(??);
   // I2c.timeOut(??);
-  sprintf(response, "%d:I2C:1", SDA);
+
+  // This format could be better.
+  stream->print(SDA);   stream->print(':');
+  stream->print("I2C"); stream->print(':');
+  stream->print('1');   stream->print('\n');
 }
 
 
@@ -22,7 +26,11 @@ void Dino::i2cBegin() {
 // Stop I2C communication.
 void Dino::i2cEnd() {
   I2c.end();
-  sprintf(response, "%d:I2C:0", SDA);
+
+  // This format could be better.
+  stream->print(SDA);   stream->print(':');
+  stream->print("I2C"); stream->print(':');
+  stream->print('0');   stream->print('\n');
 }
 
 
@@ -43,12 +51,12 @@ void Dino::i2cScan() {
     address = I2c.scanOne(address);
 
     // Write whatever we get including address space end or errors.
-    sprintf(response, "%d:%d", SDA, address);
-    writeResponse();
+    stream->print(SDA);     stream->print(':');
+    stream->print(address); stream->print('\n');
+
+    // Increment address before scanning again.
     address++;
   }
-  // Clear the response to make sure it doesn't get sent twice.
-  response[0] = '\0';
 }
 
 
@@ -89,24 +97,19 @@ void Dino::i2cRead() {
   I2c.read(auxMsg[0], auxMsg[1], auxMsg[2]);
 
   // Send back the SDA pin, the device address, and start register address first.
-  sprintf(response, "%d:%d:%d:", SDA, auxMsg[0], auxMsg[1]);
-  _writeCallback(response);
+  stream->print(SDA);       stream->print(':');
+  stream->print(auxMsg[0]); stream->print(':');
+  stream->print(auxMsg[1]); stream->print(':');
 
   // Send back the data bytes.
   uint8_t currentByte = 0;
   while(I2c.available()){
     currentByte++;
-    // Append comma, but \n for last byte, then write.
-    if (currentByte == auxMsg[2]){
-      sprintf(response, "%d\n", I2c.receive());
-    } else {
-      sprintf(response, "%d,", I2c.receive());
-    }
-    _writeCallback(response);
-  }
 
-  // Clear the response to make sure it doesn't get sent twice.
-  response[0] = '\0';
+    // Get a byte from the I2C buffer, print it, then comma or \n if last byte.
+    stream->print(I2c.receive());
+    stream->print((currentByte == auxMsg[2]) ? '\n' : ',');
+  }
 }
 
 #endif

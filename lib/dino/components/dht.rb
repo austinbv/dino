@@ -1,36 +1,25 @@
 module Dino
   module Components
-    module DHT
-      class Temperature
-        include Setup::SinglePin
-        include Setup::Input
-        include Mixins::Poller
+    class DHT
+      include Setup::SinglePin
+      include Setup::Input
+      include Mixins::Poller
 
-        def _read
-          board.dht_read(self.pin, 0)
-        end
-
-        def update(data)
-          return unless data.match /T/
-          data.gsub!('T', '')
-          super(data.to_f)
-        end
+      def after_initialize(options={})
+        super(options) if defined?(super)
+        @state = {temperature: nil, humidity: nil}
       end
 
-      class Humidity
-        include Setup::SinglePin
-        include Setup::Input
-        include Mixins::Poller
+      def _read
+        board.dht_read(self.pin)
+      end
 
-        def _read
-          board.dht_read(self.pin, 1)
-        end
-
-        def update(data)
-          return unless data.match /H/
-          data.gsub!('H', '')
-          super(data.to_f)
-        end
+      # Process raw data from the board before running Callbacks#update.
+      # super will write to @state after running callbacks.
+      def update(data)
+        t, h = data.split(",")
+        reading = { temperature: t.to_f, humidity: h.to_f }
+        super(reading)
       end
     end
   end
