@@ -17,7 +17,8 @@ DHT dht;
 // CMD = 13
 // Read a DHT sensor
 void Dino::dhtRead() {
-  if (pin != dht.pin) dht.setup(pin);
+  // if (pin != dht.pin)
+  dht.setup(pin);
   float reading;
   char readingBuff[10];
   char prefix;

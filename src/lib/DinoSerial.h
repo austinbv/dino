@@ -1,3 +1,4 @@
+#include "Dino.h"
 #ifdef DINO_SERIAL
 #ifndef DinoSerial_h
 #define DinoSerial_h

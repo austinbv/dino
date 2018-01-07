@@ -1,3 +1,5 @@
+#include "Dino.h"
+#ifdef DINO_LCD
 #ifndef DinoLCD_h
 #define DinoLCD_h
 
@@ -17,4 +19,5 @@ class DinoLCD {
     int parseSize;
 };
 
+#endif
 #endif

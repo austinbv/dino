@@ -1,3 +1,4 @@
+#include "Dino.h"
 #ifdef DINO_SERIAL
 #include "Arduino.h"
 #include "DinoSerial.h"

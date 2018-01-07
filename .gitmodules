@@ -4,3 +4,9 @@
 [submodule "src/vendor/I2C-Master-Library"]
 	path = src/vendor/I2C-Master-Library
 	url = https://github.com/vickash/I2C-Master-Library.git
+[submodule "src/vendor/arduino-DHT"]
+	path = src/vendor/arduino-DHT
+	url = https://github.com/markruys/arduino-DHT.git
+[submodule "src/vendor/OneWire"]
+	path = src/vendor/OneWire
+	url = https://github.com/PaulStoffregen/OneWire.git

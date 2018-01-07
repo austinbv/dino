@@ -54,8 +54,8 @@ PACKAGES = {
     directive: "DINO_DHT",
     files: [
       "lib/DinoDHT.cpp",
-      "vendor/DHT/DHT.cpp",
-      "vendor/DHT/DHT.h",
+      "vendor/arduino-DHT/DHT.cpp",
+      "vendor/arduino-DHT/DHT.h",
     ]
   },
   serial: {
