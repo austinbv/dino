@@ -72,7 +72,6 @@ PACKAGES = {
     files: [
       "lib/DinoIROut.cpp",
       "vendor/Arduino-IRremote/boarddefs.h",
-      "vendor/Arduino-IRremote/IRremote.cpp",
       "vendor/Arduino-IRremote/IRremote.h",
       "vendor/Arduino-IRremote/IRremoteInt.h",
       "vendor/Arduino-IRremote/irSend.cpp",
