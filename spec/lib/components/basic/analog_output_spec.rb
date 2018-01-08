@@ -18,13 +18,12 @@ module Dino
         end
 
         describe '#write' do
-          it 'should call #digital_write if value is HIGH' do
+          it 'should call #digital_write with board.high if value is board.analog_high' do
             expect(subject).to receive(:digital_write).with(board.high)
-            subject.write(board.high)
+            subject.write(board.analog_high)
           end
 
-
-          it 'should call #digital_write if value is LOW' do
+          it 'should call #digital_write with board.low if value is board.low' do
             expect(subject).to receive(:digital_write).with(board.low)
             subject.write(board.low)
           end

@@ -31,10 +31,15 @@ module Dino
         expect(subject.dac_zero).to equal(20)
       end
 
-      it 'should set the analog resolution' do
+      it 'should set digital high and low' do
         board = Board.new(io_mock)
         expect(board.low).to equal(0)
-        expect(board.high).to equal(255)
+        expect(board.high).to equal(1)
+      end
+
+      it 'should set analog high separately' do
+        board = Board.new(io_mock)
+        expect(board.analog_high).to equal(255)
       end
     end
 
@@ -205,10 +210,10 @@ module Dino
       it 'should set @high and @low correctly' do
         subject.analog_resolution = 8
         expect(subject.low).to equal(0)
-        expect(subject.high).to equal(255)
+        expect(subject.analog_high).to equal(255)
 
         subject.analog_resolution = 10
-        expect(subject.high).to equal(1023)
+        expect(subject.analog_high).to equal(1023)
       end
     end
   end

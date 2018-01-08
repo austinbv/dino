@@ -1,6 +1,6 @@
 module Dino
   class Board
-    attr_reader :high, :low, :components, :analog_zero, :dac_zero
+    attr_reader :high, :low, :analog_high, :components, :analog_zero, :dac_zero
     DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
     def initialize(io, options={})
@@ -16,7 +16,8 @@ module Dino
       @bits = value || 8
       write Dino::Message.encode(command: 96, value: @bits)
       @low  = 0
-      @high = (2 ** @bits) - 1
+      @high = 1
+      @analog_high = (2 ** @bits) - 1
     end
 
     def analog_divider=(value)

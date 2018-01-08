@@ -31,6 +31,9 @@ module Dino
 
         alias :off :low
         alias :on  :high
+
+        def high?; state == board.high end
+        def low?;  state == board.low  end
       end
     end
   end

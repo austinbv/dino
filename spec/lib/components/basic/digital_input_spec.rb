@@ -40,7 +40,7 @@ module Dino
               expect(@low_callback).to receive(:called)
               expect(@high_callback).not_to receive(:called)
 
-              subject.update(DigitalInput::LOW)
+              subject.update(board.low)
             end
           end
 
@@ -49,7 +49,7 @@ module Dino
               expect(@high_callback).to receive(:called)
               expect(@low_callback).not_to receive(:called)
 
-              subject.update(DigitalInput::HIGH)
+              subject.update(board.high)
             end
           end
         end
