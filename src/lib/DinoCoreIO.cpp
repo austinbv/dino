@@ -116,9 +116,10 @@ void Dino::removeListener() {
 void Dino::updateDigitalListeners() {
   for (int i = 0; i < PIN_COUNT; i++) {
     if (digitalListeners[i]) {
-      dRead(i);
+      rval = digitalRead(i);
       if (rval != digitalListenerValues[i]) {
         digitalListenerValues[i] = rval;
+        coreResponse(i, rval);
       }
     }
   }
