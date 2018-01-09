@@ -30,7 +30,7 @@ void setup() {
 
 // Keep count of bytes as we receive them and send a dino message with how many.
 uint8_t rcvBytes  = 0;
-uint8_t rcvThreshold = 30;
+uint8_t rcvThreshold = 64;
 long    lastRcv   = micros();
 long    rcvWindow = 1000000;
 

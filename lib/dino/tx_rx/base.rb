@@ -8,9 +8,11 @@ module Dino
     class HandshakeError     < StandardError; end
     class RxFlushTimeout     < StandardError; end
 
+    attr_accessor :sent_bytes
+
     class Base
       include Observable
-      BOARD_BUFFER = 60
+      BOARD_BUFFER = 64
       HANDSHAKE_TRIES = 3
       HANDSHAKE_TIMEOUT = 2
 
@@ -33,6 +35,7 @@ module Dino
       end
 
       def handshake
+        @sent_bytes = 0
         initialize_flow_control
         flush_read
         HANDSHAKE_TRIES.times do |retries|
@@ -70,20 +73,17 @@ module Dino
       end
 
       def synced_write(message)
-        message = message.split("")
-        loop do
-          @flow_control.synchronize do
-            bytes = BOARD_BUFFER - @transit_bytes
-            break unless bytes > 0
-
-            bytes = message.length if (message.length < bytes)
-            fragment = String.new
-            bytes.times { fragment << message.shift }
+        @sent_bytes += message.length
+        while message && !message.empty?
+          bytes = BOARD_BUFFER - transit_bytes
+          if bytes > 0
+            fragment = message[0..(bytes-1)]
+            message  = message[bytes..-1]
             io.write(fragment)
-            @transit_bytes = @transit_bytes + bytes
+            add_transit_bytes(fragment.length)
+          else
+            sleep 0.0005
           end
-          return if message.empty?
-          sleep 0.005
         end
       end
 
@@ -93,7 +93,7 @@ module Dino
 
       def _read
         line = gets
-        line ? process_line(line) : sleep(0.005)
+        line ? process_line(line) : sleep(0.001)
       end
 
       def process_line(line)
