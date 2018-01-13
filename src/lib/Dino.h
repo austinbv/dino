@@ -127,11 +127,10 @@ class Dino {
     Stream* stream;
 
     // Internal timing variables and utility functions.
-    long heartRate;
-    long lastUpdate;
-    unsigned int loopCount;
-    unsigned int analogDivider;
-    unsigned int registerDivider;
-    long timeSince (long event);
+    unsigned long heartRate;
+    unsigned long lastUpdate;
+    byte loopCount;
+    byte analogDivider;
+    byte registerDivider;
 };
 #endif

@@ -168,22 +168,16 @@ void Dino::setOutputStream(Stream* callback){
 }
 
 
-// Convenience wrapper to keep track of time since last read for listeners.
-long Dino::timeSince(long event) {
- long time = micros() - event;
- return time;
-}
-
-
 // Every heartRate microseconds, read the digital listeners and send values if changed.
 // Analog listeners use a divider to run at a fraction of that frequency.
 // Register listeners (Shift, I2C and SPI) all share a second divider value.
 // Analog and register listeners always send values even if not changed.
 // See Dino::reset for default timings.
 void Dino::updateListeners() {
-  if (timeSince(lastUpdate) > heartRate || timeSince(lastUpdate) < 0) {
+  unsigned long now = micros();
+  if ((now - lastUpdate) > heartRate) {
     // Digital Listeners
-    lastUpdate = micros();
+    lastUpdate = now;
     loopCount++;
     updateDigitalListeners();
 
