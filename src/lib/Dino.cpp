@@ -12,6 +12,31 @@ Dino::Dino(){
 }
 
 
+void Dino::acknowledge() {
+  stream->print("RCV:");
+  stream->print(rcvBytes);
+  stream->print("\n");
+  rcvBytes = 0;
+}
+
+void Dino::run(){
+  while(stream->available() > 0) {
+    parse(stream->read());
+
+    // Acknowledge when we've received as many bytes as the serial input buffer.
+    lastRcv = micros();
+    rcvBytes ++;
+    if (rcvBytes == rcvThreshold) acknowledge();
+  }
+
+  // Also acknowledge when the last byte received goes outside the receive window.
+  if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
+
+  // Run dino's listeners.
+  updateListeners();
+}
+
+
 void Dino::parse(byte c) {
   if ((c == '\n') || (c == '\\')) {
     // If last char was a \, this \ or \n is escaped.

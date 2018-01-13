@@ -42,47 +42,20 @@ void setup() {
   // Start the server.
   server.begin();
   printWifiStatus();
-
-  // Pass a client pointer to dino, so it can write too.
-  dino.setOutputStream(&client);
 }
-
-
-// Keep count of bytes as we receive them and send a dino message with how many.
-uint8_t rcvBytes  = 0;
-uint8_t rcvThreshold = 64;
-long    lastRcv   = micros();
-long    rcvWindow = 1000000;
-
-void acknowledge() {
-  client.print("RCV:");
-  client.print(rcvBytes);
-  client.print("\n");
-  rcvBytes = 0;
-}
-
 
 void loop() {
   // Listen for connections.
   client = server.available();
 
+  // Pass the stream to dino so it can read/write.
+  dino.setOutputStream(&client);
+
   // Handle a connection.
   if (client) {
-    while (client.connected()) {
-      while (client.available()){
-        dino.parse(client.read());
-
-        // Acknowledge when we've received as many bytes as the serial input buffer.
-        lastRcv = micros();
-        rcvBytes ++;
-        if (rcvBytes == rcvThreshold) acknowledge();
-      }
-
-      // Also acknowledge when the last byte received goes outside the receive window.
-      if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
-
-      dino.updateListeners();
-    }
+    while (client.connected()) dino.run();
   }
+
+  // End the connection.
   client.stop();
 }

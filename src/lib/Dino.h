@@ -19,15 +19,18 @@ class Dino {
   public:
     Dino();
     void setOutputStream(Stream* callback);
-    void parse(byte c);
-    void updateListeners();
+    void run();
 
   private:
-    // Functions with a cmd value can be called through the remote API.
+    // Main loop functions.
+    void acknowledge();
+    void parse(byte c);
+    void process();
 
     // See explanation at top of DinoBugWorkaround.cpp
     void bugWorkaround();
 
+    // Functions with a cmd value can be called through the remote API.
     // Core IO Functions
     void setMode               ();         //cmd = 0
     void dWrite                ();         //cmd = 1
@@ -39,16 +42,19 @@ class Dino {
     void addDigitalListener    ();         //cmd = 5
     void addAnalogListener     ();         //cmd = 6
     void removeListener        ();         //cmd = 7
+    void updateListeners();
     void updateDigitalListeners();
     void updateAnalogListeners ();
     void clearDigitalListeners ();
     void clearAnalogListeners  ();
+
     // Listener State and Storage
     // Array indices mapped to board pins. true = listener enabled on that pin.
     // Cache last value for digital listeners and only send on change.
     boolean analogListeners[PIN_COUNT];
     boolean digitalListeners[PIN_COUNT];
     byte digitalListenerValues[PIN_COUNT];
+
     // Storage and response func for features following the pin:rval pattern.
     int rval;
     void coreResponse(int p, int v);
@@ -104,9 +110,6 @@ class Dino {
     boolean escaping;
     void append(byte c);
 
-    // Mostly a switch statement that decides what to run.
-    void process();
-
     // Parsed message storage.
     byte cmdStr[4]; int cmd;
     byte pinStr[4]; int pin;
@@ -132,5 +135,11 @@ class Dino {
     byte loopCount;
     byte analogDivider;
     byte registerDivider;
+
+    // Keep count of bytes as we receive them and send a dino message with how many.
+    uint8_t rcvBytes  = 0;
+    uint8_t rcvThreshold = 64;
+    unsigned long lastRcv = micros();
+    long long rcvWindow = 1000000;
 };
 #endif
