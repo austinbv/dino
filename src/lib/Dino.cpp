@@ -106,9 +106,7 @@ void Dino::process() {
     case 2:  dRead               (pin); break;
     case 3:  aWrite              ();    break;
     case 4:  aRead               (pin); break;
-    case 5:  addDigitalListener  ();    break;
-    case 6:  addAnalogListener   ();    break;
-    case 7:  removeListener      ();    break;
+    case 7:  setListener         ();    break;
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
@@ -174,10 +172,8 @@ void Dino::process() {
 
     // Implemented in this file.
     case 90: reset               ();  break;
-    case 95: setAnalogDivider    ();  break;
+    case 95: setRegisterDivider  ();  break;
     case 96: setAnalogResolution ();  break;
-    case 97: setAnalogDivider    ();  break;
-    case 98: setHeartRate        ();  break;
 
     // Should send a "feature not implemented" message as default.
     default:                          break;
@@ -195,30 +191,30 @@ void Dino::setOutputStream(Stream* callback){
   stream = callback;
 }
 
-
-// Every heartRate microseconds, read the digital listeners and send values if changed.
-// Analog listeners use a divider to run at a fraction of that frequency.
-// Register listeners (Shift, I2C and SPI) all share a second divider value.
+//
+// Every 1000 microseconds count a tick and call the listeners.
+// Each core listener has its own divider, so it can read every
+// 1, 2, 4, 8, 16, 32, 64 or 128 ticks, independent of the others.
+//
+// Register listeners are still on a global divider for now.
 // Analog and register listeners always send values even if not changed.
-// See Dino::reset for default timings.
+// Digital listeners only send values on change.
+//
 void Dino::updateListeners() {
   unsigned long now = micros();
-  if ((now - lastUpdate) > heartRate) {
-    // Digital Listeners
-    lastUpdate = now;
-    loopCount++;
-    updateDigitalListeners();
+  if ((now - lastTick) > 1000) {
+    lastTick = now;
+    tickCount++;
+
+    updateCoreListeners(tickCount);
 
     // Register Listeners
     #ifdef DINO_SHIFT
-      if (loopCount % registerDivider == 0) updateShiftListeners();
+      if (tickCount % registerDivider == 0) updateShiftListeners();
     #endif
     #ifdef DINO_SPI
-      if (loopCount % registerDivider == 0) updateSpiListeners();
+      if (tickCount % registerDivider == 0) updateSpiListeners();
     #endif
-
-    // Analog Listeners
-    if (loopCount % analogDivider   == 0) updateAnalogListeners();
   }
 }
 
@@ -241,22 +237,19 @@ void Dino::reset() {
 
 
 void Dino::resetState() {
-  // Disable all the types of listeners.
-  clearDigitalListeners();
-  clearAnalogListeners();
+  clearCoreListeners();
+  lastActiveListener = 0;
   #ifdef DINO_SPI
     clearSpiListeners();
   #endif
   #ifdef DINO_SHIFT
     clearShiftListeners();
   #endif
-  heartRate = 4000;    // Update digital listeners every ~4ms.
-  analogDivider   = 4; // Update analog listeners every ~16ms.
-  registerDivider = 2; // Update register listeners every ~8ms.
+  registerDivider = 8; // Update register listeners every ~8ms.
   fragmentIndex = 0;
   charIndex = 0;
-  loopCount = 0;
-  lastUpdate = micros();
+  tickCount = 0;
+  lastTick = micros();
 }
 
 
@@ -279,25 +272,5 @@ void Dino::setAnalogResolution() {
   #endif
   #ifdef debug
     Serial.print("Called Dino::setAnalogResolution()\n");
-  #endif
-}
-
-
-// CMD = 97
-// Set the analog divider. Powers of 2 up to 128 are valid.
-void Dino::setAnalogDivider() {
-  analogDivider = val;
-  #ifdef debug
-    Serial.print("Called Dino::setAnalogDivider()\n");
-  #endif
-}
-
-
-// CMD = 98
-// Set the heart rate in milliseconds. Store it in microseconds.
-void Dino::setHeartRate() {
-  heartRate = atoi((char *)auxMsg);
-  #ifdef debug
-    Serial.print("Called Dino::setHeartRate()\n");
   #endif
 }

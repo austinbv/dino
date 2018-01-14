@@ -161,23 +161,42 @@ module Dino
       end
     end
 
+    describe '#set_listener' do
+      it 'should set the right pin' do
+        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 7, pin: 11, value: 0b00000011)
+        subject.set_listener(11, :off)
+      end
+      it 'should set the right mode' do
+        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 7, pin: 11, value: 0b01000011)
+        subject.set_listener(11, :off, mode: :analog)
+      end
+      it 'should set the right state' do
+        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 7, pin: 11, value: 0b11000011)
+        subject.set_listener(11, :on, mode: :analog)
+      end
+      it 'should set the right divider' do
+        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 7, pin: 11, value: 0b11000000)
+        subject.set_listener(11, :on, mode: :analog, divider: 1)
+      end
+    end
+
     describe '#digital_listen' do
       it 'should start listening for a digital signal on the given pin' do
-        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 5, pin: 13)
+        expect(subject).to receive(:set_listener).with(13, :on, mode: :digital, divider: 4)
         subject.digital_listen(13)
       end
     end
 
     describe '#analog_listen' do
       it 'should start listening for an analog signal on the given pin' do
-        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 6, pin: 13)
+        expect(subject).to receive(:set_listener).with(13, :on, mode: :analog, divider: 16)
         subject.analog_listen(13)
       end
     end
 
     describe '#stop_listener' do
       it 'should stop listening for any signal on the given pin' do
-        expect(io_mock).to receive(:write).with(Dino::Message.encode command: 7, pin: 13)
+        expect(subject).to receive(:set_listener).with(13, :off)
         subject.stop_listener(13)
       end
     end

@@ -6,9 +6,8 @@ module Dino
     def initialize(io, options={})
       @io, @components = io, []
       @analog_zero, @dac_zero = @io.handshake.to_s.split(",").map { |pin| pin.to_i }
-
       io.add_observer(self)
-      self.analog_resolution = options[:bits]
+      self.analog_resolution = options[:bits] || 8
     end
 
     def analog_resolution=(value)
@@ -17,18 +16,6 @@ module Dino
       @low  = 0
       @high = 1
       @analog_high = (2 ** @bits) - 1
-    end
-
-    def analog_divider=(value)
-      unless DIVIDERS.include? value
-        puts "Analog divider must be in #{DIVIDERS.inspect}"
-      else
-        write Dino::Message.encode(command: 97, value: value)
-      end
-    end
-
-    def heart_rate=(value)
-      write Dino::Message.encode(command: 98, aux_message: value)
     end
 
     def write(msg)
@@ -66,9 +53,9 @@ module Dino
       digital_read:    '2',
       analog_write:    '3',
       analog_read:     '4',
-      digital_listen:  '5',
-      analog_listen:   '6',
-      stop_listener:   '7',
+      # unused:        '5',
+      # unused:        '6',
+      set_listener:    '7',
       servo_toggle:    '8',
       servo_write:     '9',
       # LCD            '10'
@@ -79,7 +66,7 @@ module Dino
       ds18b20_read:    '15',
       # IR send:       '16'
       tone:            '17',
-      no_tone:         '18'
+      no_tone:         '18',
     }
 
     PIN_COMMANDS.each_key do |command|
@@ -91,6 +78,39 @@ module Dino
     # Redefinition tone to accept duration.
     def tone(pin, value, duration)
       write Dino::Message.encode(command: PIN_COMMANDS[:tone], pin: convert_pin(pin), value: value, aux_message: duration)
+    end
+
+    def set_listener(pin, state=:off, options={})
+      mode    = options[:mode]    || :digital
+      divider = options[:divider] || 8
+
+      unless [:digital, :analog].include? mode
+        raise "Mode must be either digital or analog"
+      end
+      unless DIVIDERS.include? divider
+        raise "Listener divider must be in #{DIVIDERS.inspect}"
+      end
+
+      # Create a bit mask for the settings we want to use. Gets sent in value.
+      mask = 0
+      mask |= 0b10000000 if (state == :on)
+      mask |= 0b01000000 if (mode == :analog)
+      mask |= Math.log2(divider).to_i
+
+      write Dino::Message.encode(command: PIN_COMMANDS[:set_listener], pin: convert_pin(pin), value: mask)
+    end
+
+    # Implement the simpler methods by wrapping set_listener with old defaults.
+    def digital_listen(pin, divider=4)
+      set_listener(pin, :on, mode: :digital, divider: divider)
+    end
+
+    def analog_listen(pin, divider=16)
+      set_listener(pin, :on, mode: :analog, divider: divider)
+    end
+
+    def stop_listener(pin)
+      set_listener(pin, :off)
     end
 
     DIGITAL_REGEX = /\A\d+\z/i

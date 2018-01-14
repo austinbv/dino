@@ -39,21 +39,29 @@ class Dino {
     void aRead                 (int pin);  //cmd = 4
 
     // Core IO Listeners
-    void addDigitalListener    ();         //cmd = 5
-    void addAnalogListener     ();         //cmd = 6
-    void removeListener        ();         //cmd = 7
-    void updateListeners();
-    void updateDigitalListeners();
-    void updateAnalogListeners ();
-    void clearDigitalListeners ();
-    void clearAnalogListeners  ();
+    void setListener           ();         //cmd = 7
+    void updateListeners       ();
+    void updateCoreListeners   (byte tickCount);
+    void digitalListenerUpdate (byte index);
+    void clearCoreListeners    ();
 
-    // Listener State and Storage
-    // Array indices mapped to board pins. true = listener enabled on that pin.
-    // Cache last value for digital listeners and only send on change.
-    boolean analogListeners[PIN_COUNT];
-    boolean digitalListeners[PIN_COUNT];
-    byte digitalListenerValues[PIN_COUNT];
+    //
+    // Store listeners as a 2 dimensional array where each gets 2 bytes, such that:
+    //
+    // byte 0, bit 7   : 1 for listener enabled, 0 for listener disabled.
+    // byte 0, bit 6   : 1 for analog listener, 0 for digital listener.
+    // byte 0, bit 5   : storage for digital listener state
+    // byte 0, bits 4-3: unused
+    // byte 0, bits 2-0: timing divider exponent specific to this pin, 2^0 through 2^8
+    //
+    // byte 1          : pin number
+    //
+    byte listeners [PIN_COUNT][2];
+
+    // Track the highest number listener that's active.
+    byte lastActiveListener;
+    // Map 2's exponents for dividers to save time.
+    const byte dividerMap[8] = {1, 2, 4, 8, 16, 32, 64, 128};
 
     // Storage and response func for features following the pin:rval pattern.
     int rval;
@@ -100,8 +108,6 @@ class Dino {
     void resetState            ();
     void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
-    void setAnalogDivider      ();  //cmd = 97
-    void setHeartRate          ();  //cmd = 98
 
     // Parser state storage and utility functions.
     byte *messageFragments[4];
@@ -111,9 +117,9 @@ class Dino {
     void append(byte c);
 
     // Parsed message storage.
-    byte cmdStr[4]; int cmd;
-    byte pinStr[4]; int pin;
-    byte valStr[4]; int val;
+    byte cmdStr[4]; byte cmd;
+    byte pinStr[4]; byte pin;
+    byte valStr[4]; byte val;
 
     // Scale aux message allocation based on enabled features and chip.
     #if defined(DINO_IR_OUT) && !defined (__AVR_ATmega168__)
@@ -130,10 +136,8 @@ class Dino {
     Stream* stream;
 
     // Internal timing variables and utility functions.
-    unsigned long heartRate;
-    unsigned long lastUpdate;
-    byte loopCount;
-    byte analogDivider;
+    unsigned long lastTick;
+    byte tickCount;
     byte registerDivider;
 
     // Keep count of bytes as we receive them and send a dino message with how many.
