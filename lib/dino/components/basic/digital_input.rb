@@ -17,8 +17,9 @@ module Dino
           board.digital_read(self.pin)
         end
 
-        def _listen
-          board.digital_listen(self.pin)
+        def _listen(divider=4)
+          divider ||= 4
+          board.digital_listen(self.pin, divider)
         end
 
         def on_high(&block)

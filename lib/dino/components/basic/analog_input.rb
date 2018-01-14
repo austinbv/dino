@@ -12,8 +12,9 @@ module Dino
           board.analog_read(self.pin)
         end
 
-        def _listen
-          board.analog_listen(self.pin)
+        def _listen(divider=16)
+          divider ||= 16
+          board.analog_listen(self.pin, divider)
         end
       end
     end

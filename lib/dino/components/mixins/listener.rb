@@ -4,10 +4,10 @@ module Dino
       module Listener
       	include Callbacks
 
-        def listen(&block)
+        def listen(divider=nil, &block)
           stop
           add_callback(:listen, &block) if block_given?
-          _listen
+          _listen(divider)
         end
 
         def stop

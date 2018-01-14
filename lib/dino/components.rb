@@ -19,5 +19,6 @@ module Dino
     autoload :DS18B20,          'dino/components/ds18b20'
     autoload :IREmitter,        'dino/components/ir_emitter'
     autoload :Piezo,            'dino/components/piezo'
+    autoload :RotaryEncoder,    'dino/components/rotary_encoder'
   end
 end

@@ -17,7 +17,7 @@ module Dino
 
         describe '#_listen' do
           it 'should send #analog_listen to the board with its pin' do
-            expect(board).to receive(:analog_listen).with(subject.pin)
+            expect(board).to receive(:analog_listen).with(subject.pin, 16)
             subject._listen
           end
         end

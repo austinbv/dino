@@ -9,7 +9,7 @@ module Dino
         subject { DigitalInput.new(options) }
 
         it 'should start listening immediately' do
-          expect(board).to receive(:digital_listen).with(14)
+          expect(board).to receive(:digital_listen).with(14, 4)
           component = DigitalInput.new(options)
         end
 
@@ -22,7 +22,7 @@ module Dino
 
         describe '#_listen' do
           it 'should call board#digital_listen with its pin once' do
-            expect(board).to receive(:digital_listen).with(subject.pin).once
+            expect(board).to receive(:digital_listen).with(subject.pin, 4).once
             subject._listen
           end
         end
