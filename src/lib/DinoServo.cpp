@@ -43,6 +43,7 @@ void Dino::servoToggle() {
         found = true;
         servos[i].servo.attach(pin);
         servos[i].active = true;
+        break;
       }
     }
     // If it doesn't exist, use the first inactive object.
@@ -51,6 +52,7 @@ void Dino::servoToggle() {
         if (servos[i].active == false) {
           servos[i].servo.attach(pin);
           servos[i].active = true;
+          break;
         }
       }
     }
