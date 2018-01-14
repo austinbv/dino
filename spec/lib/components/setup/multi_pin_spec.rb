@@ -61,10 +61,10 @@ module Dino
             expect(subject.maybe.pin).to eq(11)          end
         end
 
-        describe '#states' do
+        describe '#proxy_states' do
           it 'should return a hash with the state of each subcomponent' do
             subject.two.high
-            expect(subject.state).to eq({two: board.high, maybe: nil})
+            expect(subject.proxy_states).to eq({two: board.high, maybe: nil})
           end
         end
       end

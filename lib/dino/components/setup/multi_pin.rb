@@ -14,7 +14,7 @@ module Dino
         #
         # Return a hash with the state of each proxy component.
         #
-        def state
+        def proxy_states
           hash = {}
           proxies.each_key do |key|
             hash[key] = self.proxies[key].state rescue nil
@@ -23,6 +23,7 @@ module Dino
         end
 
       protected
+
         attr_writer :pins, :pullups, :proxies
 
         def self.included(base)

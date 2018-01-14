@@ -7,22 +7,57 @@ module Dino
       proxy_pins data: Basic::DigitalInput,
                  clock: Basic::DigitalInput
 
+      attr_reader :position, :steps, :degrees_per_step
+      alias :position :state
+
       def after_initialize(options={})
         super(options) if defined?(super)
-        @state = 0
 
-        # Stop the default behavior of the DigitalInput instances.
-        clock.stop; data.stop;
-        clock.listen(1); data.listen(1)
-        sleep 0.5
+        # Default to listening every tick (1ms / 1kHz)
+        divider = options[:divider] || 1
+        clock.listen(divider)
+        data.listen(divider)
+
+        # Setup to track position in degrees.
+        @steps = options[:steps] || 30
+        @degrees_per_step = (360 / steps).to_f
+        @state = 0.0
 
         start
       end
 
       def start
-        proxies[:clock].add_callback do |clock_state|
-          (data.state == clock_state) ? self.update(@state + 1) : self.update(@state - 1)
+        clock.add_callback do |clock_state|
+          (data.state == clock_state) ? self.update(-1) : self.update(1)
         end
+      end
+
+      #
+      # Callbacks#update calls these before and after callbacks respectively.
+      #
+      # Take data (+/- 1 step change) and calculate new position (state) in degrees.
+      # Leave old position in @state for now, so callbacks can compare to it.
+      #
+      # Return a hash with the new :position and pass through :change, overriding
+      # the data param we took, which would have passed directly to callbacks.
+      # Callbacks can use either :position (degrees) or :change (steps).
+      #
+      def pre_callback_filter(data)
+        data = { change: data,
+                 position: (state + (data * degrees_per_step)) % 360 }
+      end
+      #
+      # Callbacks run now, receiving only the value of #pre_callback_filter
+      #
+      # After callbacks, set @state to the position calculated earlier.
+      # This method also receives the value of #pre_callback_filter.
+      #
+      def update_self(data)
+        @state = data[:position]
+      end
+
+      def reset_position
+        @callbacks_mutex.synchronize { @state = 0 }
       end
     end
   end
