@@ -5,11 +5,10 @@ module Dino
 
     def initialize(io, options={})
       @io, @components = io, []
-      io.add_observer(self)
-
       @analog_zero, @dac_zero = @io.handshake.to_s.split(",").map { |pin| pin.to_i }
+
+      io.add_observer(self)
       self.analog_resolution = options[:bits]
-      start_read
     end
 
     def analog_resolution=(value)
@@ -30,14 +29,6 @@ module Dino
 
     def heart_rate=(value)
       write Dino::Message.encode(command: 98, aux_message: value)
-    end
-
-    def start_read
-      @io.read
-    end
-
-    def stop_read
-      @io.close_read
     end
 
     def write(msg)

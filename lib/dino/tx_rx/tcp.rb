@@ -12,6 +12,7 @@ module Dino
       end
 
     private
+
       def connect
         print "Connecting to TCP at: #{self.to_s}... "
         connection = Timeout::timeout(10) { TCPSocket.open @host, @port }
@@ -21,17 +22,17 @@ module Dino
         raise TCPConnectError, error.message
       end
 
-      def _write(message)
+      def write(message)
         loop do
-          if IO.select(nil, [io], nil)
+          if IO.select(nil, [io], nil, 0)
             io.syswrite(message)
             break
           end
         end
       end
 
-      def gets(timeout=0.005)
-        IO.select([io], nil, nil, timeout) && io.gets.gsub(/\n\z/, "")
+      def read
+        IO.select([io], nil, nil, 0) && io.gets.gsub(/\n\z/, "")
       end
     end
   end

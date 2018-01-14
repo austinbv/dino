@@ -74,20 +74,6 @@ module Dino
       end
     end
 
-    describe '#start_read' do
-      it 'should tell the io to read' do
-        expect(io_mock).to receive(:read)
-        subject.start_read
-      end
-    end
-
-    describe '#stop_read' do
-      it 'should tell the io to read' do
-        expect(io_mock).to receive(:close_read)
-        subject.stop_read
-      end
-    end
-
     describe '#write' do
       it 'should call #write on the io with the message' do
         expect(io_mock).to receive(:write).with('message')

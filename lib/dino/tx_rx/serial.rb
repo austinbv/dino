@@ -14,6 +14,31 @@ module Dino
         "#{@device} @ #{@baud} baud"
       end
 
+      def write(message)
+        io.write(message)
+      end
+
+      def read
+        buff, escaped = "", false
+        loop do
+          char = io.read(1)
+          if ["\n", "\\"].include? char
+            if escaped
+              buff << char
+              escaped = false
+            elsif (char == "\n")
+              return buff
+            elsif (char == "\\")
+              escaped = true
+            end
+          else
+            escaped = false
+            buff << char
+          end
+          return nil if (buff.empty? && !escaped)
+        end
+      end
+
     private
 
       def connect
@@ -48,31 +73,6 @@ module Dino
 
       def on_windows?
         RUBY_PLATFORM.match /mswin|mingw/i
-      end
-
-      def _write(message)
-        io.write(message)
-      end
-
-      def gets(timeout=0)
-        buff, escaped = "", false
-        loop do
-          char = io.read(1)
-          if ["\n", "\\"].include? char
-            if escaped
-              buff << char
-              escaped = false
-            elsif (char == "\n")
-              return buff
-            elsif (char == "\\")
-              escaped = true
-            end
-          else
-            escaped = false
-            buff << char
-          end
-          return nil if (buff.empty? && !escaped)
-        end
       end
     end
   end

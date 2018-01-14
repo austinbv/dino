@@ -10,12 +10,12 @@ module Dino
 
     describe "#connect" do
       it 'should raise a TCPConnectError exception if it cannot connect to the server' do
-        expect { @instance.io }.to raise_exception Dino::TxRx::TCPConnectError
+        expect { @instance.send :io }.to raise_exception Dino::TxRx::TCPConnectError
       end
 
       it 'should return the TCPSocket if connected' do
         @server = TCPServer.new @port
-        expect(@instance.io).to be_a(TCPSocket)
+        expect(@instance.send :io).to be_a(TCPSocket)
         @server.close
       end
     end
@@ -23,13 +23,13 @@ module Dino
     describe '#io' do
       it 'should set io to a new TCPSocket with the specified host and port' do
         expect(TCPSocket).to receive(:open).with(@host, @port)
-        @instance.io
+        @instance.send :io
       end
 
       it 'should use the existing io instance if set' do
         @server = TCPServer.new @port
-        socket = @instance.io
-        expect(@instance.io).to equal(socket)
+        socket = @instance.send :io
+        expect(@instance.send :io).to equal(socket)
         @server.close
       end
     end

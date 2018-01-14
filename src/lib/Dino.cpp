@@ -20,14 +20,17 @@ void Dino::acknowledge() {
 }
 
 void Dino::run(){
+  boolean gotByte = false;
+
   while(stream->available() > 0) {
+    gotByte = true;
+    rcvBytes ++;
     parse(stream->read());
 
-    // Acknowledge when we've received as many bytes as the serial input buffer.
-    lastRcv = micros();
-    rcvBytes ++;
+    // Acknowledge when we've received as many bytes as the serial input buffer
     if (rcvBytes == rcvThreshold) acknowledge();
   }
+  if (gotByte) lastRcv = micros();
 
   // Also acknowledge when the last byte received goes outside the receive window.
   if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
@@ -223,6 +226,9 @@ void Dino::updateListeners() {
 // CMD = 90
 void Dino::reset() {
   resetState();
+
+  // Reset this so we never send RCV: along with ACK:
+  rcvBytes = 0;
 
   stream->print("ACK:");
   stream->print(A0);

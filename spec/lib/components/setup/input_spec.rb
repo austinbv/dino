@@ -32,11 +32,6 @@ module Dino
             expect(board).to receive(:set_pullup).with(subject.pin, true)
             InputComponent.new(options)
           end
-
-          it 'should tell the board to start reading' do
-            expect(board).to receive(:start_read)
-            subject
-          end
         end
       end
     end

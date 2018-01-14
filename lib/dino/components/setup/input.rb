@@ -15,7 +15,6 @@ module Dino
           super(options)
           self.mode = :in
           self.pullup = options[:pullup]
-          board.start_read
         end
       end
     end

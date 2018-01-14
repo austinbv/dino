@@ -17,7 +17,6 @@ module Dino
 
         def initialize_pins(options={})
           super(options) if defined?(super)
-          board.start_read
         end
       end
     end
