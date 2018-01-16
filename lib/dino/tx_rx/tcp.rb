@@ -3,8 +3,9 @@ require 'socket'
 module Dino
   module TxRx
     class TCP < Base
-      def initialize(host, port=3466)
-        @host, @port = host, port
+      def initialize(host="127.0.0.1", port=3466)
+        @host = host
+        @port = port
       end
 
       def to_s
@@ -15,7 +16,9 @@ module Dino
 
       def connect
         print "Connecting to TCP at: #{self.to_s}... "
-        connection = Timeout::timeout(10) { TCPSocket.open @host, @port }
+        connection = Timeout::timeout(10) do
+          TCPSocket.open(@host, @port)
+        end
         puts "Connected"
         connection
       rescue => error

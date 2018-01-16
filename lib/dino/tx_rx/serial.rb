@@ -50,7 +50,6 @@ module Dino
             puts "Connected"
             return connection
           rescue RubySerial::Error => error
-            puts error
             handle_error(error); next
           end
         end

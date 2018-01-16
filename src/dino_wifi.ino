@@ -1,20 +1,35 @@
 #include "Dino.h"
-#include <SPI.h>
-#include <WiFi.h>
+#ifdef ESP8266
+  #include <ESP8266WiFi.h>
+  #define LED_PIN 2
+#else
+  #include <SPI.h>
+  #include <WiFi.h>
+  #define LED_PIN 13
+#endif
 
-// Configure your WiFi options here. MAC address and IP address are not configurable.
+// Configure your WiFi options here. IP address are not configurable. Uses DHCP.
 int port = 3466;
-char ssid [] = "yourNetwork";
-char pass [] = "yourPassword";
-int keyIndex = 0;
-int status = WL_IDLE_STATUS;
+char* ssid = "yourNetwork";
+char* pass = "yourPassword";
 
 Dino dino;
 WiFiServer server(port);
 WiFiClient client;
 
 
+// Use the built in LED to indicate WiFi status.
+void indicate(byte value) {
+ #ifdef ESP8266
+   digitalWrite(LED_PIN, !value);
+ #else
+  digitalWrite(LED_PIN, value);
+ #endif
+}
+
+
 void printWifiStatus() {
+  Serial.println("Connected");
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
   Serial.print("Signal Strength (RSSI):");
@@ -22,29 +37,43 @@ void printWifiStatus() {
   Serial.println(" dBm");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
-  Serial.print("Port: ");
+  Serial.print("Dino TCP Port: ");
   Serial.println(port);
+  indicate(true);
+}
+
+
+void connect(){
+  Serial.print("Attempting to connect to SSID: ");
+  Serial.print(ssid);
+  WiFi.begin(ssid, pass);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  printWifiStatus();
 }
 
 
 void setup() {
+  pinMode(LED_PIN, OUTPUT);
+
   // Start serial for debugging.
-  Serial.begin(9600);
+  Serial.begin(115200);
+  while(!Serial);
 
-  // Try to connect to the specified network.
-  while ( status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
-    delay(10000);
-  }
-
-  // Start the server.
+  connect();
   server.begin();
-  printWifiStatus();
 }
 
+
 void loop() {
+  // Reconnect if we've lost WiFi..
+  if (WiFi.status() != WL_CONNECTED){
+    indicate(false);
+    connect();
+  }
+
   // Listen for connections.
   client = server.available();
 

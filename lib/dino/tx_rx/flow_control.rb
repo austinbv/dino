@@ -7,10 +7,11 @@ module Dino
       SLEEP_MAX = 0.01
 
       def initialize(*args)
-        reset_flow_control
         super(*args)
+        reset_flow_control
       end
 
+      # Split messages to use available buffer, and wrap #write in a mutex.
       def write(message)
         add_write_call
         @write_mutex.synchronize do
@@ -61,19 +62,18 @@ module Dino
         @last_interval_update = Time.now
       end
 
-      def read_and_process
+      def read_and_parse
         line = read
 
         if line && line.match(/\AACK:/)
-          # Handle handshake responses by passing to the observing HandshakeAttempt.
-          # Also pass self so it can detach itself when done.
+          # A HandshakeAttempt is observing. Also pass self so it can stop.
           changed && notify_observers(self, line.split(":", 2)[1])
-          # Empty transit counter since ACK: won't also send RCV:
+          # Empty @transit_bytes. ACK: means the board reset its counter too.
           @transit_mutex.synchronize { @transit_bytes = 0 }
         elsif line && line.match(/\ARCV:/)
           remove_transit_bytes(line.split(/:/)[1].to_i)
         elsif line
-          process(line)
+          parse(line)
         else
           rx_wait
         end

@@ -14,14 +14,11 @@ Dino dino;
 
 
 void setup() {
+  // Wait for serial ready.
   serial.begin(115200);
+  while(!serial);
 
-  // Wait for Leonardo serial port to connect.
-  #if defined(__AVR_ATmega32U4__)
-    while(!serial);
-  #endif
-
-  // Pass the stream to dino so it can read/write.
+  // Pass serial stream to dino so it can read/write.
   dino.setOutputStream(&serial);
 }
 

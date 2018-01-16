@@ -10,14 +10,21 @@ module Dino
 
     class Base
       include Observable
+      include Handshake
       # Let the methods in FlowControl wrap subclass methods too.
       def self.inherited(subclass)
-        subclass.prepend FlowControl
+        subclass.send(:prepend, FlowControl)
       end
-      include Handshake
 
-      def read(message);  raise "#read should be defined in TxRx subclasses";  end
-      def write(message); raise "#write should be defined in TxRx subclasses"; end
+      def read(message)
+        raise NotImplementedError
+          .new("#{self.class.name}#read not defined in Dino::TxRx subclass")
+      end
+
+      def write(message)
+        raise NotImplementedError
+          .new("#{self.class.name}#write not defined in Dino::TxRx subclass")
+      end
 
     private
 
@@ -25,11 +32,16 @@ module Dino
         @io ||= connect
       end
 
-      def io_reset
-        flush_read; stop_read; start_read
+      def connect
+        raise NotImplementedError
+          .new("#{self.class.name}#connect not defined in Dino::TxRx subclass")
       end
 
-      def connect(message); raise "#connect should be defined in TxRx subclasses"; end
+      def io_reset
+        flush_read
+        stop_read
+        start_read
+      end
 
       def flush_read
         Timeout.timeout(5) { read until read == nil }
@@ -38,7 +50,7 @@ module Dino
       end
 
       def start_read
-        @thread ||= Thread.new { loop { read_and_process } }.abort_on_exception = true
+        @thread ||= Thread.new { loop { read_and_parse } }
       end
 
       def stop_read
@@ -47,9 +59,12 @@ module Dino
         @thread = nil
       end
 
-      def read_and_process(message); raise "#read_and_process should be defined in FlowControl module"; end
+      def read_and_parse
+        raise NotImplementedError
+          .new("#{self.class.name}#read_and_parse not defined in Dino::TxRx::FlowControl")
+      end
 
-      def process(line)
+      def parse(line)
         if line.match(/\A\d+:/)
           pin, message = line.split(":", 2)
           pin && message && changed && notify_observers(pin, message)

@@ -13,7 +13,6 @@ EthernetClient client;
 
 
 void printEthernetStatus() {
-  // Print ethernet status.
   Serial.print("IP Address: ");
   Serial.println(Ethernet.localIP());
   Serial.print("Port: ");
@@ -23,7 +22,8 @@ void printEthernetStatus() {
 
 void setup() {
   // Start serial for debugging.
-  Serial.begin(9600);
+  Serial.begin(115200);
+  while(!serial);
 
   // Explicitly disable the SD card.
   pinMode(4,OUTPUT);

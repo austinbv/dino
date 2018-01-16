@@ -72,19 +72,19 @@ module Dino
       end
     end
 
-    describe '#read_and_process' do
+    describe '#read_and_parse' do
       it 'should notify observers on change' do
         expect(subject).to receive(:read).and_return("02:00")
         expect(subject).to receive(:changed).and_return(true)
         expect(subject).to receive(:notify_observers).with('02','00')
-        subject.send(:read_and_process)
+        subject.send(:read_and_parse)
       end
 
       it 'should not split messages into more than 2 parts on :' do
         expect(subject).to receive(:read).and_return("02:00:00")
         expect(subject).to receive(:changed).and_return(true)
         expect(subject).to receive(:notify_observers).with('02','00:00')
-        subject.send(:read_and_process)
+        subject.send(:read_and_parse)
       end
     end
 
