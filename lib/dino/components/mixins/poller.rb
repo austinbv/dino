@@ -3,14 +3,9 @@ module Dino
     module Mixins
       module Poller
         include Reader
-        #
-        # Make sure Threaded is in the including class.
-        #
-        def self.included(base)
-          base.class_eval { include Threaded }
-        end
+        include Threaded
 
-        def poll(interval, &block)
+        def poll(interval=1, &block)
           stop
           add_callback(:poll, &block) if block_given?
           threaded_loop do
@@ -21,7 +16,7 @@ module Dino
         def stop
           super if defined?(super)
           stop_thread
-          remove_callback :poll
+          remove_callbacks :poll
         end
       end
     end

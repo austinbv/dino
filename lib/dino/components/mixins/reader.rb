@@ -6,14 +6,20 @@ module Dino
 
         def read(&block)
           add_callback(:read, &block) if block_given?
+
+          value = nil
+          add_callback(:read) { |data| value = data }
+
           _read
           loop { break if !@callbacks[:read] }
+
+          value
         end
 
-        #
-        # Including component should define this to perform a single read on the board.
-        #
-        def _read; end
+        def _read
+          raise NotImplementedError
+            .new("#{self.class.name}#_read is not defined.")
+        end
       end
     end
   end

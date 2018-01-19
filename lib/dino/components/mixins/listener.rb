@@ -12,14 +12,19 @@ module Dino
 
         def stop
           super if defined?(super)
-          board.stop_listener(pin)
+          _stop_listen
           remove_callbacks :listen
         end
 
-        #
-        # Including component should define this to start a listener on the board.
-        #
-        def _listen; end
+        def _listen
+          raise NotImplementedError
+            .new("#{self.class.name}#_listen is not defined.")
+        end
+
+        def _stop_listen
+          raise NotImplementedError
+            .new("#{self.class.name}#_stop_listen is not defined.")
+        end
       end
     end
   end

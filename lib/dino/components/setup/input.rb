@@ -16,6 +16,10 @@ module Dino
           self.mode = :in
           self.pullup = options[:pullup]
         end
+
+        def _stop_listen
+          board.stop_listener(pin)
+        end
       end
     end
   end

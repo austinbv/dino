@@ -19,12 +19,12 @@ module Dino
         def threaded(&block)
           stop_thread
           enable_interrupts unless interrupts_enabled
-          @thread = Thread.new { block.call}
+          @thread = Thread.new(&block)
         end
 
         def threaded_loop(&block)
-          threaded do 
-            loop { block.call }
+          threaded do
+            loop(&block)
           end
         end
 

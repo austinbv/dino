@@ -50,7 +50,7 @@ module Dino
               expect(subject.instance_variable_get :@callbacks).to eq({})
             end
 
-            it 'should remove only callbacks for a specific key given' do
+            it 'should remove only callbacks the given key if given' do
               subject.remove_callbacks(:read)
               expect(subject.instance_variable_get(:@callbacks)[:read]).to eq(nil)
               expect(subject.instance_variable_get(:@callbacks)[:persistent]).to_not eq(nil)
@@ -58,11 +58,6 @@ module Dino
           end
 
           describe '#update' do
-            it 'should set the @state variable' do
-              subject.update("thing")
-              expect(subject.instance_variable_get :@state).to eq("thing")
-            end
-
             it 'should call all the callbacks' do
               expect(@callback1).to receive(:call).once
               expect(@callback2).to receive(:call).once
@@ -72,6 +67,29 @@ module Dino
             it 'should remove any callbacks saved with the key :read' do
               subject.update("data")
               expect(subject.instance_variable_get(:@callbacks)[:read]).to eq(nil)
+            end
+          end
+
+
+          describe '#pre_callback_filter' do
+            it 'should mutate data being passed to callbacks' do
+              class FilteredComponent < CallbackComponent
+                def pre_callback_filter(data)
+                  "dino: #{data}"
+                end
+              end
+              callback = Proc.new{|data| data}
+              subject = FilteredComponent.new
+              subject.add_callback(&callback)
+              expect(callback).to receive(:call).with("dino: dino")
+              subject.update("dino")
+            end
+          end
+
+          describe '#update_self' do
+            it 'should set the @state variable' do
+              subject.update("dino")
+              expect(subject.instance_variable_get :@state).to eq("dino")
             end
           end
         end
