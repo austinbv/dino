@@ -77,6 +77,18 @@ PACKAGES = {
       "vendor/Arduino-IRremote/irSend.cpp",
     ]
   },
+  ir_out_esp8266: {
+    description: "Transmit infrared signals with the ESP8266",
+    directive: "DINO_IR_OUT",
+    files: [
+      "lib/DinoIROut.cpp",
+      "vendor/IRremoteESP8266/src/IRremoteESP8266.h",
+      "vendor/IRremoteESP8266/src/IRsend.h",
+      "vendor/IRremoteESP8266/src/IRsend.cpp",
+      "vendor/IRremoteESP8266/src/IRtimer.h",
+      "vendor/IRremoteESP8266/src/IRtimer.cpp",
+    ]
+  },
   one_wire: {
     description: "OneWire bus support (Just DS18B20 for now)",
     directive: "DINO_ONE_WIRE",
@@ -84,6 +96,7 @@ PACKAGES = {
       "lib/DinoOneWire.cpp",
       "vendor/OneWire/OneWire.cpp",
       "vendor/OneWire/OneWire.h",
+      "vendor/OneWire/util/OneWire_direct_gpio.h",
     ]
   },
   i2c: {

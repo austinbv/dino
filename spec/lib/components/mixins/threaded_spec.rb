@@ -45,21 +45,26 @@ module Dino
             thread = Thread.current
             async = Proc.new { thread = Thread.current }
             subject.threaded(&async)
-            sleep 0.25
-            expect(subject.instance_variable_get :@thread).to eq thread
+            while(!subject.instance_variable_get :@thread) do; end
+            expect(subject.instance_variable_get :@thread).to_not eq(thread)
           end
         end
 
         describe '#threaded_loop' do
           it 'should loop the block in the thread' do
-            async = Proc.new {}
+            main_thread = Thread.current
+            async_thread = Thread.current
+            async = Proc.new { async_thread = Thread.current}
+
+            expect(async).to receive(:call).and_call_original
             expect(subject).to receive(:loop) do |&block|
               expect(block).to eq(async)
-            end
+            end.and_yield
 
             subject.threaded_loop(&async)
-            sleep 0.25
+            while(main_thread == async_thread) do; end
             subject.stop_thread
+            expect(main_thread).to_not eq(async_thread)
           end
         end
 
@@ -86,8 +91,10 @@ module Dino
           end
 
           it 'should pass arguments through to the original method' do
+            original = subject.method(:foo)
             subject.enable_interrupts
             subject.foo("dino")
+            expect(original).to_not eq(subject.method(:foo))
             expect(subject.bar).to eq("dino")
           end
         end

@@ -41,6 +41,9 @@ class DinoCLI::Generator
         if f.match /\Avendor/
           directive = @packages[k][:directive]
           contents = "#include \"DinoDefines.h\"\n#ifdef #{directive}\n" << contents << "\n#endif\n"
+
+          # Hack to workaround /util folder includes in latest OneWire library.
+          contents.gsub!("util/OneWire_direct_gpio.h", "OneWire_direct_gpio.h") if f.match /OneWire/
         end
         { path: f, contents: contents }
       end
