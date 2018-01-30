@@ -7,7 +7,6 @@
 #ifdef ESP8266
   #include "IRremoteESP8266.h"
   #include "Irsend.h"
-  IRsend infraredOut(2);
 #else
   #include "IRremote.h"
   IRsend infraredOut;
@@ -16,6 +15,10 @@
 // CMD = 16
 // Send an infrared signal.
 void Dino::irSend(){
+  #ifdef ESP8266
+    IRsend infraredOut(pin);
+  #endif
+
   infraredOut.enableIROut(val);
 
   for (int i=0; i<(uint8_t)auxMsg[0]; i++){
