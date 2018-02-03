@@ -73,7 +73,6 @@ class Dino {
     void handleLCD             ();         //cmd = 10
     void handleSerial          ();         //cmd = 12
     void dhtRead               ();         //cmd = 13
-    void ds18Read              ();         //cmd = 15
     void irSend                ();         //cmd = 16
     void tone                  ();         //cmd = 17
     void noTone                ();         //cmd = 18
@@ -102,6 +101,14 @@ class Dino {
     void i2cScan               (); //cmd = 33
     void i2cWrite              (); //cmd = 34
     void i2cRead               (); //cmd = 35
+
+    // One Wire
+    void owReset               (); //cmd = 41
+    void owSearch              (); //cmd = 42
+    void owWrite               (); //cmd = 43
+    void owRead                (); //cmd = 44
+    void owWriteBit            (byte b);
+    byte owReadBit             ();
 
     // API access to timings, resolutions and reset.
     void reset                 ();  //cmd = 90

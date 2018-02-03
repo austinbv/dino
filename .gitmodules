@@ -7,9 +7,6 @@
 [submodule "src/vendor/arduino-DHT"]
 	path = src/vendor/arduino-DHT
 	url = https://github.com/markruys/arduino-DHT.git
-[submodule "src/vendor/OneWire"]
-	path = src/vendor/OneWire
-	url = https://github.com/PaulStoffregen/OneWire.git
 [submodule "src/vendor/IRremoteESP8266"]
 	path = src/vendor/IRremoteESP8266
 	url = https://github.com/markszabo/IRremoteESP8266.git

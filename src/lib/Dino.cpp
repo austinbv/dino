@@ -129,11 +129,6 @@ void Dino::process() {
     case 13: dhtRead             ();    break;
     #endif
 
-    // Implemented in DinoOneWire.cpp
-    #ifdef DINO_ONE_WIRE
-    case 15: ds18Read            ();    break;
-    #endif
-
     // Implemented in DinoIROut.cpp
     #ifdef DINO_IR_OUT
     case 16: irSend              ();    break;
@@ -168,6 +163,14 @@ void Dino::process() {
     case 33: i2cScan             ();  break;
     case 34: i2cWrite            ();  break;
     case 35: i2cRead             ();  break;
+    #endif
+
+    // Implemented in DinoOneWire.cpp
+    #ifdef DINO_ONE_WIRE
+    case 41: owReset             ();  break;
+    case 42: owSearch            ();  break;
+    case 43: owWrite             ();  break;
+    case 44: owRead              ();  break;
     #endif
 
     // Implemented in this file.

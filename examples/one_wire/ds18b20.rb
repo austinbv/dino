@@ -5,11 +5,19 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
+ds18b20 = Dino::Components::DS18B20.new(pin: 16, board: board)
 
-# The temperature and humidity functions of the DHT sensors are
-# modelled separately, but both isntances can be set up on the same pin.
-temp = Dino::Components::DS18B20.new(pin: 7, board: board)
+ds18b20.poll(5) do |reading|
+  # Start each reading line with a timestamp.
+  print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
 
-temp.read do |temperature|
-  puts "The temperature is #{temperature} degrees C"
+  if reading[:crc_error]
+    puts "CRC check failed for this reading!"
+  else
+    # Print converted temperature in degrees C and F and raw 9 bytes from sensor.
+    print "#{reading[:c]} \xC2\xB0C / #{reading[:f]} \xC2\xB0F / "
+    puts "Raw: #{reading[:raw].inspect}"
+  end
 end
+
+sleep

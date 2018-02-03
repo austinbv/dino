@@ -1,60 +1,97 @@
 //
-// This file adds to the Dino class only if DINO_ONE_WIRE is defined in Dino.h.
+// This file contains low-level functions to get precise (enough)
+// timing required for using the Dallas/Maxim 1-Wire protocol.
+// Higher level logic is handled in Ruby.
 //
 #include "Dino.h"
 #ifdef DINO_ONE_WIRE
 
-#include "OneWire.h"
+void Dino::owReset(){
+  // bool present;
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(500);
+  pinMode(pin, INPUT);
+  delayMicroseconds(80);
+  // present = !digitalRead(pin);
+  delayMicroseconds(420);
+  // send presence value here
+}
 
-// CMD = 15
-void Dino::ds18Read() {
-  OneWire ds(pin);
+void Dino::owSearch(){
+}
 
-  byte data[12];
-  byte addr[8];
-
-  if ( !ds.search(addr)) {
-    ds.reset_search();
-    return;
-   }
-
-  if ( OneWire::crc8( addr, 7) != addr[7]) {
-    // Serial.println("CRC is not valid!");
-    return;
-  }
-
-  if ( addr[0] != 0x10 && addr[0] != 0x28) {
-    // Serial.print("Device is not recognized");
-    return;
-  }
-
-  ds.reset();
-  ds.select(addr);
-  ds.write(0x44,1); // start conversion, with parasite power on at the end
-
-  byte present = ds.reset();
-  ds.select(addr);
-  ds.write(0xBE); // Read Scratchpad
-
-  for (int i = 0; i < 9; i++) { // we need 9 bytes
-    data[i] = ds.read();
-  }
-
-  ds.reset_search();
-
-  byte MSB = data[1];
-  byte LSB = data[0];
-
-  float tempRead = ((MSB << 8) | LSB); //using two's compliment
-  float reading = tempRead / 16;
-  char readingBuff[10];
-
-  if (! isnan(reading)) {
-    stream->print(pin);
-    stream->print(':');
-    stream->print(reading, 4);
-    stream->print('\n');
+// CMD = 43
+// Write to the OneWire bus.
+//
+// val = number of bytes to write
+// auxMsg[0] = first byte of data and so on...
+// Limited to 255 bytes. Validate on remote end.
+//
+void Dino::owWrite(){
+  byte b;
+  for(byte i=0; i<val; i++){
+    b = auxMsg[i];
+    for(byte j=0; j<8; j++){
+      owWriteBit(bitRead(b, j));
+    }
   }
 }
 
+void Dino::owWriteBit(byte b){
+  // Write slot always starts with pulling the bus low for at least 1us.
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(1);
+
+  // If 1, release so the bus idles high, and wait out the 60us write slot.
+  if(b == 1){
+    pinMode(pin, INPUT);
+    delayMicroseconds(59);
+  // If 0, keep it low for the rest of the 60us write slot, then release.
+  } else {
+    delayMicroseconds(59);
+    pinMode(pin, INPUT);
+  }
+  // Minimum 1us recovery time after each slot.
+  delayMicroseconds(1);
+}
+
+// CMD = 44
+// Read bytes from the OneWire bus.
+//
+// val = number of bytes to read
+void Dino::owRead(){
+  byte b;
+  // Start with the pin that the bus is on and the colon.
+  stream->print(pin); stream->print(':');
+
+  // Print each byte read, followed by a comma, or newline for last byte.
+  for(byte i=0; i<val; i++){
+    for(byte j=0; j<8; j++){
+      bitWrite(b, j, owReadBit());
+    }
+    stream->print(b);
+    stream->print((i == (val-1)) ? '\n' : ',');
+  }
+}
+
+byte Dino::owReadBit(){
+  byte b;
+  // Pull low for at least 1us to start a read time slot, then release.
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(1);
+  pinMode(pin, INPUT);
+
+  // Wait for the slave to write to the bus. It should hold for up to 15us.
+  delayMicroseconds(5);
+
+  // If slave pulled the bus high, the bit a 1, else 0.
+  b = digitalRead(pin);
+
+  // Wait out the 60us window + recovery time.
+  delayMicroseconds(55);
+  return b;
+}
 #endif
