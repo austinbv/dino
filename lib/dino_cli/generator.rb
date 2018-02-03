@@ -108,13 +108,22 @@ class DinoCLI::Generator
     sketch = File.join(output_dir, sketch_filename)
     File.open(sketch, 'w') { |f| f.write @sketch }
 
-    # Go through the @packages hash and copy all the source files regardless of target.
-    # Append source file basename to the output dir to get output file path.
-    # Then write the file contents to the destination path.
+    # Go through the @packages hash and copy source files.
+    # Exclude only for target hardware incompatibility.
+    # Eg. ESP8266 IR library is different and incompatible with AVR version.
     @packages.each_key do |k|
-      @packages[k][:files].each do |file|
-        dest_path = File.join(output_dir, file[:path].split('/')[-1])
-        File.open(dest_path, 'w') { |f| f.write file[:contents] }
+      # Check if the package should be included for this target.
+      package = @packages[k]
+      targeted = !package[:target] || package[:target].include?(options[:target])
+      excluded = package[:exclude] && package[:exclude].include?(options[:target])
+
+      # Append source file basename to the output dir to get output file path.
+      # Then write the file contents to the destination path.
+      if (targeted && !excluded)
+        package[:files].each do |file|
+          dest_path = File.join(output_dir, file[:path].split('/')[-1])
+          File.open(dest_path, 'w') { |f| f.write file[:contents] }
+        end
       end
     end
 

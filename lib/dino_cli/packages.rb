@@ -69,6 +69,7 @@ PACKAGES = {
   ir_out: {
     description: "Transmit infrared signals",
     directive: "DINO_IR_OUT",
+    exclude: [:esp8266],
     files: [
       "lib/DinoIROut.cpp",
       "vendor/Arduino-IRremote/boarddefs.h",
@@ -80,6 +81,7 @@ PACKAGES = {
   ir_out_esp8266: {
     description: "Transmit infrared signals with the ESP8266",
     directive: "DINO_IR_OUT",
+    target: [:esp8266],
     files: [
       "lib/DinoIROut.cpp",
       "vendor/IRremoteESP8266/src/IRremoteESP8266.h",
@@ -94,9 +96,6 @@ PACKAGES = {
     directive: "DINO_ONE_WIRE",
     files: [
       "lib/DinoOneWire.cpp",
-      "vendor/OneWire/OneWire.cpp",
-      "vendor/OneWire/OneWire.h",
-      "vendor/OneWire/util/OneWire_direct_gpio.h",
     ]
   },
   i2c: {
