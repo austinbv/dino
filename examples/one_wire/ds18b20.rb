@@ -5,17 +5,33 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-ds18b20 = Dino::Components::DS18B20.new(pin: 16, board: board)
+bus = Dino::Components::OneWire::Bus.new(pin:16, board: board)
+ds18b20 = Dino::Components::OneWire::DS18B20.new(board: bus)
 
+# Bus can detect if a device is using parasite power, but not WHICH devices.
+if bus.parasite_power
+  puts "Parasite power detected..."; puts
+end
+
+# Blocking read that returns the read value.
+temp = ds18b20.read[:celsius]
+puts "Single read: #{temp} \xC2\xB0C"
+
+# Read the most recent value from the component's @state variable.
+sleep 0.5
+temp = ds18b20.state[:celsius]
+puts "Read from last state: #{temp} \xC2\xB0C"
+
+# Poll the sensor every 5 seconds with a callback showing C, F and raw bytes.
+puts
+puts "Start polling..."
 ds18b20.poll(5) do |reading|
-  # Start each reading line with a timestamp.
   print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
 
   if reading[:crc_error]
     puts "CRC check failed for this reading!"
   else
-    # Print converted temperature in degrees C and F and raw 9 bytes from sensor.
-    print "#{reading[:c]} \xC2\xB0C / #{reading[:f]} \xC2\xB0F / "
+    print "#{reading[:celsius]} \xC2\xB0C / #{reading[:farenheit]} \xC2\xB0F / "
     puts "Raw: #{reading[:raw].inspect}"
   end
 end

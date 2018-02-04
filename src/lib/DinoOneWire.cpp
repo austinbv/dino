@@ -24,17 +24,25 @@ void Dino::owSearch(){
 // CMD = 43
 // Write to the OneWire bus.
 //
-// val = number of bytes to write
+// val = number of bytes to write + parasite power condition OR-ed into MSB.
 // auxMsg[0] = first byte of data and so on...
-// Limited to 255 bytes. Validate on remote end.
+// Limited to 127 bytes. Validate on remote end.
 //
 void Dino::owWrite(){
+  bool parasite = bitRead(val, 7);
+  bitClear(val, 7);
+
   byte b;
   for(byte i=0; i<val; i++){
     b = auxMsg[i];
     for(byte j=0; j<8; j++){
       owWriteBit(bitRead(b, j));
     }
+  }
+
+  if (parasite) {
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, HIGH);
   }
 }
 

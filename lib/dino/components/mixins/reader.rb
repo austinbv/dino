@@ -4,13 +4,13 @@ module Dino
       module Reader
         include Callbacks
 
-        def read(&block)
+        def read(*args, &block)
           add_callback(:read, &block) if block_given?
 
           value = nil
           add_callback(:read) { |data| value = data }
 
-          _read
+          _read(*args)
           loop { break if !@callbacks[:read] }
 
           value
