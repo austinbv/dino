@@ -19,6 +19,6 @@ module Dino
     autoload :IREmitter,        'dino/components/ir_emitter'
     autoload :Piezo,            'dino/components/piezo'
     autoload :RotaryEncoder,    'dino/components/rotary_encoder'
-    autoload :OneWire,          'dino/components/onewire'
+    autoload :OneWire,          'dino/components/one_wire'
   end
 end
