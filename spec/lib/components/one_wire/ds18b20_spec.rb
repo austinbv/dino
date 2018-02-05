@@ -5,7 +5,7 @@ module Dino
     module OneWire
       describe DS18B20 do
         include BoardMock
-        let(:options) { { board: board, pin: 7 } }
+        let(:options) { { board: board, pin: 7, address: 0xFFFFFFFFFFFFFFFF}}
         subject { DS18B20.new(options)  }
 
         describe '#decode' do

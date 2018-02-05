@@ -6,6 +6,10 @@
 #include "Dino.h"
 #ifdef DINO_ONE_WIRE
 
+
+// CMD = 41
+// Reset the OneWire bus and optionally return a presence value if val > 0.
+//
 void Dino::owReset(){
   // bool present;
   pinMode(pin, OUTPUT);
@@ -18,7 +22,45 @@ void Dino::owReset(){
   // send presence value here
 }
 
+// CMD = 42
+// Read a 64-bit address and complement, echoing the address bits unless there's
+// a discrepancy, then we check the branch mask in auxMsg to decide what to do.
+//
 void Dino::owSearch(){
+  byte addr;
+  byte comp;
+
+  // Start with the pin that the bus is on and the colon.
+  stream->print(pin); stream->print(':');
+
+  // Print each byte read, followed by a comma, or newline for last byte.
+  for(byte i=0; i<8; i++){
+    for(byte j=0; j<8; j++){
+      bitWrite(addr, j, owReadBit());
+      bitWrite(comp, j, owReadBit());
+
+      // If there is a discrepancy, first 8 bytes of auxMsg is a branch mask.
+      // These are bits we must write 1 for since we're searching that branch.
+      // Also set the address bit to 1, but don't touch the complement.
+      // This 'corrupts' the check for discrepancies we already new about,
+      // but we're tracking that remotely anyway.
+      //
+      if(bitRead(auxMsg[i], j) == 1){
+        owWriteBit(1);
+        bitWrite(addr, j, 1);
+
+      // If we're don't already know about the discrepancy, behave normally
+      // so it shows up on the next search.
+      //
+      } else {
+        owWriteBit(bitRead(addr, j));
+      }
+    }
+    stream->print(addr);
+    stream->print("-");
+    stream->print(comp);
+    stream->print((i == 7) ? '\n' : ',');
+  }
 }
 
 // CMD = 43
@@ -29,6 +71,7 @@ void Dino::owSearch(){
 // Limited to 127 bytes. Validate on remote end.
 //
 void Dino::owWrite(){
+  // Check and clear parasite flag masked into array length.
   bool parasite = bitRead(val, 7);
   bitClear(val, 7);
 
@@ -40,6 +83,7 @@ void Dino::owWrite(){
     }
   }
 
+  // Drive bus high to feed the parasite capacitor after writing if necessary.
   if (parasite) {
     pinMode(pin, OUTPUT);
     digitalWrite(pin, HIGH);

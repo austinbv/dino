@@ -4,8 +4,10 @@ module Dino
       class DS18B20
         include Setup::Base
         include Mixins::Poller
-        attr_reader :resolution, :parasite_power
 
+        FAMILY_CODE = 0x28
+
+        attr_reader :resolution, :address
         alias  :bus :board
 
         def after_initialize(options={})
@@ -13,10 +15,17 @@ module Dino
           # Should set only if given as parameter.
           # If not, read from sensor and leave as is.
           self.resolution = 12
+
+          raise "missing ROM address for 1-Wire device, try searching first" unless options[:address]
+          @address = options[:address]
         end
 
         def resolution
           # Read scratchpad and resolution from sensor here.
+        end
+
+        def serial
+          Helper.address_to_serial(self.address)
         end
 
         def resolution=(bits)
@@ -26,24 +35,43 @@ module Dino
           @convert_time = 0.75 / (13 - bits)
         end
 
-        def _read
+        #
+        # If we're the only device on the bus, save time by skipping ROM match.
+        #
+        def identify
+          bus.reset
+          if bus.found_devices == 1
+            bus.write(SKIP_ROM)
+          else
+            bus.write(MATCH_ROM)
+            bus.write(Helper.address_to_bytes(self.address))
+          end
+        end
+
+        def convert
           bus.mutex.synchronize do
-            bus.reset
-            bus.write(SKIP_ROM, CONVERT_T)
+            identify
+            bus.write(CONVERT_T)
             sleep @convert_time if bus.parasite_power
           end
-
           sleep @convert_time unless bus.parasite_power
-          data = nil
+        end
 
+        def read_scratch
+          data = nil
           bus.mutex.synchronize do
-            bus.reset
-            bus.write(SKIP_ROM, READ_SCRATCH)
+            identify
+            bus.write(READ_SCRATCH)
             data = bus.read(9)
           end
+          data
+        end
 
-          # Once we got data, free the bus and run callbacks ourselves.
-          self.update(data)
+        def _read
+          convert
+          reading = read_scratch
+          # This runs callbacks in our thread instead of the callback thread...
+          self.update(reading)
         end
 
         #

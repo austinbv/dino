@@ -11,9 +11,13 @@ module Dino
           add_callback(:read) { |data| value = data }
 
           _read(*args)
-          loop { break if !@callbacks[:read] }
+          block_until_read
 
           value
+        end
+
+        def block_until_read
+          loop { break if !@callbacks[:read] }
         end
 
         def _read

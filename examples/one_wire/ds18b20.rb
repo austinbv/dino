@@ -6,27 +6,30 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 bus = Dino::Components::OneWire::Bus.new(pin:16, board: board)
-ds18b20 = Dino::Components::OneWire::DS18B20.new(board: bus)
 
-# Bus can detect if a device is using parasite power, but not WHICH devices.
+# The bus does parasite power detection on startup.
+# It can tell that parasite power is in use, but not by WHICH devices.
 if bus.parasite_power
   puts "Parasite power detected..."; puts
 end
 
-# Blocking read that returns the read value.
-temp = ds18b20.read[:celsius]
-puts "Single read: #{temp} \xC2\xB0C"
+# The bus automatically searches when initialized. It finds the address of
+# every device, identifies the device type and matching Ruby class, storing here.
+puts "Found #{bus.found_devices.count} devices on the bus:"
+puts bus.found_devices.inspect; puts
 
-# Read the most recent value from the component's @state variable.
-sleep 0.5
-temp = ds18b20.state[:celsius]
-puts "Read from last state: #{temp} \xC2\xB0C"
+# We can use the search results to setup instances of the device classes.
+ds18b20s = []
+bus.found_devices.each do |d|
+  if d[:class] == Dino::Components::OneWire::DS18B20
+    ds18b20s << Dino::Components::OneWire::DS18B20.new(board: bus, address: d[:address])
+  end
+end
 
-# Poll the sensor every 5 seconds with a callback showing C, F and raw bytes.
-puts
-puts "Start polling..."
-ds18b20.poll(5) do |reading|
+#  Format a reading for printing on a line.
+def print_reading(reading, sensor, i)
   print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
+  print "index: #{i}, serial# :#{sensor.serial} "
 
   if reading[:crc_error]
     puts "CRC check failed for this reading!"
@@ -36,4 +39,8 @@ ds18b20.poll(5) do |reading|
   end
 end
 
-sleep
+# Read the temp from each sensor in a simple loop.
+loop do
+  ds18b20s.each_with_index { |s,i| print_reading(s.read, s, i) }
+  sleep 5
+end
