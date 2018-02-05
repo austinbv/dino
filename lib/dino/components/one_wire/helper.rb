@@ -3,17 +3,19 @@ module Dino
     module OneWire
       class Helper
         #
-        # Convert a 64-bit ROM address in Integer form to an array of bytes.
+        # Convert 64-bit Integer ROM address to array of 8 LSByte first bytes.
         #
         def self.address_to_bytes(address)
           [address].pack('<Q').split("").map(&:ord)
         end
 
         #
-        # Convert the 48 bit serial number out of a 64-bit address into printable hex.
+        # Remove the MSByte (CRC) and LSByte (family code) from a ROM address
+        # to get the device's 48-bit serial number and convert to hex.
         #
         def self.address_to_serial(address)
-          address >> 8
+          address = address & 0x00FFFFFFFFFFFFFF
+          address = address >> 8
           address.to_s(16)
         end
 
@@ -83,7 +85,7 @@ module Dino
           #
           new_discrepancies = (address ^ complement) ^ 0xFFFFFFFFFFFFFFFF
           high_discrepancy = new_discrepancies.bit_length - 1
-          
+
           [{class: klass, address: address}, high_discrepancy]
         end
 

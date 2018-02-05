@@ -5,8 +5,8 @@ module Dino
     module OneWire
       describe DS18B20 do
         include BoardMock
-        let(:options) { { board: board, pin: 7, address: 0xFFFFFFFFFFFFFFFF}}
-        subject { DS18B20.new(options)  }
+        let(:bus) { double.as_null_object }
+        subject   { DS18B20.new(board: bus, address: 0xFFFFFFFFFFFFFFFF) }
 
         describe '#decode' do
           it 'should decode values matching the datasheet and convert C to F' do

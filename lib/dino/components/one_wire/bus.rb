@@ -61,14 +61,14 @@ module Dino
 
         #
         # Reset the bus, then send the search command, along with a 64-bit
-        # mask of bits to write 1 for.
+        # mask of bits to write 1 to force the search into a specific branch.
         #
-        def _search(high_mask)
+        def _search(branch_mask)
           reset
           write(SEARCH_ROM)
           board.write Dino::Message.encode command: 42,
                                            pin: pin,
-                                           aux_message: [high_mask].pack('<Q')
+                                           aux_message: [branch_mask].pack('<Q')
         end
 
         #
@@ -97,18 +97,24 @@ module Dino
 
         def write(*bytes)
           bytes = bytes.flatten
-          raise ArgumentError, "wrong number of arguments (given 0, expected at least 1)" if bytes.empty?
+          if bytes.empty?
+            raise ArgumentError, "0 bytes given (expected at least 1)"
+          end
 
           length = bytes.length
-          raise Exception.new('max 127 bytes for single OneWire write') if length > 127
+          if length > 127
+            raise ArgumentError, 'too many bytes given (expected at most 127)'
+          end
 
-          # Set flag if last byte is a command requiring parasite power after it.
+          # Set flag in high bit of length if last command needs parasite power.
           if parasite_power && [CONVERT_T, COPY_SCRATCH].include?(bytes.last)
             length = length | 0b10000000
           end
 
-          bytes = bytes.pack('C*')
-          board.write Dino::Message.encode(command: 43, pin: pin, value: length, aux_message: bytes)
+          board.write Dino::Message.encode command: 43,
+                                           pin: pin,
+                                           value: length,
+                                           aux_message: bytes.pack('C*')
         end
       end
     end
