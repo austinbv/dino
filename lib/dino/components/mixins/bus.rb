@@ -7,9 +7,12 @@ module Dino
         # attached to it, matching Board, but without the full Board interface.
         # See OneWire::Bus class for an example.
         #
+        attr_reader :mutex
+
         def after_initialize(options={})
           super(options)
           @components = []
+          @mutex = Mutex.new
         end
 
         attr_reader :components

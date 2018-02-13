@@ -2,10 +2,9 @@ module Dino
   module Components
     module OneWire
       class DS18B20 < Slave
-        include Mixins::Poller
+
         FAMILY_CODE = 0x28
 
-        # Scratch read specifically for the resolution if not set yet.
         def resolution
           @resolution ||= decode_resolution read_scratch(9)
         end
@@ -32,7 +31,9 @@ module Dino
         end
 
         def convert
-          @convert_time ||= 0.75
+          @resolution ||= 12
+          set_convert_time
+
           atomically do
             match
             bus.write(CONVERT_T)
@@ -43,18 +44,15 @@ module Dino
 
         def _read
           convert
-          # This runs callbacks in our thread instead of the callback thread...
-          self.update(read_scratch(9))
+          read_scratch(9)
         end
 
         def pre_callback_filter(data)
           # Data is 9 comma delimited numbers in ASCII, representing bytes.
-          bytes = data.split(",").map{|b| b.to_i}
+          bytes = data.split(",").map{ |b| b.to_i }
           return {crc_error: true} unless Helper.crc_check(bytes)
 
-          # Update resolution and conversion time each read.
           @resolution = decode_resolution(bytes)
-          set_convert_time
 
           decode_temp(bytes).merge(raw: bytes)
         end
@@ -65,15 +63,14 @@ module Dino
         # 2^-4 exponent, up through 2^6 for next 10 bits. 5 MSBs repeat the sign.
         #
         def decode_temp(bytes)
-          # Get magnitude without sign.
-          value = bytes[1] << 8 | bytes[0]
-          negative = (value[15] == 1)
-          value = (value ^ 0xFFFF) + 1 if negative
+          magnitude = bytes[1] << 8 | bytes[0]
+          negative = (magnitude[15] == 1)
+          magnitude = (magnitude ^ 0xFFFF) + 1 if negative
 
           celsius = 0.0
           exp = -4
           for bit in (0..10)
-            if (value[bit] == 1)
+            if (magnitude[bit] == 1)
               celsius = celsius + (2.0 ** (exp+bit))
             end
           end

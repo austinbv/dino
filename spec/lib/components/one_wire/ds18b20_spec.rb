@@ -5,7 +5,7 @@ module Dino
     module OneWire
       describe DS18B20 do
         include BoardMock
-        let(:bus) { double.as_null_object }
+        let(:bus) { double(mutex: Mutex.new).as_null_object }
         subject   { DS18B20.new(bus: bus, address: 0xFFFFFFFFFFFFFFFF) }
 
         describe '#decode_temp' do
@@ -19,6 +19,46 @@ module Dino
             expect(subject.decode_temp([0b1001_0000,0b1111_1100]))
               .to eq(celsius: -55, farenheit: -67)
           end
+        end
+
+        describe '#decode_resolution' do
+          it 'should get the resolution from the entire scratchpad' do
+            expect(subject.decode_resolution([0,0,0,0,0b01100000])).to eq(12)
+            expect(subject.decode_resolution([0,0,0,0,0b01000000])).to eq(11)
+            expect(subject.decode_resolution([0,0,0,0,0b00100000])).to eq(10)
+            expect(subject.decode_resolution([0,0,0,0,0b00000000])).to eq(9)
+          end
+        end
+
+        describe '#convert' do
+          it 'should be atomic' do
+            expect(subject).to receive(:atomically).exactly(1).times
+            subject.convert
+          end
+
+          it 'should match first' do
+            expect(subject).to receive(:atomically).exactly(1).times
+            subject.convert
+          end
+
+          it 'should send the command' do
+            expect(bus).to receive(:write).with(0x44)
+            subject.convert
+          end
+
+          it 'should set the sleep time to default on first conversion' do
+            subject.convert
+            expect(subject.instance_variable_get(:@convert_time)).to eq(0.75)
+          end
+
+          it 'should sleep for the conversion time' do
+            subject.convert
+            expect(subject).to receive(:sleep).with(subject.instance_variable_get(:@convert_time))
+            subject.convert
+          end
+
+          it 'should sleep inside the mutex lock if parasite power in use'
+          it 'should sleep outside the mutex lock if parasite power not in use'
         end
       end
     end

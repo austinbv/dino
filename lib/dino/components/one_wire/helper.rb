@@ -2,20 +2,11 @@ module Dino
   module Components
     module OneWire
       class Helper
-
-        #
-        # Convert 64-bit Integer ROM address to array of 8 LSByte first bytes.
-        #
         def self.address_to_bytes(address)
           [address].pack('Q<').split("").map(&:ord)
         end
 
-
         def self.crc_check(data)
-          #
-          # Sensor data will usually be an array of bytes, but for checking
-          # things like ROM addresses, we may receive a 64-bit Integer.
-          #
           if data.class == Integer
             bytes = address_to_bytes(data)
           else

@@ -10,11 +10,9 @@ class DinoCLI::Generator
   end
 
   def append_target
-    # Default to generating the mega sketch.
     options[:target] = :mega unless options[:target]
     # Preserve the source sketch name, since we need to copy that file.
     options[:src_sketch_name] = options[:sketch_name].dup
-    # Append the target to the output sketch name/folder when not using :mega.
     options[:sketch_name] << "_#{options[:target]}" unless options[:target] == :mega
   end
 
@@ -28,10 +26,9 @@ class DinoCLI::Generator
   end
 
   def read
-    # Start by just copying the PACKAGES hash.
     @packages = PACKAGES
 
-    # Now replace each filepath with a hash containing the filepath and contents.
+    # Replace each filepath with a hash containing the filepath and contents.
     @packages.each_key do |k|
       @packages[k][:files].map! do |f|
         contents = File.read(File.join(options[:src_dir], f))

@@ -28,9 +28,8 @@ module Dino
           board.remove_component(self)
         end
 
-        #
-        # Setup::Base only requires a board. Mix in modules from Setup or define
-        # this method in your class to use pins.
+        # Setup::Base only requires a board.
+        # Include modules from Setup or override this to use pins.
         #
         def initialize_pins(options={}) ; end
         alias :initialize_pin :initialize_pins

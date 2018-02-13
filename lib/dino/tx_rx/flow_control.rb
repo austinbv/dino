@@ -11,7 +11,6 @@ module Dino
         reset_flow_control
       end
 
-      # Split messages to use available buffer, and wrap #write in a mutex.
       def write(message)
         add_write_call
         @write_mutex.synchronize do
@@ -68,7 +67,7 @@ module Dino
         if line && line.match(/\AACK:/)
           # A HandshakeAttempt is observing. Also pass self so it can stop.
           changed && notify_observers(self, line.split(":", 2)[1])
-          # Empty @transit_bytes. ACK: means the board reset its counter too.
+          # ACK: means the board reset its counter. Reset ours.
           @transit_mutex.synchronize { @transit_bytes = 0 }
         elsif line && line.match(/\ARCV:/)
           remove_transit_bytes(line.split(/:/)[1].to_i)

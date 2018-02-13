@@ -13,12 +13,10 @@ module Dino
       def after_initialize(options={})
         super(options)
 
-        # Default to listening every tick (1ms / 1kHz)
         divider = options[:divider] || 1
         clock.listen(divider)
         data.listen(divider)
 
-        # Setup to track position in degrees.
         @steps = options[:steps] || 30
         @degrees_per_step = (360 / steps).to_f
         @state = 0.0

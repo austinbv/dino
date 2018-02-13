@@ -12,9 +12,7 @@ module Dino
           raise ArgumentError 'pulse too long (max 65536 microsec)' if pulse > 65536
         end
 
-        # Default to 38kHz.
         frequency = options[:frequency] || 38
-
         board.infrared_send(pin, frequency, pulses)
       end
     end

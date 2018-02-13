@@ -2,7 +2,7 @@ module Dino
   module Components
     module OneWire
       class Bus
-        # 1 bits in mask set discrepancies to 1. 0 leaves bit as read from bus.
+        # 1 bits in mask force discrepancies to 1. 0 leaves bit as read from bus.
         def _search(branch_mask)
           reset
           write(SEARCH_ROM)
@@ -23,15 +23,13 @@ module Dino
             _search(branch_mask)
             block_until_read
 
-            # No untested discrepancies left. End the search.
+            # No unsearched discrepancies left.
             break if high_discrepancy == - 1
 
-            # If high_discrepancy was not forced 1 last iteration, do it next.
+            # Force highest new discrepancy to 1 on the next search.
             # i.e. Go as deep as possible into each branch found then back out.
             #
-            if branch_mask[high_discrepancy] == 0
-              branch_mask = branch_mask | (2 ** high_discrepancy)
-            end
+            branch_mask = branch_mask | (2 ** high_discrepancy)
 
             # Clear bits above high_discrepancy so we don't repeat branches.
             # When high_discrepancy < MSB of branch_mask, this moves us
@@ -51,25 +49,15 @@ module Dino
             raise "OneWire device not connected or disconnected during search"
           end
 
-          #
-          # XOR address with complement to give a 0 at each discrepancy.
-          # XOR again with 64 1s to flip, so each discrepancy is a 1 instead.
-          #
-          new_discrepancies = (address ^ complement) ^ 0xFFFFFFFFFFFFFFFF
+          # Gives 0 at every discrepancy we didn't write 1 for on this search.
+          new_discrepancies = address ^ complement
 
-          #
-          # Note: Discrepancies forced to 1 in an iteration will not show up as
-          # discrepancies when parsing the result from that iteration. The board
-          # will have read 0-0 from the bus, but we told it to override the
-          # address bit to a 1, so we get back (1-0), as if no discrepancy.
-          #
-          # This is OK. We only want the highest discrepancy we did not set to 1.
-          #
+          # Newer rubies:
           # high_discrepancy = new_discrepancies.bit_length - 1
           high_discrepancy = -1
-          (0..63).each { |i| high_discrepancy = i if new_discrepancies[i] == 1 }
+          (0..63).each { |i| high_discrepancy = i if new_discrepancies[i] == 0 }
 
-          # LSByte of address is product family. Check for existing class.
+          # LSByte of address is product family.
           klass = family_lookup(address & 0x00000000000000FF)
 
           [{class: klass, address: address}, high_discrepancy]

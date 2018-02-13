@@ -6,17 +6,16 @@ module Dino
         include Mixins::Bus
         include Mixins::Reader
 
-        attr_reader :found_devices, :parasite_power, :mutex
+        attr_reader :found_devices, :parasite_power
 
         def after_initialize(options = {})
           super(options)
-          @mutex = Mutex.new
           @found_devices = []
           read_power_supply
         end
 
         # Without driving low first, results are inconsistent.
-        # Only the first (LS) bit matters, but it's easier to read a whole byte.
+        # Only first (LS) bit matters, but we can only read whole bytes.
         #
         def read_power_supply
           board.set_pin_mode(self.pin, :out)

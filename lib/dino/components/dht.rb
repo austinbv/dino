@@ -14,7 +14,6 @@ module Dino
         board.dht_read(self.pin)
       end
 
-      # Process raw data from the board before running #update.
       def pre_callback_filter(data)
         t, h = data.split(",")
         { temperature: t.to_f, humidity: h.to_f }

@@ -3,18 +3,9 @@ module Dino
     module OneWire
       class Slave
         include Setup::Base
+        include Mixins::Poller
         attr_reader :address
         alias  :bus :board
-
-        #
-        # Remove the MSByte (CRC) and LSByte (family code) from slave's ROM
-        # address to get a printable 48-bit serial number in hex.
-        #
-        def serial_number
-          address = @address & 0x00FFFFFFFFFFFFFF
-          address = address >> 8
-          address.to_s(16).rjust(12, "0")
-        end
 
         def initialize(options={})
           options[:board] ||= options[:bus]
@@ -31,13 +22,15 @@ module Dino
 
         def read_scratch(num_bytes)
           atomically do
+            # Bubble a single bus callback up to self, bound by this lock.
+            bus.add_callback(:read) { |data| self.update(data) }
             match
             bus.write(READ_SCRATCH)
             bus.read(num_bytes)
           end
         end
 
-        def write_scratch(bytes)
+        def write_scratch(*bytes)
           atomically do
             match
             bus.write(WRITE_SCRATCH)
@@ -62,13 +55,24 @@ module Dino
 
         def match
           bus.reset
-          # Skip ROM match if only one device on the bus.
-          if bus.found_devices == 1
+          if bus.found_devices.count < 2
             bus.write(SKIP_ROM)
           else
             bus.write(MATCH_ROM)
             bus.write(Helper.address_to_bytes(self.address))
           end
+        end
+
+        def serial_number
+          @serial_number ||= extract_serial
+        end
+
+        def extract_serial
+          # Remove CRC.
+          address = @address & 0x00FFFFFFFFFFFFFF
+          # Remove family code.
+          address = address >> 8
+          address.to_s(16).rjust(12, "0")
         end
       end
     end
