@@ -60,7 +60,7 @@ module Dino
             async = Proc.new { async_thread = Thread.current}
 
             expect(async).to receive(:call).and_call_original
-            expect(component).to receive(:loop) do |&block|
+            allow_any_instance_of(ThreadedComponent).to receive(:loop) do |&block|
               expect(block).to eq(async)
             end.and_yield
 
