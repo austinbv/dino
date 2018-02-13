@@ -75,8 +75,8 @@ void Dino::coreResponse(int p, int v){
 
 // CMD = 07
 // Set a listener ON or OFF, or change its type, or divider.
-// Takes settings as binary stored in val from the parser and applies
-// them to an existing listener if pin was already used, or first inactive.
+// Takes settings as mask stored in val and applies to existing listener
+// if pin was already used, or first inactive. See Dino.h for mask structure.
 void Dino::setListener(){
   boolean found = false;
   // Check if previously assigned a listener to this pin and re-use.

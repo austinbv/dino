@@ -6,6 +6,7 @@ module Dino
       describe Poller do
 
         class PollComponent
+          include Setup::Base
           include Poller
           def _read; end
           def initialize; after_initialize; end

@@ -11,7 +11,7 @@ module Dino
       alias :position :state
 
       def after_initialize(options={})
-        super(options) if defined?(super)
+        super(options)
 
         # Default to listening every tick (1ms / 1kHz)
         divider = options[:divider] || 1
@@ -40,17 +40,16 @@ module Dino
       #
       # Return a hash with the new :position and pass through :change, overriding
       # the data param we took, which would have passed directly to callbacks.
-      # Callbacks can use either :position (degrees) or :change (steps).
+      # Callbacks can use either :position (in degrees) or :change (in steps).
       #
       def pre_callback_filter(data)
-        data = { change: data,
-                 position: (state + (data * degrees_per_step)) % 360 }
+        { change: data, position: (state + (data * degrees_per_step)) % 360 }
       end
       #
       # Callbacks run now, receiving only the value of #pre_callback_filter
       #
       # After callbacks, set @state to the position calculated earlier.
-      # This method also receives the value of #pre_callback_filter.
+      # This method also receives the result of #pre_callback_filter.
       #
       def update_self(data)
         @state = data[:position]

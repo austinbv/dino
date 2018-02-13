@@ -83,7 +83,7 @@ module Dino
               comp = comp | (comp_bit * (2 ** j))
 
               # Override address bit to a 1 in variable if 1 in mask.
-              # Write whatever addr_bit ends up being back to the simulator.
+              # Write whatever addr_bit ends up being back to the bus simulator.
               if branch_mask[(i*8) + j] == 1
                 @simulator.write_bit(1)
                 addr = addr | (1 * (2 ** j))
@@ -104,7 +104,7 @@ module Dino
       #
       class Bus
         def initialize(options={})
-          @board_sim = BoardSimulator.new(options[:simulator])
+          @board_sim = options[:board_sim]
           super(options)
         end
 
@@ -125,11 +125,13 @@ module Dino
             allow_any_instance_of(Bus).to receive(:read_power_supply).and_return false
 
             # This gets slow really fast... 256 seems fine.
-            sim = BusSimulator.new(256)
-            bus = Bus.new(board: board, pin: 7, simulator: sim)
+            bus_sim = BusSimulator.new(256)
+            board_sim = BoardSimulator.new(bus_sim)
+            bus = Bus.new(board: board, pin: 7, board_sim: board_sim)
+            bus.search
 
             found_addresses = bus.found_devices.map { |d| d[:address] }
-            expect(found_addresses.sort).to eq(sim.addresses.sort)
+            expect(found_addresses.sort).to eq(bus_sim.addresses.sort)
           end
         end
       end

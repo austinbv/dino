@@ -3,9 +3,9 @@ module Dino
     class Servo
       include Setup::SinglePin
       include Mixins::Threaded
-      
+
       def after_initialize(options={})
-        board.servo_toggle(pin, 1)
+        board.servo_toggle(pin, :on)
       end
 
       def position=(value)

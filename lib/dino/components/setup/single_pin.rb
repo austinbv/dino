@@ -9,9 +9,6 @@ module Dino
 
         attr_writer :pin
 
-        #
-        # Require a single pin for single pin components.
-        #
         def initialize_pins(options={})
           raise 'a pin is required for this component' unless options[:pin]
           self.pin = board.convert_pin(options[:pin])
@@ -19,7 +16,7 @@ module Dino
 
         def mode=(mode)
           @mode = mode
-          board.set_pin_mode(self.pin, mode)
+          board.set_pin_mode(pin, mode)
         end
       end
     end

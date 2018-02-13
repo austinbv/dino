@@ -6,6 +6,7 @@ module Dino
       describe Poller do
 
         class ListenComponent
+          include Setup::Base
           include Listener
           def _listen(divider=nil); end
           def _stop_listen; end

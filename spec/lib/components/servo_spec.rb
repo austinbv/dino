@@ -9,7 +9,7 @@ module Dino
 
       describe '#initialize' do
         it 'should toggle the servo library on for the pin' do
-          expect(board).to receive(:servo_toggle).with(options[:pin], 1)
+          expect(board).to receive(:servo_toggle).with(options[:pin], :on)
           subject
         end
       end

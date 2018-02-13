@@ -5,7 +5,7 @@ module Dino
         include Bus
 
         def after_initialize(options={})
-          super(options) if defined?(super)
+          super(options)
           @high = 1
           @low = 0
         end

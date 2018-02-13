@@ -7,7 +7,7 @@
 # The Button object is created by passing the register instead of the board, and
 # the register's parallel output pin that the button is connected to.
 #
-# Note: preclock_high must be set to true if using TI CD4021B register or similar.
+# Note: rising_clock must be set to true if using TI CD4021B register or similar.
 # This should apply to any register which outputs on a rising clock edge.
 # Change as needed.
 #
@@ -18,7 +18,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 
 shift_register = Dino::Components::Register::ShiftIn.new  board: board,
                                                           pins: {latch: 10, data: 12, clock: 13},
-                                                          preclock_high: true,
+                                                          rising_clock: true,
                                                           bytes: 1
 
 button = Dino::Components::Button.new(pin: 0, board: shift_register)

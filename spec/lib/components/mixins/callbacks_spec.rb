@@ -6,6 +6,7 @@ module Dino
       describe Callbacks do
 
         class CallbackComponent
+          include Setup::Base
           include Callbacks
           def initialize; after_initialize; end
         end

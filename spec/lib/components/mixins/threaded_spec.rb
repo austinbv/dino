@@ -4,8 +4,10 @@ module Dino
   module Components
     module Mixins
       describe Threaded do
+        include BoardMock
 
         class ThreadedComponent
+          include Setup::Base
           include Threaded
           def foo(str="test")
             @bar = str
@@ -14,7 +16,7 @@ module Dino
           interrupt_with :foo
         end
 
-        subject { ThreadedComponent.new }
+        subject { ThreadedComponent.new(board: board) }
 
         describe 'ClassMethods' do
           it 'should add methods to interrupt the thread using #interrupt_with' do
@@ -78,7 +80,7 @@ module Dino
 
         describe '#enable_interrupts' do
           it 'should override the given method on the singleton class only' do
-            second_part = ThreadedComponent.new
+            second_part = ThreadedComponent.new(board: board)
             before_class = second_part.method(:foo)
             before_instance = subject.method(:foo)
 

@@ -6,6 +6,7 @@ module Dino
       describe Reader do
 
         class ReadComponent
+          include Setup::Base
           include Reader
           def _read; end
           def initialize; after_initialize; end

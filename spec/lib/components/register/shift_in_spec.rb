@@ -26,13 +26,13 @@ module Dino
             expect(subject.instance_variable_get(:@bytes)).to eq(2)
           end
 
-          it 'should default the preclock_high variable to 0' do
-            expect(subject.instance_variable_get(:@preclock_high)).to eq(0)
+          it 'should default the rising_clock variable to 0' do
+            expect(subject.instance_variable_get(:@rising_clock)).to eq(false)
           end
 
-          it 'should set @preclock_high to 1 if given anything other than 0' do
-            subject = ShiftIn.new(options.merge(preclock_high: :yes))
-            expect(subject.instance_variable_get(:@preclock_high)).to eq(1)
+          it 'should set @rising_clock to true if given anything other than false' do
+            subject = ShiftIn.new(options.merge(rising_clock: :yes))
+            expect(subject.instance_variable_get(:@rising_clock)).to eq(true)
           end
         end
 
@@ -51,7 +51,7 @@ module Dino
           end
 
           it 'should request clock pin to go high before reading if set' do
-            subject = ShiftIn.new(options.merge(preclock_high: 1))
+            subject = ShiftIn.new(options.merge(rising_clock: 1))
             expect(board).to receive(:write).with "22.8.1.#{[11,12,1].pack('C*')}\n"
             subject.read
           end

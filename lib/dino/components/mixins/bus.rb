@@ -8,7 +8,7 @@ module Dino
         # See OneWire::Bus class for an example.
         #
         def after_initialize(options={})
-          super(options) if defined?(super)
+          super(options)
           @components = []
         end
 

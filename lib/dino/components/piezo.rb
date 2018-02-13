@@ -12,11 +12,11 @@ module Dino
 
       # Duration is in mills
       def tone(value, duration = 500)
-        board.tone pin, value, duration
+        board.tone(pin, value, duration)
       end
 
       def no_tone
-        board.no_tone pin
+        board.no_tone(pin)
       end
     end
   end

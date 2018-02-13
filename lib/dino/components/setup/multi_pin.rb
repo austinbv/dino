@@ -11,9 +11,7 @@ module Dino
         include Base
         attr_reader :pin, :pins, :pullups, :proxies
 
-        #
         # Return a hash with the state of each proxy component.
-        #
         def proxy_states
           hash = {}
           proxies.each_key do |key|
@@ -32,11 +30,10 @@ module Dino
 
         module ClassMethods
           #
-          # Requiring a pin simply raises an error if not specified in options[:pins].
+          # Requiring a pin simply raises an error if missing from options[:pins].
           # It will not automatically set up a subcomponent or do anything else.
           # This is useful for calling Arduino-native libraries, where we need
           # to say what pins we are using, but don't need to do more in Ruby.
-          # See the LCD component for an example.
           #
           def require_pins(*args)
             required_pins = self.class_eval('@@required_pins') rescue []
@@ -49,17 +46,15 @@ module Dino
           # Proxying a pin models it as a single-pin component and requires it.
           # It can be made optional by adding `optional: true` to the hash.
           #
-          # On initializing a multi-pin component, its proxy instances are
-          # created and stored in the @proxies variable. Call #proxies for access.
+          # When instancing a multi-pin component, its proxy instances are
+          # created and stored in @proxies, readable via `#proxies`.
           #
-          # Lastly, convenience methods for each proxy are defined on the singleton
-          # class of the multi-pin instance.
+          # A convenience method for each proxy is defined on the singleton
+          # class of the multi-pin instance. For example, `rgb_led.red` returns
+          # the AnalogOutput instance for the red part of that specific RGB LED.
           #
-          # For example, you can call `rgb_led.red` for the AnalogOutput
-          # instance that controls the red part of that RGB led.
-          #
-          # These method names correspond to the hash keys (pin names) defined in
-          # the class definition call to `proxy_pins`. See RgbLed class for examples.
+          # Method names match the hash keys (pin names) used when calling
+          # '::proxy_pins' in the class definition. See RgbLed class for examples.
           #
           def proxy_pins(options={})
             if options[:optional]

@@ -8,7 +8,6 @@ module Dino
           initialize_board(options)
           initialize_pins(options)
           register
-
           after_initialize(options)
         end
 
@@ -30,18 +29,14 @@ module Dino
         end
 
         #
-        # Setup::Base just requires a board and adds the component to the list of components.
-        # Mix in other modules from Setup or define this method in your class to initialize the pin(s).
+        # Setup::Base only requires a board. Mix in modules from Setup or define
+        # this method in your class to use pins.
         #
         def initialize_pins(options={}) ; end
         alias :initialize_pin :initialize_pins
 
-        #
-        # Define #after_initialize in your component class.
-        #
-        # @note This method should be implemented in the including class.
-        #
-        def after_initialize(options={}) ; end
+        # Override in components. Call super when inheriting or mixing in.
+        def after_initialize(options={}); end
       end
     end
   end
