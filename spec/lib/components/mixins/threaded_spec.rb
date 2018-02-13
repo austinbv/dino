@@ -54,20 +54,19 @@ module Dino
 
         describe '#threaded_loop' do
           it 'should loop the block in the thread' do
+            @mutex = Mutex.new
+            @count = 0
+
             component = subject
-            main_thread = Thread.current
-            async_thread = Thread.current
-            async = Proc.new { async_thread = Thread.current}
+            component.threaded_loop do
+              @mutex.synchronize do
+                @count = @count + 1
+              end
+            end
 
-            expect(async).to receive(:call).and_call_original
-            expect(component).to receive(:loop) do |&block|
-              expect(block).to eq(async)
-            end.and_yield
-
-            component.threaded_loop(&async)
-            while(main_thread == async_thread) do; sleep 0.05; end
+            while(@mutex.synchronize{ @count } < 2) do; sleep 0.05; end
             component.stop_thread
-            expect(main_thread).to_not eq(async_thread)
+            expect(@count).to be > 1
           end
         end
 
