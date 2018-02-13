@@ -47,7 +47,7 @@ module Dino
             thread = Thread.current
             component = subject
             component.threaded {}
-            while(!component.instance_variable_get :@thread) do; end
+            while(!component.instance_variable_get :@thread) do; sleep 0.05; end
             expect(component.instance_variable_get :@thread).to_not eq(thread)
           end
         end
@@ -60,12 +60,12 @@ module Dino
             async = Proc.new { async_thread = Thread.current}
 
             expect(async).to receive(:call).and_call_original
-            allow_any_instance_of(ThreadedComponent).to receive(:loop) do |&block|
+            expect(component).to receive(:loop) do |&block|
               expect(block).to eq(async)
             end.and_yield
 
             component.threaded_loop(&async)
-            while(main_thread == async_thread) do; end
+            while(main_thread == async_thread) do; sleep 0.05; end
             component.stop_thread
             expect(main_thread).to_not eq(async_thread)
           end
