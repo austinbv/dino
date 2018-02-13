@@ -65,7 +65,9 @@ module Dino
           #
           # This is OK. We only want the highest discrepancy we did not set to 1.
           #
-          high_discrepancy = new_discrepancies.bit_length - 1
+          # high_discrepancy = new_discrepancies.bit_length - 1
+          high_discrepancy = -1
+          (0..63).each { |i| high_discrepancy = i if new_discrepancies[i] == 1 }
 
           # LSByte of address is product family. Check for existing class.
           klass = family_lookup(address & 0x00000000000000FF)
