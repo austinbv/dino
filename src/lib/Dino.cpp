@@ -144,15 +144,15 @@ void Dino::process() {
     #ifdef DINO_SHIFT
     case 21: shiftWrite          (pin, val, auxMsg[0], auxMsg[1], &auxMsg[3]); break;
     case 22: shiftRead           (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);  break;
-    case 23: addShiftListener    (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);  break;
-    case 24: removeShiftListener ();                                           break;
+    case 23: addShiftListener    ();  break;
+    case 24: removeShiftListener ();  break;
     #endif
 
     // Implemented in DinoSPI.cpp
     #ifdef DINO_SPI
     case 26: spiTransfer      (pin, auxMsg[0], auxMsg[1], auxMsg[2], (uint32_t)auxMsg[3], &auxMsg[7]); break;
-    case 27: addSpiListener   (pin, auxMsg[0], auxMsg[1], 0,         (uint32_t)auxMsg[3]);             break;
-    case 28: removeSpiListener();                                                                      break;
+    case 27: addSpiListener   ();  break;
+    case 28: removeSpiListener();  break;
     #endif
 
     // Implemented in DinoI2C.cpp

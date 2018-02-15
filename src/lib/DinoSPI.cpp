@@ -17,7 +17,6 @@ struct SpiListener{
 };
 SpiListener spiListeners[SPI_LISTENER_COUNT];
 
-
 // Convenience wrapper for SPI.begin
 void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.begin();
@@ -35,7 +34,6 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.beginTransaction(SPISettings(clockRate, bitOrder, mode));
 }
 
-
 // Convenience wrapper for SPI.end
 void Dino::spiEnd(){
   SPI.endTransaction();
@@ -45,7 +43,6 @@ void Dino::spiEnd(){
     SPI.end();
   #endif
 }
-
 
 //
 // Request format for SPI 2-way transfers
@@ -92,18 +89,17 @@ void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength,
   digitalWrite(selectPin, HIGH);
 }
 
-
 // CMD = 27
 // Start listening to an SPI register.
-// Overwrite the first disabled listener in the struct array.
-void Dino::addSpiListener(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate) {
+void Dino::addSpiListener() {
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
+    // Overwrite the first disabled listener in the struct array.
     if (spiListeners[i].enabled == false) {
       spiListeners[i] = {
-        selectPin,
-        settings,
-        rLength,
-        clockRate,
+        pin,
+        auxMsg[0],
+        auxMsg[1],
+        (uint32_t)auxMsg[3],
         true
       };
       return;
@@ -123,7 +119,6 @@ void Dino::removeSpiListener(){
   }
 }
 
-
 // Gets called by Dino::updateListeners to run listeners in the main loop.
 void Dino::updateSpiListeners(){
   for (int i = 0; i < SPI_LISTENER_COUNT; i++) {
@@ -138,10 +133,8 @@ void Dino::updateSpiListeners(){
   }
 }
 
-
 // Gets called by Dino::reset to clear all listeners.
 void Dino::clearSpiListeners(){
   for (int i = 0; i < SPI_LISTENER_COUNT; i++) spiListeners[i].enabled = false;
 }
-
 #endif

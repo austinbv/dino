@@ -80,7 +80,7 @@ class Dino {
     // Shift Registers
     void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte *data);          //cmd = 21
     void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 22
-    void addShiftListener      (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 23
+    void addShiftListener      ();                                                                         //cmd = 23
     void removeShiftListener   ();                                                                         //cmd = 24
     void updateShiftListeners  ();
     void clearShiftListeners   ();
@@ -89,7 +89,7 @@ class Dino {
     void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
     void spiTransfer           (int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data);  //cmd = 26
-    void addSpiListener        (int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate);              //cmd = 27
+    void addSpiListener        ();                                                                                          //cmd = 27
     void removeSpiListener     ();                                                                                          //cmd = 28
     void updateSpiListeners    ();
     void clearSpiListeners     ();

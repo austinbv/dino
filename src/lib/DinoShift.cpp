@@ -75,16 +75,16 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
 
 // CMD = 23
 // Start listening to a register using the Arduino shiftIn function.
-// Overwrite the first disabled listener in the struct array.
-void Dino::addShiftListener(int latchPin, int len, byte dataPin, byte clockPin, byte clockHighFirst) {
+void Dino::addShiftListener() {
   for (int i = 0;  i < SHIFT_LISTENER_COUNT;  i++) {
+    // Overwrite the first disabled listener in the struct array.
     if (shiftListeners[i].enabled == false) {
       shiftListeners[i] = {
-        latchPin,
-        len,
-        dataPin,
-        clockPin,
-        clockHighFirst,
+        pin,
+        val,
+        auxMsg[0],
+        auxMsg[1],
+        auxMsg[2],
         true
       };
       return;
