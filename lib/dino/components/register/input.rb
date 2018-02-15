@@ -91,7 +91,7 @@ module Dino
           read unless any_listening
         end
 
-        def digital_listen(pin)
+        def digital_listen(pin, divider)
           listen unless any_listening
           @listening_pins[pin] = true
         end

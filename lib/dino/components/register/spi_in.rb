@@ -23,11 +23,11 @@ module Dino
         end
 
         def read
-          board.spi_read(pin, spi_mode, frequency, @bytes)
+          board.spi_transfer(pin, mode: spi_mode, frequency: frequency, read: @bytes)
         end
 
         def listen
-          board.spi_listen(pin, spi_mode, frequency, @bytes)
+          board.spi_listen(pin, mode: spi_mode, frequency: frequency, read: @bytes)
         end
 
         def stop

@@ -86,12 +86,11 @@ class Dino {
     void clearShiftListeners   ();
 
     // SPI
-    void spiBegin              (byte spiMode, uint32_t clockRate);
+    void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
-    void spiWrite              (int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data);     //cmd = 26
-    void spiRead               (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 27
-    void addSpiListener        (int selectPin, int len, byte spiMode, uint32_t clockRate);                 //cmd = 28
-    void removeSpiListener     ();                                                                         //cmd = 29
+    void spiTransfer           (int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data);  //cmd = 26
+    void addSpiListener        (int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate);              //cmd = 27
+    void removeSpiListener     ();                                                                                          //cmd = 28
     void updateSpiListeners    ();
     void clearSpiListeners     ();
 

@@ -23,7 +23,7 @@ module Dino
         end
 
         def write(*bytes)
-          board.spi_write(pin, spi_mode, frequency, bytes.flatten)
+          board.spi_transfer(pin, mode: spi_mode, frequency: frequency, write: bytes.flatten)
         end
       end
     end

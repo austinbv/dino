@@ -34,8 +34,7 @@ module Dino
           end
         end
 
-        # Minimum 1 whether or not :min is given as an option.
-        if str.length < (options[:min] || 1)
+        if options[:min] && str.length < options[:min]
           raise ArgumentError, "too few bytes given (expected at least #{options[:min]})"
         end
 

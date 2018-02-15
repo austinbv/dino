@@ -10,8 +10,8 @@
 #define SPI_LISTENER_COUNT 4
 struct SpiListener{
   byte     selectPin;
+  byte     settings;
   byte     len;
-  byte     spiMode;
   uint32_t clockRate;
   boolean  enabled;
 };
@@ -19,15 +19,20 @@ SpiListener spiListeners[SPI_LISTENER_COUNT];
 
 
 // Convenience wrapper for SPI.begin
-void Dino::spiBegin(byte spiMode, uint32_t clockRate){
+void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.begin();
-  // Should make LSB/MSB optional.
-  switch(spiMode) {
-    case 0:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE0)); break;
-    case 1:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE1)); break;
-    case 2:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE2)); break;
-    case 3:  SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE3)); break;
+
+  byte bitOrder;
+  if bitRead(settings, 7) {
+    bitOrder = MSBFIRST;
+  } else {
+    bitOrder = LSBFIRST;
   }
+
+  byte mode = settings;
+  bitClear(mode, 7);
+
+  SPI.beginTransaction(SPISettings(clockRate, bitOrder, mode));
 }
 
 
@@ -43,24 +48,43 @@ void Dino::spiEnd(){
 
 
 //
-// Request format for single direction SPI API functions.
+// Request format for SPI 2-way transfers
 // pin         = slave select pin (int)
-// val         = length (int)
-// auxMsg[0]   = SPI mode (byte)
-// auxMsg[1-4] = clock frequency (uint32_t as 4 bytes)
-// auxMsg[5]+  = data (bytes) (write func only)
+// val         = empty
+// auxMsg[0]   = SPI settings. 2 LSB = SPI mode. Bit 7 = MSB(1) / LSB(0).
+// auxMsg[1]   = write length (number of bytes)
+// auxMsg[2]   = read length  (number of bytes)
+// auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
+//
+// auxMsg[7]+  = data (bytes) (write only)
 //
 // CMD = 26
 // Write to an SPI device.
-void Dino::spiWrite(int selectPin, int len, byte spiMode, uint32_t clockRate, byte *data) {
-  spiBegin(spiMode, clockRate);
+void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data) {
 
-  // Select the device.
+  spiBegin(settings, clockRate);
   digitalWrite(selectPin, LOW);
 
-  // Write one byte at a time.
-  for (uint8_t i = 0;  i < len;  i++) {
-    SPI.transfer(data[i]);
+  if (rLength > 0) {
+    // Stream read bytes as if coming from select pin for easy identification.
+    stream->print(selectPin);
+    stream->print(':');
+  }
+
+  for (byte i = 0;  (i < rLength || i < wLength);  i++) {
+    byte b;
+
+    if (i < wLength) {
+      b = SPI.transfer(data[i]);
+    } else {
+      b = SPI.transfer(0x00);
+    }
+
+    if (i < rLength) {
+      // Print read byte, then a comma or \n if it's the last read byte.
+      stream->print(b);
+      stream->print((i+1 == rLength) ? '\n' : ',');
+    }
   }
   spiEnd();
 
@@ -70,42 +94,15 @@ void Dino::spiWrite(int selectPin, int len, byte spiMode, uint32_t clockRate, by
 
 
 // CMD = 27
-// Read from an SPI device.
-void Dino::spiRead(int selectPin, int len, byte spiMode, uint32_t clockRate) {
-  spiBegin(spiMode, clockRate);
-
-  // Select the device.
-  digitalWrite(selectPin, LOW);
-
-  // Send data as if coming from the slave select pin so it's easy to identify.
-  // Start with just pin number and : for now.
-  stream->print(selectPin);
-  stream->print(':');
-
-  for (int i = 1;  i <= len;  i++) {
-    // Read a single byte from the register.
-    byte reading = SPI.transfer(0x00);
-
-    // Print it, then a comma or \n if it's the last byte.
-    stream->print(reading);
-    stream->print((i==len) ? '\n' : ',');
-  }
-  spiEnd();
-
-  // Leave select high.
-  digitalWrite(selectPin, HIGH);
-}
-
-// CMD = 28
 // Start listening to an SPI register.
 // Overwrite the first disabled listener in the struct array.
-void Dino::addSpiListener(int selectPin, int len, byte spiMode, uint32_t clockRate) {
+void Dino::addSpiListener(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate) {
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
     if (spiListeners[i].enabled == false) {
       spiListeners[i] = {
         selectPin,
-        len,
-        spiMode,
+        settings,
+        rLength,
         clockRate,
         true
       };
@@ -116,7 +113,7 @@ void Dino::addSpiListener(int selectPin, int len, byte spiMode, uint32_t clockRa
   }
 }
 
-// CMD = 29
+// CMD = 28
 // Send a number for a select pin to remove an SPI register listener.
 void Dino::removeSpiListener(){
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
@@ -131,10 +128,12 @@ void Dino::removeSpiListener(){
 void Dino::updateSpiListeners(){
   for (int i = 0; i < SPI_LISTENER_COUNT; i++) {
     if (spiListeners[i].enabled) {
-      spiRead(spiListeners[i].selectPin,
-              spiListeners[i].len,
-              spiListeners[i].spiMode,
-              spiListeners[i].clockRate);
+      spiTransfer(spiListeners[i].selectPin,
+                  spiListeners[i].settings,
+                  spiListeners[i].len,
+                  0,
+                  spiListeners[i].clockRate,
+                  {});
     }
   }
 }

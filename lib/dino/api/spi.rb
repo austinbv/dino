@@ -3,36 +3,53 @@ module Dino
     module SPI
       include Helper
 
-      def spi_settings(mode, frequency)
-        pack(:uint8, [0, mode]) + pack(:uint32, [frequency])
+      def spi_header(options)
+        options[:mode]       ||= 0
+        options[:frequency]  ||= 3000000
+        options[:bit_order]  ||= :lsbfirst
+        raise ArgumentError,
+              'invalid SPI mode' unless (0..3).include? options[:mode]
+
+        # Flag unused high bit of mode if we need to transfer MSBFIRST.
+        settings = options[:mode]
+        settings = settings | 0b10000000 if options[:bit_order] == :msbfirst
+
+        uint8 = pack(:uint8, [settings, options[:read], options[:write].length])
+        uint8 + pack(:uint32, options[:frequency])
       end
 
-      # Listener can store up to 8 bytes to get written each time, read up to 256.
-      def spi_write(pin, mode, frequency, bytes)
-        settings = spi_settings(mode, frequency)
-        bytes = pack(:uint8, bytes)
+      # CMD = 26
+      def spi_transfer(pin, options={})
+        options[:read] ||= 0
+        if options[:write]
+          options[:write] = [options[:write]].flatten
+        else
+          options[:write] = []
+        end
+
+        return if (options[:read] == 0) && (options[:write].empty?)
+
+        header = spi_header(options)
         write Message.encode command: 26,
                              pin: pin,
-                             value: bytes.length,
-                             aux_message: settings + bytes
+                             aux_message: header + pack(:uint8, options[:write])
       end
 
-      def spi_read(pin, mode, frequency, num_bytes)
+      # CMD = 27
+      def spi_listen(pin, options={})
+        raise ArgumentError,
+              'no SPI bytes to read' unless (options[:read] > 0)
+        options[:write] = []
+
+        header = spi_header(options)
         write Message.encode command: 27,
                              pin: pin,
-                             value: num_bytes,
-                             aux_message: spi_settings(mode, frequency)
+                             aux_message: header
       end
 
-      def spi_listen(pin, mode, frequency, num_bytes)
-        write Message.encode command: 28,
-                             pin: pin,
-                             value: num_bytes,
-                             aux_message: spi_settings(mode, frequency)
-      end
-
+      # CMD = 28
       def spi_stop(pin)
-        write Message.encode command: 29, pin: pin
+        write Message.encode command: 28, pin: pin
       end
     end
   end
