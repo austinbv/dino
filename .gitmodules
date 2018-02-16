@@ -1,9 +1,6 @@
 [submodule "src/vendor/Arduino-IRremote"]
 	path = src/vendor/Arduino-IRremote
 	url = https://github.com/z3t0/Arduino-IRremote.git
-[submodule "src/vendor/I2C-Master-Library"]
-	path = src/vendor/I2C-Master-Library
-	url = https://github.com/vickash/I2C-Master-Library.git
 [submodule "src/vendor/arduino-DHT"]
 	path = src/vendor/arduino-DHT
 	url = https://github.com/markruys/arduino-DHT.git

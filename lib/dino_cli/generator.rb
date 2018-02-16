@@ -111,7 +111,7 @@ class DinoCLI::Generator
     @packages.each_key do |k|
       # Check if the package should be included for this target.
       package = @packages[k]
-      targeted = !package[:target] || package[:target].include?(options[:target])
+      targeted = !package[:only] || package[:only].include?(options[:target])
       excluded = package[:exclude] && package[:exclude].include?(options[:target])
 
       # Append source file basename to the output dir to get output file path.

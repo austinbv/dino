@@ -2,7 +2,6 @@ module Dino
   module Components
     module OneWire
       class Bus
-        # 1 bits in mask force discrepancies to 1. 0 leaves bit as read from bus.
         def _search(branch_mask)
           reset
           write(SEARCH_ROM)
@@ -24,9 +23,9 @@ module Dino
             block_until_read
 
             # No unsearched discrepancies left.
-            break if high_discrepancy == - 1
+            break if high_discrepancy == -1
 
-            # Force highest new discrepancy to 1 on the next search.
+            # Force highest new discrepancy to be a 1 on the next search.
             # i.e. Go as deep as possible into each branch found then back out.
             #
             branch_mask = branch_mask | (2 ** high_discrepancy)
@@ -52,8 +51,6 @@ module Dino
           # Gives 0 at every discrepancy we didn't write 1 for on this search.
           new_discrepancies = address ^ complement
 
-          # Newer rubies:
-          # high_discrepancy = new_discrepancies.bit_length - 1
           high_discrepancy = -1
           (0..63).each { |i| high_discrepancy = i if new_discrepancies[i] == 0 }
 

@@ -1,7 +1,11 @@
 class DinoCLI::Generator
+  STANDARD_PACKAGES = PACKAGES.each_key.map do |package|
+                        package unless PACKAGES[package][:only]
+                      end.compact
+
   TARGETS = {
-    # Default target always includes all packages.
-    mega: PACKAGES.each_key.to_a,
+    # Default target includes all standard package.
+    mega: STANDARD_PACKAGES,
 
     # Core is core.
     core: [:core],
@@ -10,9 +14,9 @@ class DinoCLI::Generator
     mega168: [:core, :servo, :dht, :one_wire, :ir_out, :tone, :spi, :i2c],
 
     # ARM includes everytyhing except specific incompatibilities.
-    arm: PACKAGES.each_key.to_a - [:serial, :tone, :ir_out, :i2c],
+    arm: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
 
     # A surprising amount "just works" on the ESP, notably not LCD.
-    esp8266: PACKAGES.each_key.to_a - [:lcd, :serial, :ir_out, :i2c] + [:ir_out_esp8266],
+    esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
   }
 end

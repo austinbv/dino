@@ -96,8 +96,7 @@ class Dino {
 
     // I2C
     void i2cBegin              (); //cmd = 31
-    void i2cEnd                (); //cmd = 32
-    void i2cScan               (); //cmd = 33
+    void i2cSearch             (); //cmd = 33
     void i2cWrite              (); //cmd = 34
     void i2cRead               (); //cmd = 35
 

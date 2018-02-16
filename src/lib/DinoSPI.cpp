@@ -21,17 +21,15 @@ SpiListener spiListeners[SPI_LISTENER_COUNT];
 void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.begin();
 
-  byte bitOrder;
-  if bitRead(settings, 7) {
-    bitOrder = MSBFIRST;
-  } else {
-    bitOrder = LSBFIRST;
-  }
-
+  bool msbfirst = bitRead(settings, 7);
   byte mode = settings;
   bitClear(mode, 7);
 
-  SPI.beginTransaction(SPISettings(clockRate, bitOrder, mode));
+  if (msbfirst) {
+    SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, mode));
+  } else {
+    SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, mode));
+  }
 }
 
 // Convenience wrapper for SPI.end
@@ -58,7 +56,6 @@ void Dino::spiEnd(){
 // CMD = 26
 // Write to an SPI device.
 void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data) {
-
   spiBegin(settings, clockRate);
   digitalWrite(selectPin, LOW);
 

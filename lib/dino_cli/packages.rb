@@ -81,7 +81,7 @@ PACKAGES = {
   ir_out_esp8266: {
     description: "Transmit infrared signals with the ESP8266",
     directive: "DINO_IR_OUT",
-    target: [:esp8266],
+    only: [:esp8266],
     files: [
       "lib/DinoIROut.cpp",
       "vendor/IRremoteESP8266/src/IRremoteESP8266.h",
@@ -103,8 +103,6 @@ PACKAGES = {
     directive: "DINO_I2C",
     files: [
       "lib/DinoI2C.cpp",
-      "vendor/I2C-Master-Library/I2C.h",
-      "vendor/I2C-Master-Library/I2C.cpp",
     ]
   }
 }

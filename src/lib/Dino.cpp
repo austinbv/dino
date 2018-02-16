@@ -157,9 +157,7 @@ void Dino::process() {
 
     // Implemented in DinoI2C.cpp
     #ifdef DINO_I2C
-    case 31: i2cBegin            ();  break;
-    case 32: i2cEnd              ();  break;
-    case 33: i2cScan             ();  break;
+    case 33: i2cSearch           ();  break;
     case 34: i2cWrite            ();  break;
     case 35: i2cRead             ();  break;
     #endif
