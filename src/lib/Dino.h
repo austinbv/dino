@@ -128,14 +128,15 @@ class Dino {
 
     // Scale aux message allocation based on enabled features and chip.
     #if defined(DINO_IR_OUT) && !defined (__AVR_ATmega168__)
-      byte auxMsg[528];
+    #  define AUX_SIZE 528
     #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
-      byte auxMsg[264];
+    #  define AUX_SIZE 264
     #elif defined (DINO_LCD)
-      byte auxMsg[136];
+    #  define AUX_SIZE 136
     #else
-      byte auxMsg[40];
+    #  define AUX_SIZE 40
     #endif
+    byte auxMsg[AUX_SIZE];
 
     // Save a pointer to any stream so we can call ->print and ->write on it.
     Stream* stream;

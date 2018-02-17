@@ -3,7 +3,11 @@ require 'spec_helper'
 module Dino
   describe Dino::Board do
     def io_mock(methods = {})
-      @io ||= double(:io, {add_observer: true, handshake: "14,20", write: true, read: true}.merge(methods))
+      @io ||= double :io, { add_observer: true,
+                            handshake: "528,14,20",
+                            write: true,
+                            read: true
+                          }.merge(methods)
     end
 
     subject { Board.new(io_mock) }

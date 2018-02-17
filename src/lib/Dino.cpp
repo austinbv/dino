@@ -227,6 +227,8 @@ void Dino::reset() {
   rcvBytes = 0;
 
   stream->print("ACK:");
+  stream->print(AUX_SIZE);
+  stream->print(',');
   stream->print(A0);
   #if defined(__SAM3X8E__)
     stream->print(',');

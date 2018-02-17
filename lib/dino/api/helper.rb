@@ -1,19 +1,6 @@
 module Dino
   module API
     module Helper
-      #
-      # Microcontrollers have different aux message limits based on available RAM.
-      # Board should set @aux_limit from handshake. Default to safe minimum.
-      #
-      def aux_limit
-        @aux_limit || 527 # Should default to 39, but this isn't in handshake yet.
-      end
-
-      def write(message)
-        raise NotImplementedError
-          .new("#{self.class.name}#write not defined in Board subclass")
-      end
-
       def pack(type, data, options={})
         # Always pack as little endian.
         template =  case type
