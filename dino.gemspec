@@ -35,6 +35,7 @@ Gem::Specification.new do |gem|
   gem.executables   = ["dino"]
 
   gem.add_dependency 'rubyserial', '~> 0.5.0'
+  gem.add_dependency 'bcd', '~> 0.3.0'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'

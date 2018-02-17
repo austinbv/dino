@@ -18,11 +18,15 @@ module Dino
 
       # CMD = 35
       def i2c_read(address, register, num_bytes, options={})
-        aux = pack :uint8, [address, register, num_bytes]
-
         settings = options[:repeated_start] ? 1 : 0
-        settings = settings | 0b10 unless register
 
+        # Won't write anything if no start register was given.
+        unless register
+          settings = settings | 0b10
+          register = 0
+        end
+
+        aux = pack :uint8, [address, register, num_bytes]
         write Message.encode command: 35,
                              value: settings,
                              aux_message: aux
