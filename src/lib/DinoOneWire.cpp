@@ -59,7 +59,7 @@ void Dino::owSearch(){
       }
     }
     stream->print(addr);
-    stream->print('-');
+    stream->print(',');
     stream->print(comp);
     stream->print((i == 7) ? '\n' : ',');
   }

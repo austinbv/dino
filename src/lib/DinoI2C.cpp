@@ -63,17 +63,23 @@ void Dino::i2cWrite() {
 //
 void Dino::i2cRead() {
   if (auxMsg[2] > 32) auxMsg[2] = 32;
-
+  byte repeatedStart = bitRead(val, 0);
   i2cBegin();
-  Wire.beginTransmission(auxMsg[0]);
-  Wire.write(auxMsg[1]);
-  Wire.endTransmission(val); // Add repeated start option here.
-  Wire.requestFrom(auxMsg[0], auxMsg[2], val);
 
-  // Send data as if coming from SDA pin. Implement a bus lock remotely.
+  // Bit 1 of val is flag for whether to write register address first or not.
+  if (bitRead(val, 1)) {
+    Wire.beginTransmission(auxMsg[0]);
+    Wire.write(auxMsg[1]);
+    Wire.endTransmission(repeatedStart);
+  }
+
+  Wire.requestFrom(auxMsg[0], auxMsg[2], repeatedStart);
+
+  // Send data as if coming from SDA pin. Prefix with device adddress.
   // Fail silently if no bytes read / invalid device address.
   if(Wire.available()){
     stream->print(SDA); stream->print(':');
+    stream->print(auxMsg[0]); stream->print('-');
   }
   uint8_t currentByte = 0;
   while(Wire.available()){

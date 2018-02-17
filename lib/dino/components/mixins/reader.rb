@@ -4,16 +4,21 @@ module Dino
       module Reader
         include Callbacks
 
-        def read(*args, &block)
+        def read_using(method, &block)
           add_callback(:read, &block) if block_given?
 
+          # Block and catches read value for return, AFTER the pre-filter.
           value = nil
           add_callback(:read) { |data| value = data }
 
-          _read(*args)
+          method.call
           block_until_read
 
           value
+        end
+
+        def read(&block)
+          read_using(self.method(:_read), &block)
         end
 
         def block_until_read

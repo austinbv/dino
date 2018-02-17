@@ -44,7 +44,6 @@ module Dino
                            preclock_high: rising_clock
         end
 
-        # Untested
         def listen(num_bytes=@bytes)
           board.shift_listen latch.pin, data.pin, clock.pin, num_bytes,
                              preclock_high: rising_clock

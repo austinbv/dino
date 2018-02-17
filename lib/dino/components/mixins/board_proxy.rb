@@ -2,7 +2,7 @@ module Dino
   module Components
     module Mixins
       module BoardProxy
-        include Bus
+        include BusMaster
 
         def after_initialize(options={})
           super(options)

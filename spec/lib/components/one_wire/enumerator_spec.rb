@@ -92,7 +92,7 @@ module Dino
               end
             end
 
-            output_string << addr.to_s << "-" << comp.to_s
+            output_string << addr.to_s << "," << comp.to_s
             output_string << "," if (i != 7 ) # No \n. TxRx strips it IRL.
           end
           output_string

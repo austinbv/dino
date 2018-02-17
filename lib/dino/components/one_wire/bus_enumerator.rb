@@ -14,13 +14,10 @@ module Dino
           high_discrepancy = 0
 
           loop do
-            self.add_callback(:read) do |result|
+            read_using -> { _search(branch_mask) } do |result|
               device, high_discrepancy = parse_search_result(result)
               @found_devices << device
             end
-
-            _search(branch_mask)
-            block_until_read
 
             # No unsearched discrepancies left.
             break if high_discrepancy == -1
@@ -60,18 +57,14 @@ module Dino
           [{class: klass, address: address}, high_discrepancy]
         end
 
-        # Search result is a comma separated list of 8 byte-pairs. Each pair is
-        # formatted "addressByte-compByte". Pairs are ordered LS byte first.
-        #
-        def split_search_result(str)
-          byte_pairs = str.split(",")
+        # Result is 16 bytes, 8 byte address and complement interleaved LSByte first.
+        def split_search_result(data)
           address = 0
           complement = 0
 
-          byte_pairs.reverse.each do |pair|
-            address_byte, complement_byte = pair.split("-").map(&:to_i)
-            address = (address << 8) | address_byte
-            complement = (complement << 8) | complement_byte
+          data.reverse.each_slice(2) do |comp_byte, addr_byte|
+            address = (address << 8) | addr_byte
+            complement = (complement << 8) | comp_byte
           end
 
           [address, complement]

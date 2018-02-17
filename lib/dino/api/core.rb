@@ -50,11 +50,9 @@ module Dino
           raise "Listener divider must be in #{DIVIDERS.inspect}"
         end
 
-        # Create a bit mask for the settings we want to use. Gets sent in value.
-        mask = 0
+        mask  = Math.log2(divider).to_i
         mask |= 0b10000000 if (state == :on)
         mask |= 0b01000000 if (mode == :analog)
-        mask |= Math.log2(divider).to_i
 
         write Message.encode(command: 7, pin: convert_pin(pin), value: mask)
       end

@@ -9,18 +9,22 @@ module Dino
       end
 
       # CMD = 34
-      def i2c_write(slave_address, data=[], options={})
-        aux = pack :uint8, [slave_address, data.length, data].flatten
+      def i2c_write(address, bytes=[], options={})
+        aux = pack :uint8, [address, bytes.length, bytes].flatten
         write Message.encode command: 34,
                              value: options[:repeated_start] ? 1 : 0,
                              aux_message: aux
       end
 
       # CMD = 35
-      def i2c_read(slave_address, register_start, num_bytes, options={})
-        aux = pack :uint8, [slave_address, register_start, num_bytes]
+      def i2c_read(address, register, num_bytes, options={})
+        aux = pack :uint8, [address, register, num_bytes]
+
+        settings = options[:repeated_start] ? 1 : 0
+        settings = settings | 0b10 unless register
+
         write Message.encode command: 35,
-                             value: options[:repeated_start] ? 1 : 0,
+                             value: settings,
                              aux_message: aux
       end
     end

@@ -3,7 +3,7 @@ module Dino
     module OneWire
       class Bus
         include Setup::SinglePin
-        include Mixins::Bus
+        include Mixins::BusMaster
         include Mixins::Reader
 
         attr_reader :found_devices, :parasite_power
@@ -14,38 +14,40 @@ module Dino
           read_power_supply
         end
 
-        # Without driving low first, results are inconsistent.
-        # Only first (LS) bit matters, but we can only read whole bytes.
-        #
         def read_power_supply
-          board.set_pin_mode(self.pin, :out)
-          board.digital_write(self.pin, board.low)
-          sleep 0.1
+          mutex.synchronize do
+            # Without driving low first, results are inconsistent.
+            board.set_pin_mode(self.pin, :out)
+            board.digital_write(self.pin, board.low)
+            sleep 0.1
 
-          reset
-          write(SKIP_ROM, READ_POWER_SUPPLY)
-          byte = read(1)
+            reset
+            write(SKIP_ROM, READ_POWER_SUPPLY)
 
-          @parasite_power = (byte.to_i[0] == 0) ? true : false
+            # Only LSBIT matters, but we can only read whole bytes.
+            byte = read(1)
+            @parasite_power = (byte[0] == 0) ? true : false
+          end
         end
 
-        def reset
-          board.one_wire_reset(pin)
+        def pre_callback_filter(bytes)
+          bytes = bytes.split(",").map(&:to_i)
+          bytes.length > 1 ? bytes : bytes[0]
         end
 
         def device_present
-          present = false
-          self.add_callback(:read) do |result|
-            present = (result.to_i == 0) ? true : false
+          mutex.synchronize do
+            byte = read_using -> { reset(1) }
+            (byte == 0) ? true : false
           end
-
-          board.one_wire_reset(pin, 1)
-          block_until_read
-          present
         end
 
-        def _read(num_bytes)
-          board.one_wire_read(pin, num_bytes)
+        def reset(get_presence=0)
+          board.one_wire_reset(pin, get_presence)
+        end
+
+        def read(num_bytes)
+          read_using -> { board.one_wire_read(pin, num_bytes) }
         end
 
         def write(*bytes)

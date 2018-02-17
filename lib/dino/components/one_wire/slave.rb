@@ -2,38 +2,17 @@ module Dino
   module Components
     module OneWire
       class Slave
-        include Setup::Base
+        include Mixins::BusSlave
         include Mixins::Poller
+
         attr_reader :address
         alias  :bus :board
 
-        def initialize(options={})
-          options[:board] ||= options[:bus]
-          super(options)
-        end
-
-        def after_initialize(options={})
-          super(options)
-
-          unless options[:address]
-            raise ArgumentError,
-                  'missing 1-Wire slave ROM address; try Bus#search first'
-          end
-          @address = options[:address]
-        end
-
-        def read_scratch(num_bytes, &block)
+        def read_scratch(num_bytes)
           atomically do
-            # Bubble bus callback while still in the lock.
-            if block_given?
-              bus.add_callback(:read) do |data|
-                block.call data.split(",").map(&:to_i)
-              end
-            end
-
             match
             bus.write(READ_SCRATCH)
-            bus.read(num_bytes).split(",").map(&:to_i)
+            bus.read(num_bytes)
           end
         end
 
@@ -51,12 +30,6 @@ module Dino
             bus.write(COPY_SCRATCH)
             sleep 0.05
             bus.reset if bus.parasite_power
-          end
-        end
-
-        def atomically(&block)
-          bus.mutex.synchronize do
-            block.call
           end
         end
 

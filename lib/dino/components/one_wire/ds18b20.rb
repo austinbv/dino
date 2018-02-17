@@ -44,7 +44,10 @@ module Dino
 
         def _read
           convert
-          read_scratch(9) { |data| self.update(data) }
+          data = read_scratch(9)
+
+          self.update(data)
+          pre_callback_filter(data)
         end
 
         def pre_callback_filter(bytes)
