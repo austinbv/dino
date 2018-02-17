@@ -11,30 +11,15 @@ module Dino
     class Base
       include Observable
       include Handshake
-      # Let the methods in FlowControl wrap subclass methods too.
+      # We need the methods in FlowControl to wrap subclass methods too.
       def self.inherited(subclass)
         subclass.send(:prepend, FlowControl)
-      end
-
-      def read(message)
-        raise NotImplementedError
-          .new("#{self.class.name}#read not defined in Dino::TxRx subclass")
-      end
-
-      def write(message)
-        raise NotImplementedError
-          .new("#{self.class.name}#write not defined in Dino::TxRx subclass")
       end
 
     private
 
       def io
         @io ||= connect
-      end
-
-      def connect
-        raise NotImplementedError
-          .new("#{self.class.name}#connect not defined in Dino::TxRx subclass")
       end
 
       def io_reset
@@ -50,18 +35,22 @@ module Dino
       end
 
       def start_read
-        @thread ||= Thread.new { loop { read_and_parse } }
+        @thread ||= Thread.new  do
+          trap("INT") do
+            io.write("\n90\n")
+            raise Interrupt
+          end
+
+          loop do
+            read_and_parse
+          end
+        end
       end
 
       def stop_read
         return nil if @thread.nil?
         Thread.kill(@thread)
         @thread = nil
-      end
-
-      def read_and_parse
-        raise NotImplementedError
-          .new("#{self.class.name}#read_and_parse not defined in Dino::TxRx::FlowControl")
       end
 
       def parse(line)
