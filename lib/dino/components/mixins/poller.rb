@@ -5,14 +5,18 @@ module Dino
         include Reader
         include Threaded
 
-        def poll(interval=1, &block)
+        def poll_using(method, interval=1, &block)
           stop
           add_callback(:poll, &block) if block_given?
 
           threaded_loop do
-            _read
+            method.call
             sleep interval
           end
+        end
+
+        def poll(interval=1, &block)
+          poll_using(self.method(:_read), interval, &block)
         end
 
         def stop

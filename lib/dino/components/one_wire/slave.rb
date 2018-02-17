@@ -8,8 +8,9 @@ module Dino
         attr_reader :address
         alias  :bus :board
 
-        def read_scratch(num_bytes)
+        def read_scratch(num_bytes, &block)
           atomically do
+            bus.add_callback(:read, &block) if block_given?
             match
             bus.write(READ_SCRATCH)
             bus.read(num_bytes)
