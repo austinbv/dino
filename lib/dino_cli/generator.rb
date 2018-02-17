@@ -2,6 +2,7 @@ class DinoCLI::Generator
   require "fileutils"
   require "dino_cli/packages"
   require "dino_cli/targets"
+  require "dino/version"
   attr_accessor :options
 
   def initialize(options={})
@@ -14,6 +15,7 @@ class DinoCLI::Generator
     # Preserve the source sketch name, since we need to copy that file.
     options[:src_sketch_name] = options[:sketch_name].dup
     options[:sketch_name] << "_#{options[:target]}" unless options[:target] == :mega
+    options[:sketch_name] << "_#{::Dino::VERSION}"
   end
 
   def self.run!(options={})
