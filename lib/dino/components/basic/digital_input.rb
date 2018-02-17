@@ -14,12 +14,12 @@ module Dino
         end
 
         def _read
-          board.digital_read(self.pin)
+          board.digital_read(pin)
         end
 
         def _listen(divider=4)
-          divider ||= 4
-          board.digital_listen(self.pin, divider)
+          @divider ||= 4
+          board.digital_listen(pin, @divider)
         end
 
         def on_high(&block)

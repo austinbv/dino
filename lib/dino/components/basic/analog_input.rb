@@ -7,14 +7,14 @@ module Dino
         include Mixins::Reader
         include Mixins::Poller
         include Mixins::Listener
-        
+
         def _read
-          board.analog_read(self.pin)
+          board.analog_read(pin)
         end
 
         def _listen(divider=16)
-          divider ||= 16
-          board.analog_listen(self.pin, divider)
+          @divider ||= 16
+          board.analog_listen(pin, @divider)
         end
       end
     end

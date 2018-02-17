@@ -54,8 +54,8 @@ module Dino
 
         def extract_serial
           # Remove CRC & family code.
-          address = (@address & 0x00FFFFFFFFFFFFFF) >> 8
-          address.to_s(16).rjust(12, "0")
+          serial = (@address & 0x00FFFFFFFFFFFFFF) >> 8
+          serial.to_s(16).rjust(12, "0")
         end
       end
     end

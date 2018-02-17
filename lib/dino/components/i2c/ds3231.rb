@@ -6,7 +6,7 @@ module Dino
 
         def pre_callback_filter(bytes)
           t = bytes.map { |b| BCD.encode(b) }
-          Time.new t[6]+ 1970, t[5], t[4], t[2], t[1], t[0]
+          Time.new t[6] + 1970, t[5], t[4], t[2], t[1], t[0]
         end
 
         def time

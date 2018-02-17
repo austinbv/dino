@@ -9,7 +9,7 @@ module Dino
           include Setup::Base
           include Listener
           def _listen(divider=nil); end
-          def _stop_listen; end
+          def _stop_listener; end
           def initialize; after_initialize; end
         end
 
@@ -42,8 +42,8 @@ module Dino
         end
 
         describe '#stop' do
-          it 'should call #_stop_listen' do
-            expect(subject).to receive(:_listen)
+          it 'should call #_stop_listener' do
+            expect(subject).to receive(:_stop_listener)
             subject.listen
           end
 

@@ -12,18 +12,8 @@ module Dino
 
         def stop
           super if defined?(super)
-          _stop_listen
+          _stop_listener
           remove_callbacks :listen
-        end
-
-        def _listen
-          raise NotImplementedError
-            .new("#{self.class.name}#_listen is not defined.")
-        end
-
-        def _stop_listen
-          raise NotImplementedError
-            .new("#{self.class.name}#_stop_listen is not defined.")
         end
       end
     end

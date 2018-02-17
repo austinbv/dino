@@ -16,9 +16,17 @@ module Dino
         end
 
         describe '#_listen' do
-          it 'should send #analog_listen to the board with its pin' do
+          it 'should send #analog_listen to the board with its pin and divider' do
             expect(board).to receive(:analog_listen).with(subject.pin, 16)
             subject._listen
+          end
+        end
+
+
+        describe '#_stop_listener' do
+          it 'should send #stop_listener to the board with its pin' do
+            expect(board).to receive(:stop_listener).with(subject.pin)
+            subject._stop_listener
           end
         end
       end
