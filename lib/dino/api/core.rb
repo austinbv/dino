@@ -69,6 +69,24 @@ module Dino
       def stop_listener(pin)
         set_listener(pin, :off)
       end
+
+      def pulse_read(pin, options={})
+        reset       = options[:reset] || false
+        reset_time  = options[:reset_time] || 0
+        pulse_limit = options[:pulse_limit] || 100
+        timeout     = options[:timeout] || 200
+
+        settings = reset ? 1 : 0
+        settings = settings | 0b10 if reset == high
+
+        aux = pack :uint16, [reset_time, timeout]
+        aux << pack(:uint8, pulse_limit)
+
+        write Message.encode command: 11,
+                             pin: convert_pin(pin),
+                             value: settings,
+                             aux_message: aux
+      end
     end
   end
 end

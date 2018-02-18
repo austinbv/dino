@@ -52,7 +52,7 @@ module Dino
           (0..63).each { |i| high_discrepancy = i if new_discrepancies[i] == 0 }
 
           # LSByte of address is product family.
-          klass = family_lookup(address & 0x00000000000000FF)
+          klass = family_lookup(address & 0xFF)
 
           [{class: klass, address: address}, high_discrepancy]
         end

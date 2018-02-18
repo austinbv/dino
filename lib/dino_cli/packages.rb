@@ -49,15 +49,6 @@ PACKAGES = {
       "lib/DinoLCD.h",
     ]
   },
-  dht: {
-    description: "Read DHT temp/humidity sensors",
-    directive: "DINO_DHT",
-    files: [
-      "lib/DinoDHT.cpp",
-      "vendor/arduino-DHT/DHT.cpp",
-      "vendor/arduino-DHT/DHT.h",
-    ]
-  },
   serial: {
     description: "Software serial output",
     directive: "DINO_SERIAL",

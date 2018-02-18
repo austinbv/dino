@@ -5,18 +5,39 @@ module Dino
       include Setup::Input
       include Mixins::Poller
 
-      def after_initialize(options={})
-        super(options)
-        @state = {temperature: nil, humidity: nil}
-      end
-
       def _read
-        board.dht_read(self.pin)
+        board.pulse_read(pin, reset: board.low, reset_time: 1000, pulse_limit: 84)
       end
 
       def pre_callback_filter(data)
-        t, h = data.split(",")
-        { temperature: t.to_f, humidity: h.to_f }
+        decode(data.split(",").map(&:to_i))
+      end
+
+      def decode(data)
+        data = data.last(81)
+        return { error: 'missing data' } unless data.length == 81
+        data = data[0..79]
+
+        bytes = []
+        data.each_slice(16) do |b|
+          byte = 0b00000000
+          b.each_slice(2) do |x,y|
+            bit = (y<x) ? 0 : 1
+            byte = (byte << 1) | bit
+          end
+          bytes << byte
+        end
+        return { error: 'CRC failure' } unless crc(bytes)
+
+        celsius   = ((bytes[2] << 8) | bytes[3]).to_f / 10
+        humidity  = ((bytes[0] << 8) | bytes[1]).to_f / 10
+        farenheit = (celsius * 1.8 + 32).round(1)
+
+        { celsius: celsius, farenheit: farenheit, humidity: humidity }
+      end
+
+      def crc(bytes)
+        bytes[0..3].reduce(0, :+) & 0xFF == bytes[4]
       end
     end
   end

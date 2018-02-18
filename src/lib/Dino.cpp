@@ -100,13 +100,14 @@ void Dino::process() {
     // See explanation at top of DinoBugWorkaround.cpp
     case 999999: bugWorkaround   ();  break;
 
-    // Implemented in this file.
+    // Implemented in DinoCoreIO.cpp
     case 0:  setMode             ();    break;
     case 1:  dWrite              ();    break;
     case 2:  dRead               (pin); break;
     case 3:  aWrite              ();    break;
     case 4:  aRead               (pin); break;
     case 7:  setListener         ();    break;
+    case 11: pulseRead           ();    break;
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
@@ -122,11 +123,6 @@ void Dino::process() {
     // Implemented in DinoSerial.cpp
     #ifdef DINO_SERIAL
     case 12: handleSerial        ();    break;
-    #endif
-
-    // Implemented in DinoDHT.cpp
-    #ifdef DINO_DHT
-    case 13: dhtRead             ();    break;
     #endif
 
     // Implemented in DinoIROut.cpp

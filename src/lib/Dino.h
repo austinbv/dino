@@ -71,8 +71,8 @@ class Dino {
     void servoToggle           ();         //cmd = 8
     void servoWrite            ();         //cmd = 9
     void handleLCD             ();         //cmd = 10
+    void pulseRead             ();         //cmd = 11
     void handleSerial          ();         //cmd = 12
-    void dhtRead               ();         //cmd = 13
     void irSend                ();         //cmd = 16
     void tone                  ();         //cmd = 17
     void noTone                ();         //cmd = 18

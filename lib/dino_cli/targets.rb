@@ -11,7 +11,7 @@ class DinoCLI::Generator
     core: [:core],
 
     # Specific features for the old mega168 chips.
-    mega168: [:core, :servo, :dht, :one_wire, :ir_out, :tone, :spi, :i2c],
+    mega168: [:core, :servo, :one_wire, :ir_out, :tone, :spi, :i2c],
 
     # ARM includes everytyhing except specific incompatibilities.
     arm: STANDARD_PACKAGES - [:serial, :tone, :ir_out],

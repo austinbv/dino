@@ -4,16 +4,21 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::TxRx::Serial.new(device: "/dev/cu.usbmodem1431"))
 dht = Dino::Components::DHT.new(pin: 7, board: board)
 
 # The DHT class pre-processes raw data from the board. When it reaches callbacks
 # it's already hash of :temperature and :humidity keys, both with Float values.
-dht.add_callback do |data|
-  puts "The temperature is #{data[:temperature]} degrees Celsius"
-  puts "The relative humidity is #{data[:humidity]}%"
+dht.add_callback do |reading|
+  print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
+  if reading[:error]
+    puts "Error: #{reading[:error]}"
+  else
+    print "#{reading[:celsius]} \xC2\xB0C | #{reading[:farenheit]} \xC2\xB0F | "
+    puts "#{reading[:humidity]}% relative humidity"
+  end
 end
 
-# Read it every 10 seconds.
-dht.poll(10)
+# Read it every 5 seconds.
+dht.poll(5)
 sleep
