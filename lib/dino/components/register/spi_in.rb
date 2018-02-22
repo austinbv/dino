@@ -14,12 +14,9 @@ module Dino
 
         def after_initialize(options={})
           super(options) if defined?(super)
-
-          @spi_mode  = options[:spi_mode] || 0
-
-          # No default value for clock frequency.
-          raise 'SPI clock rate (Hz) required in :frequency option' unless options[:frequency]
-          @frequency = options[:frequency]
+          
+          @spi_mode  = options[:spi_mode]  || 0
+          @frequency = options[:frequency] || 3000000
         end
 
         def read

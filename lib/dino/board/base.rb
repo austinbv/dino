@@ -1,6 +1,8 @@
 module Dino
   module Board
     class Base
+      include API::Core
+
       attr_reader :high, :low, :analog_high, :components, :analog_zero, :dac_zero
 
       def initialize(io, options={})

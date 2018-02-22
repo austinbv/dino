@@ -33,7 +33,7 @@ module Dino
         def bubble_callbacks
           add_callback(:bus_master) do |str|
             if str.match /d*-/
-              address, data = str.split("-")
+              address, data = str.split("-", 2)
               address = address.to_i
               data = data.split(",").map(&:to_i)
               update_component({address: address, data: data})

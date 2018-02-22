@@ -4,25 +4,21 @@ module Dino
       module BoardProxy
         include BusMaster
 
-        def after_initialize(options={})
-          super(options)
-          @high = 1
-          @low = 0
+        def high
+          1
         end
 
-        attr_reader :high, :low
+        def low
+          0
+        end
 
         def convert_pin(pin)
-          pin = pin.to_i
+          pin.to_i
         end
 
-        def set_pin_mode(pin, mode)
-          nil
-        end
+        def set_pin_mode(pin, mode); end
 
-        def set_pullup(pin, pullup)
-          nil
-        end
+        def set_pullup(pin, pullup); end
 
         def start_read; end
       end

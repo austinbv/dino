@@ -1,7 +1,6 @@
 module Dino
   module Board
     class ESP8266 < Base
-      include API::Core
       include API::I2C
       include API::Servo
       include API::ShiftIO
@@ -9,7 +8,6 @@ module Dino
       include API::Infrared
       include API::OneWire
       include API::Tone
-
 
       DIGITAL_REGEX = /\Ad\d+\z/i
       ANALOG_REGEX  = /\A(a)\d+\z/i

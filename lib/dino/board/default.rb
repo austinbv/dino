@@ -1,7 +1,6 @@
 module Dino
   module Board
     class Default < Base
-      include API::Core
       include API::I2C
       include API::Servo
       include API::ShiftIO

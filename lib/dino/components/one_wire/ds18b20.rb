@@ -51,14 +51,14 @@ module Dino
           return { crc_error: true } unless Helper.crc_check(bytes)
           @resolution = decode_resolution(bytes)
 
-          decode_temp(bytes).merge(raw: bytes)
+          decode_temperature(bytes).merge(raw: bytes)
         end
 
         #
-        # Temperature is the first 16 bits (2 bytes of 9 read), little-endian.
-        # It's a signed, 2's complement, little-endian decimal with 2^-4 exp.
+        # Temperature is the first 16 bits (2 bytes of 9 read).
+        # It's a signed, 2's complement, little-endian decimal. LSB = 2 ^ -4.
         #
-        def decode_temp(bytes)
+        def decode_temperature(bytes)
           celsius = bytes[0..1].pack('C*').unpack('s<')[0] * (2.0 ** -4)
           farenheit = (celsius * 1.8 + 32).round(4)
 

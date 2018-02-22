@@ -21,11 +21,7 @@ module Dino
       # CMD = 26
       def spi_transfer(pin, options={})
         options[:read] ||= 0
-        if options[:write]
-          options[:write] = [options[:write]].flatten
-        else
-          options[:write] = []
-        end
+        options[:write] = [options[:write]].flatten.compact || []
 
         return if (options[:read] == 0) && (options[:write].empty?)
 
@@ -37,9 +33,7 @@ module Dino
 
       # CMD = 27
       def spi_listen(pin, options={})
-        raise ArgumentError,
-              'no SPI bytes to read' unless (options[:read] > 0)
-        options[:write] = []
+        raise ArgumentError, 'no SPI bytes to read' unless (options[:read] > 0)
 
         header = spi_header(options)
         write Message.encode command: 27,

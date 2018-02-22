@@ -8,7 +8,6 @@
 // #define DINO_SERVO
 // #define DINO_LCD
 // #define DINO_SERIAL
-// #define DINO_DHT
 // #define DINO_ONE_WIRE
 // #define DINO_IR_OUT
 // #define DINO_TONE
