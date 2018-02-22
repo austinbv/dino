@@ -38,10 +38,13 @@ void Dino::servoToggle() {
   // Search by pin for in use servo object, attach and set active.
   else {
     boolean found = false;
+    uint16_t min = (auxMsg[1] << 8) | auxMsg[0];
+    uint16_t max = (auxMsg[3] << 8) | auxMsg[2];
+
     for (int i = 0;  i < SERVO_COUNT;  i++) {
       if (servos[i].pin == pin) {
         found = true;
-        servos[i].servo.attach(pin);
+        servos[i].servo.attach(pin, min, max);
         servos[i].active = true;
         break;
       }
@@ -50,8 +53,9 @@ void Dino::servoToggle() {
     if (found == false) {
       for (int i = 0;  i < SERVO_COUNT;  i++) {
         if (servos[i].active == false) {
-          servos[i].servo.attach(pin);
+          servos[i].servo.attach(pin, min, max);
           servos[i].active = true;
+          servos[i].pin = pin;
           break;
         }
       }
@@ -69,7 +73,8 @@ void Dino::servoWrite() {
   // Find servo by pin and write value to it.
   for (int i = 0;  i < SERVO_COUNT;  i++) {
     if (servos[i].pin == pin) {
-      servos[i].servo.write(val);
+      uint16_t us = (auxMsg[1] << 8) | auxMsg[0];
+      servos[i].servo.writeMicroseconds(us);
     }
   }
 
