@@ -28,9 +28,19 @@ module Dino
         @state = value
       end
 
+      def speed=(value)
+        raise 'invalud speed value' if value > 100 || value < -100
+
+        microseconds = (((value.to_f + 100) / 200) * (@max - @min)) + @min
+        board.servo_write(pin, microseconds.ceil)
+
+        @state = value
+      end
+
       alias :angle=   :position=
       alias :angle    :state
       alias :position :state
+      alias :speed    :state
 
       def write_microseconds(value)
         raise 'invalud microsecond value' if value > @max || value < @min
