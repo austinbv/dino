@@ -8,9 +8,9 @@ module Dino
       # CMD = 0
       def set_pin_mode(pin, mode)
         pin, value = convert_pin(pin), mode == :out ? 0 : 1
-        write Dino::Message.encode command: 0,
-                                   pin: convert_pin(pin),
-                                   value: value
+        write Message.encode command: 0,
+                             pin: convert_pin(pin),
+                             value: value
       end
 
       # CMD = 1

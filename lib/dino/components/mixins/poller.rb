@@ -16,7 +16,7 @@ module Dino
         end
 
         def poll(interval=1, &block)
-          poll_using(self.method(:_read), interval, &block)
+          poll_using(method(:_read), interval, &block)
         end
 
         def stop

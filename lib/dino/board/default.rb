@@ -18,7 +18,7 @@ module Dino
         return pin.to_i             if pin.match(DIGITAL_REGEX)
         return analog_pin_to_i(pin) if pin.match(ANALOG_REGEX)
         return dac_pin_to_i(pin)    if pin.match(DAC_REGEX)
-        raise "Incorrect pin format"
+        raise ArgumentError, "incorrect pin format"
       end
 
       def analog_pin_to_i(pin)
@@ -26,7 +26,7 @@ module Dino
       end
 
       def dac_pin_to_i(pin)
-        raise "The board did not specify any DAC pins" unless @dac_zero
+        raise ArgumentError, "board does not specify DAC pins" unless @dac_zero
         @dac_zero + pin.gsub(/\Adac/i, '').to_i
       end
     end

@@ -2,6 +2,9 @@ module Dino
   module Components
     module Mixins
       module Callbacks
+        attr_reader :callback_mutex, :callbacks
+        attr_writer :callbacks
+
         def after_initialize(options={})
           super(options)
           @callbacks = {}
@@ -9,14 +12,14 @@ module Dino
         end
 
         def add_callback(key=:persistent, &block)
-          @callback_mutex.synchronize do
+          callback_mutex.synchronize do
             @callbacks[key] ||= []
             @callbacks[key] << block
           end
         end
 
         def remove_callback(key=nil)
-          @callback_mutex.synchronize do
+          callback_mutex.synchronize do
             key ? @callbacks.delete(key) : @callbacks = {}
           end
         end
@@ -26,13 +29,17 @@ module Dino
 
         def update(data)
           data = pre_callback_filter(data)
-          @callback_mutex.synchronize do
-            @callbacks.each_value do |array|
-              array.each { |callback| callback.call(data) }
+
+          callback_mutex.synchronize do
+            callbacks.each_value do |array|
+              array.each do |callback|
+                callback.call(data)
+              end
             end
-            # Remove the special :read callback while still inside the lock.
-            @callbacks.delete(:read)
+            # Remove special :read callback before unlocking.
+            callbacks.delete(:read)
           end
+
           update_self(data)
         end
 
@@ -41,10 +48,9 @@ module Dino
           data
         end
 
-        # Set @state to the value passed to callbacks after running them all.
-        # Override if some other behavior is needed.
-        def update_self(data)
-          @state = data
+        # Override if behavior other than @state = filtered data is needed.
+        def update_self(filtered_data)
+          self.state = filtered_data
         end
       end
     end

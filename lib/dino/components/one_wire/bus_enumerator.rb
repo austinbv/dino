@@ -8,6 +8,10 @@ module Dino
           board.one_wire_search(pin, branch_mask)
         end
 
+        def found_devices
+          @found_devices ||= []
+        end
+
         def search
           @found_devices = []
           branch_mask = 0

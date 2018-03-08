@@ -29,20 +29,20 @@ module Dino
       end
 
       LIBRARY_COMMANDS = {
-        clear:              '2',
-        home:               '3',
-        show_cursor:        '6',
-        hide_cursor:        '7',
-        blink:              '8',
-        no_blink:           '9',
-        on:                '10',
-        off:               '11',
-        scroll_left:       '12',
-        scroll_right:      '13',
-        enable_autoscroll: '14',
-        disable_autoscroll:'15',
-        left_to_right:     '16',
-        right_to_left:     '17'
+        clear:              2,
+        home:               3,
+        show_cursor:        6,
+        hide_cursor:        7,
+        blink:              8,
+        no_blink:           9,
+        on:                10,
+        off:               11,
+        scroll_left:       12,
+        scroll_right:      13,
+        enable_autoscroll: 14,
+        disable_autoscroll:15,
+        left_to_right:     16,
+        right_to_left:     17
       }
 
       LIBRARY_COMMANDS.each_pair do |command, command_id|

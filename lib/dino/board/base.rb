@@ -10,13 +10,19 @@ module Dino
 
         ack = io.handshake.split(",").map { |num| num.to_i }
         @aux_limit, @analog_zero, @dac_zero = ack
+        # Leave room for null termination.
+        @aux_limit = @aux_limit - 1
 
         io.add_observer(self)
         self.analog_resolution = options[:bits] || 8
       end
 
+      def analog_resolution
+        @bits ||= 8
+      end
+
       def analog_resolution=(value)
-        @bits = value || 8
+        @bits = value
         write Dino::Message.encode(command: 96, value: @bits)
         @low  = 0
         @high = 1

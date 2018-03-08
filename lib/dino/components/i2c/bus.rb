@@ -19,7 +19,7 @@ module Dino
         end
 
         def write(address, bytes=[], options={})
-          board.i2c_write(address, bytes, options)
+          board.i2c_write(address, [bytes].flatten, options)
         end
 
         def read(*args)
@@ -32,7 +32,7 @@ module Dino
 
         def bubble_callbacks
           add_callback(:bus_master) do |str|
-            if str.match /d*-/
+            if str.match(/d*-/)
               address, data = str.split("-", 2)
               address = address.to_i
               data = data.split(",").map(&:to_i)
@@ -42,7 +42,7 @@ module Dino
         end
 
         def update_component(hash)
-          @components.each do |component|
+          components.each do |component|
             if component.address == hash[:address]
               component.update(hash[:data])
             end

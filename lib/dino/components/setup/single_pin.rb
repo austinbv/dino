@@ -10,8 +10,11 @@ module Dino
         attr_writer :pin
 
         def initialize_pins(options={})
-          raise 'a pin is required for this component' unless options[:pin]
-          self.pin = board.convert_pin(options[:pin])
+          if options[:pin]
+            self.pin = options[:pin]
+          else
+            raise ArgumentError, 'a pin is required for this component'
+          end
         end
 
         def mode=(mode)

@@ -156,6 +156,7 @@ void Dino::process() {
     case 33: i2cSearch           ();  break;
     case 34: i2cWrite            ();  break;
     case 35: i2cRead             ();  break;
+    case 36: i2cTransfer         ();  break;
     #endif
 
     // Implemented in DinoOneWire.cpp

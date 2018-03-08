@@ -21,7 +21,7 @@ module Dino
           atomically do
             match
             bus.write(WRITE_SCRATCH)
-            bus.write(bytes)
+            bus.write(*bytes)
           end
         end
 

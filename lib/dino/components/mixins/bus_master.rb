@@ -7,15 +7,16 @@ module Dino
         end
 
         # Essential part of board interface that components need.
-        attr_reader :components
+        def components
+          @components ||= []
+        end
 
         def add_component(component)
-          @components ||= []
-          @components << component
+          components << component
         end
 
         def remove_component(component)
-          @components.delete(component)
+          components.delete(component)
         end
       end
     end

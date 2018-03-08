@@ -9,7 +9,7 @@ module Dino
     autoload :Led,              'dino/components/led'
     autoload :Button,           'dino/components/button'
     autoload :Sensor,           'dino/components/sensor'
-    autoload :RgbLed,           'dino/components/rgb_led'
+    autoload :RGBLed,           'dino/components/rgb_led'
     autoload :Servo,            'dino/components/servo'
     autoload :SSD,              'dino/components/ssd'
     autoload :Stepper,          'dino/components/stepper'

@@ -34,26 +34,26 @@ module Dino
         return gpio_pin_to_i(pin)    if pin.match(GPIO_REGEX)
         return analog_pin_to_i(pin)  if pin.match(ANALOG_REGEX)
         return digital_pin_to_i(pin) if pin.match(DIGITAL_REGEX)
-        raise "Incorrect pin format"
+        raise ArgumentError, "incorrect pin format"
       end
 
       # Only one analog in on the ESP8266, GPIO 17.
       def analog_pin_to_i(pin)
         gpio = pin.gsub(/\Aa/i, '').to_i
-        raise "Invalid analog input pin" unless gpio == 0
+        raise ArgumentError, "invalid analog input pin" unless gpio == 0
         17
       end
 
       def gpio_pin_to_i(pin)
         gpio = pin.gsub(/\Agpio/i, '').to_i
-        raise "Invalid GPIO input pin" if (gpio < 0 || gpio > 17)
+        raise ArgumentError, "invalid GPIO pin" if (gpio < 0 || gpio > 17)
         gpio
       end
 
       def digital_pin_to_i(pin)
         d_index = pin.gsub(/\Ad/i, '').to_i
         gpio = D_PIN_MAP[d_index]
-        raise "Invalid D pin" unless gpio
+        raise ArgumentError, "invalid D pin" unless gpio
         gpio
       end
     end

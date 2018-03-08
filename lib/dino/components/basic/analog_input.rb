@@ -13,7 +13,7 @@ module Dino
         end
 
         def _listen(divider=16)
-          @divider ||= 16
+          @divider = divider || 16
           board.analog_listen(pin, @divider)
         end
       end

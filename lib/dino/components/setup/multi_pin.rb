@@ -81,7 +81,9 @@ module Dino
 
         def validate_pins
           required_pins = self.class.class_eval('@@required_pins') rescue []
-          required_pins.each { |key| raise "missing pins[:#{key}] pin" unless pins[key] }
+          required_pins.each do |key|
+            raise ArgumentError, 'missing pins[:#{key}] pin' unless pins[key]
+          end
         end
 
         def build_proxies

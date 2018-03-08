@@ -23,7 +23,7 @@ module Dino
         value = value % 180 unless value == 180
 
         microseconds = ((value.to_f / 180) * (@max - @min)) + @min
-        board.servo_write(pin, microseconds.ceil)
+        board.servo_write(pin, microseconds.round)
 
         @state = value
       end
@@ -32,7 +32,7 @@ module Dino
         raise 'invalud speed value' if value > 100 || value < -100
 
         microseconds = (((value.to_f + 100) / 200) * (@max - @min)) + @min
-        board.servo_write(pin, microseconds.ceil)
+        board.servo_write(pin, microseconds.round)
 
         @state = value
       end

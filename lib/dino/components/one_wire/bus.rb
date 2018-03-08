@@ -6,11 +6,10 @@ module Dino
         include Mixins::BusMaster
         include Mixins::Reader
 
-        attr_reader :found_devices, :parasite_power
+        attr_reader :parasite_power
 
         def after_initialize(options = {})
           super(options)
-          @found_devices = []
           read_power_supply
         end
 

@@ -5,6 +5,8 @@ module Dino
         include Setup::Base
         include Mixins::Callbacks
 
+        attr_reader :bytes
+
         def after_initialize(options={})
           super(options) if defined?(super)
           #
@@ -118,7 +120,7 @@ module Dino
         def enable_proxy
           self.add_callback(:board_proxy) do |bit_array|
             bit_array.each_with_index do |value, pin|
-              @components.each do |part|
+              components.each do |part|
                 update_component(part, pin, value) if pin == part.pin
               end
               @reading_pins[pin] = false

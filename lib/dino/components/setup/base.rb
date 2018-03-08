@@ -2,9 +2,14 @@ module Dino
   module Components
     module Setup
       module Base
-        attr_reader :board, :state
+        attr_reader :board
+
+        def state
+          @state_mutex.synchronize { @state }
+        end
 
         def initialize(options={})
+          @state_mutex = Mutex.new
           initialize_board(options)
           initialize_pins(options)
           register
@@ -13,11 +18,16 @@ module Dino
 
         protected
 
-        attr_writer :board, :state
+        def state=(value)
+          @state_mutex.synchronize { @state = value }
+        end
 
         def initialize_board(options={})
-          raise 'a board is required for a component' unless options[:board]
-          self.board = options[:board]
+          if options[:board]
+            @board = options[:board]
+          else
+            raise ArgumentError, 'a board is required for a component'
+          end
         end
 
         def register
