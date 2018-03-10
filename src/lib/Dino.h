@@ -149,7 +149,7 @@ class Dino {
     // Keep count of bytes as we receive them and send a dino message with how many.
     uint8_t rcvBytes  = 0;
     uint8_t rcvThreshold = 64;
-    unsigned long lastRcv = micros();
-    long long rcvWindow = 1000000;
+    unsigned long lastRcv = millis();
+    long long rcvWindow = 1000;
 };
 #endif

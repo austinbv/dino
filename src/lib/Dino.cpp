@@ -30,10 +30,10 @@ void Dino::run(){
     // Acknowledge when we've received as many bytes as the serial input buffer
     if (rcvBytes == rcvThreshold) acknowledge();
   }
-  if (gotByte) lastRcv = micros();
+  if (gotByte) lastRcv = millis();
 
   // Also acknowledge when the last byte received goes outside the receive window.
-  if ((rcvBytes > 0) && ((micros() - lastRcv) > rcvWindow)) acknowledge();
+  if ((rcvBytes > 0) && ((millis() - lastRcv) > rcvWindow)) acknowledge();
 
   // Run dino's listeners.
   updateListeners();
