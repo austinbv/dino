@@ -14,7 +14,7 @@ if bus.parasite_power
 end
 
 # Call #device_present to reset the bus and return presence pulse as a boolean.
-if bus.device_present
+if bus.device_present?
   puts "Devices present on bus..."; puts
 else
   puts "No devices present on bus... Quitting..."

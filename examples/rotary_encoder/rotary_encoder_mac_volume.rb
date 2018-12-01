@@ -1,10 +1,5 @@
 #
-# Example of a smiple rotary encoder polling at ~1ms.
-#
-# WARNING: This method is not precise at all. Please do not use it for anything
-# that requires all steps to be read for precise positioning or high speed.
-#
-# Works well enough for making knobs like this example though.
+# Example using a rotary encoder to control audio output volume on a Mac.
 #
 require 'bundler/setup'
 require 'dino'
@@ -50,8 +45,9 @@ encoder.add_callback do |update|
   value = 0 if value < 0
   value = 100 if value > 100
   volume.set(value)
-  unused_steps = value - volume.get
-  puts "Current volume: #{volume.get}%"
+  current_volume = volume.get
+  unused_steps = value - current_volume
+  puts "Current volume: #{current_volume}%"
 end
 
 sleep

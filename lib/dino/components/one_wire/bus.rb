@@ -40,6 +40,7 @@ module Dino
             (byte == 0) ? true : false
           end
         end
+        alias :device_present? :device_present
 
         def reset(get_presence=0)
           board.one_wire_reset(pin, get_presence)

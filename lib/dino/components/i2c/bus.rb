@@ -22,6 +22,10 @@ module Dino
           board.i2c_write(address, [bytes].flatten, options)
         end
 
+        def transfer(address, options={})
+          board.i2c_transfer(address, options)
+        end
+
         def read(*args)
           read_using -> { _read(*args) }
         end
@@ -36,15 +40,15 @@ module Dino
               address, data = str.split("-", 2)
               address = address.to_i
               data = data.split(",").map(&:to_i)
-              update_component({address: address, data: data})
+              update_component(address, data)
             end
           end
         end
 
-        def update_component(hash)
+        def update_component(address, data)
           components.each do |component|
-            if component.address == hash[:address]
-              component.update(hash[:data])
+            if component.address == address
+              component.update(data)
             end
           end
         end

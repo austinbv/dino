@@ -8,7 +8,7 @@
   #define LED_PIN 13
 #endif
 
-// Configure your WiFi options here. IP address are not configurable. Uses DHCP.
+// Configure your WiFi options here. IP address is not configurable. Uses DHCP.
 int port = 3466;
 char* ssid = "yourNetwork";
 char* pass = "yourPassword";
