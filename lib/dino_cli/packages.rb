@@ -10,7 +10,6 @@ PACKAGES = {
       "lib/Dino.cpp",
       "lib/DinoCoreIO.cpp",
       "lib/DinoIncludes.cpp",
-      "lib/DinoBugWorkaround.cpp",  # See explanation at top of file.
     ]
   },
   servo: {

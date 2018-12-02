@@ -42,19 +42,19 @@ void Dino::spiEnd(){
   #endif
 }
 
+// CMD = 26
+// Simultaneous read from and write to an SPI device.
 //
 // Request format for SPI 2-way transfers
 // pin         = slave select pin (int)
 // val         = empty
-// auxMsg[0]   = SPI settings. 2 LSB = SPI mode. Bit 7 = MSB(1) / LSB(0).
+// auxMsg[0]   = SPI settings. 2 LSB = SPI mode. Bit 7 = MSB(1) or LSB(0).
 // auxMsg[1]   = write length (number of bytes)
 // auxMsg[2]   = read length  (number of bytes)
 // auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
 //
-// auxMsg[7]+  = data (bytes) (write only)
+// auxMsg[7+]  = data (bytes) (write only)
 //
-// CMD = 26
-// Write to an SPI device.
 void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data) {
   spiBegin(settings, clockRate);
   digitalWrite(selectPin, LOW);

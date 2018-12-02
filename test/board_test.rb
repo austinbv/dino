@@ -25,7 +25,7 @@ class BoardTest < Minitest::Test
   end
 
   def test_calls_handshake_on_txrx
-    mock = MiniTest::Mock.new.expect(:call, "528,14,20")
+    mock = MiniTest::Mock.new.expect(:call, "actual ack value in txrx_mock.rb")
     txrx.stub(:handshake, mock) do
       Dino::Board.new(txrx)
     end
@@ -34,6 +34,10 @@ class BoardTest < Minitest::Test
 
   def test_set_aux_limit
     assert_equal 527, board.aux_limit
+  end
+
+  def test_set_eeprom_length
+    assert_equal 1024, board.eeprom_length
   end
 
   def test_set_dac_and_analog_zero
@@ -70,13 +74,14 @@ class BoardTest < Minitest::Test
   def test_update_passes_messages_to_components
     mock1 = MiniTest::Mock.new.expect(:update, nil, ["data"])
     3.times { mock1.expect(:pin, 1) }
-    mock2 = MiniTest::Mock.new.expect(:update, nil, ["byte"])
+    # This tests that lines are not split after the first colon delimiter.
+    mock2 = MiniTest::Mock.new.expect(:update, nil, ["with:colon"])
     3.times { mock2.expect(:pin, 2) }
     board.add_component(mock1)
     board.add_component(mock2)
-    board.update(1, "data")
-    board.update(2, "byte")
-    board.update(3, "ignore")
+    board.update("1:data")
+    board.update("2:with:colon")
+    board.update("3:ignore")
     mock1.verify
     mock2.verify
   end

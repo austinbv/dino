@@ -22,7 +22,11 @@ module Dino
         end
 
         def block_until_read
-          loop { break if !@callbacks[:read] }
+          loop do
+            break if !@callbacks[:read]
+            # EEPROM read won't work without sleeping here. Not sure why.
+            sleep 0.001
+          end
         end
 
         def _read

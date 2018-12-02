@@ -38,7 +38,7 @@ module Dino
         pullup ? digital_write(pin, @high) : digital_write(pin, @low)
       end
 
-      # CMD = 7
+      # CMD = 5
       def set_listener(pin, state=:off, options={})
         mode    = options[:mode]    || :digital
         divider = options[:divider] || 8
@@ -54,7 +54,7 @@ module Dino
         mask |= 0b10000000 if (state == :on)
         mask |= 0b01000000 if (mode == :analog)
 
-        write Message.encode(command: 7, pin: convert_pin(pin), value: mask)
+        write Message.encode(command: 5, pin: convert_pin(pin), value: mask)
       end
 
       # Convenience methods by wrapping set_listener with old defaults.

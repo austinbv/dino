@@ -97,16 +97,15 @@ void Dino::process() {
 
   // Call the command.
   switch(cmd) {
-    // See explanation at top of DinoBugWorkaround.cpp
-    case 999999: bugWorkaround   ();  break;
-
     // Implemented in DinoCoreIO.cpp
     case 0:  setMode             ();    break;
     case 1:  dWrite              ();    break;
     case 2:  dRead               (pin); break;
     case 3:  aWrite              ();    break;
     case 4:  aRead               (pin); break;
-    case 7:  setListener         ();    break;
+    case 5:  setListener         ();    break;
+    case 6:  eepromRead          ();    break;
+    case 7:  eepromWrite         ();    break;
     case 11: pulseRead           ();    break;
 
     // Implemented in DinoServo.cpp
@@ -225,6 +224,8 @@ void Dino::reset() {
 
   stream->print("ACK:");
   stream->print(AUX_SIZE);
+  stream->print(',');
+  stream->print(EEPROM.length());
   stream->print(',');
   stream->print(A0);
   #if defined(__SAM3X8E__)

@@ -93,10 +93,9 @@ class TxRxSerialTest < Minitest::Test
   end
 
   def test_read_and_parse
-    # Should not split on any colon after the first.
     txrx.stub(:read, "02:00:00") do
       txrx.stub(:changed, true) do
-        mock = MiniTest::Mock.new.expect :call, nil, ['02', '00:00']
+        mock = MiniTest::Mock.new.expect :call, nil, ['02:00:00']
         txrx.stub(:notify_observers, mock) do
           txrx.send(:read_and_parse)
         end

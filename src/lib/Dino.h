@@ -4,6 +4,7 @@
 #ifndef Dino_h
 #define Dino_h
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "DinoDefines.h"
 
 // Figure out how many pins our hardware has.
@@ -39,11 +40,15 @@ class Dino {
     void aRead                 (int pin);  //cmd = 4
 
     // Core IO Listeners
-    void setListener           ();         //cmd = 7
+    void setListener           ();         //cmd = 5
     void updateListeners       ();
     void updateCoreListeners   (byte tickCount);
     void digitalListenerUpdate (byte index);
     void clearCoreListeners    ();
+
+    // EEPROM Access
+    void eepromRead            ();         //cmd = 6
+    void eepromWrite           ();         //cmd = 7
 
     //
     // Store listeners as a 2 dimensional array where each gets 2 bytes, such that:
@@ -95,10 +100,11 @@ class Dino {
     void clearSpiListeners     ();
 
     // I2C
-    void i2cBegin              (); //cmd = 31
+    void i2cBegin              ();
     void i2cSearch             (); //cmd = 33
     void i2cWrite              (); //cmd = 34
     void i2cRead               (); //cmd = 35
+    void i2cTransfer           (); //cmd = 36
 
     // One Wire
     void owReset               (); //cmd = 41

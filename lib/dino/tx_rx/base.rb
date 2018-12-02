@@ -54,10 +54,7 @@ module Dino
       end
 
       def parse(line)
-        if line.match(/\A\d+:/)
-          pin, message = line.split(":", 2)
-          pin && message && changed && notify_observers(pin, message)
-        end
+        changed && notify_observers(line)
       end
     end
   end
