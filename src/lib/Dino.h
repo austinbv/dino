@@ -19,45 +19,54 @@
 class Dino {
   public:
     Dino();
-    void setOutputStream(Stream* callback);
     void run();
 
-  private:
-    // Main loop functions.
-    void acknowledge();
-    void parse(byte c);
-    void process();
+    // Expect main sketch to pass a reference to a Stream-like object for IO.
+    // Store it and call ->print, ->write, ->available, ->read etc. on it.
+    Stream* stream;
 
-    // See explanation at top of DinoBugWorkaround.cpp
-    void bugWorkaround();
+    // Callback hooks for local logic (defined in main sketch) based on listeners.
+    // These should be used if:
+    //   1) a round-trip to the remote client is too slow, or
+    //   2) something needs to happen regardless of remote client connection.
+    // Eg. Instant feedback from a smart light switch.
+    void (*digitalListenCallback)(byte p, byte v);
+    void (*analogListenCallback)(byte p, int v);
 
+    // Core IO API Functions
     // Functions with a cmd value can be called through the remote API.
-    // Core IO Functions
-    void setMode               ();         //cmd = 0
-    void dWrite                ();         //cmd = 1
-    void dRead                 (int pin);  //cmd = 2
-    void aWrite                ();         //cmd = 3
-    void aRead                 (int pin);  //cmd = 4
+    //
+    // This subset is made public to allow use by local listener callbacks.
+    // Reading and writing through the dino library can help maintain
+    // consistency and notify the remote client of local actions automatically.
+    //
+    void setMode     (byte p, byte m);                     //cmd = 0
+    void dWrite      (byte p, byte v, boolean echo=true);  //cmd = 1
+    byte dRead       (byte p);                             //cmd = 2
+    void aWrite      (byte p, int v,  boolean echo=true);  //cmd = 3
+    int  aRead       (byte p);                             //cmd = 4
+    void setListener (byte p, boolean enabled, byte analog, byte exponent, boolean local=true); //cmd = 5
 
-    // Core IO Listeners
-    void setListener           ();         //cmd = 5
+  private:
+    //
+    // Main loop listen functions.
+    //
     void updateListeners       ();
     void updateCoreListeners   (byte tickCount);
+    void analogListenerUpdate  (byte index);
     void digitalListenerUpdate (byte index);
     void clearCoreListeners    ();
-
-    // EEPROM Access
-    void eepromRead            ();         //cmd = 6
-    void eepromWrite           ();         //cmd = 7
+    void findLastActiveListener();
 
     //
-    // Store listeners as a 2 dimensional array where each gets 2 bytes, such that:
+    // Store listeners as a 2 dimensional array where each gets 2 bytes:
     //
-    // byte 0, bit 7   : 1 for listener enabled, 0 for listener disabled.
-    // byte 0, bit 6   : 1 for analog listener, 0 for digital listener.
-    // byte 0, bit 5   : storage for digital listener state
-    // byte 0, bits 4-3: unused
-    // byte 0, bits 2-0: timing divider exponent specific to this pin, 2^0 through 2^8
+    // byte 0, bit 7   : 1 = enabled, 0  = disabled
+    // byte 0, bit 6   : 1 = analog, 0 = digital
+    // byte 0, bit 5   : digital listener state storage
+    // byte 0, bit 4   : local flag (remote client cannot modify listener if set)
+    // byte 0, bit 3   : unused
+    // byte 0, bits 2-0: timing divider exponent (2^0 through 2^8)
     //
     // byte 1          : pin number
     //
@@ -68,9 +77,13 @@ class Dino {
     // Map 2's exponents for dividers to save time.
     const byte dividerMap[8] = {1, 2, 4, 8, 16, 32, 64, 128};
 
-    // Storage and response func for features following the pin:rval pattern.
-    int rval;
+    // Response func for features following the pin:value pattern.
     void coreResponse(int p, int v);
+
+    // Functions with a cmd value can be called through the remote API.
+    // EEPROM Access
+    void eepromRead            ();         //cmd = 6
+    void eepromWrite           ();         //cmd = 7
 
     // Included Libraries
     void servoToggle           ();         //cmd = 8
@@ -114,11 +127,23 @@ class Dino {
     void owWriteBit            (byte b);
     byte owReadBit             ();
 
-    // API access to timings, resolutions and reset.
+    //
+    // Board level timings, resolutions and reset.
+    //
     void reset                 ();  //cmd = 90
     void resetState            ();
     void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
+    unsigned long lastTick;
+    byte tickCount;
+    byte registerDivider;
+
+    //
+    // Main loop input functions.
+    //
+    void acknowledge();
+    void parse(byte c);
+    void process();
 
     // Parser state storage and utility functions.
     byte *messageFragments[4];
@@ -143,14 +168,6 @@ class Dino {
     #  define AUX_SIZE 40
     #endif
     byte auxMsg[AUX_SIZE];
-
-    // Save a pointer to any stream so we can call ->print and ->write on it.
-    Stream* stream;
-
-    // Internal timing variables and utility functions.
-    unsigned long lastTick;
-    byte tickCount;
-    byte registerDivider;
 
     // Keep count of bytes as we receive them and send a dino message with how many.
     uint8_t rcvBytes  = 0;

@@ -50,11 +50,13 @@ module Dino
           raise "Listener divider must be in #{DIVIDERS.inspect}"
         end
 
-        mask  = Math.log2(divider).to_i
-        mask |= 0b10000000 if (state == :on)
-        mask |= 0b01000000 if (mode == :analog)
+        exponent = Math.log2(divider).to_i
+        aux = pack :uint8, [mode == :analog ? 1 : 0, exponent]
 
-        write Message.encode(command: 5, pin: convert_pin(pin), value: mask)
+        write Message.encode command: 5,
+                             pin: convert_pin(pin),
+                             value: (state == :on ? 1 : 0),
+                             aux_message: aux
       end
 
       # Convenience methods by wrapping set_listener with old defaults.

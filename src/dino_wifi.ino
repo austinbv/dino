@@ -64,8 +64,10 @@ void setup() {
 
   connect();
   server.begin();
-}
 
+  dino.digitalListenCallback = onDigitalListen;
+  dino.analogListenCallback = onAnalogListen;
+}
 
 void loop() {
   // Reconnect if we've lost WiFi..
@@ -78,7 +80,7 @@ void loop() {
   client = server.available();
 
   // Pass the stream to dino so it can read/write.
-  dino.setOutputStream(&client);
+  dino.stream = &client;
 
   // Handle a connection.
   if (client) {
@@ -87,4 +89,14 @@ void loop() {
 
   // End the connection.
   client.stop();
+}
+
+// This runs every time a digital pin that dino is listening to changes value.
+// p = pin number, v = current value
+void onDigitalListen(byte p, byte v){
+}
+
+// This runs every time an analog pin that dino is listening to gets read.
+// p = pin number, v = read value
+void onAnalogListen(byte p, int v){
 }

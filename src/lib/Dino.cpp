@@ -90,23 +90,26 @@ void Dino::process() {
   val = atoi((char *)valStr);
 
   #ifdef debug
-   Serial.print("Received - Command: "); Serial.print(cmdStr);
-   Serial.print(" Pin: ");               Serial.print(pinStr);
-   Serial.print(" Value: ");             Serial.print(valStr); Serial.print("\n")
+    if (cmd != 90) {
+      Serial.print("cmd:");   Serial.print(cmd);
+      Serial.print(", pin:"); Serial.print(pin);
+      Serial.print(", val:"); Serial.println(val);
+    }
   #endif
 
   // Call the command.
   switch(cmd) {
     // Implemented in DinoCoreIO.cpp
-    case 0:  setMode             ();    break;
-    case 1:  dWrite              ();    break;
-    case 2:  dRead               (pin); break;
-    case 3:  aWrite              ();    break;
-    case 4:  aRead               (pin); break;
-    case 5:  setListener         ();    break;
+    case 0:  setMode             (pin, val);        break;
+    case 1:  dWrite              (pin, val, false); break;
+    case 2:  dRead               (pin);             break;
+    case 3:  aWrite              (pin, val, false); break;
+    case 4:  aRead               (pin);             break;
+    case 5:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
+
+    // Implemented in DinoEEPROM.cpp
     case 6:  eepromRead          ();    break;
     case 7:  eepromWrite         ();    break;
-    case 11: pulseRead           ();    break;
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
@@ -118,6 +121,9 @@ void Dino::process() {
     #ifdef DINO_LCD
     case 10: handleLCD           ();    break;
     #endif
+
+    // Implemented in DinoPulseInput.cpp
+    case 11: pulseRead           ();    break;
 
     // Implemented in DinoSerial.cpp
     #ifdef DINO_SERIAL
@@ -174,17 +180,6 @@ void Dino::process() {
     // Should send a "feature not implemented" message as default.
     default:                          break;
   }
-
-  #ifdef debug
-   Serial.print("Responded with - "); Serial.print(response); Serial.print("\n\n");
-  #endif
-}
-
-
-// Expect the sketch to pass a pointer to something that inherits from Stream.
-// Store it and call ->print, ->write, etc on it to send data.
-void Dino::setOutputStream(Stream* callback){
-  stream = callback;
 }
 
 //
@@ -238,7 +233,6 @@ void Dino::reset() {
 
 void Dino::resetState() {
   clearCoreListeners();
-  lastActiveListener = 0;
   #ifdef DINO_SPI
     clearSpiListeners();
   #endif

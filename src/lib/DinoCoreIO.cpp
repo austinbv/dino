@@ -2,70 +2,86 @@
 
 // CMD = 00
 // Set a pin to output (0), or input (1).
-void Dino::setMode() {
-  if (val == 0) {
-    pinMode(pin, OUTPUT);
+void Dino::setMode(byte p, byte m) {
+  #ifdef debug
+    Serial.print("setmode, pin:");
+    Serial.print(p);
+    Serial.print(", mode:");
+    Serial.println(m);
+  #endif
+
+  if (m == 0) {
+    pinMode(p, OUTPUT);
   }
   else {
-    pinMode(pin, INPUT);
+    pinMode(p, INPUT);
   }
-
-  #ifdef debug
-    Serial.print("Called Dino::setMode()\n");
-  #endif
 }
 
 // CMD = 01
 // Write a digital output pin. 0 for LOW, 1 or >0 for HIGH.
-void Dino::dWrite() {
-  if (val == 0) {
-    digitalWrite(pin, LOW);
+void Dino::dWrite(byte p, byte v, boolean echo) {
+  #ifdef debug
+    Serial.print("dwrite, pin:");
+    Serial.print(p);
+    Serial.print(", value:");
+    Serial.print(v);
+    Serial.print(", echo:");
+    Serial.println(echo);
+  #endif
+
+  if (v == 0) {
+    digitalWrite(p, LOW);
   }
   else {
-    digitalWrite(pin, HIGH);
+    digitalWrite(p, HIGH);
   }
-
-  #ifdef debug
-    Serial.print("Called Dino::dWrite()\n");
-  #endif
+  if (echo) coreResponse(p, v);
 }
 
 // CMD = 02
 // Read a digital input pin. 0 for LOW, 1 for HIGH.
-void Dino::dRead(int pin) {
-  rval = digitalRead(pin);
-  coreResponse(pin, rval);
-
+byte Dino::dRead(byte p) {
   #ifdef debug
-    Serial.print("Called Dino::dRead()\n");
+    Serial.print("dread, pin:");
+    Serial.println(p);
   #endif
+
+  byte rval = digitalRead(p);
+  coreResponse(p, rval);
+  return rval;
 }
 
 // CMD = 03
 // Write an analog output pin. 0 for LOW, up to 255 for HIGH @ 8-bit resolution.
-void Dino::aWrite() {
-  analogWrite(pin,val);
-
+void Dino::aWrite(byte p, int v, boolean echo) {
   #ifdef debug
-    Serial.print("Called Dino::aWrite()\n");
+    Serial.print("awrite, pin:");
+    Serial.print(p);
+    Serial.print(", value:");
+    Serial.print(v);
+    Serial.print(", echo:");
+    Serial.println(echo);
   #endif
+
+  analogWrite(p,v);
+  if (echo) coreResponse(p, v);
 }
 
 // CMD = 04
 // Read an analog input pin. 0 for LOW, up to 1023 for HIGH @ 10-bit resolution.
-void Dino::aRead(int pin) {
-  rval = analogRead(pin);
-  coreResponse(pin, rval);
-
+int Dino::aRead(byte p) {
   #ifdef debug
-    Serial.print("Called Dino::aRead()\n");
+    Serial.print("aread, pin:");
+    Serial.println(p);
   #endif
+
+  int rval = analogRead(p);
+  coreResponse(p, rval);
+  return rval;
 }
 
-
-// Send current value of pin and reading value (rval), following the protocol.
-// This is for core reads and listeners, but can be used for any function
-// following the pin:rval pattern. Set those variables correctly before calling.
+// Simple response for core listeners, or any response with the pin:value pattern.
 void Dino::coreResponse(int p, int v){
   stream->print(p);
   stream->print(':');
@@ -74,39 +90,62 @@ void Dino::coreResponse(int p, int v){
 }
 
 // CMD = 05
-// Set a listener ON or OFF, or change its type, or divider.
-// Takes settings as mask stored in val and applies to existing listener
-// if pin was already used, or first inactive. See Dino.h for mask structure.
-void Dino::setListener(){
+// Enable, disable and change settings for core (digital/analog) listeners.
+// See Dino.h for settings and mask layout.
+void Dino::setListener(byte p, boolean enabled, byte analog, byte exponent, boolean local){
+  // Pre-format the settings into a mask byte.
+  byte settingMask = 0;
+  if (enabled)  settingMask = settingMask | B10000000;
+  if (analog)   settingMask = settingMask | B01000000;
+  if (local)    settingMask = settingMask | B00010000;
+  settingMask = settingMask | dividerMap[exponent];
+
+  #ifdef debug
+    Serial.print("setlistener, pin:");
+    Serial.print(p);
+    Serial.print(", enabled:");
+    Serial.print(enabled);
+    Serial.print(", analog:");
+    Serial.print(analog);
+    Serial.print(", exponent:");
+    Serial.print(exponent);
+    Serial.print(", local:");
+    Serial.print(local);
+    Serial.print(", settingMask:");
+    Serial.println(settingMask);
+  #endif
+
+  // If an existing listener was already using this pin, just update settings.
   boolean found = false;
-  // Check if previously assigned a listener to this pin and re-use.
   for(byte i=0; i<PIN_COUNT; i++){
-    if (listeners[i][1] == pin){
-      listeners[i][0] = val;
+    if (listeners[i][1] == p){
       found = true;
+      if (bitRead(listeners[i][0], 4) == 0) {
+        listeners[i][0] = settingMask;
+      } else if(local) {
+        // Only allow local code to update local listeners.
+        listeners[i][0] = settingMask;
+      }
       break;
     }
   }
 
-  // If this pin wasn't used before, take the fist inactive one.
+  // If this pin wasn't used before, take the lowest index inactive listener.
   if (!found){
     for(byte i=0; i<PIN_COUNT; i++){
       if (bitRead(listeners[i][0], 7) == 0){
-        listeners[i][0] = val;
-        listeners[i][1] = pin;
+        listeners[i][0] = settingMask;
+        listeners[i][1] = p;
         break;
       }
     }
   }
 
-  // Update the last active listener whenever we make a change.
-  for(byte i=0; i<PIN_COUNT; i++){
-    if (bitRead(listeners[i][0], 7) == 1){
-      lastActiveListener = i;
-    }
-  }
+  // Keep track of how far into the listener array to go when updating.
+  findLastActiveListener();
 }
 
+// Runs once on every loop to update necessary listeners.
 void Dino::updateCoreListeners(byte tickCount){
   for (byte i = 0; i <= lastActiveListener; i++){
     // Check if active.
@@ -117,7 +156,7 @@ void Dino::updateCoreListeners(byte tickCount){
       if(tickCount % divider == 0){
         // Check if digital or analog.
         if (bitRead(listeners[i][0], 6) == 1){
-          aRead(listeners[i][1]);
+          analogListenerUpdate(i);
         } else {
           digitalListenerUpdate(i);
         }
@@ -126,117 +165,44 @@ void Dino::updateCoreListeners(byte tickCount){
   }
 }
 
+// Handle a single analog listener when it needs to read.
+void Dino::analogListenerUpdate(byte i){
+  int rval = analogRead(listeners[i][1]);
+  analogListenCallback(listeners[i][1], rval);
+  coreResponse(listeners[i][1], rval);
+}
+
+// Handle a single digital listener when it needs to read.
 void Dino::digitalListenerUpdate(byte i){
-  rval = digitalRead(listeners[i][1]);
-  // Previous state is stored in the 5th bit of the first byte.
-  // If changed, update it and send the message.
+  byte rval = digitalRead(listeners[i][1]);
+
   if (rval != bitRead(listeners[i][0], 5)){
+    // State for digital listeners is stored in byte 5 of the listener itself.
     bitWrite(listeners[i][0], 5, rval);
+    digitalListenCallback(listeners[i][1], rval);
     coreResponse(listeners[i][1], rval);
   }
 }
 
-// Gets called by Dino::reset to clear all core listeners.
+// Gets called by Dino::reset to clear all listeners set by the remote client.
 void Dino::clearCoreListeners(){
   for (int i = 0; i < PIN_COUNT; i++){
-    listeners[i][0] = 0;
-    listeners[i][1] = 0;
-  }
-}
-
-//
-// Rapidly polls a digital input looking for rising or falling edges,
-// recording the time in microseconds between consecutive edges.
-// There is an optional reset at the beginning if the pin must be held opposite
-// to its idle state to trigger a reading.
-//
-// Max 65535 microseconds reset time.
-// Max 255 microseconds per pulse (between 2 consecutive edges).
-// Max 255 pulses counted.
-//
-// val bit 0   : whether to reset the line first or not (0 = no, 1 = yes)
-// val bit 1   : direction to pull the line (0 = low, 1 = high)
-// auxMsg[0-1] : unsigned 16-bit reset duration
-// auxMsg[2-3] : unsigned 16-bit pulse read timeout (in milliseconds)
-// auxMsg[4]   : unsigned 8-bit pulse count limit
-// auxMsg[8] + : reserved as output buffer, will be overwritten
-//
-void Dino::pulseRead(){
-  // Reset
-  if (bitRead(val, 0)) {
-    uint16_t resetTime = (auxMsg[1] << 8) | auxMsg[0];
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, bitRead(val, 1));
-    delayMicroseconds(resetTime);
-  }
-  pinMode(pin, INPUT);
-  byte state = digitalRead(pin);
-
-  uint16_t timeout = (auxMsg[3] << 8) | auxMsg[2];
-  byte pulseCount = 0;
-
-  uint32_t start = millis();
-  uint32_t lastWrite = micros();
-
-  while ((millis() - start < timeout) && (pulseCount < auxMsg[4])) {
-    if (digitalRead(pin) != state){
-      uint32_t now = micros();
-      pulseCount++;
-      auxMsg[pulseCount+8] = now - lastWrite;
-      lastWrite = now;
-      state = state ^ 1;
+    // Only clear listeners if they were started by the remote client.
+    // Leaves listeners started by local code running.
+    if (bitRead(listeners[i][0], 4) == 0) {
+      listeners[i][0] = 0;
+      listeners[i][1] = 0;
     }
   }
-
-  stream->print(pin); stream->print(':');
-  for (byte i=1; i<=pulseCount; i++){
-    stream->print(auxMsg[i+8]);
-    stream->print((i == pulseCount) ? '\n' : ',');
-  }
-  if (pulseCount == 0) stream->print('\n');
+  findLastActiveListener();
 }
 
-
-// CMD = 6
-// Read from the microcontroller's EEPROM.
-//
-// pin         = empty
-// val         = number of bytes to read
-// auxMsg[0-1] = start address
-//
-void Dino::eepromRead(){
-  if (val > 0) {
-    uint16_t startAddress = (uint16_t)auxMsg[1] << 8 | auxMsg[0];
-
-    // Stream read bytes as if coming from a pin named 'EE'.
-    stream->print("EE");
-    stream->print(':');
-    stream->print(startAddress);
-    stream->print('-');
-
-    for (byte i = 0;  (i < val);  i++) {
-      stream->print(EEPROM.read(startAddress + i));
-      stream->print((i+1 == val) ? '\n' : ',');
-    }
-  }
-}
-
-// CMD = 7
-// Write to the microcontroller's EEPROM.
-//
-// pin         = empty
-// val         = number of bytes to write
-// auxMsg[0-1] = start address
-// auxMsg[2+]  = bytes to write
-//
-void Dino::eepromWrite(){
-  if (val > 0) {
-    uint16_t startAddress = (uint16_t)auxMsg[1] << 8 | auxMsg[0];
-
-    for (byte i = 0;  (i < val);  i++) {
-      if(EEPROM.read(startAddress + i) != auxMsg[2+i]) {
-        EEPROM.write(startAddress + i, auxMsg[2+i]);
-      }
+// Track the last active listener whenever changes are made.
+// Call this after setting or clearing any listeners.
+void Dino::findLastActiveListener(){
+  for(byte i=0; i<PIN_COUNT; i++){
+    if (bitRead(listeners[i][0], 7) == 1){
+      lastActiveListener = i;
     }
   }
 }

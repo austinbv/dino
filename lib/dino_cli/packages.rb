@@ -9,6 +9,8 @@ PACKAGES = {
       "lib/DinoDefines.h",
       "lib/Dino.cpp",
       "lib/DinoCoreIO.cpp",
+      "lib/DinoPulseInput.cpp",
+      "lib/DinoEEPROM.cpp",
       "lib/DinoIncludes.cpp",
     ]
   },

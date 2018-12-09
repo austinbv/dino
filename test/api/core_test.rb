@@ -83,10 +83,11 @@ class APICoreTest < Minitest::Test
 
   def test_set_listener
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0b00000011)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0b01000011)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0b11000011)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0b11000000)])
+
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x00\x03")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x01\x03")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x03")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x00")])
 
     board.stub(:write, mock) do
       board.set_listener(1, :off)
