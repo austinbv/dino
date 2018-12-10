@@ -1,6 +1,9 @@
 #include "Dino.h"
 #ifdef ESP8266
   #include <ESP8266WiFi.h>
+  #include <ESP8266mDNS.h>
+  #include <WiFiUdp.h>
+  #include <ArduinoOTA.h>
   #define LED_PIN 2
 #else
   #include <SPI.h>
@@ -17,7 +20,6 @@ Dino dino;
 WiFiServer server(port);
 WiFiClient client;
 
-
 // Use the built in LED to indicate WiFi status.
 void indicate(byte value) {
  #ifdef ESP8266
@@ -26,7 +28,6 @@ void indicate(byte value) {
   digitalWrite(LED_PIN, value);
  #endif
 }
-
 
 void printWifiStatus() {
   Serial.println("Connected");
@@ -42,10 +43,13 @@ void printWifiStatus() {
   indicate(true);
 }
 
-
 void connect(){
+  Serial.println();
   Serial.print("Attempting to connect to SSID: ");
-  Serial.print(ssid);
+  Serial.println(ssid);
+  #ifdef ESP8266
+    WiFi.mode(WIFI_STA);
+  #endif
   WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -53,7 +57,6 @@ void connect(){
   }
   printWifiStatus();
 }
-
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
@@ -65,30 +68,37 @@ void setup() {
   connect();
   server.begin();
 
+  #ifdef ESP8266
+    ArduinoOTA.begin();
+  #endif
+
   dino.digitalListenCallback = onDigitalListen;
   dino.analogListenCallback = onAnalogListen;
 }
 
 void loop() {
-  // Reconnect if we've lost WiFi..
+  // Reconnect if we've lost WiFi.
   if (WiFi.status() != WL_CONNECTED){
     indicate(false);
     connect();
   }
 
-  // Listen for connections.
-  client = server.available();
-
-  // Pass the stream to dino so it can read/write.
-  dino.stream = &client;
-
-  // Handle a connection.
-  if (client) {
-    while (client.connected()) dino.run();
+  // Handle one client at a time.
+  if (!client){
+    client = server.available();
+    if (client) dino.stream = &client;
   }
 
-  // End the connection.
-  client.stop();
+  // Run dino.
+  if (client) dino.run();
+
+  // End the connection when client disconnects.
+  if (client && !client.connected()) client.stop();
+
+  // Handle OTA updates.
+  #ifdef ESP8266
+    ArduinoOTA.handle();
+  #endif
 }
 
 // This runs every time a digital pin that dino is listening to changes value.

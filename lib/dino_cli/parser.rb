@@ -34,21 +34,21 @@ class DinoCLI::Parser
           args.shift; set_sketch("ethernet")
         when 'wifi'
           args.shift; set_sketch("wifi")
-        when '-baud'
+        when '--baud'
           args.shift; @options[:baud] = args.shift
-        when '-target'
+        when '--target'
           args.shift; set_target(args.shift)
-        when '-mac'
+        when '--mac'
           args.shift; @options[:mac] = args.shift
-        when '-ip'
+        when '--ip'
           args.shift; @options[:ip] = args.shift
-        when '-ssid'
+        when '--ssid'
           args.shift; @options[:ssid] = args.shift
-        when '-password'
+        when '--password'
           args.shift; @options[:password] = args.shift
-        when '-port'
+        when '--port'
           args.shift; @options[:port] = args.shift
-        when '-debug'
+        when '--debug'
           args.shift; @options[:debug] = true
         when /^-/
           error "Invalid argument '#{args[0]}'"
