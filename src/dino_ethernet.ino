@@ -2,6 +2,16 @@
 #include <SPI.h>
 #include <Ethernet.h>
 
+// Define 'serial' as the serial interface we want to use.
+// Defaults to Native USB port on the Due, whatever class "Serial" is on everything else.
+// Classes need to inherit from Stream to be compatible with the Dino library.
+#if defined(__SAM3X8E__)
+  #define serial SerialUSB
+  //#define serial Serial
+#else
+  #define serial Serial
+#endif
+
 // Configure your MAC address, IP address, and HTTP port here.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0x30, 0x31, 0x32 };
 IPAddress ip(192,168,0,77);
@@ -11,7 +21,6 @@ Dino dino;
 EthernetServer server(port);
 EthernetClient client;
 
-
 void printEthernetStatus() {
   Serial.print("IP Address: ");
   Serial.println(Ethernet.localIP());
@@ -19,10 +28,9 @@ void printEthernetStatus() {
   Serial.println(port);
 }
 
-
 void setup() {
-  // Start serial for debugging.
-  Serial.begin(115200);
+  // Wait for serial ready.
+  serial.begin(115200);
   while(!serial);
 
   // Explicitly disable the SD card.
@@ -32,27 +40,30 @@ void setup() {
   // Start up the network connection and server.
   Ethernet.begin(mac, ip);
   server.begin();
-  printEthernetStatus();
+  #ifdef debug
+    printEthernetStatus();
+  #endif
 
+  // Add listener callbacks for local logic.
   dino.digitalListenCallback = onDigitalListen;
   dino.analogListenCallback = onAnalogListen;
 }
 
-
 void loop() {
-  // Listen for connections.
-  client = server.available();
-
-  // Pass the stream to dino so it can read/write.
-  dino.stream = &client;
-
-  // Handle a connection.
-  if (client) {
-    while (client.connected()) dino.run();
+  // Allow one client at a time to be connected. Set it as the dino IO stream.
+  if (!client){
+    client = server.available();
+    if (client) dino.stream = &client;
   }
 
-  // End the connection.
-  client.stop();
+  // Main loop of the dino library.
+  dino.run();
+
+  // End the connection when client disconnects and revert to serial IO.
+  if (client && !client.connected()){
+    client.stop();
+    dino.stream = &serial;
+  }
 }
 
 // This runs every time a digital pin that dino is listening to changes value.
