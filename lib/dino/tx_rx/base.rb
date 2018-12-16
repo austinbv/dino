@@ -37,7 +37,7 @@ module Dino
       def start_read
         @thread ||= Thread.new  do
           trap("INT") do
-            io.write("\n90\n")
+            io.write("\n91\n")
             raise Interrupt
           end
 

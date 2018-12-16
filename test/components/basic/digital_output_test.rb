@@ -11,9 +11,9 @@ class DigitalOutputTest < Minitest::Test
     @part ||= Dino::Components::Basic::DigitalOutput.new(board: board, pin: 14)
   end
 
-  def test_low_on_initialize
-    mock = MiniTest::Mock.new.expect :call, nil, [14, board.low]
-    board.stub(:digital_write, mock) do
+  def read_state_on_initialize
+    mock = MiniTest::Mock.new.expect :call, nil, [14]
+    board.stub(:digital_read, mock) do
       part
     end
     mock.verify

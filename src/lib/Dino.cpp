@@ -51,7 +51,7 @@ void Dino::parse(byte c) {
     // If EOL, process and reset.
     else if (c == '\n'){
       append('\0');
-      process();
+      if ((fragmentIndex > 0) || (charIndex > 1)) process();
       fragmentIndex = 0;
       charIndex = 0;
     }
@@ -81,7 +81,8 @@ void Dino::parse(byte c) {
 }
 
 void Dino::append(byte c) {
-  messageFragments[fragmentIndex][charIndex++] = c;
+  messageFragments[fragmentIndex][charIndex] = c;
+  charIndex++;
 }
 
 void Dino::process() {
@@ -173,7 +174,8 @@ void Dino::process() {
     #endif
 
     // Implemented in this file.
-    case 90: reset               ();  break;
+    case 90: handshake           ();  break;
+    case 91: resetState          ();  break;
     case 95: setRegisterDivider  ();  break;
     case 96: setAnalogResolution ();  break;
 
@@ -211,7 +213,7 @@ void Dino::updateListeners() {
 
 
 // CMD = 90
-void Dino::reset() {
+void Dino::handshake() {
   resetState();
 
   // Reset this so we never send RCV: along with ACK:
@@ -230,7 +232,7 @@ void Dino::reset() {
   stream->print('\n');
 }
 
-
+// CMD = 91
 void Dino::resetState() {
   clearCoreListeners();
   #ifdef DINO_SPI
