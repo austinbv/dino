@@ -4,14 +4,21 @@ module Dino
       class DigitalOutput
         include Setup::SinglePin
         include Setup::Output
+        include Mixins::Callbacks
         include Mixins::Threaded
         interrupt_with :digital_write
 
         def after_initialize(options={})
-          low
+          super(options)
+          board.digital_read(pin)
+        end
+
+        def pre_callback_filter(board_state)
+          board_state.to_i
         end
 
         def digital_write(value)
+          value = board.high unless (value == board.low)
           board.digital_write(pin, @state = value)
         end
 
