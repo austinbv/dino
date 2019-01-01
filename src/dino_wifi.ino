@@ -4,12 +4,11 @@
   #include <ESP8266mDNS.h>
   #include <WiFiUdp.h>
   #include <ArduinoOTA.h>
-  #include <EEPROM.h>
-  #define LED_PIN 2
+  #define WIFI_STATUS_LED 2
 #else
   #include <SPI.h>
   #include <WiFi.h>
-  #define LED_PIN 13
+  #define WIFI_STATUS_LED 13
 #endif
 
 // Define 'serial' as the serial interface we want to use.
@@ -26,58 +25,62 @@
 int port = 3466;
 char* ssid = "yourNetwork";
 char* pass = "yourPassword";
+boolean connected = false;
+long lastConnectAttempt;
+int WiFiConnectTimeout = 10000;
 
 Dino dino;
 WiFiServer server(port);
 WiFiClient client;
 
 // Use the built in LED to indicate WiFi status.
-void indicate(byte value) {
-  pinMode(LED_PIN, OUTPUT);
+void indicateWiFi(byte value) {
+  pinMode(WIFI_STATUS_LED, OUTPUT);
   #ifdef ESP8266
-    digitalWrite(LED_PIN, !value);
+    digitalWrite(WIFI_STATUS_LED, !value);
   #else
-    digitalWrite(LED_PIN, value);
+    digitalWrite(WIFI_STATUS_LED, value);
   #endif
 }
 
 void printWifiStatus() {
-  Serial.println("Connected");
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-  Serial.print("Signal Strength (RSSI):");
-  Serial.print(WiFi.RSSI());
-  Serial.println(" dBm");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Dino TCP Port: ");
-  Serial.println(port);
-  indicate(true);
+  serial.println("WiFi Connected");
+  serial.print("SSID: ");
+  serial.println(WiFi.SSID());
+  serial.print("Signal Strength (RSSI):");
+  serial.print(WiFi.RSSI());
+  serial.println(" dBm");
+  serial.print("IP Address: ");
+  serial.println(WiFi.localIP());
+  serial.print("Dino TCP Port: ");
+  serial.println(port);
+  indicateWiFi(true);
 }
 
 void connect(){
-  #ifdef debug
-    indicate(false);
-    Serial.println();
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-  #endif
-
   #ifdef ESP8266
     WiFi.mode(WIFI_STA);
   #endif
-
-  WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    #ifdef ESP8266
-      Serial.print(".");
-    #endif
+  if (millis() - lastConnectAttempt > WiFiConnectTimeout){
+    WiFi.begin(ssid, pass);
+    lastConnectAttempt = millis();
   }
+}
 
-  #ifdef debug
+void maintainWiFi(){
+  if (connected == true){
+    if (WiFi.status() == WL_CONNECTED) return;
+    connected = false;
+    connect();
+  }
+  if (connected == false){
+    if (WiFi.status() != WL_CONNECTED) {
+      connect();
+      return;
+    }
+    connected = true;
     printWifiStatus();
-  #endif
+  }
 }
 
 void setup() {
@@ -90,10 +93,19 @@ void setup() {
     EEPROM.begin(512);
     ArduinoOTA.begin();
   #endif
-
-  // Connect to WiFi and start TCP server.
-  connect();
+  // Start the dino TCP server.
   server.begin();
+
+  delay(2000);
+
+  // Attempt initial WiFi connection.
+  #ifdef debug
+    indicateWiFi(false);
+    serial.println();
+    serial.print("Attempting to connect to SSID: ");
+    serial.println(ssid);
+  #endif
+  connect();
 
   // Add listener callbacks for local logic.
   dino.digitalListenCallback = onDigitalListen;
@@ -105,7 +117,7 @@ void setup() {
 
 void loop() {
   // Reconnect if we've lost WiFi.
-  if (WiFi.status() != WL_CONNECTED) connect();
+  maintainWiFi();
 
   // Allow one client at a time to be connected. Set it as the dino IO stream.
   if (!client){
