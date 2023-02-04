@@ -8,9 +8,9 @@ module Dino
       end
 
       def update(sender, result)
-        @acknowledged = true
         sender.delete_observer(self)
         @result = result
+        @acknowledged = true
       end
     end
 
