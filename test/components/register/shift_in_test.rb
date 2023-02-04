@@ -33,15 +33,32 @@ class RegisterShiftInTest < Minitest::Test
   end
 
   def test_read
-    # mock = MiniTest::Mock.new.expect :call, nil, ["22.8.1.#{[11,12,0].pack('C<*')}\n"]
-    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, 2, {preclock_high: true}]
+    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, 2], preclock_high: true
     board.stub(:shift_read, mock) do
       new_part = Dino::Components::Register::ShiftIn.new(options.merge(bytes: 2, rising_clock: true))
       new_part.read
     end
     mock.verify
   end
-
+  
+  def test_listen
+    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, 2], preclock_high: true
+    board.stub(:shift_listen, mock) do
+      new_part = Dino::Components::Register::ShiftIn.new(options.merge(bytes: 2, rising_clock: true))
+      new_part.listen
+    end
+    mock.verify
+  end
+  
+  def test_stop
+    mock = MiniTest::Mock.new.expect :call, nil, [8]
+    board.stub(:shift_stop, mock) do
+      new_part = Dino::Components::Register::ShiftIn.new(options.merge(bytes: 2, rising_clock: true))
+      new_part.stop
+    end
+    mock.verify
+  end
+  
   def test_callback_bubble
     mock = MiniTest::Mock.new.expect :call, nil, ["127,255"]
     part.stub(:update, mock) do

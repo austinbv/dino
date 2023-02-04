@@ -41,7 +41,7 @@ module Dino
       # CMD = 5
       def set_listener(pin, state=:off, options={})
         mode    = options[:mode]    || :digital
-        divider = options[:divider] || 8
+        divider = options[:divider] || 16
 
         unless [:digital, :analog].include? mode
           raise "Mode must be either digital or analog"

@@ -12,7 +12,7 @@ class ServoTest < MiniTest::Test
   end
 
   def test_toggle_on_initialize
-    mock = MiniTest::Mock.new.expect(:call, nil, [1, :on, Hash])
+    mock = MiniTest::Mock.new.expect(:call, nil, [1, :on], min: 544, max: 2400)
     board.stub(:servo_toggle, mock) do
       Dino::Components::Servo.new(board: board, pin:1)
     end
@@ -20,14 +20,14 @@ class ServoTest < MiniTest::Test
 
   def test_attach
     part
-    mock = MiniTest::Mock.new.expect(:call, nil, [1, :on, Hash])
+    mock = MiniTest::Mock.new.expect(:call, nil, [1, :on], min: 0, max: 360)
     board.stub(:servo_toggle, mock) { part.attach }
     mock.verify
   end
 
   def test_detach
     part
-    mock = MiniTest::Mock.new.expect(:call, nil, [1, :off, Hash])
+    mock = MiniTest::Mock.new.expect(:call, nil, [1, :off])
     board.stub(:servo_toggle, mock) { part.detach }
     mock.verify
   end

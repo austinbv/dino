@@ -84,9 +84,10 @@ class APICoreTest < Minitest::Test
   def test_set_listener
     mock = MiniTest::Mock.new
 
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x00\x03")])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x01\x03")])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x03")])
+    # \x00\x04 corresponds to the default divider of 16 (2^4)
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x00\x04")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x01\x04")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x04")])
     mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x00")])
 
     board.stub(:write, mock) do
@@ -100,7 +101,7 @@ class APICoreTest < Minitest::Test
 
   def test_digital_listen
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [1, :on, {mode: :digital, divider: 4}])
+    mock.expect(:call, nil, [1, :on], mode: :digital, divider: 4)
 
     board.stub(:set_listener, mock) do
       board.digital_listen(1)
@@ -109,7 +110,7 @@ class APICoreTest < Minitest::Test
 
   def test_analog_listen
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [1, :on, {mode: :analog, divider: 16}])
+    mock.expect(:call, nil, [1, :on], mode: :analog, divider: 16)
 
     board.stub(:set_listener, mock) do
       board.analog_listen(1)

@@ -2,14 +2,12 @@ module Dino
   module Components
     module OneWire
       class Helper
-        ADDRESS_TO_BYTES_CLASSES = [Integer, Bignum, Fixnum].freeze
-
         def self.address_to_bytes(address)
           [address].pack('Q<').split("").map(&:ord)
         end
 
         def self.crc_check(data)
-          if ADDRESS_TO_BYTES_CLASSES.include?(data.class)
+          if data.class == Integer
             bytes = address_to_bytes(data)
           else
             bytes = data

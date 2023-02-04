@@ -16,7 +16,7 @@ module Dino
       end
 
       def detach
-        board.servo_toggle(pin, :off, min: @min, max: @max)
+        board.servo_toggle(pin, :off)
       end
 
       def position=(value)
