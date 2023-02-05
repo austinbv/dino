@@ -27,7 +27,29 @@ module Dino
           end
           load
         end
-
+        
+        #
+        # Specific Array-like methods for convenience.
+        # 
+        def length; board.eeprom_length; end
+        alias :count :length
+        
+        def [](index)
+          @state_mutex.synchronize { @state.send :[], index }
+        end
+        
+        def []=(index, value)
+          @state_mutex.synchronize { @state.send :[]=, index, value }
+        end
+        
+        def each(&block)
+          @state_mutex.synchronize { @state.send :each, &block }
+        end
+        
+        def each_with_index(&block)
+          @state_mutex.synchronize { @state.send :each_with_index, &block }
+        end
+        
         def pre_callback_filter(message)
           address = message.split("-", 2)[0].to_i
           bytes = message.split("-", 2)[1].split(",").map(&:to_i)
