@@ -26,14 +26,6 @@ module Dino
           board.i2c_write(address, [bytes].flatten, options)
         end
 
-        def transfer(address, options={})
-          board.i2c_transfer(address, options)
-        end
-
-        def read(*args)
-          read_using -> { _read(*args) }
-        end
-
         def _read(address, register=nil, num_bytes=1, options={})
           board.i2c_read(address, register, num_bytes, options)
         end

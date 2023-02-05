@@ -4,23 +4,36 @@ module Dino
       module Reader
         include Callbacks
 
-        def read_using(method, &block)
+        #
+        # Defalt behavior for #read is to delegate to #_read.
+        # Define #_read in including classes.
+        #
+        def read(*args, &block)
+          read_using(self.method(:_read), *args, &block)
+        end
+
+        #
+        # Delegate reading to another method that sends a command to the board. 
+        # Accepts blocks as one-time callbacks stored in the :read key.
+        # Blocks until a value is recieved from the board.
+        # Returns the value after #pre_callback_filter runs on it.
+        #
+        # Give procs as methods to build more complex functionality for buses.
+        #
+        def read_using(method, *args, &block)
           add_callback(:read, &block) if block_given?
 
-          # Block and catches read value for return, AFTER the pre-filter.
           value = nil
-          add_callback(:read) { |data| value = data }
-
-          method.call
+          add_callback(:read) do |filtered_data|
+            value = filtered_data
+          end
+          
+          method.call(*args)
           block_until_read
 
           value
         end
-
-        def read(&block)
-          read_using(self.method(:_read), &block)
-        end
-
+        
         def block_until_read
           loop do
             break if !@callbacks[:read]

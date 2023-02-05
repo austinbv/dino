@@ -4,19 +4,19 @@ module Dino
       module Poller
         include Reader
         include Threaded
-
-        def poll_using(method, interval=1, &block)
+        
+        def poll_using(method, interval=3, *args, &block)
           stop
           add_callback(:poll, &block) if block_given?
 
           threaded_loop do
-            method.call
+            method.call(*args)
             sleep interval
           end
         end
 
-        def poll(interval=1, &block)
-          poll_using(method(:_read), interval, &block)
+        def poll(interval=3, *args, &block)
+          poll_using(self.method(:_read), interval, *args, &block)
         end
 
         def stop

@@ -4,11 +4,7 @@ module Dino
       class DS3231 < Slave
         require 'bcd'
         
-        def time
-          read_using -> { _read }
-          state
-        end
-        
+        # Set the time.
         def time=(time)
           bytes = [ 0,
                     BCD.decode(time.sec),
@@ -21,6 +17,9 @@ module Dino
           write(bytes)
           time
         end
+        
+        # Read the time.
+        alias :time :read
         
         # Time data starts at register 0 and is 7 bytes long.
         def _read

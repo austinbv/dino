@@ -37,7 +37,7 @@ bus.found_devices.each do |d|
 end
 
 #  Format a reading for printing on a line.
-def print_reading(reading, sensor, i)
+def print_reading(reading, sensor)
   print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
   print "Serial(HEX): #{sensor.serial_number} | Res: #{sensor.resolution} bits | "
 
@@ -49,8 +49,10 @@ def print_reading(reading, sensor, i)
   end
 end
 
-# Read the temp from each sensor in a simple loop.
-loop do
-  ds18b20s.each_with_index { |s,i| print_reading(s.read, s, i) }
-  sleep 5
+ds18b20s.each do |sensor|
+  sensor.poll(5) do |reading|
+    print_reading(reading, sensor)
+  end
 end
+
+sleep

@@ -46,8 +46,8 @@ module Dino
           board.one_wire_reset(pin, get_presence)
         end
 
-        def read(num_bytes)
-          read_using -> { board.one_wire_read(pin, num_bytes) }
+        def _read(num_bytes)
+          board.one_wire_read(pin, num_bytes)
         end
 
         def write(*bytes)
