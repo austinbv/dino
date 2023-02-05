@@ -10,12 +10,16 @@ module Dino
 
         def after_initialize(options={})
           super(options)
+          @found_devices = []
+          search
           bubble_callbacks
         end
 
         def search
           addresses = read_using -> { board.i2c_search }
-          @found_devices = addresses.split(":").map(&:to_i)
+          if addresses
+            @found_devices = addresses.split(":").map(&:to_i)
+          end
         end
 
         def write(address, bytes=[], options={})
@@ -30,13 +34,13 @@ module Dino
           read_using -> { _read(*args) }
         end
 
-        def _read(address, register, num_bytes=1, options={})
+        def _read(address, register=nil, num_bytes=1, options={})
           board.i2c_read(address, register, num_bytes, options)
         end
 
         def bubble_callbacks
           add_callback(:bus_master) do |str|
-            if str.match(/d*-/)
+            if str && str.match(/d*-/)
               address, data = str.split("-", 2)
               address = address.to_i
               data = data.split(",").map(&:to_i)

@@ -23,8 +23,9 @@ void Dino::i2cSearch() {
   stream->print(SDA);
 
   i2cBegin();
-  for (byte i = 0x08; i < 0x78;  i++) {
-    Wire.requestFrom(i, 1);
+  for (uint8_t i = 0x08; i < 0x78;  i++) {
+    uint8_t length = 1;
+    Wire.requestFrom(i, length);
     if (Wire.available()){
       stream->print(':'); stream->print(i);
       while(Wire.available()) Wire.read();
@@ -37,43 +38,53 @@ void Dino::i2cSearch() {
 // CMD = 34
 // Write to an I2C device. All params as binary in auxMsg.
 //
-// val        = repeated starts?
-// auxMsg[0]  = device address
-// auxMsg[1]  = number of bytes
-// auxMsg[2]+ = data
+// val        = Settings
+// val bit 0  = repeated start
+// val bit 1  = write register address before reading
+// val bit 2+ = unused
 //
-// Max 256 bytes. Validate remotely.
+// auxMsg[0]  = 7-bit device address
+// auxMsg[1]  = reserved
+// auxMsg[2]  = data length
+// auxMsg[3]+ = data
+//
+// Max limited by aux message size.
 //
 void Dino::i2cWrite() {
+  byte repeatedStart = bitRead(val, 0);
   i2cBegin();
   Wire.beginTransmission(auxMsg[0]);
   Wire.write(&auxMsg[2], auxMsg[1]);
-  Wire.endTransmission(val);
+  Wire.endTransmission(repeatedStart);
 }
 
 // CMD = 35
 // Read from an I2C device. All params as binary in auxMsg.
 //
-// val        = repeated starts?
-// auxMsg[0]  = device address
-// auxMsg[1]  = start register address
-// auxMsg[2]  = number of bytes
+// val        = Settings
+// val bit 0  = repeated start
+// val bit 1  = write register address before reading
+// val bit 2+ = unused
+// 
+// auxMsg[0]  = 7-bit device address
+// auxMsg[1]  = reserved
+// auxMsg[2]  = register address
+// auxMsg[3]  = number of bytes
 //
 // Max 32 bytes, limited by Wire library buffer. Validate remotely.
 //
 void Dino::i2cRead() {
-  if (auxMsg[2] > 32) auxMsg[2] = 32;
+  if (auxMsg[3] > 32) auxMsg[3] = 32;
   byte repeatedStart = bitRead(val, 0);
   i2cBegin();
 
-  // Bit 1 of val is flag for whether to write register address first or not.
+  // Optionally write a register address before reading.
   if (bitRead(val, 1)) {
     Wire.beginTransmission(auxMsg[0]);
     Wire.write(auxMsg[1]);
     Wire.endTransmission(repeatedStart);
   }
-
-  Wire.requestFrom(auxMsg[0], auxMsg[2], repeatedStart);
+  Wire.requestFrom(auxMsg[0], auxMsg[3], repeatedStart);
 
   // Send data as if coming from SDA pin. Prefix with device adddress.
   // Fail silently if no bytes read / invalid device address.
@@ -85,7 +96,7 @@ void Dino::i2cRead() {
   while(Wire.available()){
     currentByte++;
     stream->print(Wire.read());
-    stream->print((currentByte == auxMsg[2]) ? '\n' : ',');
+    stream->print((currentByte == auxMsg[3]) ? '\n' : ',');
   }
 }
 #endif

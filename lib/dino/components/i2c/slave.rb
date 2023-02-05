@@ -3,12 +3,15 @@ module Dino
     module I2C
       class Slave
         include Mixins::BusSlave
-        include Mixins::Poller
+        include Mixins::Reader
 
-        def repeated_start
-          false
+        def initialize(options)
+          super(options)
+          @repeated_start = options[:repeated_start] || false
         end
-
+        
+        attr_accessor :repeated_start
+        
         def write(bytes=[])
           bus.write(address, bytes, repeated_start: repeated_start)
         end
