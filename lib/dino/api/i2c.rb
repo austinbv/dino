@@ -10,7 +10,6 @@ module Dino
 
       # CMD = 34
       def i2c_write(address, bytes=[], options={})
-        
         # Bit 1 of settings controls repeated start.
         settings  = 0b00
         settings |= 0b01 if options[:repeated_start]
@@ -31,6 +30,7 @@ module Dino
         
         # Bit 2 of settings controls whether to write a start register before reading.
         settings |= 0b10 if register
+        register = 0 unless register
 
         aux = pack :uint8, [address, 0, register, num_bytes]
         write Message.encode command: 35,

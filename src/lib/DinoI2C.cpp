@@ -54,7 +54,7 @@ void Dino::i2cWrite() {
   byte repeatedStart = bitRead(val, 0);
   i2cBegin();
   Wire.beginTransmission(auxMsg[0]);
-  Wire.write(&auxMsg[2], auxMsg[1]);
+  Wire.write(&auxMsg[3], auxMsg[2]);
   Wire.endTransmission(repeatedStart);
 }
 
@@ -81,9 +81,10 @@ void Dino::i2cRead() {
   // Optionally write a register address before reading.
   if (bitRead(val, 1)) {
     Wire.beginTransmission(auxMsg[0]);
-    Wire.write(auxMsg[1]);
+    Wire.write(auxMsg[2]);
     Wire.endTransmission(repeatedStart);
   }
+  Wire.beginTransmission(auxMsg[0]);
   Wire.requestFrom(auxMsg[0], auxMsg[3], repeatedStart);
 
   // Send data as if coming from SDA pin. Prefix with device adddress.
@@ -98,5 +99,6 @@ void Dino::i2cRead() {
     stream->print(Wire.read());
     stream->print((currentByte == auxMsg[3]) ? '\n' : ',');
   }
+  Wire.endTransmission(repeatedStart);
 }
 #endif
