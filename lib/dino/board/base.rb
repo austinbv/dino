@@ -5,7 +5,7 @@ module Dino
       include API::EEPROM
 
       attr_reader :high, :low, :analog_high, :components
-      attr_reader :analog_zero, :dac_zero, :aux_limit, :eeprom_length
+      attr_reader :analog_zero, :dac_zero, :eeprom_length
 
       def initialize(io, options={})
         @io, @components = io, []

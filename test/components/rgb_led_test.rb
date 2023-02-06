@@ -3,7 +3,7 @@ require 'board_mock'
 require 'minitest/autorun'
 
 class RGBLedTest < MiniTest::Test
- def board
+  def board
     @board ||= BoardMock.new
   end
 

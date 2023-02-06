@@ -71,7 +71,7 @@ module Dino
       end
 
       def on_windows?
-        RUBY_PLATFORM.match /mswin|mingw/i
+        RUBY_PLATFORM.match(/mswin|mingw/i)
       end
     end
   end

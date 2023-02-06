@@ -36,7 +36,7 @@ class InputSetupTest < Minitest::Test
   def test_pullup_in_options
     mock = Minitest::Mock.new.expect :call, nil, [2, true]
     board.stub(:set_pullup, mock) do
-      new_part = InputComponent.new(board: board, pin: 2, pullup: true)
+      InputComponent.new(board: board, pin: 2, pullup: true)
     end
   end
 end

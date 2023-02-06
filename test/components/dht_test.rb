@@ -48,12 +48,12 @@ class DHTTest < MiniTest::Test
     # Error message in output if data is missing.
     result = part.decode(SHORT_ARRAY)
     assert result.keys.include? :error
-    assert result[:error]. match /missing/i
+    assert result[:error].match(/missing/i)
     
     # Error message in output if bad CRC.
     result = part.decode(bad_crc)
     assert result.keys.include? :error
-    assert result[:error]. match /crc/i
+    assert result[:error].match(/crc/i)
     
     # It should calculate output correctly.
     result = part.decode(GOOD_ARRAY)
