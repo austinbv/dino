@@ -1,3 +1,9 @@
+require "minitest/autorun"
+require 'simplecov'
+SimpleCov.start do
+  add_filter "test"
+  track_files "lib/**/*.rb"
+end
 require 'dino'
 
 # Nice little helper module to redefine constants quietly.
@@ -27,3 +33,19 @@ def suppress_output
   end
   retval
 end
+
+class TxRxMock
+  def add_observer(board); true; end
+  def read; true; end
+  def write(str); true; end
+  def handshake
+    "528,1024,14,20"
+  end
+end
+
+class BoardMock < Dino::Board::Default
+  def initialize
+    super(TxRxMock.new)
+  end
+end
+

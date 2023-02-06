@@ -1,6 +1,4 @@
-require 'dino'
-require 'board_mock'
-require 'minitest/autorun'
+require 'test_helper'
 
 class DS18B20Test < MiniTest::Test
   def bus

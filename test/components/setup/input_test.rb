@@ -1,6 +1,4 @@
-require 'dino'
-require 'board_mock'
-require 'minitest/autorun'
+require 'test_helper'
 
 class InputComponent
   include Dino::Components::Setup::Input

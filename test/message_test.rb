@@ -1,5 +1,4 @@
-require 'dino'
-require 'minitest/autorun'
+require 'test_helper'
 
 class MessageTest < Minitest::Test
   def test_require_a_command

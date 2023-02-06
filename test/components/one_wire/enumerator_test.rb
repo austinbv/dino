@@ -1,6 +1,4 @@
-require 'dino'
-require 'board_mock'
-require 'minitest/autorun'
+require 'test_helper'
 
 # State machine simulating a bus during address search. Initialize with n for
 # n devices with random (CRC-invalid) addresses. Call #reset before each search.

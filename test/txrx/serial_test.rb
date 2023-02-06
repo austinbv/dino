@@ -1,6 +1,3 @@
-require 'dino'
-require 'minitest/autorun'
-require 'txrx_mock'
 require 'test_helper'
 
 class DummySerial

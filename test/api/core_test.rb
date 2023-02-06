@@ -1,6 +1,4 @@
-require 'dino'
-require 'txrx_mock'
-require 'minitest/autorun'
+require 'test_helper'
 
 class APICoreTest < Minitest::Test
   def txrx

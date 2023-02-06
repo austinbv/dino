@@ -34,9 +34,10 @@ Gem::Specification.new do |gem|
   gem.version       = Dino::VERSION
   gem.executables   = ["dino"]
 
-  gem.add_dependency 'rubyserial', '~> 0.6.0'
-  gem.add_dependency 'bcd', '~> 0.3.0'
+  gem.add_dependency 'rubyserial'
+  gem.add_dependency 'bcd'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'minitest'
+  gem.add_development_dependency 'simplecov'
 end
