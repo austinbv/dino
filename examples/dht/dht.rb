@@ -4,8 +4,8 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new(device: "/dev/cu.usbmodem1431"))
-dht = Dino::Components::DHT.new(pin: 7, board: board)
+board = Dino::Board.new(Dino::TxRx::Serial.new)
+dht = Dino::Components::DHT.new(pin: 4, board: board)
 
 # The DHT class pre-processes raw data from the board. When it reaches callbacks
 # it's already hash of :temperature and :humidity keys, both with Float values.

@@ -3,7 +3,6 @@ module Dino
     require 'dino/api/helper'
     require 'dino/api/core'
     require 'dino/api/eeprom'
-    require 'dino/api/dht'
     require 'dino/api/i2c'
     require 'dino/api/infrared'
     require 'dino/api/one_wire'
