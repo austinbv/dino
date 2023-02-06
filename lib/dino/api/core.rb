@@ -73,13 +73,24 @@ module Dino
       end
 
       def pulse_read(pin, options={})
-        reset       = options[:reset] || false
-        reset_time  = options[:reset_time] || 0
+        # Hold the input pin high or low (give as values) before reading
+        reset = options[:reset] || false
+        
+        # How long to reset the pin for in ms
+        reset_time = options[:reset_time] || 0
+        
+        # Maximum number of pulses to capture
         pulse_limit = options[:pulse_limit] || 100
-        timeout     = options[:timeout] || 200
+        
+        # A pulse of this length will end the read
+        timeout = options[:timeout] || 200
+        
+        raise ArgumentError("reset time must be betwen 0 and 65535 ms")if reset_time > 0xFFFF
+        raise ArgumentError("timeout must be betwen 0 and 65535 ms")if timeout > 0xFFFF
+        raise ArgumentError("pulse limit must be betwen 0 and 255")if pulse_limit > 0xFF
 
         settings = reset ? 1 : 0
-        settings = settings | 0b10 if reset == high
+        settings = settings | 0b10 if (reset && reset != low)
 
         aux = pack :uint16, [reset_time, timeout]
         aux << pack(:uint8, pulse_limit)

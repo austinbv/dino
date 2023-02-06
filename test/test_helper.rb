@@ -1,9 +1,12 @@
 require "minitest/autorun"
+
 require 'simplecov'
 SimpleCov.start do
-  add_filter "test"
   track_files "lib/**/*.rb"
+  add_filter "test"
+  add_filter "lib/dino_cli"
 end
+
 require 'dino'
 
 # Nice little helper module to redefine constants quietly.
