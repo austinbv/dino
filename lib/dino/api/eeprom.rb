@@ -12,7 +12,7 @@ module Dino
       end
 
       # CMD = 7
-      def eeprom_write(address, bytes=[])
+      def eeprom_write(address, bytes)
         address = pack :uint16, address
         bytes  = pack :uint8, bytes, min: 1, max: 128
         write Message.encode command: 7,

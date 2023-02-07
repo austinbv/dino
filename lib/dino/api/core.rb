@@ -85,9 +85,16 @@ module Dino
         # A pulse of this length will end the read
         timeout = options[:timeout] || 200
         
-        raise ArgumentError("reset time must be betwen 0 and 65535 ms")if reset_time > 0xFFFF
-        raise ArgumentError("timeout must be betwen 0 and 65535 ms")if timeout > 0xFFFF
-        raise ArgumentError("pulse limit must be betwen 0 and 255")if pulse_limit > 0xFF
+        # Validate
+        if reset_time < 0 || reset_time > 0xFFFF
+          raise ArgumentError, "reset time must be betwen 0 and 65535 ms"
+        end
+        if timeout < 0 || timeout > 0xFFFF
+          raise ArgumentError, "timeout must be betwen 0 and 65535 ms"
+        end
+        if pulse_limit < 0 || pulse_limit > 0xFF
+          raise ArgumentError, "pulse limit must be betwen 0 and 255"
+        end
 
         settings = reset ? 1 : 0
         settings = settings | 0b10 if (reset && reset != low)

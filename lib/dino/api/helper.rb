@@ -8,7 +8,7 @@ module Dino
                     when :uint32  then 'L<*'
                     when :uint16  then 'S<*'
                     when :uint8   then 'C*'
-                    else raise ArgumentError "unsupported pack format '#{type}'"
+                    else raise ArgumentError, "unsupported pack format '#{type}'"
                     end
 
         # Can pass a single integer to get packed if we always [] then flatten.

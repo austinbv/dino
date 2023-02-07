@@ -163,11 +163,11 @@ class APICoreTest < Minitest::Test
     mock.verify
     
     # Bad options
-    assert_raises(ArgumentError) { board.one_wire_write(4, reset_time: 65536) }
-    assert_raises(ArgumentError) { board.one_wire_write(4, reset_time: -1) }
-    assert_raises(ArgumentError) { board.one_wire_write(4, timeout: 65536) }
-    assert_raises(ArgumentError) { board.one_wire_write(4, timeout: -1) }
-    assert_raises(ArgumentError) { board.one_wire_write(4, pulse_limit: 256) }
-    assert_raises(ArgumentError) { board.one_wire_write(4, pulse_limit: -1) }    
+    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: 65536) }
+    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: -1) }
+    assert_raises(ArgumentError) { board.pulse_read(4, timeout: 65536) }
+    assert_raises(ArgumentError) { board.pulse_read(4, timeout: -1) }
+    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: 256) }
+    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: -1) }    
   end
 end
