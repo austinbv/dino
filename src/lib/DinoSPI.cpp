@@ -21,15 +21,13 @@ SpiListener spiListeners[SPI_LISTENER_COUNT];
 void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.begin();
 
-  bool msbfirst = bitRead(settings, 7);
+  // SPI mode is the lowest 4 bits of settings.
   byte mode = settings;
-  bitClear(mode, 7);
+  mode << 4;
+  mode >> 4;
 
-  if (msbfirst) {
-    SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, mode));
-  } else {
-    SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, mode));
-  }
+  // Bit 7 of settings toggles MSBFIRST.
+  SPI.beginTransaction(SPISettings(clockRate, bitRead(settings, 7), mode));
 }
 
 // Convenience wrapper for SPI.end
@@ -48,16 +46,20 @@ void Dino::spiEnd(){
 // Request format for SPI 2-way transfers
 // pin         = slave select pin (int)
 // val         = empty
-// auxMsg[0]   = SPI settings. 2 LSB = SPI mode. Bit 7 = MSB(1) or LSB(0).
-// auxMsg[1]   = write length (number of bytes)
-// auxMsg[2]   = read length  (number of bytes)
+// auxMsg[0]   = SPI settings
+//   Bit 0..3  = SPI mode
+//   Bit 7     = MSBFIRST(1) or LSBFIRST(0)
+// auxMsg[1]   = read length  (number of bytes)
+// auxMsg[2]   = write length (number of bytes)
 // auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
-//
 // auxMsg[7+]  = data (bytes) (write only)
 //
 void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data) {
-  spiBegin(settings, clockRate);
+  // Pull select pin low.
+  pinMode(selectPin, OUTPUT);
   digitalWrite(selectPin, LOW);
+  
+  spiBegin(settings, clockRate);
 
   if (rLength > 0) {
     // Stream read bytes as if coming from select pin for easy identification.
