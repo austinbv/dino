@@ -8,20 +8,31 @@ class IREmitterTest < MiniTest::Test
   def part
     @part ||= Dino::Components::IREmitter.new(board: board, pin:1)
   end
-
-  # These are really API tests.
-  # Should move these and test that API methods get called here instead.
-  def test_packs_pulses_correctly
-    part
-    string = "16.1.38.#{[4].pack('C')}#{[100,200,300,400].pack('S<*')}\n"
-    mock = MiniTest::Mock.new.expect(:call, nil, [string])
-    board.stub(:write, mock) { part.send [100,200,300,400] }
+  
+  def test_pulse_count_validation
+    assert_raises(ArgumentError) do
+      part.emit Array.new(257) { 0 }
+    end
   end
-
-  def test_accepts_modulation_frequency_as_option
+  
+  def test_numeric_validation
+    assert_raises(ArgumentError) do
+      part.emit ["a", "b", "c"]
+    end
+  end
+  
+  def test_pulse_length_validation
+    assert_raises(ArgumentError) do
+      part.emit [65536]
+    end
+  end
+  
+  def test_emits
     part
-    string = "16.1.40.#{[4].pack('C')}#{[100,200,300,400].pack('S<*')}\n"
-    mock = MiniTest::Mock.new.expect(:call, nil, [string])
-    board.stub(:write, mock) { part.send [100,200,300,400], frequency: 40 }
+    mock = MiniTest::Mock.new.expect(:call, nil, [1, 38, [127,0]])
+    board.stub(:infrared_emit, mock) do
+      part.emit([127,0])
+    end
+    mock.verify
   end
 end

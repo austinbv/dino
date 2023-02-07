@@ -3,7 +3,7 @@ module Dino
     module Infrared
       include Helper
 
-      def infrared_send(pin, frequency, pulses)
+      def infrared_emit(pin, frequency, pulses)
         # Need to start using length - 1, but doesn't work on board yet.
         # 0 = 1 pulse, 255 = 256 pulses.
         length = pack :uint8,  pulses.length,  max: 1

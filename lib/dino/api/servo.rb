@@ -11,7 +11,7 @@ module Dino
         write Message.encode command: 8,
                              pin: convert_pin(pin),
                              value: (value == :off) ? 0 : 1,
-                             aux: aux
+                             aux_message: aux
       end
 
       def servo_write(pin, value=0)
