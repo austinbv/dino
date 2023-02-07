@@ -42,25 +42,14 @@ module Dino
       end
 
       def update(line)
-        case line
-        when /\AEE:/
-          update_eeprom(line)
-        else
-          update_component(line)
-        end
-      end
-
-      def update_eeprom(line)
-        message = line.split(":", 2)[1]
-        @components.each do |part|
-          part.update(message) if part.pin == "EE"
-        end
+        update_component(line)
       end
 
       def update_component(line)
         pin, message = line.split(":", 2)
+        pin = pin.to_i unless pin == "EE"
         @components.each do |part|
-          part.update(message) if pin.to_i == convert_pin(part.pin)
+          part.update(message) if pin == convert_pin(part.pin)
         end
       end
 

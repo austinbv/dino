@@ -18,6 +18,7 @@ module Dino
         return pin.to_i             if pin.match(DIGITAL_REGEX)
         return analog_pin_to_i(pin) if pin.match(ANALOG_REGEX)
         return dac_pin_to_i(pin)    if pin.match(DAC_REGEX)
+        return "EE"                 if pin == "EE"
         raise ArgumentError, "incorrect pin format"
       end
 

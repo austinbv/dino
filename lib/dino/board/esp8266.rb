@@ -34,6 +34,7 @@ module Dino
         return gpio_pin_to_i(pin)    if pin.match(GPIO_REGEX)
         return analog_pin_to_i(pin)  if pin.match(ANALOG_REGEX)
         return digital_pin_to_i(pin) if pin.match(DIGITAL_REGEX)
+        return "EE"                  if pin == "EE"
         raise ArgumentError, "incorrect pin format"
       end
 

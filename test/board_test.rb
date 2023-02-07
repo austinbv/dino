@@ -23,7 +23,7 @@ class BoardTest < Minitest::Test
   end
 
   def test_calls_handshake_on_txrx
-    mock = MiniTest::Mock.new.expect(:call, "actual ack value in txrx_mock.rb")
+    mock = MiniTest::Mock.new.expect(:call, "528,1024,14,20")
     txrx.stub(:handshake, mock) do
       Dino::Board.new(txrx)
     end
@@ -42,11 +42,25 @@ class BoardTest < Minitest::Test
     assert_equal 20, board.dac_zero
     assert_equal 14, board.analog_zero
   end
-
-  def test_set_low_high_analog_high
+  
+  def test_set_low_high
     assert_equal 0, board.low
     assert_equal 1, board.high
+  end
+  
+  def test_analog_resolution
     assert_equal 255, board.analog_high
+    assert_equal 8,   board.analog_resolution
+    
+    mock = MiniTest::Mock.new.expect(:call, nil, [Dino::Message.encode(command:96, value:10)])
+    board.stub(:write, mock) do
+      board.analog_resolution = 10
+    end
+    mock.verify
+    
+    assert_equal 10,   board.analog_resolution
+    assert_equal 0,    board.low
+    assert_equal 1023, board.analog_high
   end
 
   def test_add_remove_component
@@ -69,19 +83,29 @@ class BoardTest < Minitest::Test
     mock.verify
   end
 
-  def test_update_passes_messages_to_components
+  def test_update_passes_messages_to_correct_components
     mock1 = MiniTest::Mock.new.expect(:update, nil, ["data"])
-    3.times { mock1.expect(:pin, 1) }
-    # This tests that lines are not split after the first colon delimiter.
+    4.times { mock1.expect(:pin, 1) }
+    
+    # Make sure lines are split only on the first colon.
+    # Tests for string based pine names too.
     mock2 = MiniTest::Mock.new.expect(:update, nil, ["with:colon"])
-    3.times { mock2.expect(:pin, 2) }
+    4.times { mock2.expect(:pin, 'A0') }
+    
+    # Special EEPROM mock.
+    mock3 = MiniTest::Mock.new.expect(:update, nil, ["bytes"])
+    4.times { mock3.expect(:pin, 'EE') }
+     
     board.add_component(mock1)
     board.add_component(mock2)
+    board.add_component(mock3)
     board.update("1:data")
-    board.update("2:with:colon")
+    board.update("14:with:colon")
     board.update("3:ignore")
+    board.update("EE:bytes")
     mock1.verify
     mock2.verify
+    mock3.verify
   end
 
   def test_convert_pin
@@ -105,12 +129,5 @@ class BoardTest < Minitest::Test
     assert_raises(ArgumentError) { board.convert_pin('ADC1') }
     board.instance_variable_set(:@dac_zero, nil)
     assert_raises(ArgumentError) { board.convert_pin('DAC1') }
-  end
-
-  def test_analog_resolution
-    board.analog_resolution = 10
-    assert_equal 0,    board.low
-    assert_equal 1023, board.analog_high
-    assert_equal 10,   board.analog_resolution
   end
 end
