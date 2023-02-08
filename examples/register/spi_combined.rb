@@ -1,30 +1,27 @@
 #
-# Example showing how to use an output shift register to drive a seven segment display.
-#
-# The register implements #digital_write and other methods expected by Components,
-# and makes its parallel pins addressable (zero index), so it can proxy the Board class.
-#
-# The SSD object is created by passing the register instead of the board, and
-# the registers's parallel pin number that each SSD pin is connected to.
-#
+# Example showing 2 SPI devices on the same bus with different select pins.
+# Combination of examples/spi_ssd.rb and examples/spi_in.rb
 #
 require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-output_register = Dino::Components::Register::SPIOut.new  board: board,
-                                                          pin: 9,
-                                                          frequency: 3000000,
-                                                          spi_mode: 3
+output_register = Dino::Components::Register::SPIOut.new board: board,
+                                                         pin: 9
+                                                         # frequency: 3000000,
+                                                         # spi_mode: 0,
+                                                         # bytes: 1
+                                                         # bit_order: :lsbfirst
 
 ssd = Dino::Components::SSD.new   board: output_register,
                                   pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
 input_register = Dino::Components::Register::SPIIn.new  board: board,
-                                                        pin: 10,
-                                                        bytes: 1,
-                                                        spi_mode: 3,
+                                                        pin: 8,
+                                                        spi_mode: 0,
                                                         frequency: 3000000
+                                                        # bytes: 1
+                                                        # bit_order: :lsbfirst
 
 button = Dino::Components::Button.new(pin: 0, board: input_register)
 

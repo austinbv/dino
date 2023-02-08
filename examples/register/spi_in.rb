@@ -1,33 +1,34 @@
 #
-# Example showing how to read an input shift register using SPI.
+# Example of input components connected to an input SPI shift register.
 #
-# The register implements #digital_read and other methods expected by Components,
-# and makes its parallel pins addressable (zero index), so it can proxy the Board class.
+# The register is a BoardProxy, and implements enough Board methods that
+# DigitalInput components can be attached to its pins. 
 #
-# The Button object is created by passing the register instead of the board, and
-# the register's parallel output pin that the button is connected to.
+# The Button object is created by using the register in place of board, and
+# the register output pin that it's connected to.
+#
+# The board pin connected to the register's select/latch pin is required to initialize.
+# Each device connected to the SPI bus needs a unique select pin on the board.
+#
+# Clock and data pins do not need to be specified when using SPI, since they are
+# predetermined on the board and shared by all SPI devices, but they must be connected.
+# Pin mapping varies depending on the board.
+# A reference can be found here: https://www.arduino.cc/en/Reference/SPI
+#
+# SPI output (MISO) and SPI clock (SCLK) map to pins 12 and 13 respectively on the Arduino UNO.
 #
 require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 
-#
-# Pin 10 is default slave select on Arduino UNO. Connect to register "latch" input.
-# Register data and clock pins go to 12 (MISO) and 13 respectively on the Arduino UNO.
-#
-# Clock and data pins do not need to be given when using SPI, since they are
-# predetermined based on the board you are using, and dealt with by the library.
-# But they still must be connected. The exact pins vary depending on the board,
-# and a reference can be found here: https://www.arduino.cc/en/Reference/SPI
-#
 # SPI mode and frequency are specific to a TI CD4021B register. Change as needed.
-#
 shift_register = Dino::Components::Register::SPIIn.new  board: board,
-                                                        pin: 10,
-                                                        bytes: 1,
-                                                        spi_mode: 3,
+                                                        pin: 8,
+                                                        spi_mode: 0,
                                                         frequency: 3000000
+                                                        # bytes: 1
+                                                        # bit_order: :lsbfirst
 
 button = Dino::Components::Button.new(pin: 0, board: shift_register)
 

@@ -1,11 +1,13 @@
 #
-# Example showing how to read an input shift register using Arduino's "shiftIn".
+# Example using the Arduino shiftIn function to read data from a shift register.
+# SPI is more efficient and may work with the same hardware, so use that if possible.
+# See examples/spi_in.rb
 #
-# The register implements #digital_read and other methods expected by Components,
-# and makes its parallel pins addressable (zero index), so it can proxy the Board class.
+# The register is a BoardProxy, and implements enough Board methods that
+# DigitalInput components can use its pins directly.
 #
-# The Button object is created by passing the register instead of the board, and
-# the register's parallel output pin that the button is connected to.
+# The Button object is created by using the register in place of board, and
+# the register output pin that it's connected to.
 #
 # Note: rising_clock must be set to true if using TI CD4021B register or similar.
 # This should apply to any register which outputs on a rising clock edge.

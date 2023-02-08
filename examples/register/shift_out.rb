@@ -1,13 +1,17 @@
 #
-# Example showing how to set up an output shift register.
+# Example using the Arduino shiftOut function to write data to a shift register.
+# SPI is more efficient and may work with the same hardware, so use that if possible.
+#
 # Multiple bytes may be written in one operation.
+# Register instance stores state, and its size can be set by including :bytes when intiailizing.
 #
 require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 register = Dino::Components::Register::ShiftOut.new  board: board,
-                                                     pins: {latch: 9, data: 11, clock: 13}
+                                                     pins:  {latch: 9, data: 11, clock: 13}
+                                                     # bytes: 1
 
 # Write a single byte
 register.write(255)
