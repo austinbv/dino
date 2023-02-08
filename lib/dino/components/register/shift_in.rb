@@ -20,6 +20,10 @@ module Dino
           self.rising_clock = options[:rising_clock]
           bubble_callbacks
         end
+        
+        def pin
+          latch.pin
+        end
 
         #
         # Some registers use rising edges for clock signals. Unless we pull clock

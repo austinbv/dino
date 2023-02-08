@@ -9,6 +9,7 @@ module Dino
         end
 
         def initialize(options={})
+          @state = nil
           @state_mutex = Mutex.new
           initialize_board(options)
           initialize_pins(options)

@@ -32,7 +32,7 @@ class MultiPinSetupTest < Minitest::Test
       MultiPinComponent.new board: board, pins: { one: 9, maybe: 11 }
     end
     assert_raises(ArgumentError) do
-      MultiPinComponent.new board: board, pins: { one: 10, maybe: 11 }
+      MultiPinComponent.new board: board, pins: { two: 10, maybe: 11 }
     end
     MultiPinComponent.new board: board, pins: { one: 9, two:10 }
   end
@@ -40,6 +40,11 @@ class MultiPinSetupTest < Minitest::Test
   def test_build_proxies
     assert_equal Dino::Components::Basic::DigitalOutput, part.proxies[:two].class
     assert_equal Dino::Components::Basic::DigitalInput, part.proxies[:maybe].class
+  end
+  
+  def attr_reader_exists_for_optional_pins
+    part = MultiPinComponent.new board: board, pins: { one: 9, two:10 }
+    assert_nil part.maybe
   end
 
   def test_proxy_reader_methods

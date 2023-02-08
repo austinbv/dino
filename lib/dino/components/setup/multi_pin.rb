@@ -57,13 +57,9 @@ module Dino
           # '::proxy_pins' in the class definition. See RgbLed class for examples.
           #
           def proxy_pins(options={})
-            if options[:optional]
-              options.reject! { |k| k == :optional }
-            else
-              options.reject! { |k| k == :optional } if (options[:optional] == false)
-              require_pins(*options.keys)
-            end
-
+            require_pins(*options.keys) unless options[:optional]
+            options.reject! { |k| k == :optional }
+            
             proxied_pins = self.class_eval('@@proxied_pins') rescue {}
             proxied_pins.merge!(options)
             self.class_variable_set(:@@proxied_pins, proxied_pins)
@@ -82,17 +78,31 @@ module Dino
         def validate_pins
           required_pins = self.class.class_eval('@@required_pins') rescue []
           required_pins.each do |key|
-            raise ArgumentError, 'missing pins[:#{key}] pin' unless pins[key]
+            raise ArgumentError, "missing pins[:#{key}] pin" unless pins[key]
           end
         end
 
         def build_proxies
-          proxied_pins = self.class.class_eval('@@proxied_pins') rescue {}
-          proxied_pins.each_pair do |key, klass|
-            component = klass.new(board: board, pin: pins[key], pullup: pullups[key]) rescue nil
-            self.proxies[key] = component
-            instance_variable_set("@#{key}", component)
-            singleton_class.class_eval { attr_reader key }
+          proxy_classes = self.class.class_eval('@@proxied_pins') rescue {}
+
+          # Build proxies for named pins once a pin number was given.
+          pins.each_pair do |pin_name, pin_number|
+            if proxy_classes[pin_name]
+              component = proxy_classes[pin_name].new(board: board, pin: pin_number, pullup: pullups[pin_name])
+              self.proxies[pin_name] = component
+              instance_variable_set("@#{pin_name}", component)
+              singleton_class.class_eval { attr_reader pin_name }
+            else
+              # Fail silently when given pins that don't map to a proxy class
+              # Components can use pins without setting up a subcomponent
+            end
+          end
+
+          # attr_reader nil for optional pins when not given.
+          proxy_classes.each_key do |pin_name|
+            unless self.proxies[pin_name]
+              singleton_class.class_eval { attr_reader pin_name }
+            end
           end
         end
       end

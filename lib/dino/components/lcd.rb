@@ -22,7 +22,7 @@ module Dino
       #       rows: 2
       # )
       #
-      def after_initialize(options)
+      def after_initialize(options={})
         board.write Dino::Message.encode command: 10, value: 0, aux_message: encoded_pins
         @cols, @rows = options[:cols], options[:rows]
         board.write Dino::Message.encode command: 10, value: 1, aux_message: "#{@cols},#{@rows}"

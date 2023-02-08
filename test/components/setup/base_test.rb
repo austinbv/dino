@@ -17,4 +17,8 @@ class BaseSetupTest < Minitest::Test
     part = BaseComponent.new(board: board)
     assert_equal board.components, [part]
   end
+  
+  def test_start_with_nil_state
+    assert_nil BaseComponent.new(board: board).state
+  end
 end

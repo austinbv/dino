@@ -17,7 +17,7 @@ module Dino
 
       # ssd = SevenSegmentDisplay.new(
       #   board: board,
-      #   pins:  {anode: 11, a: 12, b: 13, c: 3,d: 4,e: 5,f: 10,g: 9}
+      #   pins:  {anode: 11, a: 12, b: 13, c: 3,d: 4, e: 5, f: 10, g: 9}
       # )
       def after_initialize(options={})
         @segments = [a,b,c,d,e,f,g]

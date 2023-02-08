@@ -18,6 +18,10 @@ class RegisterShiftInTest < Minitest::Test
     assert_equal Dino::Components::Basic::DigitalInput,  part.data.class
     assert_equal Dino::Components::Register::Select,     part.latch.class
   end
+  
+  def test_identifies_with_latch_pin
+    assert_equal 8, part.pin
+  end
 
   def test_byte_length
     new_part = Dino::Components::Register::ShiftIn.new(options.merge(bytes: 2))

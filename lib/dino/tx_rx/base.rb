@@ -31,7 +31,7 @@ module Dino
       def flush_read
         Timeout.timeout(5) { read until read == nil }
       rescue Timeout::Error
-        raise RxFlushTimeout "Cannot read from device, or device not running dino"
+        raise RxFlushTimeout, "Cannot read from device, or device not running dino"
       end
 
       def start_read

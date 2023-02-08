@@ -17,7 +17,7 @@ module Dino
           # When used as a board proxy, store the state of each register
           # pin as a 0 or 1 in an array that is (@bytes * 8) long. Zero out to start.
           #
-          @state = Array.new(@bytes*8) {|i| 0}
+          @state = Array.new(@bytes*8) { 0 }
           write_state
 
           #
@@ -39,9 +39,12 @@ module Dino
         #
         include Mixins::BoardProxy
         def digital_write(pin, value)
-          # puts @state.inspect
-          @state[pin] = value
-          delayed_write(@state)
+          state[pin] = value
+          delayed_write(state)
+        end
+        
+        def digital_read(pin)
+          state[pin]
         end
 
         #
@@ -49,10 +52,11 @@ module Dino
         # Lets us catch multiple changed bits, like when hosting an SSD.
         #
         include Mixins::Threaded
-        def delayed_write(state)
+        def delayed_write(old_state)
           threaded do
             sleep @write_delay
-            write_state if (state == @state)
+            # Keep delaying if state has changed.
+            write_state if (old_state == state)
           end
         end
 
@@ -61,8 +65,10 @@ module Dino
         #
         def write_state
           bytes = []
-          @state.each_slice(8) do |slice|
-            bytes << slice.join("").to_i(2)
+          state.each_slice(8) do |slice|
+            # Convert nil to 0 to ensure bit order is consistent.
+            zeroed = slice.map { |bit| bit.to_i }.join.to_i(2)
+            bytes << zeroed
           end
           write(bytes)
         end
