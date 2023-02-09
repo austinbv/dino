@@ -84,7 +84,7 @@ PACKAGES = {
     ]
   },
   one_wire: {
-    description: "OneWire bus support (Just DS18B20 for now)",
+    description: "OneWire bus support",
     directive: "DINO_ONE_WIRE",
     files: [
       "lib/DinoOneWire.cpp",
