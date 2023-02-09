@@ -62,6 +62,14 @@ class BoardTest < Minitest::Test
     assert_equal 0,    board.low
     assert_equal 1023, board.analog_high
   end
+  
+  def test_eeprom
+    mock = MiniTest::Mock.new.expect(:call, "test eeprom", [], board: board)
+    Dino::Components::Basic::BoardEEPROM.stub(:new, mock) do
+      board.eeprom
+    end
+    mock.verify
+  end
 
   def test_add_remove_component
     mock = MiniTest::Mock.new

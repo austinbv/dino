@@ -36,6 +36,10 @@ module Dino
       def aux_limit
         @aux_limit ||= 39
       end
+      
+      def eeprom
+        @eeprom ||= Components::Basic::BoardEEPROM.new(board: self)
+      end
 
       def write(msg)
         @io.write(msg)

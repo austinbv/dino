@@ -7,8 +7,9 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 
-# Initialization automatically gets all EEPROM data from thee board.
-eeprom = Dino::Components::Basic::BoardEEPROM.new(board: board)
+# Initialization automatically gets all EEPROM data from the board.
+# eeprom = Dino::Components::Basic::BoardEEPROM.new(board: board)
+eeprom = board.eeprom
 
 # EEPROM size reported by the board.
 puts "EEPROM Size: #{eeprom.length} bytes"
