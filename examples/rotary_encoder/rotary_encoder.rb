@@ -10,8 +10,8 @@ require 'dino'
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 encoder = Dino::Components::RotaryEncoder.new board: board,
                                               pins:{ clock: 4, data: 5 },
-                                              divider: 1, # (default) read approx every divider ms
-                                              steps: 30   # (default) steps / revolution
+                                              divider: 1,            # (default) read approx every divider ms
+                                              degrees_per_step: 12   # (default) angular degrees the encoder moves between steps
 
 encoder.add_callback do |data|
   puts "Encoder position: #{data[:position]}°"
