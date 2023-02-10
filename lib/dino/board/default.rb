@@ -14,12 +14,13 @@ module Dino
       DAC_REGEX = /\A(dac)\d+\z/i
 
       def convert_pin(pin)
+        return nil                  if pin == nil
         pin = pin.to_s
         return pin.to_i             if pin.match(DIGITAL_REGEX)
         return analog_pin_to_i(pin) if pin.match(ANALOG_REGEX)
         return dac_pin_to_i(pin)    if pin.match(DAC_REGEX)
         return "EE"                 if pin == "EE"
-        raise ArgumentError, "incorrect pin format"
+        raise ArgumentError, "incorrect pin format: #{pin.inspect}"
       end
 
       def analog_pin_to_i(pin)
