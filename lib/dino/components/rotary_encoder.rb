@@ -12,7 +12,7 @@ module Dino
       def after_initialize(options={})
         super(options)
                 
-        self.degrees_per_step = options[:degrees_per_step] || 12
+        self.degrees_per_step = (360 / options[:steps_per_revolution]) || 30
         reset
         
         # DigitalInputs listen with default divider automatically. Override here.
@@ -66,7 +66,7 @@ module Dino
         temp_state = state.dup
         temp_state[:change] = step
         temp_state[:steps]  = temp_state[:steps]  + step
-        temp_state[:angle]  = (temp_state[:angle] + (step * degrees_per_step))
+        temp_state[:angle]  = (temp_state[:angle] + (step * degrees_per_step)) % 360
         temp_state
       end
 

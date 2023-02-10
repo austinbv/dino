@@ -7,8 +7,8 @@ require 'dino'
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 encoder = Dino::Components::RotaryEncoder.new board: board,
                                               pins:{ clock: 4, data: 5 },
-                                              divider: 1,            # (default) read approx every divider ms
-                                              degrees_per_step: 12   # (default) angular degrees the encoder moves between steps
+                                              divider: 1,                # (default) read approx every divider ms
+                                              steps_per_revolution: 30   # (default)
 
 # Set up a pseudo terminal with osascript (AppleScript) in interactive mode.
 # Calling a separate script each update is too slow.
@@ -34,10 +34,6 @@ end
 
 volume = AppleVolumeWrapper.new
 puts "Current volume: #{volume.get}%"
-
-# Some values from 0-100 aren't applied so the encoder gets stuck in a
-# small range if we write every step. Track when a step has no effect
-# and apply it later with this.
 
 encoder.add_callback do |update|
   # Increase by 2% for every step so it responds faster.
