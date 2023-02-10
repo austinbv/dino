@@ -18,7 +18,7 @@ module Dino
         end
 
         def _listen(divider=4)
-          @divider = divider || 4
+          @divider = divider
           board.digital_listen(pin, @divider)
         end
 

@@ -16,6 +16,12 @@ class DigitalInputTest < Minitest::Test
     end
     mock.verify
   end
+  
+  def test_converts_to_integer
+    part
+    part.update("1")
+    assert_equal part.state, 1
+  end
 
   def test__read
     mock = MiniTest::Mock.new.expect :call, nil, [14]

@@ -98,7 +98,7 @@ void Dino::setListener(byte p, boolean enabled, byte analog, byte exponent, bool
   if (enabled)  settingMask = settingMask | B10000000;
   if (analog)   settingMask = settingMask | B01000000;
   if (local)    settingMask = settingMask | B00010000;
-  settingMask = settingMask | dividerMap[exponent];
+  settingMask = settingMask | exponent;
 
   #ifdef debug
     Serial.print("setlistener, pin:");
@@ -151,7 +151,7 @@ void Dino::updateCoreListeners(byte tickCount){
     // Check if active.
     if (bitRead(listeners[i][0], 7) == 1){
       // Check if to update it on this tick.
-      byte exponent = 0b111 & listeners[i][0];
+      byte exponent = (listeners[i][0] << 5) >> 5;
       byte divider = dividerMap[exponent];
       if(tickCount % divider == 0){
         // Check if digital or analog.
