@@ -22,9 +22,7 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.begin();
 
   // SPI mode is the lowest 4 bits of settings.
-  byte mode = settings;
-  mode << 4;
-  mode >> 4;
+  byte mode = settings & 0B00001111;
 
   // Bit 7 of settings toggles MSBFIRST.
   SPI.beginTransaction(SPISettings(clockRate, bitRead(settings, 7), mode));

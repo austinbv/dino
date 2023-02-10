@@ -33,6 +33,10 @@ module Dino
             block.call(data) if data.to_i == board.low
           end
         end
+        
+        def pre_callback_filter(data)
+          data.to_i
+        end
 
         def high?; state == board.high end
         def low?;  state == board.low  end

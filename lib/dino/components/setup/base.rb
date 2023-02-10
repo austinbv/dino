@@ -4,10 +4,6 @@ module Dino
       module Base
         attr_reader :board
 
-        def state
-          @state_mutex.synchronize { @state }
-        end
-
         def initialize(options={})
           @state = nil
           @state_mutex = Mutex.new
@@ -15,6 +11,10 @@ module Dino
           initialize_pins(options)
           register
           after_initialize(options)
+        end
+        
+        def state
+          @state_mutex.synchronize { @state }
         end
 
         protected

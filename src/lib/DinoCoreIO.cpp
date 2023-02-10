@@ -151,7 +151,8 @@ void Dino::updateCoreListeners(byte tickCount){
     // Check if active.
     if (bitRead(listeners[i][0], 7) == 1){
       // Check if to update it on this tick.
-      byte exponent = (listeners[i][0] << 5) >> 5;
+	  // Divider exponent is last 3 bits of settings.
+      byte exponent = listeners[i][0] & 0B00000111;
       byte divider = dividerMap[exponent];
       if(tickCount % divider == 0){
         // Check if digital or analog.
