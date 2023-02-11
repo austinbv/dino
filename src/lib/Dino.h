@@ -16,6 +16,11 @@
 #  define PIN_COUNT 22
 #endif
 
+// Use the maximum length for the ESP8266 EEPROM.
+#ifdef ESP8266
+#  define ESP8266_EEPROM_LENGTH 4096
+#endif
+
 class Dino {
   public:
     Dino();

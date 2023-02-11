@@ -12,7 +12,11 @@
 //
 void Dino::eepromRead(){
   if (val > 0) {
-    uint16_t startAddress = (uint16_t)auxMsg[1] << 8 | auxMsg[0];
+	#ifdef ESP8266
+	  EEPROM.begin(ESP8266_EEPROM_LENGTH);
+    #endif
+	  
+    uint16_t startAddress = ((uint16_t)auxMsg[1] << 8) | auxMsg[0];
 
     // Stream read bytes as if coming from a pin named 'EE'.
     stream->print("EE");
@@ -24,6 +28,10 @@ void Dino::eepromRead(){
       stream->print(EEPROM.read(startAddress + i));
       stream->print((i+1 == val) ? '\n' : ',');
     }
+	
+	#ifdef ESP8266
+	  EEPROM.end();
+	#endif
   }
 }
 
@@ -37,12 +45,19 @@ void Dino::eepromRead(){
 //
 void Dino::eepromWrite(){
   if (val > 0) {
-    uint16_t startAddress = (uint16_t)auxMsg[1] << 8 | auxMsg[0];
+	#ifdef ESP8266
+	  EEPROM.begin(ESP8266_EEPROM_LENGTH);
+	#endif
+	  
+    uint16_t startAddress = ((uint16_t)auxMsg[1] << 8) | auxMsg[0];
 
     for (byte i = 0;  (i < val);  i++) {
-      if(EEPROM.read(startAddress + i) != auxMsg[2+i]) {
-        EEPROM.write(startAddress + i, auxMsg[2+i]);
-      }
+	  EEPROM.write(startAddress + i, auxMsg[2+i]);
     }
+	
+	#ifdef ESP8266
+	  EEPROM.end();
+	  EEPROM.commit();
+	#endif
   }
 }

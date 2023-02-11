@@ -221,7 +221,13 @@ void Dino::handshake() {
   stream->print("ACK:");
   stream->print(AUX_SIZE);
   stream->print(',');
-  stream->print(EEPROM.length());
+  // Send the defined length for ESP8266 EEPROM and initialize later.
+  // Read the value and send that for other boards.
+  #ifdef ESP8266
+  	stream->print(ESP8266_EEPROM_LENGTH);
+  #else
+  	stream->print(EEPROM.length());
+  #endif
   stream->print(',');
   stream->print(A0);
   #if defined(__SAM3X8E__)
