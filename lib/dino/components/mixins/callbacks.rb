@@ -3,12 +3,15 @@ module Dino
     module Mixins
       module Callbacks
         attr_reader :callback_mutex, :callbacks
-        attr_writer :callbacks
 
         def after_initialize(options={})
           super(options)
           @callbacks = {}
           @callback_mutex = Mutex.new
+        end
+        
+        def callbacks
+          callback_mutex.synchronize { @callbacks }
         end
 
         def add_callback(key=:persistent, &block)
@@ -31,13 +34,13 @@ module Dino
           data = pre_callback_filter(data)
 
           callback_mutex.synchronize do
-            callbacks.each_value do |array|
+            @callbacks.each_value do |array|
               array.each do |callback|
                 callback.call(data)
               end
             end
             # Remove special :read callback before unlocking.
-            callbacks.delete(:read)
+            @callbacks.delete(:read)
           end
 
           update_self(data)

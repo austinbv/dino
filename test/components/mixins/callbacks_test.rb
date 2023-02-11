@@ -18,6 +18,19 @@ class CallbacksTest < Minitest::Test
     @part ||= CallbackComponent.new(board: board, pin: 1)
   end
 
+  def test_callback_mutex
+    callback = Proc.new{}
+    mock = MiniTest::Mock.new
+    3.times {mock.expect(:call, nil)}
+    
+    part.callback_mutex.stub(:synchronize, mock) do
+      part.callbacks
+      part.add_callback(:key, &callback)
+      part.remove_callbacks(:key)
+    end
+    mock.verify
+  end
+
   def test_add_callback
     callback = Proc.new{}
     part.add_callback(&callback)
