@@ -108,9 +108,11 @@ void Dino::process() {
     case 4:  aRead               (pin);             break;
     case 5:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
 
+	#ifdef EEPROM_PRESENT
     // Implemented in DinoEEPROM.cpp
     case 6:  eepromRead          ();    break;
     case 7:  eepromWrite         ();    break;
+	#endif
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
@@ -221,13 +223,17 @@ void Dino::handshake() {
   stream->print("ACK:");
   stream->print(AUX_SIZE);
   stream->print(',');
+  
   // Send the defined length for ESP8266 EEPROM and initialize later.
-  // Read the value and send that for other boards.
+  // Read the value and send that for other boards, except the Due.
   #ifdef ESP8266
   	stream->print(ESP8266_EEPROM_LENGTH);
+  #elif defined(EEPROM_PRESENT)
+	stream->print(EEPROM.length());
   #else
-  	stream->print(EEPROM.length());
+     stream->print('0');
   #endif
+	
   stream->print(',');
   stream->print(A0);
   #if defined(__SAM3X8E__)

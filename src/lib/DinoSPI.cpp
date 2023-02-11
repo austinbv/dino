@@ -25,7 +25,13 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
   byte mode = settings & 0B00001111;
 
   // Bit 7 of settings toggles MSBFIRST.
-  SPI.beginTransaction(SPISettings(clockRate, bitRead(settings, 7), mode));
+  // Don't try to refactor t his and just pass bit 7.
+  // On the Due, MSBFIRST and LSBFIRST are ByteOrder class objects.
+  if (bitRead(settings, 7)) {
+  	SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, mode));
+  } else {
+  	SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, mode));
+  }
 }
 
 // Convenience wrapper for SPI.end

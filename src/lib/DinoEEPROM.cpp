@@ -3,6 +3,7 @@
 //
 #include "Dino.h"
 
+#ifdef EEPROM_PRESENT
 // CMD = 6
 // Read from the microcontroller's EEPROM.
 //
@@ -61,3 +62,4 @@ void Dino::eepromWrite(){
 	#endif
   }
 }
+#endif

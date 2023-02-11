@@ -4,7 +4,6 @@
 #ifndef Dino_h
 #define Dino_h
 #include <Arduino.h>
-#include <EEPROM.h>
 #include "DinoDefines.h"
 
 // Figure out how many pins our hardware has.

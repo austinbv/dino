@@ -14,3 +14,9 @@
 // #define DINO_SHIFT
 // #define DINO_SPI
 // #define DINO_I2C
+
+// No EEPROM on the Due.
+#ifndef __SAM3X8E__
+  #define EEPROM_PRESENT
+  #include <EEPROM.h>
+#endif
