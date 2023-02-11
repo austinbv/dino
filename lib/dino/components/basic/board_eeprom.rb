@@ -56,8 +56,10 @@ module Dino
           {address: address, data: bytes}
         end
 
-        def update_self(hash)
-          self.state[hash[:address], hash[:data].length] = hash[:data]
+        def update_state(hash)
+          @state_mutex.synchronize do
+            @state[hash[:address], hash[:data].length] = hash[:data]
+          end
         end
 
         def pin

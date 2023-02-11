@@ -77,7 +77,7 @@ module Dino
       #
       # After callbacks, set state to the hash from before, except change.
       #
-      def update_self(new_state)
+      def update_state(new_state)
         self.state = new_state.except(:change)
       end
     end

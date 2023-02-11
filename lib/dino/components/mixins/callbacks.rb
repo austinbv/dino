@@ -31,19 +31,19 @@ module Dino
         alias :remove_callbacks :remove_callback
 
         def update(data)
-          data = pre_callback_filter(data)
+          filtered_data = pre_callback_filter(data)
 
           callback_mutex.synchronize do
             @callbacks.each_value do |array|
               array.each do |callback|
-                callback.call(data)
+                callback.call(filtered_data)
               end
             end
             # Remove special :read callback before unlocking.
             @callbacks.delete(:read)
           end
 
-          update_self(data)
+          update_state(filtered_data)
         end
 
         # Override this to process data before passing to callbacks.
@@ -52,7 +52,7 @@ module Dino
         end
 
         # Override if behavior other than @state = filtered data is needed.
-        def update_self(filtered_data)
+        def update_state(filtered_data)
           self.state = filtered_data
         end
       end

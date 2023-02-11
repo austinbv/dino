@@ -81,7 +81,7 @@ class CallbacksTest < Minitest::Test
     cb.verify
   end
 
-  def test_update_self
+  def test_update_state
     part.update("test")
     assert_equal "dino: test", part.state
   end

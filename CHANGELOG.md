@@ -26,7 +26,7 @@
   - Included libraries can be toggled in `DinoDefines.h` to suit your needs.
   - **Note:** Aux message is limited to 264 bytes on the mega168, or less depending on included libraries. The only feature currently affected by this is sending long infrared signals, like for an air conditioner.
 
-#### New Components
+### New Components
 
 - Hitachi HD44780 LCD support. _Uses Arduino `LiquidCrystal` library._
 
@@ -113,6 +113,7 @@
 
 ### Minor Changes
 - Serial communication now uses the [`rubyserial`](https://github.com/hybridgroup/rubyserial) gem instead of [`serialport`](https://github.com/hparra/ruby-serialport).
+- Switched from `respec` to `minitest` for testing.
 - Added more useful information and errors during the connect & handshake process.
 - Extended message syntax so the Arduino can receive arbitrary length messages, including binary.
 - Created `Dino::Message` class to handle message construction.
