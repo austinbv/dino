@@ -1,5 +1,3 @@
-# For convenience when validating longer data types.
-
 require 'test_helper'
 
 class APIServoTest < Minitest::Test

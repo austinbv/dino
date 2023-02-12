@@ -1,3 +1,4 @@
+# encoding: ascii-8bit
 # For convenience when validating longer data types.
 
 require 'test_helper'

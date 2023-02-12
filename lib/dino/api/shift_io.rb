@@ -12,12 +12,12 @@ module Dino
         settings = shift_settings(data, clock)
         limit = aux_limit - settings.length
         bytes = pack :uint8,
-                     byte_array,
-                     max: (limit < 256) ? limit : 256
+                     [byte_array].flatten,
+                     max: limit
 
         write Message.encode command: 21,
                              pin: convert_pin(latch),
-                             value: bytes.length, # Should be length-1 so 0 = 1 byte, 255 = 256 bytes
+                             value: bytes.length,
                              aux_message: settings + bytes
       end
 
@@ -25,7 +25,7 @@ module Dino
         settings = shift_settings(data, clock, options[:preclock_high])
         write Message.encode command: 22,
                              pin: convert_pin(latch),
-                             value: num_bytes, # Should be num-1 so 0 = 1 byte, 255 = 256 bytes
+                             value: num_bytes,
                              aux_message: settings
       end
 
@@ -33,7 +33,7 @@ module Dino
         settings = shift_settings(data, clock, options[:preclock_high])
         write Message.encode command: 23,
                              pin: convert_pin(latch),
-                             value: num_bytes, # Should be num-1 so 0 = 1 byte, 255 = 256 bytes
+                             value: num_bytes,
                              aux_message: settings
       end
 
