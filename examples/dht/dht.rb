@@ -14,7 +14,7 @@ dht.add_callback do |reading|
   if reading[:error]
     puts "Error: #{reading[:error]}"
   else
-    print "#{reading[:celsius]} \xC2\xB0C | #{reading[:farenheit]} \xC2\xB0F | "
+    print "#{reading[:celsius]} \xC2\xB0C | #{reading[:fahrenheit]} \xC2\xB0F | "
     puts "#{reading[:humidity]}% relative humidity"
   end
 end

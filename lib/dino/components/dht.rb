@@ -31,9 +31,9 @@ module Dino
 
         celsius   = ((bytes[2] << 8) | bytes[3]).to_f / 10
         humidity  = ((bytes[0] << 8) | bytes[1]).to_f / 10
-        farenheit = (celsius * 1.8 + 32).round(1)
+        fahrenheit = (celsius * 1.8 + 32).round(1)
 
-        { celsius: celsius, farenheit: farenheit, humidity: humidity }
+        { celsius: celsius, fahrenheit: fahrenheit, humidity: humidity }
       end
 
       def crc(bytes)

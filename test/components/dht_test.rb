@@ -55,7 +55,7 @@ class DHTTest < MiniTest::Test
     
     # It should calculate output correctly.
     result = part.decode(GOOD_ARRAY)
-    assert_equal result, {celsius: 29.5, farenheit: 85.1, humidity: 66.9}
+    assert_equal result, {celsius: 29.5, fahrenheit: 85.1, humidity: 66.9}
   end
   
   def test_crc

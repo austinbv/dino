@@ -60,9 +60,9 @@ module Dino
         #
         def decode_temperature(bytes)
           celsius = bytes[0..1].pack('C*').unpack('s<')[0] * (2.0 ** -4)
-          farenheit = (celsius * 1.8 + 32).round(4)
+          fahrenheit = (celsius * 1.8 + 32).round(4)
 
-          {celsius: celsius, farenheit: farenheit}
+          {celsius: celsius, fahrenheit: fahrenheit}
         end
 
         def decode_resolution(bytes)

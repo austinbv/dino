@@ -10,13 +10,13 @@ class DS18B20Test < MiniTest::Test
   end
 
   def test_decode_temperatures
-    assert_equal({ celsius: 125, farenheit: 257 },
+    assert_equal({ celsius: 125, fahrenheit: 257 },
                  part.decode_temperature([0b1101_0000,0b0000_0111]))
-    assert_equal({ celsius: 0, farenheit: 32 },
+    assert_equal({ celsius: 0, fahrenheit: 32 },
                  part.decode_temperature([0b0000_0000,0b0000_0000]))
-    assert_equal({ celsius: -10.125, farenheit: 13.775 },
+    assert_equal({ celsius: -10.125, fahrenheit: 13.775 },
                  part.decode_temperature([0b0101_1110,0b1111_1111]))
-    assert_equal({ celsius: -55, farenheit: -67 },
+    assert_equal({ celsius: -55, fahrenheit: -67 },
                  part.decode_temperature([0b1001_0000,0b1111_1100]))
   end
 
