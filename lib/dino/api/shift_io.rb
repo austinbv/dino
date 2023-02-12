@@ -8,11 +8,11 @@ module Dino
         pack :uint8, [convert_pin(data), convert_pin(clock), preclock_high]
       end
 
-      def shift_write(latch, data, clock, byte_array, options={})
+      def shift_write(latch, data, clock, bytes, options={})
         settings = shift_settings(data, clock)
         limit = aux_limit - settings.length
         bytes = pack :uint8,
-                     [byte_array].flatten,
+                     bytes,
                      max: limit
 
         write Message.encode command: 21,

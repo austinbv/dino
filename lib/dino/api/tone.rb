@@ -2,15 +2,20 @@ module Dino
   module API
     module Tone
       include Helper
+      
+      def tone(pin, frequency, duration=nil)
+        if frequency < 31
+          raise ArgumentError, "Tone cannot generate frequencies lower than 31Hz"
+        end
+        
+        # Pack the frequency and optiona duration as binary.
+        aux = pack(:uint16, frequency)
+        aux << pack(:uint32, duration) if duration
 
-      # value = tone frequency in Hz (should be sent as binary to allow higher than 9999, and limit to above 30Hz)
-      # duration = tone duration in ms
-      # duration currently sent as string. Should be binary and max limited to uint32
-      def tone(pin, value, duration)
         write Dino::Message.encode command: 17,
                                    pin: convert_pin(pin),
-                                   value: value,
-                                   aux_message: duration
+                                   value: duration ? 1 : 0,
+                                   aux_message: aux
       end
 
       def no_tone(pin)
