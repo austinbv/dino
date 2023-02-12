@@ -18,8 +18,8 @@ module Dino
         end
 
         def mode=(mode)
-          @mode = mode
           board.set_pin_mode(pin, mode)
+          @mode = mode
         end
       end
     end

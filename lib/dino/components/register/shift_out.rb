@@ -18,10 +18,6 @@ module Dino
         def write(*bytes)
           board.shift_write(latch.pin, data.pin, clock.pin, bytes)
         end
-        
-        def pin
-          latch.pin
-        end
       end
     end
   end

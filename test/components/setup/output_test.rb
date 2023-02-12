@@ -14,10 +14,6 @@ class OutputSetupTest < Minitest::Test
   end
 
   def test_pin_mode
-    mock = Minitest::Mock.new.expect :call, nil, [1, :out]
-    board.stub(:set_pin_mode, mock) do
-      part
-    end
-    mock.verify
+    assert_equal part.mode, :out
   end
 end

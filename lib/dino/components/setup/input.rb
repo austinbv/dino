@@ -3,7 +3,7 @@ module Dino
     module Setup
       module Input
         include SinglePin
-        attr_reader :pullup, :divider
+        attr_reader :pullup
 
         def pullup=(pullup)
           @pullup = pullup

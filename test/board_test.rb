@@ -73,7 +73,8 @@ class BoardTest < Minitest::Test
 
   def test_add_remove_component
     mock = MiniTest::Mock.new
-    mock.expect(:pin, 1)
+    mock.expect(:methods, [:stop])
+    mock.expect(:stop, true)
 
     board.add_component(mock)
     assert_equal [mock], board.components

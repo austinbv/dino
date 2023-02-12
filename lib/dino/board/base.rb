@@ -62,7 +62,7 @@ module Dino
       end
 
       def remove_component(component)
-        stop_listener(component.pin)
+        component.stop if component.methods.include? :stop
         @components.delete(component)
       end
     end

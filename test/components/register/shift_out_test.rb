@@ -18,10 +18,6 @@ class RegisterShiftOutTest < Minitest::Test
     assert_equal Dino::Components::Basic::DigitalOutput, part.data.class
     assert_equal Dino::Components::Register::Select,     part.latch.class
   end
-  
-  def test_identifies_with_latch_pin
-    assert_equal 8, part.pin
-  end
 
   def test_write
     # mock = MiniTest::Mock.new.expect :call, nil, ["21.8.1.#{[11,12,0,255,127].pack('C*')}\n"]

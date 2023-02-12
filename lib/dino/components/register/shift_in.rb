@@ -20,10 +20,6 @@ module Dino
           self.rising_clock = options[:rising_clock]
           bubble_callbacks
         end
-        
-        def pin
-          latch.pin
-        end
 
         #
         # Some registers use rising edges for clock signals. Unless we pull clock
@@ -34,13 +30,6 @@ module Dino
 
         def rising_clock=(value)
           @rising_clock = [0, nil, false].include?(value) ? false : true
-        end
-
-        # Reads come through the latch pin. Bubble them up to ourselves.
-        def bubble_callbacks
-          proxies[:latch].add_callback do |byte|
-            self.update(byte)
-          end
         end
 
         def read(num_bytes=@bytes)
@@ -55,6 +44,13 @@ module Dino
 
         def stop
           board.shift_stop(latch.pin)
+        end
+        
+        # Reads come through the latch pin. Bubble them up to ourselves.
+        def bubble_callbacks
+          proxies[:latch].add_callback do |byte|
+            self.update(byte)
+          end
         end
       end
     end

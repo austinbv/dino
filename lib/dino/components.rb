@@ -15,7 +15,7 @@ module Dino
     autoload :Stepper,          'dino/components/stepper'
     autoload :LCD,              'dino/components/lcd'
     autoload :Relay,            'dino/components/relay'
-    autoload :SoftwareSerial,   'dino/components/softserial'
+    autoload :SoftwareSerial,   'dino/components/software_serial'
     autoload :DHT,              'dino/components/dht'
     autoload :IREmitter,        'dino/components/ir_emitter'
     autoload :Piezo,            'dino/components/piezo'

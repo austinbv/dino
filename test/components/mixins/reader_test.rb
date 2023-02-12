@@ -39,10 +39,18 @@ class ReaderTest < Minitest::Test
     part.stub(:_read, mock) { part.read }
     mock.verify
   end
-
-  # test returns read value
-  # test blocks main thread
-  # test read_using -> {}
+  
+  def test_return_value
+    inject(42)
+    assert_equal part.read, 42
+  end
+  
+  def test_read_using
+    inject(1)
+    reader = MiniTest::Mock.new.expect :call, nil
+    part.read_using -> { reader.call }
+    reader.verify
+  end
 
   def test_add_run_remove_callback
     cb = MiniTest::Mock.new.expect :call, nil

@@ -21,6 +21,11 @@ class ListenerTest < Minitest::Test
     assert_includes ListenerComponent.ancestors,
                     Dino::Components::Mixins::Callbacks
   end
+  
+  def test_divider_save_and_read
+    part.listen(4)
+    assert_equal part.divider, 4
+  end
 
   def test_call_stop_before_listening
     mock = MiniTest::Mock.new.expect :call, nil

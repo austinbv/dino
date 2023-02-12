@@ -30,6 +30,15 @@ class InputSetupTest < Minitest::Test
     end
     mock.verify
   end
+  
+  def test_stop_listener
+    mock = Minitest::Mock.new
+    mock.expect :call, nil, [1]
+    board.stub(:stop_listener, mock) do
+      part._stop_listener
+    end
+    mock.verify
+  end
 
   def test_pullup_in_options
     mock = Minitest::Mock.new.expect :call, nil, [2, true]

@@ -3,8 +3,11 @@ module Dino
     module Mixins
       module Listener
       	include Callbacks
+        
+        attr_reader :divider
 
         def listen(divider=nil, &block)
+          @divider = divider
           stop
           add_callback(:listen, &block) if block_given?
           _listen(divider)
