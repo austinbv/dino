@@ -29,13 +29,14 @@ module Dino
       }
 
       def convert_pin(pin)
+        return nil                   if pin == nil
         pin = pin.to_s
         return pin.to_i              if pin.match(RAW_REGEX)
         return gpio_pin_to_i(pin)    if pin.match(GPIO_REGEX)
         return analog_pin_to_i(pin)  if pin.match(ANALOG_REGEX)
         return digital_pin_to_i(pin) if pin.match(DIGITAL_REGEX)
         return "EE"                  if pin == "EE"
-        raise ArgumentError, "incorrect pin format"
+        raise ArgumentError, "incorrect pin format: #{pin.inspect}"
       end
 
       # Only one analog in on the ESP8266, GPIO 17.
