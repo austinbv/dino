@@ -31,18 +31,28 @@ class RegisterShiftInTest < Minitest::Test
   end
 
   def test_read
-    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, 2], preclock_high: true
+    mock = MiniTest::Mock.new
+    mock.expect :call, nil, [8, 11, 12, 2], preclock_high: false, bit_order: :msbfirst
+    mock.expect :call, nil, [8, 11, 12, 2], preclock_high: true, bit_order: :lsbfirst
     board.stub(:shift_read, mock) do
-      new_part = Dino::Components::Register::ShiftIn.new(options.merge(bytes: 2, rising_clock: true))
+      new_part = Dino::Components::Register::ShiftIn.new options.merge(bytes: 2)
+      new_part.read
+      
+      new_part = Dino::Components::Register::ShiftIn.new options.merge(bytes: 2, rising_clock: true, bit_order: :lsbfirst)
       new_part.read
     end
     mock.verify
   end
   
   def test_listen
-    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, 2], preclock_high: true
+    mock = MiniTest::Mock.new
+    mock.expect :call, nil, [8, 11, 12, 2], preclock_high: false, bit_order: :msbfirst
+    mock.expect :call, nil, [8, 11, 12, 2], preclock_high: true, bit_order: :lsbfirst
     board.stub(:shift_listen, mock) do
-      new_part = Dino::Components::Register::ShiftIn.new(options.merge(bytes: 2, rising_clock: true))
+      new_part = Dino::Components::Register::ShiftIn.new options.merge(bytes: 2)
+      new_part.listen
+      
+      new_part = Dino::Components::Register::ShiftIn.new options.merge(bytes: 2, rising_clock: true, bit_order: :lsbfirst)
       new_part.listen
     end
     mock.verify

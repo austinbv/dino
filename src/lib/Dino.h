@@ -100,10 +100,10 @@ class Dino {
     void noTone                ();         //cmd = 18
 
     // Shift Registers
-    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte *data);          //cmd = 21
-    void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte clockHighFirst); //cmd = 22
-    void addShiftListener      ();                                                                         //cmd = 23
-    void removeShiftListener   ();                                                                         //cmd = 24
+    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte settings, byte *data); //cmd = 21
+    void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte settings);             //cmd = 22
+    void addShiftListener      ();                                                                               //cmd = 23
+    void removeShiftListener   ();                                                                               //cmd = 24
     void updateShiftListeners  ();
     void clearShiftListeners   ();
 

@@ -146,8 +146,8 @@ void Dino::process() {
 
     // Implemented in DinoShift.cpp
     #ifdef DINO_SHIFT
-    case 21: shiftWrite          (pin, val, auxMsg[0], auxMsg[1], &auxMsg[3]); break;
-    case 22: shiftRead           (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);  break;
+    case 21: shiftWrite          (pin, val, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[3]); break;
+    case 22: shiftRead           (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);             break;
     case 23: addShiftListener    ();  break;
     case 24: removeShiftListener ();  break;
     #endif

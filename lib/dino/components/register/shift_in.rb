@@ -15,9 +15,10 @@ module Dino
                     data:  Basic::DigitalInput,
                     latch: Register::Select
 
-        def after_initialize(options={})
+        def after_initialize(options)
           super(options)
-          self.rising_clock = options[:rising_clock]
+          self.rising_clock = options[:rising_clock] || false
+          self.bit_order = options[:bit_order] || :msbfirst
           bubble_callbacks
         end
 
@@ -27,19 +28,22 @@ module Dino
         # Set this once and future calls to #read and #listen will do it.
         #
         attr_reader :rising_clock
+        attr_accessor :bit_order
 
         def rising_clock=(value)
           @rising_clock = [0, nil, false].include?(value) ? false : true
         end
 
         def read(num_bytes=@bytes)
-          board.shift_read latch.pin, data.pin, clock.pin, num_bytes,
-                           preclock_high: rising_clock
+          board.shift_read latch.pin, data.pin, clock.pin, num_bytes, 
+                           preclock_high: rising_clock,
+                           bit_order: bit_order
         end
 
         def listen(num_bytes=@bytes)
           board.shift_listen latch.pin, data.pin, clock.pin, num_bytes,
-                             preclock_high: rising_clock
+                             preclock_high: rising_clock,
+                             bit_order: bit_order
         end
 
         def stop

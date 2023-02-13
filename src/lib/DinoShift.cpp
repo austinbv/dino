@@ -23,18 +23,24 @@ shiftListener shiftListeners[SHIFT_LISTENER_COUNT];
 // val        = length (int)
 // auxMsg[0]  = data pin (byte)
 // auxMsg[1]  = clock pin (byte)
-// auxMsg[2]  = send clock high before reading (byte) (0/1) (read func only)
+// auxMsg[2]  = settings
+//     bit 0  = transmission bit order (1 = MSBFIRST, 0 = LSBFIRST)
+//     bit 1  = send clock high before reading (byte) (0/1) (only matters for reading)
 // auxMsg[3]+ = data (bytes) (write func only)
 //
 // CMD = 21
 // Write to a shift register.
-void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte *data) {
+void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte settings, byte *data) {
   // Set latch pin low to begin serial write.
   digitalWrite(latchPin, LOW);
 
   // Write one byte at a time.
   for (uint8_t i = 0;  i < len;  i++) {
-    shiftOut(dataPin, clockPin, LSBFIRST, data[i]);
+    if (bitRead(settings, 0)) {
+      shiftOut(dataPin, clockPin, MSBFIRST, data[i]);
+    } else {
+      shiftOut(dataPin, clockPin, LSBFIRST, data[i]);	
+    }
   }
 
   // Set latch pin high so register writes to parallel output.
@@ -44,11 +50,11 @@ void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte *
 
 // CMD = 22
 // Read from a shift register.
-void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte clockHighFirst) {
+void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte settings) {
   // Send clock pin high if using a register that clocks on rising edges.
   // If not, the MSB will not be read on those registers (always 1),
   // and all other bits will be shifted by 1 towards the LSB.
-  if (clockHighFirst > 0) digitalWrite(clockPin, HIGH);
+  if (bitRead(settings, 1)) digitalWrite(clockPin, HIGH);
 
   // Latch high to read parallel state, then low again to stop.
   digitalWrite(latchPin, HIGH);
@@ -58,11 +64,17 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte cl
   // Start with just pin number and : for now.
   stream->print(latchPin);
   stream->print(':');
+  byte reading = 0;
 
   for (int i = 1;  i <= len;  i++) {
-    // Read a single byte from the register.
-    byte reading = shiftIn(dataPin, clockPin, LSBFIRST);
-
+	
+	// Read a single byte from the register.
+	if (bitRead(settings, 0)) {
+	  reading = shiftIn(dataPin, clockPin, MSBFIRST);
+	} else {
+      reading = shiftIn(dataPin, clockPin, LSBFIRST);
+	}
+	
     // Print it, then a comma or \n if it's the last byte.
     stream->print(reading);
     stream->print((i==len) ? '\n' : ',');

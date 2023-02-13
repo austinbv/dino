@@ -14,6 +14,13 @@ module Dino
         proxy_pins  clock: Basic::DigitalOutput,
                     data:  Basic::DigitalOutput,
                     latch: Register::Select
+                    
+        def after_initialize(options)
+          super(options)
+          self.bit_order = options[:bit_order] || :lsbfirst
+        end
+        
+        attr_accessor :bit_order
 
         def write(*bytes)
           board.shift_write(latch.pin, data.pin, clock.pin, bytes)
