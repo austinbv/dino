@@ -15,7 +15,7 @@ module Dino
         if options[:steps_per_revolution] 
           self.degrees_per_step = (360 / options[:steps_per_revolution])
         else
-          self.degrees_per_step = 30
+          self.degrees_per_step = 12
         end
         reset
         
