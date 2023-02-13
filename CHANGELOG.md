@@ -6,15 +6,15 @@
 - The `dino sketch` shell command now accepts a `--target` argument. It includes/excludes features to tailor the sketch for different boards/chips. Run `dino targets` for more info.
 
 - ATmega Based Boards (default) (`--target mega`):
-  - This is the default sketch if `--target` isn't specified, and works for many of the common Arduino products, like the Uno, Nano, Leonardo and Mega.
+  - This is the default sketch if `--target` isn't specified, and works for Arduino (and other) products based on the ATmega AVR chips, like the Uno, Nano, Leonardo and Mega.
 
 - ESP8266 (`--target esp8266`):
-  - Works with `Dino::Board.new`, but calling `Dino::Board::ESP8266.new` instead allows pins to be referred to as any of `'GPIO4'`, `4`, or `'D2'`, as printed on dev boards like the NodeMCU or WeMos, with the printed names mapping to the correct GPIO.
+  - Works with `Dino::Board.new`, but calling `Dino::Board::ESP8266.new` instead allows pins to be referred to as any of `'GPIO4'`, `4`, or `'D2'`, as printed on the NodeMCU dev board. When in doubt, look up your board's GPIO mapping and use those numbers instead.
   - Works with either built in WiFi or Serial.
   - WiFi version supports OTA (over-the-air) update in the Arduino IDE. Initial flash must still be done via serial.
   - **Note**: SoftwareSerial is incompatible with the ESP8266. LiquidCrystal (LCD) compiles for the ESP8266, but does not work. Both of these are excluded.
   
-- Arduino Due (`--target due`) :
+- Arduino Due (`--target sam3x`) :
   - Up to 12-bit analog in/out. Pass a `bits:` option to `Board#new` to set resolution for both.
   - DAC support. Refer to DAC pins as `'DAC0'`, `'DAC1'`, just as labeled on the board. Call `#analog_write` or just `#write` on an `AnalogOutput` component that uses the pin.
   - Uses the native ARM serial port by default. Configurable in sketch to use programming port.
@@ -28,6 +28,8 @@
 
 ### New Components
 
+- `TxRx::TCP` allows communication with the board over an IP network, instead of serial connection. Tested on Arduino Uno Ethernet Shield (Wiznet W5100), and ESP8266 native WiFi. Should work on Uno WiFi shield, but is **untested**. WiFi must be configured before flashing. Instad of `dino sketch serial`, use `dino sketch wifi`.
+
 - Hitachi HD44780 LCD support. _Uses Arduino `LiquidCrystal` library._
 
 - Seven Segment Display support. _Ruby implementation as multiple LEDs._
@@ -38,7 +40,7 @@
 
 - SoftwareSerial. _Uses Arduino `SoftSerial` library._ (**write only / experimental**)
 
-- Rotary encoder support. _Uses polling method @ 1ms interval._ **WARNING**: Not suitable for high speeds or precise position needs. It will definitely miss steps. Sufficient for using rotary knobs for user input.
+- Rotary encoder support. _Uses polling method @ 1ms interval._ **WARNING**: Not suitable for high speed or precise position needs. It will definitely miss steps. Sufficient for rotary knobs as user input.
 
 - DHT11 / DHT 21 (AM2301) / DHT22 temperature and relative humidity sensor support. _Custom implementation where input pulses are measured on the board, then decoded in Ruby._
 
@@ -62,21 +64,19 @@
 
 - Board EEPROM support. _Uses Arduino `EEPROM` library._
 
-- WiFi shield support (**untested**)
-
 ### Changed Components
 - Servos can now be connected to arbitrary pins as long as they are supported by the board.
 
 - Digital and analog listeners now have dividers on a per-pin basis.
   - Timing is based on a 1000 microsecond tick being counted by the board.
-  - Call `#listen` with a value as the first argument. Eg. `sensor.listen(64)` will tell the board to send us that specific sensor's state every 64 ticks (~64ms)  or around 16 times per second, without affecting other components' rates.
+  - Call `#listen` with a value as the first argument. Eg. `analog_sensor.listen(64)` will tell the board to send us that specific sensor's state every 64 ticks (~64ms)  or around 16 times per second, without affecting other components' rates.
   - Valid dividers are: `1, 2, 4, 8, 16, 32, 64, 128`.
   - Defaults are same as before: `4` for digital, `16` for analog.
 
 ### Hardware Abstraction
 
 - `MultiPin` abstraction for components using more than one pin:
-  - Components connecting to more than 1 pin, like an RGB LED or rotary encoder, are now modeled as `MultiPin` and contain multiple `SinglePin` proxy components. An `RGBLed` is built from 3 `AnalogOutput`s, for example, one for each color, connected to a separate pin.
+  - Components connecting to more than 1 pin, like an RGB LED or rotary encoder, are now modeled as `MultiPin` and contain multiple `SinglePin` `proxies`. An `RGBLed` is built from 3 `AnalogOutput`s, for example, one for each color, connected to a separate pin.
   - `MultiPin` implements a shortcut class method `proxy_pins`. Proxying a pin allows subcomponent pin numbers to be given as a hash when initializing an instance of a `MultiPin` component. Eg: `{red: 9, green: 10, blue: 11}` given as the `pins:` option for `RGBLed#new`.
   -  When initialized, subcomponents corresponding to the proxied pins are automatically created. They're stored in `#proxies` and `attr_reader` methods are created for each, corresponding to their key in the `pins:` hash. Eg: `RGBLed#green` and `RGBLed#proxies[:green]` both give the `AnalogOutput` component that represents the green LED inside the RGB LED, connected to pin 10.
 
@@ -98,22 +98,22 @@
   - Each key represents an array of callbacks, so multiple callbacks can share the same key.
   - Calling `#remove_callbacks` with a key empties that array. Calling with no key removes **all** callbacks for the component.
   - `#pre_callback_filter` is defined in the `Callbacks` module. The return value of this method is what is given to the component's callbacks and to update its `@state`. By default, it returns whatever was given from the board.
-  - Override `#pre_callback_filter` to process data before giving it to callbacks and `@state`. Eg: given raw bytes from a DHT sensor, process them into a hash containing `:celsius`, `: fahrenheit` and `:humidity` values. That hash is given to to callbacks and `#update_state` instead of the original string of values.
-  - `#update_state` is defined in the `Callbacks` module.  It is called after all callbacks are run and given the return value of `#pre_callback_filter`. By default, it sets `#state=` to that value.
+  - Override `#pre_callback_filter` to process data before giving it to callbacks and `@state`. Eg: given raw bytes from a DHT sensor, process them into a hash containing `:celsius`, `: fahrenheit` and `:humidity` values. That hash is given to to callbacks and `#update_state` instead of the original string of raw bytes.
+  - `#update_state` is defined in the `Callbacks` module. It is called after all callbacks are run and given the return value of `#pre_callback_filter`. By default, it sets `@state=` to the value given.
   - Override it if updating `@state` is more complex than this, but be sure to either use `#state=` only once, or wrap the operation in `@state_mutex.synchronize`.
 
 - Input components no longer automatically start listening when created, since there are more options for reading inputs.
   - `DigitalInput` and its subclasses are the exception to this. They automatically listen, since there is little advantage to other modes.
 
 - Input components can have any combination of `#read`, `#poll` and `#listen` methods now, coming from `Reader`, `Poller`, and `Listener` respectively, inside `Mixins`.
-  - `#read` sends a single read command by calling `#_read`, and blocks the main thread, until `data` is received from `#pre_callback_filter`. When received, any block given to `#read` will run in the "update" thread once and be removed immediately. `#read` then stops blocking the main thread and returns `data`.
+  - `#read` sends a single read command by calling `#_read`, and blocks the main thread, until `data` is received from `#pre_callback_filter`. When received, any block that was given to `#read` will run once as a callback and be removed immediately. `#read` then stops blocking the main thread and returns `data`.
   - `#poll` requires an interval (in seconds) as its first argument. It starts a new thread, and keeps calling `#_read` in it, at the given interval. `#poll` does not block the main thread, and does not return a value. A block given will be added as a callback inside the `:poll` key.
   - `#listen` adds its block as a callback inside the `:listen` key, calls `#_listen` and returns immediately.
   - `#stop` stops polling **and** listening. It also **removes all callbacks** in the **`:poll` and `:listen` keys** (callbacks added as blocks when polling or listening).
 
 ### Minor Changes
 - Serial communication now uses the [`rubyserial`](https://github.com/hybridgroup/rubyserial) gem instead of [`serialport`](https://github.com/hparra/ruby-serialport).
-- Switched from `respec` to `minitest` for testing.
+- Switched from `rspec` to `minitest` for testing.
 - Added more useful information and errors during the connect & handshake process.
 - Extended message syntax so the Arduino can receive arbitrary length messages, including binary.
 - Created `Dino::Message` class to handle message construction.

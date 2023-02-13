@@ -58,7 +58,7 @@
             These limits apply as long as an Atmega168 is selected in the
             Arduino IDE, regardless of the options passed to this sketch generator.
 
-    arm
+    sam3x
 
       This is the same as mega, but omits libraries specifically known to be
       incompatible with the Atmel SAMD (ARM Cortex M0) chips. Use this when

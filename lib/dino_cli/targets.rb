@@ -14,7 +14,7 @@ class DinoCLI::Generator
     mega168: [:core, :servo, :shift,:tone, :spi, :i2c],
 
     # ARM includes everytyhing except specific incompatibilities.
-    arm: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
+    sam3x: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
 
     # A surprising amount "just works" on the ESP, notably not LCD.
     esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
