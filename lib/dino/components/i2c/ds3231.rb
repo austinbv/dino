@@ -23,7 +23,7 @@ module Dino
         
         # Time data starts at register 0 and is 7 bytes long.
         def _read
-          read_bytes(0, 7)
+          super(0, 7)
         end
         
         # Convert raw bytes from the I2C bus into a Ruby Time object.

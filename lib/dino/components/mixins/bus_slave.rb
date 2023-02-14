@@ -7,19 +7,16 @@ module Dino
         attr_reader :address
         alias  :bus :board
 
-        def initialize(options={})
+        def before_initialize(options={})
           options[:board] ||= options[:bus]
-          super(options)
-        end
-
-        def after_initialize(options={})
-          super(options)
-
+          
           unless options[:address]
             raise ArgumentError,
                   'missing Slave device address; try Bus#search first'
           end
           @address = options[:address]
+          
+          super(options)
         end
 
         def atomically(&block)

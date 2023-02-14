@@ -16,7 +16,7 @@ module Dino
           bus.write(address, bytes, repeated_start: repeated_start)
         end
 
-        def read_bytes(register, num_bytes=1)
+        def _read(register, num_bytes=1)
           bus.read(address, register, num_bytes, repeated_start: repeated_start)
         end
       end
