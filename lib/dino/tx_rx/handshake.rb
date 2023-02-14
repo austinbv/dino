@@ -7,10 +7,11 @@ module Dino
         @result = nil
       end
 
-      def update(sender, result)
-        sender.delete_observer(self)
-        @result = result
-        @acknowledged = true
+      def update(line)
+        if line.match(/\AACK:/)
+          @result = line.split(":", 2)[1]
+          @acknowledged = true
+        end
       end
     end
 
@@ -30,6 +31,14 @@ module Dino
               loop do
                 if attempt.acknowledged
                   puts "Acknowledged. Hardware ready...\n\n"
+                  
+                  # Stop the handshake attempt from observing.
+                  self.delete_observer(attempt)
+                  
+                  # We reset the board, so reset the transit mutex.
+                  @transit_mutex.synchronize { @transit_bytes = 0 }
+                  
+                  # Return the data part of the ACK line.
                   return attempt.result
                 end
               end

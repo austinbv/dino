@@ -48,8 +48,7 @@ module Dino
       end
 
       def stop_read
-        return nil if @thread.nil?
-        Thread.kill(@thread)
+        Thread.kill(@thread) if @thread
         @thread = nil
       end
 

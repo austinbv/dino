@@ -64,12 +64,7 @@ module Dino
       def read_and_parse
         line = read
 
-        if line && line.match(/\AACK:/)
-          # A HandshakeAttempt is observing. Also pass self so it can stop.
-          changed && notify_observers(self, line.split(":", 2)[1])
-          # ACK: means the board reset its counter. Reset ours.
-          @transit_mutex.synchronize { @transit_bytes = 0 }
-        elsif line && line.match(/\ARCV:/)
+        if line && line.match(/\ARCV:/)
           remove_transit_bytes(line.split(/:/)[1].to_i)
         elsif line
           parse(line)
