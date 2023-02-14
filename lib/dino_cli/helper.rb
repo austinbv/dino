@@ -20,4 +20,10 @@ module DinoCLI::Helper
     $stderr.puts
     exit(2)
   end
+  
+  def missing_files
+    text = File.read(File.join(@options[:cli_dir], "missing_files.txt"))
+    $stderr.print text
+    $stderr.puts
+  end
 end

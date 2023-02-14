@@ -3,6 +3,10 @@ class DinoCLI::Generator
   require "dino_cli/packages"
   require "dino_cli/targets"
   require "dino/version"
+  
+  require "dino_cli/helper"
+  include DinoCLI::Helper
+  
   attr_accessor :options
 
   def initialize(options={})
@@ -29,6 +33,7 @@ class DinoCLI::Generator
 
   def read
     @packages = PACKAGES
+    files_missing = false
 
     # Replace each filepath with a hash containing the filepath and contents.
     @packages.each_key do |k|
@@ -42,7 +47,15 @@ class DinoCLI::Generator
           contents = "#include \"DinoDefines.h\"\n#ifdef #{directive}\n" << contents << "\n#endif\n"
         end
         { path: f, contents: contents }
+      rescue
+        files_missing = true
+        puts "File missing: #{f}"
       end
+    end
+    
+    # Show the text file when vendor files are missing
+    if files_missing
+      missing_files
     end
 
     # Read in the sketch itself.
@@ -117,6 +130,7 @@ class DinoCLI::Generator
       # Then write the file contents to the destination path.
       if (targeted && !excluded)
         package[:files].each do |file|
+          next unless file
           dest_path = File.join(output_dir, file[:path].split('/')[-1])
           File.open(dest_path, 'w') { |f| f.write file[:contents] }
         end
