@@ -4,21 +4,13 @@ module Dino
       class DS3231 < Slave
         require 'bcd'
         
-        # Set the time.
+        # Write start register 0x00, then bytes to set time.
         def time=(time)
-          bytes = [ 0,
-                    BCD.decode(time.sec),
-                    BCD.decode(time.min),
-                    BCD.decode(time.hour),
-                    BCD.decode(time.strftime('%u').to_i),
-                    BCD.decode(time.day),
-                    BCD.decode(time.month),
-                    BCD.decode(time.year - 1970) ]
-          write(bytes)
+          write [0, time_to_bcd(time)]
           time
         end
         
-        # Read the time.
+        # Do a blocking read when #time is called.
         alias :time :read
         
         # Time data starts at register 0 and is 7 bytes long.
@@ -26,8 +18,23 @@ module Dino
           super(0, 7)
         end
         
-        # Convert raw bytes from the I2C bus into a Ruby Time object.
         def pre_callback_filter(bytes)
+          bcd_to_time(bytes)
+        end
+        
+        # Convert Time object to 7 byte BCD sequence.
+        def time_to_bcd(time)
+          [ BCD.decode(time.sec),
+            BCD.decode(time.min),
+            BCD.decode(time.hour),
+            BCD.decode(time.strftime('%u').to_i),
+            BCD.decode(time.day),
+            BCD.decode(time.month),
+            BCD.decode(time.year - 1970) ]
+        end
+        
+        # Convert 7 byte BCD sequence to Time object.
+        def bcd_to_time(bytes)
           t = bytes.map { |b| BCD.encode(b) }
           Time.new t[6] + 1970, t[5], t[4], t[2], t[1], t[0]
         end
