@@ -7,6 +7,7 @@ module Dino
         def initialize(options={})
           @state = nil
           @state_mutex = Mutex.new
+          before_initialize(options)
           initialize_board(options)
           initialize_pins(options)
           register
@@ -42,6 +43,7 @@ module Dino
         # Setup::Base only requires a board.
         # Include modules from Setup or override this to use pins.
         #
+        def before_initialize(options={}) ; end
         def initialize_pins(options={}) ; end
         alias :initialize_pin :initialize_pins
 

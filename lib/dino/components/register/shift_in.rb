@@ -15,10 +15,14 @@ module Dino
                     data:  Basic::DigitalInput,
                     latch: Register::Select
 
-        def after_initialize(options)
+        def before_initialize(options={})
           super(options)
           self.rising_clock = options[:rising_clock] || false
           self.bit_order = options[:bit_order] || :msbfirst
+        end
+        
+        def after_initialize(options={})
+          super(options)
           bubble_callbacks
         end
 

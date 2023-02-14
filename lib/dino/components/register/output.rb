@@ -3,9 +3,11 @@ module Dino
     module Register
       module Output
         include Setup::Base
-
-        def after_initialize(options={})
-          super(options) if defined?(super)
+        
+        attr_reader :bytes
+        
+        def before_initialize(options={})
+          super(options)
           #
           # To use the register as a board proxy, we need to know how many
           # bytes there are and map each bit to a virtual pin.
@@ -17,15 +19,18 @@ module Dino
           # When used as a board proxy, store the state of each register
           # pin as a 0 or 1 in an array that is (@bytes * 8) long. Zero out to start.
           #
-          @state = Array.new(@bytes*8) { 0 }
-          write_state
-
+          self.state = Array.new(@bytes*8) { 0 }
+          
           #
           # When used as a board proxy, only write sate if @write_delay seconds
           # have passed since this object last got input. Better for things like SSDs
           # where many bits change in sequence, but not at exactly the same time.
           #
           @write_delay = options[:write_delay] || 0.005
+        end
+        
+        def after_initialize(options={})
+          write_state
         end
 
         def write

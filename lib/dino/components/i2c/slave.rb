@@ -5,7 +5,7 @@ module Dino
         include Mixins::BusSlave
         include Mixins::Reader
 
-        def initialize(options)
+        def before_initialize(options)
           super(options)
           @repeated_start = options[:repeated_start] || false
         end

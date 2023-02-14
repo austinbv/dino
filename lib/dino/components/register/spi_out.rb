@@ -12,11 +12,10 @@ module Dino
 
         attr_reader :spi_mode, :frequency, :bit_order
 
-        def after_initialize(options)
-          super(options) if defined?(super)
-          
+        def before_initialize(options)
+          super(options)
           @spi_mode  = options[:spi_mode]  || 0
-          @frequency = options[:frequency] || 3000000
+          @frequency = options[:frequency] || 1000000
           @bit_order = options[:bit_order] || :lsbfirst
         end
 

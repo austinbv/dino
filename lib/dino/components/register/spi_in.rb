@@ -12,20 +12,19 @@ module Dino
 
         attr_reader :spi_mode, :frequency, :bit_order
 
-        def after_initialize(options)
-          super(options) if defined?(super)
-          
+        def initialize(options)
+          super(options)
           @spi_mode  = options[:spi_mode]  || 0
-          @frequency = options[:frequency] || 3000000
+          @frequency = options[:frequency] || 1000000
           @bit_order = options[:bit_order] || :msbfirst
         end
 
         def read
-          board.spi_transfer(pin, mode: spi_mode, frequency: frequency, read: @bytes)
+          board.spi_transfer(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
         end
 
         def listen
-          board.spi_listen(pin, mode: spi_mode, frequency: frequency, read: @bytes)
+          board.spi_listen(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
         end
 
         def stop

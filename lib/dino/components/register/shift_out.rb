@@ -15,7 +15,7 @@ module Dino
                     data:  Basic::DigitalOutput,
                     latch: Register::Select
                     
-        def after_initialize(options)
+        def before_initialize(options={})
           super(options)
           self.bit_order = options[:bit_order] || :lsbfirst
         end

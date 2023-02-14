@@ -6,9 +6,9 @@ module Dino
         include Mixins::Callbacks
 
         attr_reader :bytes
-
-        def after_initialize(options={})
-          super(options) if defined?(super)
+        
+        def before_initialize(options={})
+          super(options)
           #
           # To use the register as a board proxy, we need to know how many
           # bytes there are and map each bit to a virtual pin.
@@ -28,7 +28,10 @@ module Dino
           #
           @reading_pins   = Array.new(@bytes*8) {|i| false}
           @listening_pins = Array.new(@bytes*8) {|i| false}
+        end
 
+        def after_initialize(options={})
+          super(options)
           enable_proxy
         end
 

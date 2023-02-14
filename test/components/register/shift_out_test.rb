@@ -20,7 +20,6 @@ class RegisterShiftOutTest < Minitest::Test
   end
 
   def test_write
-    # mock = MiniTest::Mock.new.expect :call, nil, ["21.8.1.#{[11,12,0,255,127].pack('C*')}\n"]
     new_part = Dino::Components::Register::ShiftOut.new(options.merge(bytes: 2))
     mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, [255,127]]
     board.stub(:shift_write, mock) do
