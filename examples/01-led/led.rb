@@ -1,34 +1,39 @@
 #
-# Simple example that controls an LED.
+# Example 1: Controlling an LED
 #
 require 'bundler/setup'
 require 'dino'
 
-# If the board is connected with a USB cable, it's most likely serial over USB.
-connection = Dino::TxRx::Serial.new
+# If the board is plugged into a USB port, we can talk to it with serial over USB.
+io = Dino::TxRx::Serial.new
 
-# Initialize an object to represent the board, giving the connection.
-board = Dino::Board.new(connection)
-
-# Initialize an object representing the LED, giving the board and pin.
-# The on-board LED (marked "L") is connectd to pin 13 on most Arduinos.
-led = Dino::Components::Led.new(pin: 13, board: board)
+# Create an object to represent the board, giving the I/O object.
+board = Dino::Board.new(io)
 
 #
-# Now we can control the LED.
-# Led is a DigitalOutput, so it can only have one of two states:
+# Create an object for the LED, giving the board, and the pin that the positive
+# leg of your LED is connected to. The longer leg is usually positive.
+# See led.png in this folder for a hook-up diagram. 
+#
+# The on-board LED (marked "L") is internally connected to pin 13 on most Arduinos,
+# and can be used without connecting anything.
+#
+led = Dino::Components::Led.new(board: board, pin: 13)
+
+#
+# Now we can use it. A digital output can only have one of two states:
 # 1 / high / on
 # 0 / low / off
 #
-# We can write the state directly, or use named convenience methods.
-# The 3 lines below all do the same thing: turn it on, wait half a second, turn it off.
+# We can write state directly, or use named convenience methods that led has.
+# The 3 lines below all do the same thing: turn on, wait half a second, turn off.
 #
 led.write(1); sleep 0.5; led.write(0)
 led.high;     sleep 0.5; led.low
 led.on;       sleep 0.5; led.off
 
 #
-# Calling #toggle will set it to the opposite of its current state.
+# led.toggle will set it to the opposite of its current state.
 # Keep it blinking for 3 more seconds using #toggle.
 #
 6.times do
@@ -40,18 +45,18 @@ end
 # What if we want to blink in the background?
 #
 # led.blink runs in a separate thread, managed by the led object,
-# and doesn't block the main thread. Give it the blink interval in seconds.
+# and doesn't block the main thread. Give the blink interval in seconds.
 #
 led.blink 0.5
 
 # Wait while it blinks for 5 seconds.
 sleep 5
 
-# Call a method that sets the state (#write, #high, #low, #on, #off) to
-# automatically stop the blink thread.
+# Calling a method that sets the state (#write, #high, #low, #on, #off)
+# automatically stops the blink thread.
 led.off
 sleep 2
 
 # Blink faster indefinitely.
-led.blink 0.25
+led.blink 0.05
 sleep
