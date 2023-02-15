@@ -12,28 +12,21 @@ Dino::Dino(){
 }
 
 
-void Dino::acknowledge() {
-  stream->print("RCV:");
-  stream->print(rcvBytes);
+void Dino::rxNotify() {
+  stream->print("Rx");
+  stream->print(rxBytes);
   stream->print("\n");
-  rcvBytes = 0;
+  rxBytes = 0;
 }
 
 void Dino::run(){
-  boolean gotByte = false;
-
   while(stream->available() > 0) {
-    gotByte = true;
-    rcvBytes ++;
+    rxBytes ++;
     parse(stream->read());
 
-    // Acknowledge when we've received as many bytes as the serial input buffer
-    if (rcvBytes == rcvThreshold) acknowledge();
+    // Acknowledge when we've received half as many bytes as the serial buffer.
+    if (rxBytes >= rxNotifyLimit) rxNotify();
   }
-  if (gotByte) lastRcv = millis();
-
-  // Also acknowledge when the last byte received goes outside the receive window.
-  if ((rcvBytes > 0) && ((millis() - lastRcv) > rcvWindow)) acknowledge();
 
   // Run dino's listeners.
   updateListeners();
@@ -217,8 +210,8 @@ void Dino::updateListeners() {
 void Dino::handshake() {
   resetState();
 
-  // Reset this so we never send RCV: along with ACK:
-  rcvBytes = 0;
+  // Reset this so we never send Rx along with ACK:
+  rxBytes = 0;
 
   stream->print("ACK:");
   stream->print(AUX_SIZE);

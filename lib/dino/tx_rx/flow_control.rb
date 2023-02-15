@@ -64,8 +64,8 @@ module Dino
       def read_and_parse
         line = read
 
-        if line && line.match(/\ARCV:/)
-          remove_transit_bytes(line.split(/:/)[1].to_i)
+        if line && line.match(/\ARx/)
+          remove_transit_bytes(line.split(/x/)[1].to_i)
         elsif line
           parse(line)
         else

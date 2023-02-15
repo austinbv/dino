@@ -145,7 +145,6 @@ class Dino {
     //
     // Main loop input functions.
     //
-    void acknowledge();
     void parse(byte c);
     void process();
 
@@ -173,10 +172,9 @@ class Dino {
     #endif
     byte auxMsg[AUX_SIZE];
 
-    // Keep count of bytes as we receive them and send a dino message with how many.
-    uint8_t rcvBytes  = 0;
-    uint8_t rcvThreshold = 64;
-    unsigned long lastRcv = millis();
-    long long rcvWindow = 1000;
+    // Flow control stuff. Notify when we've received half a serial buffer worth of bytes.
+    void rxNotify();
+    uint8_t rxBytes  = 0;
+    uint8_t rxNotifyLimit = 32;
 };
 #endif
