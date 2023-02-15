@@ -14,11 +14,11 @@ module Dino
         "#{@device} @ #{@baud} baud"
       end
 
-      def write(message)
+      def _write(message)
         io.write(message)
       end
 
-      def read
+      def _read
         buff, escaped = "", false
         loop do
           char = io.read(1)

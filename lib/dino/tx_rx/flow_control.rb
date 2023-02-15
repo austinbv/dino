@@ -13,34 +13,15 @@ module Dino
 
       def write(message)
         add_write_call
-        @write_mutex.synchronize do
-          while message && !message.empty?
-            bytes = reserve_bytes(message.length)
-            if bytes > 0
-              fragment = message[0..(bytes-1)]
-              message = message[bytes..-1]
-              super(fragment)
-            else
-              tx_wait
-            end
-          end
-        end
-      end
-
-      # Keep the transit mutex lock for as little time as possible this way.
-      def reserve_bytes(length)
-        @transit_mutex.synchronize do
-          available = BOARD_BUFFER - @transit_bytes
-          reserved = (length > available) ? available : length
-          @transit_bytes += reserved
-          reserved
+        @write_buffer_mutex.synchronize do
+          @write_buffer << message
         end
       end
 
     private
 
       def reset_flow_control
-        @write_mutex    ||= Mutex.new
+        @io_mutex       ||= Mutex.new
         @transit_mutex  ||= Mutex.new
         @tx_sleep_mutex ||= Mutex.new
         @rx_sleep_mutex ||= Mutex.new
@@ -57,23 +38,62 @@ module Dino
           @read_lines      = 0
           @rx_sleep_calls  = 0
         end
+        
+        @write_buffer_mutex ||= Mutex.new
+        @write_buffer_mutex.synchronize do
+          @write_buffer = ""
+        end
 
         @last_interval_update = Time.now
       end
+      
+      def write_from_buffer
+        fragment = nil
+        
+        # Check space on the remote read buffer. If available, take a fragment
+        # of that many bytes off the local write buffer.
+        @write_buffer_mutex.synchronize do
+          break if @write_buffer.empty?
+          bytes = reserve_bytes(@write_buffer.length)
+          if bytes > 0
+            fragment = @write_buffer[0..(bytes-1)]
+            @write_buffer = @write_buffer[bytes..-1]
+          end
+        end
+        
+        # Write if we can. Wait otherwise.
+        if fragment
+          @io_mutex.synchronize { _write fragment }
+        else
+          tx_wait
+        end
+      end
 
-      def read_and_parse
-        line = read
+      # Use transit mutex for as short as possible by reserving bytes and writing later.
+      def reserve_bytes(length)
+        @transit_mutex.synchronize do
+          available = BOARD_BUFFER - @transit_bytes
+          reserved = (length > available) ? available : length
+          @transit_bytes += reserved
+          reserved
+        end
+      end
 
-        if line && line.match(/\ARx/)
-          remove_transit_bytes(line.split(/x/)[1].to_i)
-        elsif line
-          parse(line)
+      def read
+        line = @io_mutex.synchronize { _read }
+        
+        if line
+          add_read_line
+          if line.match(/\ARx/)
+            remove_transit_bytes(line.split(/x/)[1].to_i)
+            line = nil
+          end
         else
           rx_wait
         end
-
-        add_read_line if line
         update_sleep_intervals
+        
+        return line
       end
 
       def update_sleep_intervals

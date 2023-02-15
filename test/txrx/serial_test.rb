@@ -75,54 +75,78 @@ class TxRxSerialTest < Minitest::Test
 
   def test_io_reset
     flush_mock = MiniTest::Mock.new.expect :call, true
-    stop_mock = MiniTest::Mock.new.expect :call, true
-    start_mock = MiniTest::Mock.new.expect :call, true
+    r_stop_mock = MiniTest::Mock.new.expect :call, true
+    r_start_mock = MiniTest::Mock.new.expect :call, true
+    w_stop_mock = MiniTest::Mock.new.expect :call, true
+    w_start_mock = MiniTest::Mock.new.expect :call, true
+
     txrx.stub(:flush_read, flush_mock) do
-      txrx.stub(:stop_read, stop_mock) do
-        txrx.stub(:start_read, start_mock) do
-          txrx.send(:io_reset)
+      txrx.stub(:stop_read, r_stop_mock) do
+        txrx.stub(:start_read, r_start_mock) do
+          txrx.stub(:stop_write, w_stop_mock) do
+            txrx.stub(:start_write, w_start_mock) do
+              txrx.send(:io_reset)
+            end
+          end
         end
       end
     end
+    
     flush_mock.verify
-    stop_mock.verify
-    start_mock.verify
+    r_stop_mock.verify
+    r_start_mock.verify
+    w_start_mock.verify
+    w_start_mock.verify
   end
 
-  def test_read_and_parse
-    txrx.stub(:read, "02:00:00") do
-      txrx.stub(:changed, true) do
-        mock = MiniTest::Mock.new.expect :call, nil, ['02:00:00']
-        txrx.stub(:notify_observers, mock) do
-          txrx.send(:read_and_parse)
-        end
-        mock.verify
-      end
+  def test_read
+    txrx.stub(:_read, "02:00:00") do
+      line = txrx.send(:read)
+      assert_equal line, "02:00:00"
     end
   end
-
-  # Test start read?
+  
+  def test_parse
+    mock = MiniTest::Mock.new.expect :call, nil, ['02:00:00']
+    txrx.stub(:changed, true) do
+      txrx.stub(:notify_observers, mock) do
+        txrx.send(:parse, '02:00:00')
+      end
+      mock.verify
+    end
+  end
 
   def test_stop_read
     thread = Thread.new { sleep }
-    mock = MiniTest::Mock.new.expect :call, nil, [thread]
-    txrx.instance_variable_set(:@thread, thread)
-
-    Thread.stub(:kill, mock) do
-      txrx.send(:stop_read)
-    end
-    mock.verify
+    txrx.instance_variable_set(:@read_thread, thread)
+    txrx.send(:stop_write)
+    assert_nil txrx.instance_variable_get(:@write_thread)
+  end
+  
+  def test_stop_write
+    thread = Thread.new { sleep }
+    txrx.instance_variable_set(:@write_thread, thread)
+    txrx.send(:stop_write)
+    assert_nil txrx.instance_variable_get(:@write_thread)
   end
 
   def test_write
-    mock = MiniTest::Mock.new.expect :write, nil, ['message']
-    txrx.stub(:io, mock) do
-      txrx.write('message')
+    # Message is appended to the buffer.
+    txrx.send(:stop_write)
+    txrx.write('message')
+    assert_equal txrx.instance_variable_get("@write_buffer"), "message"
+    
+    # Message is written from buffer when we start the write thread.
+    mock = MiniTest::Mock.new.expect :call, nil, ['message']
+    txrx.stub(:_write, mock) do
+      txrx.send(:start_write)
+      sleep 0.005
     end
     mock.verify
+    assert_equal txrx.instance_variable_get("@write_buffer"), ""
   end
 
-  def test_read_single_chars_until_newline_and_strips_it
+  def test_io_read_single_chars_until_newline_and_strips_it
     mock = MiniTest::Mock.new
     "line\n".split("").each do |char|
       mock.expect :read, char, [1]
@@ -133,7 +157,7 @@ class TxRxSerialTest < Minitest::Test
     mock.verify
   end
 
-  def test_read_handles_escaped_newlines_and_backslashes
+  def test_io_read_handles_escaped_newlines_and_backslashes
     mock = MiniTest::Mock.new
     "l1\\\nl2\\\\\n".split("").each do |char|
       mock.expect :read, char, [1]
@@ -144,7 +168,7 @@ class TxRxSerialTest < Minitest::Test
     mock.verify
   end
 
-  def test_read_returns_empty_string_if_just_newline
+  def test_io_read_returns_empty_string_if_just_newline
     mock = MiniTest::Mock.new
     mock.expect :read, "\n", [1]
     txrx.stub(:io, mock) do

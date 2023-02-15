@@ -25,7 +25,7 @@ module Dino
         raise TCPConnectError, error.message
       end
 
-      def write(message)
+      def _write(message)
         loop do
           if IO.select(nil, [io], nil, 0)
             io.syswrite(message)
@@ -34,7 +34,7 @@ module Dino
         end
       end
 
-      def read
+      def _read
         IO.select([io], nil, nil, 0) && io.gets.gsub(/\n\z/, "")
       end
     end

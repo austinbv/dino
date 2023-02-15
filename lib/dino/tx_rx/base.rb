@@ -17,6 +17,10 @@ module Dino
       end
 
     private
+    
+      def parse(line)
+        changed && notify_observers(line) if line
+      end
 
       def io
         @io ||= connect
@@ -26,34 +30,42 @@ module Dino
         flush_read
         stop_read
         start_read
+        stop_write
+        start_write
       end
 
       def flush_read
-        Timeout.timeout(5) { read until read == nil }
+        Timeout.timeout(5) { _read until _read == nil }
       rescue Timeout::Error
         raise RxFlushTimeout, "Cannot read from device, or device not running dino"
       end
 
       def start_read
-        @thread ||= Thread.new do
-          trap("INT") do
-            io.write("\n91\n")
-            raise Interrupt
-          end
-
-          loop do
-            read_and_parse
-          end
+        @read_thread ||= Thread.new do
+          loop { parse(read) }
         end
       end
 
       def stop_read
-        Thread.kill(@thread) if @thread
-        @thread = nil
+        Thread.kill(@read_thread) if @read_thread
+        @read_thread = nil
       end
-
-      def parse(line)
-        changed && notify_observers(line)
+      
+      def start_write
+        @write_thread ||= Thread.new do
+          # Tell the board to reset if our script is interrupted.
+          trap("INT") do
+            _write "\n91\n"
+            raise Interrupt
+          end
+          
+          loop { write_from_buffer }
+        end
+      end
+      
+      def stop_write
+        Thread.kill(@write_thread) if @write_thread
+        @write_thread = nil
       end
     end
   end

@@ -29,6 +29,7 @@ module Dino
 
             Timeout.timeout(HANDSHAKE_TIMEOUT) do
               loop do
+                sleep 0.001
                 if attempt.acknowledged
                   puts "Acknowledged. Hardware ready...\n\n"
                   
