@@ -188,12 +188,17 @@ void Dino::process() {
 // Digital listeners only send values on change.
 //
 void Dino::updateListeners() {
-  unsigned long now = micros();
-  if ((now - lastTick) > 1000) {
-    lastTick = now;
-    tickCount++;
+  currentTime = micros();
+  timeDiff = currentTime - lastTime;
+  
+  if (timeDiff > 999) {
+    // Add a tick for every 1000us passed
+    tickCount = tickCount + (timeDiff / 1000);
+      
+    // lastTime for next run is currentTime offset by remainder.
+    lastTime = currentTime - (timeDiff % 1000);
 
-    updateCoreListeners(tickCount);
+    updateCoreListeners();
 
     // Register Listeners
     #ifdef DINO_SHIFT
@@ -249,7 +254,7 @@ void Dino::resetState() {
   fragmentIndex = 0;
   charIndex = 0;
   tickCount = 0;
-  lastTick = micros();
+  lastTime = micros();
 }
 
 

@@ -146,12 +146,12 @@ void Dino::setListener(byte p, boolean enabled, byte analog, byte exponent, bool
 }
 
 // Runs once on every loop to update necessary listeners.
-void Dino::updateCoreListeners(byte tickCount){
+void Dino::updateCoreListeners() {
   for (byte i = 0; i <= lastActiveListener; i++){
     // Check if active.
     if (bitRead(listeners[i][0], 7) == 1){
       // Check if to update it on this tick.
-	  // Divider exponent is last 3 bits of settings.
+	    // Divider exponent is last 3 bits of settings.
       byte exponent = listeners[i][0] & 0B00000111;
       byte divider = dividerMap[exponent];
       if(tickCount % divider == 0){

@@ -50,13 +50,19 @@ class Dino {
     void aWrite      (byte p, int v,  boolean echo=true);  //cmd = 3
     int  aRead       (byte p);                             //cmd = 4
     void setListener (byte p, boolean enabled, byte analog, byte exponent, boolean local=true); //cmd = 5
+    
+    // Read value of micros() every loop.
+    unsigned long currentTime;
+    
+    // Counts 1ms ticks based on currentTime. Rolls over every 256ms.
+    byte tickCount;
 
   private:
     //
     // Main loop listen functions.
     //
     void updateListeners       ();
-    void updateCoreListeners   (byte tickCount);
+    void updateCoreListeners   ();
     void analogListenerUpdate  (byte index);
     void digitalListenerUpdate (byte index);
     void clearCoreListeners    ();
@@ -138,8 +144,8 @@ class Dino {
     void resetState            ();  //cmd = 91
     void setRegisterDivider    ();  //cmd = 97
     void setAnalogResolution   ();  //cmd = 96
-    unsigned long lastTick;
-    byte tickCount;
+    unsigned long lastTime;
+    unsigned long timeDiff;
     byte registerDivider;
 
     //
