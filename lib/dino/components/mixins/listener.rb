@@ -7,10 +7,10 @@ module Dino
         attr_reader :divider
 
         def listen(divider=nil, &block)
-          @divider = divider
+          @divider = divider || @listener
           stop
           add_callback(:listen, &block) if block_given?
-          _listen(divider)
+          _listen(@divider)
         end
 
         def stop

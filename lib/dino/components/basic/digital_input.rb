@@ -10,6 +10,7 @@ module Dino
 
         def after_initialize(options={})
           super(options)
+          @divider = 4
           _listen
         end
 
@@ -17,8 +18,8 @@ module Dino
           board.digital_read(pin)
         end
 
-        def _listen(divider=4)
-          @divider = divider
+        def _listen(divider=nil)
+          @divider = divider || @divider
           board.digital_listen(pin, @divider)
         end
 
@@ -34,8 +35,8 @@ module Dino
           end
         end
         
-        def pre_callback_filter(data)
-          data.to_i
+        def pre_callback_filter(value)
+          value.to_i
         end
 
         def high?; state == board.high end
