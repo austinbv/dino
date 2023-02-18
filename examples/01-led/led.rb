@@ -20,20 +20,22 @@ board = Dino::Board.new(io)
 #
 led = Dino::Components::Led.new(board: board, pin: 13)
 
+# Now we can make it blink.
+puts "Blinking every half second..."
+
 #
-# Now we can use it. A digital output can only have one of two states:
+# A digital output can only have one of two states:
 # 1 / high / on
 # 0 / low / off
-#
-# We can write state directly, or use named convenience methods that led has.
-# The 3 lines below all do the same thing: turn on, wait half a second, turn off.
+# We can use led.write to set it directly, or named convenience methods.
+# These 3 lines all do the same thing: turn on, wait half a second, turn off.
 #
 led.write(1); sleep 0.5; led.write(0)
 led.high;     sleep 0.5; led.low
 led.on;       sleep 0.5; led.off
 
 #
-# led.toggle will set it to the opposite of its current state.
+# led.toggle will set it to the opposite state each time it's called.
 # Keep it blinking for 3 more seconds using #toggle.
 #
 6.times do
@@ -44,19 +46,20 @@ end
 #
 # What if we want to blink in the background?
 #
-# led.blink runs in a separate thread, managed by the led object,
-# and doesn't block the main thread. Give the blink interval in seconds.
+# led.blink runs in a separate thread, managed by the led, and doesn't block the
+# main thread. Give it the blink interval in seconds.
 #
 led.blink 0.5
-
-# Wait while it blinks for 5 seconds.
-sleep 5
+puts "Blinking in the background... Hello from the main thread!"
+sleep 3
 
 # Calling a method that sets the state (#write, #high, #low, #on, #off)
 # automatically stops the blink thread.
+puts "Turning off for 2 seconds..."
 led.off
 sleep 2
 
 # Blink faster indefinitely.
-led.blink 0.05
+puts "Blinking faster forever... (Press Ctrl+C to exit)"
+led.blink 0.1
 sleep

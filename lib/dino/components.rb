@@ -21,5 +21,6 @@ module Dino
     autoload :Piezo,            'dino/components/piezo'
     autoload :RotaryEncoder,    'dino/components/rotary_encoder'
     autoload :OneWire,          'dino/components/one_wire'
+    autoload :Potentiometer,    'dino/components/potentiometer'
   end
 end
