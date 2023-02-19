@@ -40,6 +40,8 @@
 
 - SoftwareSerial. _Uses Arduino `SoftSerial` library._ (**write only / experimental**)
 
+- Potentiometer class, based on AnalogInput, but enables moving average smoothing by default and adds #on_change callback method.
+
 - Rotary encoder support. _Uses polling method @ 1ms interval._ **WARNING**: Not suitable for high speed or precise position needs. It will definitely miss steps. Sufficient for rotary knobs as user input.
 
 - DHT11 / DHT 21 (AM2301) / DHT22 temperature and relative humidity sensor support. _Custom implementation where input pulses are measured on the board, then decoded in Ruby._
