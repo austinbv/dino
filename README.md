@@ -1,5 +1,5 @@
 # Dino 0.12.0 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
-#### Ruby Meets Microcontrollers
+### Ruby Meets Microcontrollers
 Dino gives you a high-level Ruby interface to low-level hardware, without writing microcontroller code. Use LEDs, buttons, sensors and more, just as easily as any Ruby object:
 
 ````ruby
@@ -14,9 +14,9 @@ button.down do
 end
 ````
 
-Dino doesn't run Ruby on the microcontroller board either, like [mruby](https://github.com/mruby/mruby). The board always runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes an I/O peripheral for your computer.
+Dino doesn't run Ruby on the microcontroller board either, like [mruby](https://github.com/mruby/mruby). The board always runs a C++ firmware that exposes as much low-level I/O as possible, for us to use in Ruby. It becomes a peripheral for your computer.
 
-High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They also get thread-safe state, callbacks for inputs, and effectively mulitask a single threaded microcontroller (no "task" priority though).
+High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They get thread-safe state, callbacks for inputs, and mulitask a single core microcontroller, but no "task" priority.
 
 Physical components connected to your boards map to Ruby objects you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between.
 
@@ -26,11 +26,11 @@ Physical components connected to your boards map to Ruby objects you can use dir
 gem install dino
 ```
 
-Before we can use the microcontroller in Ruby, we need to flash it with the dino firmware (or "sketch" in Arduino slang). This is needed **only once** for each board, but future versions of dino may need reflashing to add firmware-level functions.
+Before using the microcontroller in Ruby, we need to flash it with the dino firmware (or "sketch" in Arduino slang). This is needed **only once** for each board, but future dino versions may need reflashing for firmware functions.
 
 #### 2) Install the Arduino IDE OR CLI
 
-Download the Arduino IDE from [here](http://arduino.cc/en/Main/Software) for a graphical interface, or install the command line interface from [here](https://github.com/arduino/arduino-cli/releases), or Homebrew.
+Get the Arduino IDE [here](http://arduino.cc/en/Main/Software) for a graphical interface, or use the command line interface from [here](https://github.com/arduino/arduino-cli/releases), or Homebrew.
 
 **CLI Installation with Homebrew on Mac, Linux, or WSL on Windows:**
 ````shell
@@ -39,7 +39,7 @@ brew install arduino-cli
 ````
 
 #### 3) Install Arduino Dependencies
-Dino uses Arduino "cores" which add microcontroller support, and a few C++ libraries for now. We need to install them.
+Dino uses Arduino "cores" which add microcontroller support, and a few C++ libraries for now. Let's install them.
 
 **IDE:**
 * Open the IDE and select Tools > Board > Board Manager from the menus.
@@ -75,7 +75,7 @@ dino sketch serial -target esp8266
 ```shell
 dino sketch wifi -target esp8266 -ssid YOUR_SSID -password YOUR_PASSWORD
 ````
-**Note:** [This example](https://github.com/austinbv/dino/tree/master/examples/tcp.rb) shows how to instantiate a board over the network. After flashing, you'll need to figure out what IP address your board has, and modify the TxRx line in any other example you wish to run. They are written for serial.
+**Note:** [This example](https://github.com/austinbv/dino/tree/master/examples/tcp.rb) shows how to instantiate a board over the network. You'll need to figure out what IP address your board got, and modify the TxRx line in other examples you wish to run. They are written for serial.
 
 #### 5a) IDE Flashing
 
@@ -112,7 +112,7 @@ arduino-cli board listall
 
 #### 6)  Test It!
 
-Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be another pin on your board. Run the LED example from [here](https://github.com/austinbv/dino/tree/master/examples/01-led/led.rb), changing the pin number if needed. If the LED starts blinking, you're ready for Ruby!
+Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Run the LED example from [here](https://github.com/austinbv/dino/tree/master/examples/01-led/led.rb), changing the pin number if needed. If the LED starts blinking, you're ready for Ruby!
 
 ## Examples and Tutorials
 
