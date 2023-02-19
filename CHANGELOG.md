@@ -38,11 +38,11 @@
 
 - Tone (piezo) support. _Uses Arduino `tone`,`noTone` functions._ 
 
-- SoftwareSerial. _Uses Arduino `SoftSerial` library._ (**write only / experimental**)
+- SoftwareSerial **(write only)**. _Uses Arduino `SoftSerial` library. Only tested on ATmega chips._
 
-- Potentiometer class, based on AnalogInput, but enables moving average smoothing by default and adds #on_change callback method.
+- Potentiometer class, based on AnalogInput, but enables moving average smoothing by default, and adds #on_change callback method.
 
-- Rotary encoder support. _Uses polling method @ 1ms interval._ **WARNING**: Not suitable for high speed or precise position needs. It will definitely miss steps. Sufficient for rotary knobs as user input.
+- Rotary encoder support. _Polls @ 1ms interval._ **WARNING**: Not suitable for high speed or precise position needs. It will definitely miss steps. Sufficient for rotary knobs as user input.
 
 - DHT11 / DHT 21 (AM2301) / DHT22 temperature and relative humidity sensor support. _Custom implementation where input pulses are measured on the board, then decoded in Ruby._
 
@@ -54,7 +54,7 @@
   - Most bus features are implemented: reset/presence detect, parasite power handling, bus search and slave device identification, CRC. No overdrive support.
   - Based on [Kevin Darrah's video](https://www.youtube.com/watch?v=ZKNQhzPwH0s) explaining the DS18B20 datasheet.
 
-- I2C bus support. _Uses Arduino`Wire` library._
+- I2C bus support. _Uses Arduino `Wire` library._
 
 - Shift Register support. _Uses Arduino `ShiftOut` and `ShiftIn` functions._
 
@@ -71,7 +71,7 @@
 
 - Digital and analog listeners now have dividers on a per-pin basis.
   - Timing is based on a 1000 microsecond tick being counted by the board.
-  - Call `#listen` with a value as the first argument. Eg. `analog_sensor.listen(64)` will tell the board to send us that specific sensor's state every 64 ticks (~64ms)  or around 16 times per second, without affecting other components' rates.
+  - Call `#listen` with a value as the first argument. Eg. `analog_sensor.listen(64)` will tell the board to send us that specific sensor's state every 64 ticks (~64ms) or around 16 times per second, without affecting other components' rates.
   - Valid dividers are: `1, 2, 4, 8, 16, 32, 64, 128`.
   - Defaults are same as before: `4` for digital, `16` for analog.
 
@@ -85,8 +85,8 @@
 - `BoardProxy` abstraction for shift/SPI registers:
   - The `Register` classes implement enough of the `Board` interface to satisfy components based on `DigitalInput` and `DigitalOutput`, such as `Led` or `Button`.
   - This lets you call methods on components directly, rather than manipulating the register data to control components indirectly. 
-  - Initialize the appropriate `Register` object for the type of register. To initialize a component connected to the register, use the register as the "board", and for the pin, give the parallel I/O pin of the register that the component is connected to. Pin 0 maps to the lowest bit.
-  - This also works for `MultiPin` components built out of only `DigitalInput` and `DigitalOutput`, eg. `SSD` - seven segment display or `RGBLed`. See `examples/register` for more.
+  - Initialize the appropriate `Register` object for the type of register. To initialize a component connected to the register, use the register as the `board:`, and give the parallel I/O pin on the register that the component is connected to. Pin 0 maps to the lowest bit.
+  - This also works for `MultiPin` components built out of only `DigitalInput` or `DigitalOutput`, eg. `SSD` - seven segment display or `RGBLed`. See `examples/register` for more.
 
 ### Input Components, Callbacks and State
 - `@value` has been renamed to `@state`.

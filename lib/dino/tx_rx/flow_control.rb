@@ -17,6 +17,10 @@ module Dino
           @write_buffer << message
         end
       end
+      
+      def writing?
+        @write_buffer_mutex.synchronize { !@write_buffer.empty? }
+      end
 
     private
 

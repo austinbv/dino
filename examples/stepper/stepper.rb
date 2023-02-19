@@ -1,5 +1,5 @@
 #
-# This is a simple example to move a stepper motor using the sparkfun easydriver shield: https://www.sparkfun.com/products/10267?
+# Example driving a stepper motor with the EasyDriver board: https://www.sparkfun.com/products/10267?
 #
 require 'bundler/setup'
 require 'dino'
@@ -16,3 +16,6 @@ end
   stepper.step_cw
   sleep 0.001
 end
+
+# The board writes asynchronously. Make sure it has written everything before we exit.
+board.finish_write

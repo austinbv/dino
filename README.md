@@ -14,11 +14,11 @@ button.down do
 end
 ````
 
-Dino doesn't run Ruby on the microcontroller board either, like [mruby](https://github.com/mruby/mruby). The board always runs a C++ firmware that exposes as much low-level I/O as possible, for us to use in Ruby. It becomes a peripheral for your computer.
+Dino doesn't run Ruby on the microcontroller board either, like [mruby](https://github.com/mruby/mruby). The board runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
 
-High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They get thread-safe state, callbacks for inputs, and mulitask a single core microcontroller, but no "task" priority.
+High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They "multitask" a single core microcontroller, with thread-safe state and callbacks for inputs, but no "task" priority. If you need more, integration is seamless. Simply connect another board and instantiate.
 
-Physical components connected to your boards map to Ruby objects you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between.
+Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between.
 
 ## Getting Started
 #### 1) Install the Gem
@@ -112,7 +112,7 @@ arduino-cli board listall
 
 #### 6)  Test It!
 
-Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Run the LED example from [here](https://github.com/austinbv/dino/tree/master/examples/01-led/led.rb), changing the pin number if needed. If the LED starts blinking, you're ready for Ruby!
+Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Run the LED example [here](https://github.com/austinbv/dino/tree/master/examples/01-led/led.rb). Change the pin number if needed. If the LED starts blinking, you're ready for Ruby!
 
 ## Examples and Tutorials
 
@@ -122,7 +122,7 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
   * 1 microcontroller (Arduino Uno, Leonardo and Mega are most compatible)
   * 1 button or momentary switch
   * 1 potentiometer (any value)
-  * 1 external RGB LED (4 legs common cathode, not a Neopixel, or individually addressable)
+  * 1 external RGB LED (4 legs common cathode, not a Neopixel or individually addressable)
   * 1 external LED (any color, or use one color of the RGB LED)
   * Current limiting resistors for the LEDs
   * Breadboard

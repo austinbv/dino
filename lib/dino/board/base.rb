@@ -19,6 +19,12 @@ module Dino
         io.add_observer(self)
         self.analog_resolution = options[:bits] || 8
       end
+      
+      def finish_write
+        sleep 0.001 while @io.writing?
+        write "\n91\n"
+        sleep 0.001 while @io.writing?
+      end
 
       def analog_resolution
         @bits ||= 8
