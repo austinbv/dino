@@ -139,6 +139,7 @@ class DinoCLI::Generator
 
     # Return the location of the sketch file.
     options[:sketch_file] = sketch
+    options[:sketch_folder] = output_dir
     options
   end
 
