@@ -47,6 +47,7 @@ Dino uses Arduino "cores" which add microcontroller support, and a few C++ libra
 * Now go to: Tools > Manage Libraries.
 * Find and install the following libraries, at the version numbers given:
   * `Liquid Crystal by Arduino, Adafruit` at latest version
+  * `WiFi by Arduino` at latest version
   * `IRremote by shirriff, z3to, ArminJo` at `version 2.2.3`
   * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.3.2`
 
@@ -54,8 +55,9 @@ Dino uses Arduino "cores" which add microcontroller support, and a few C++ libra
 ````shell
 arduino-cli core install esp8266:esp8266
 arduino-cli lib install LiquidCrystal
+arduino-cli lib install WiFi
 arduino-cli lib install IRremote@2.2.3
-arduino-cli lib install IRremoteESP8266@2.3.2 
+arduino-cli lib install IRremoteESP8266@2.3.2
 ````
 
 #### 4) Generate the Arduino Sketch
