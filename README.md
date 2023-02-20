@@ -82,7 +82,7 @@ dino sketch wifi -target esp8266 -ssid YOUR_SSID -password YOUR_PASSWORD
 * Connect the board to your computer with a USB cable.
 * Open the .ino file inside your sketch folder with the IDE.
 * Open the dropdown menu at the top of the IDE window, and select your board.
-* Press the Upload ➡️ button. This will compile the sketch, and flash it to the board.
+* Press the Upload :arrow_right: button. This will compile the sketch, and flash it to the board.
 
 **Troubleshooting:**
 * If your serial port is in the list, but the board is wrong, select the serial port anyway, then go to Tools > Board in the menus and choose your board from the list.

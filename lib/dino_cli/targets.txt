@@ -42,7 +42,7 @@
       This specifically targets the older ATmega168 chip used in early Arduinos.
       With half the RAM and flash available, we need to cut the sketch down.
       This option includes core functionality AND:
-          Servo (6 maxmium), DHT, OneWire, IR Out, Tone, SPI, I2C
+          Servo (6 maxmium), DHT, Shift In/Out, Tone, SPI, I2C
 
       Chips:  ATmega168
       Boards: Duemilanove, Diecimila, Pro, Pro Mini

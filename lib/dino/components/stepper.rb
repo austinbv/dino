@@ -9,46 +9,45 @@ module Dino
       proxy_pins  ms1:       Basic::DigitalOutput,
                   ms2:       Basic::DigitalOutput,
                   enable:    Basic::DigitalOutput,
-                  sleep:     Basic::DigitalOutput,
-                  optional: true
-
+                  slp:       Basic::DigitalOutput,
+                  optional:  true
+                  
+      attr_reader :microsteps
+                  
       def after_initialize(options={})
-        wake; on; divider = 8
+        wake; on;
+        self.microsteps = 8
       end
 
-      def sleep_mode
-        sleep.low if pins[:sleep]
+      def sleep
+        slp.low if slp
       end
 
       def wake
-        sleep.high if pins[:sleep]
+        slp.high if slp
       end
 
       def off
-        enable.high if pins[:enable]
+        enable.high if enable
       end
 
       def on
-        enable.low if pins[:enable]
+        enable.low if enable
       end
 
-      def divider=(steps)
-        return unless (ms1 && ms2)
-        case steps.to_i
-        when 1
-          ms1.low; ms2.low
-        when 2
-          ms1.high; ms2.low
-        when 4
-          ms1.low; ms2.high
-        when 8
-          ms1.high; ms2.high
+      def microsteps=(steps)
+        if (ms1 && ms2)
+          case steps.to_i
+          when 1; ms2.low;  ms1.low
+          when 2; ms2.low;  ms1.high
+          when 4; ms2.high; ms1.low
+          when 8; ms2.high; ms1.high
+          end
         else
-          return
+          raise ArgumentError, "ms1 and ms2 pins must be connected to GPIO pins to control microstepping."
         end
-        @divider = steps
+        @microsteps = steps
       end
-      attr_reader :divider
 
       def step_cc
         direction.high unless direction.high?
