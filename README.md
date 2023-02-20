@@ -18,7 +18,7 @@ Dino doesn't run Ruby on the microcontroller board either, like [mruby](https://
 
 High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They "multitask" a single core microcontroller, with thread-safe state and callbacks for inputs, but no "task" priority. If you need more, integration is seamless. Simply connect another board and instantiate.
 
-Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between.
+Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between. See supported hardware [here](HARDWARE.md).
 
 ## Getting Started
 #### 1) Install the Gem
@@ -77,7 +77,7 @@ dino sketch serial -target esp8266
 ```shell
 dino sketch wifi -target esp8266 -ssid YOUR_SSID -password YOUR_PASSWORD
 ````
-**Note:** [This example](https://github.com/austinbv/dino/tree/master/examples/tcp.rb) shows how to instantiate a board over the network. You'll need to figure out what IP address your board got, and modify the TxRx line in other examples you wish to run. They are written for serial.
+**Note:** [This example](examples/tcp.rb) shows how to instantiate a board over the network. You'll need to figure out what IP address your board got, and modify the TxRx line in other examples you wish to run. They are written for serial.
 
 #### 5a) IDE Flashing
 
@@ -114,13 +114,13 @@ arduino-cli board listall
 
 #### 6)  Test It!
 
-Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Run the LED example [here](https://github.com/austinbv/dino/tree/master/examples/01-led/led.rb). Change the pin number if needed. If the LED starts blinking, you're ready for Ruby!
+Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Run the LED example [here](examples/01-led/led.rb). Change the pin number if needed. If the LED starts blinking, you're ready for Ruby!
 
 ## Examples and Tutorials
 
 #### Included Examples
 
-* The first 5 [examples](https://github.com/austinbv/dino/tree/master/examples) are sort of a mini-tutorial, to familiarize you with the basics. Read the comments and try modifying the code. You will need the following:
+* The first 5 [examples](examples) are sort of a mini-tutorial, to familiarize you with the basics. Read the comments and try modifying the code. You will need the following:
   * 1 microcontroller (Arduino Uno, Leonardo and Mega are most compatible)
   * 1 button or momentary switch
   * 1 potentiometer (any value)
