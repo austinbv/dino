@@ -22,27 +22,27 @@ module Dino
       #       rows: 2
       # )
       #
-      def after_initialize(options)
+      def after_initialize(options={})
         board.write Dino::Message.encode command: 10, value: 0, aux_message: encoded_pins
         @cols, @rows = options[:cols], options[:rows]
         board.write Dino::Message.encode command: 10, value: 1, aux_message: "#{@cols},#{@rows}"
       end
 
       LIBRARY_COMMANDS = {
-        clear:              '2',
-        home:               '3',
-        show_cursor:        '6',
-        hide_cursor:        '7',
-        blink:              '8',
-        no_blink:           '9',
-        on:                '10',
-        off:               '11',
-        scroll_left:       '12',
-        scroll_right:      '13',
-        enable_autoscroll: '14',
-        disable_autoscroll:'15',
-        left_to_right:     '16',
-        right_to_left:     '17'
+        clear:              2,
+        home:               3,
+        show_cursor:        6,
+        hide_cursor:        7,
+        blink:              8,
+        no_blink:           9,
+        on:                10,
+        off:               11,
+        scroll_left:       12,
+        scroll_right:      13,
+        enable_autoscroll: 14,
+        disable_autoscroll:15,
+        left_to_right:     16,
+        right_to_left:     17
       }
 
       LIBRARY_COMMANDS.each_pair do |command, command_id|

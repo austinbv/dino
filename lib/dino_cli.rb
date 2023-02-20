@@ -1,25 +1,18 @@
 module DinoCLI
   require "dino_cli/parser"
   require "dino_cli/generator"
-  require "dino_cli/uploader"
 
-  COMMANDS = ["generate-sketch"]
+  TASKS    = ["sketch"]
   SKETCHES = ["serial", "ethernet", "wifi"]
-  
-  def self.start(options={})
-    parsed_options = DinoCLI::Parser.run(options)
 
-    method = parsed_options[:command].gsub('-', '_').to_s
+  def self.start(options={})
+    options = DinoCLI::Parser.run(options)
+    method = options[:task]
     self.send method, options
   end
 
-  def self.generate_sketch(options)
-    options = DinoCLI::Generator.run!(options)
-    
-    if options[:upload] || options[:compile]
-      DinoCLI::Uploader.run!(options)
-    else
-      $stdout.puts options[:sketch_file]
-    end
+  def self.sketch(options)
+    result = DinoCLI::Generator.run!(options)
+    $stdout.puts result[:sketch_folder]
   end
 end

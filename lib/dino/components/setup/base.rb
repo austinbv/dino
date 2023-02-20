@@ -2,23 +2,34 @@ module Dino
   module Components
     module Setup
       module Base
-        attr_reader :board, :state
+        attr_reader :board
 
         def initialize(options={})
+          @state = nil
+          @state_mutex = Mutex.new
+          before_initialize(options)
           initialize_board(options)
           initialize_pins(options)
           register
-
           after_initialize(options)
+        end
+        
+        def state
+          @state_mutex.synchronize { @state }
         end
 
         protected
 
-        attr_writer :board, :state
+        def state=(value)
+          @state_mutex.synchronize { @state = value }
+        end
 
         def initialize_board(options={})
-          raise 'a board is required for a component' unless options[:board]
-          self.board = options[:board]
+          if options[:board]
+            @board = options[:board]
+          else
+            raise ArgumentError, 'a board is required for a component'
+          end
         end
 
         def register
@@ -29,19 +40,15 @@ module Dino
           board.remove_component(self)
         end
 
+        # Setup::Base only requires a board.
+        # Include modules from Setup or override this to use pins.
         #
-        # Setup::Base just requires a board and adds the component to the list of components.
-        # Mix in other modules from Setup or define this method in your class to initialize the pin(s).
-        #
+        def before_initialize(options={}) ; end
         def initialize_pins(options={}) ; end
         alias :initialize_pin :initialize_pins
 
-        #
-        # Define #after_initialize in your component class.
-        #
-        # @note This method should be implemented in the including class.
-        #
-        def after_initialize(options={}) ; end
+        # Override in components. Call super when inheriting or mixing in.
+        def after_initialize(options={}); end
       end
     end
   end

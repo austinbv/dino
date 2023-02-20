@@ -3,23 +3,21 @@ module Dino
     module Mixins
       module Listener
       	include Callbacks
+        
+        attr_reader :divider
 
-        def listen(&block)
+        def listen(divider=nil, &block)
+          @divider = divider || @listener
           stop
           add_callback(:listen, &block) if block_given?
-          _listen
+          _listen(@divider)
         end
 
         def stop
           super if defined?(super)
-          board.stop_listener(pin)
+          _stop_listener
           remove_callbacks :listen
         end
-
-        #
-        # Including component should define this to start a listener on the board.
-        #
-        def _listen; end
       end
     end
   end

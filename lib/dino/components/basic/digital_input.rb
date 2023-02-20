@@ -9,31 +9,38 @@ module Dino
         include Mixins::Listener
 
         def after_initialize(options={})
+          super(options)
+          @divider = 4
           _listen
         end
 
-        HIGH = 1
-        LOW = 0
-
         def _read
-          board.digital_read(self.pin)
+          board.digital_read(pin)
         end
 
-        def _listen
-          board.digital_listen(self.pin)
+        def _listen(divider=nil)
+          @divider = divider || @divider
+          board.digital_listen(pin, @divider)
         end
 
         def on_high(&block)
           add_callback(:high) do |data|
-            block.call(data) if data.to_i == HIGH
+            block.call(data) if data.to_i == board.high
           end
         end
 
         def on_low(&block)
           add_callback(:low) do |data|
-            block.call(data) if data.to_i == LOW
+            block.call(data) if data.to_i == board.low
           end
         end
+        
+        def pre_callback_filter(value)
+          value.to_i
+        end
+
+        def high?; state == board.high end
+        def low?;  state == board.low  end
       end
     end
   end

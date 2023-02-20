@@ -1,12 +1,12 @@
 module Dino
   module Components
-    class RgbLed
+    class RGBLed
       include Setup::MultiPin
 
       proxy_pins red:   Basic::AnalogOutput,
                  green: Basic::AnalogOutput,
-                 blue:  Basic::AnalogOutput 
-      
+                 blue:  Basic::AnalogOutput
+
       # Format: [R, G, B]
       COLORS = {
         red:     [255, 000, 000],
@@ -27,16 +27,9 @@ module Dino
 
       def color=(color)
         return write(color) if color.class == Array
-        
+
         color = color.to_sym
         write(COLORS[color]) if COLORS.include? color
-      end
-
-      def cycle
-        [:red, :green, :blue].cycle do |color|
-          self.color = color
-          sleep(0.01)
-        end
       end
     end
   end

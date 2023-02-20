@@ -1,87 +1,151 @@
 #include "Dino.h"
-#include <SPI.h>
-#include <WiFi.h>
-#include <Servo.h>
-#include <LiquidCrystal.h>
-#include "DHT.h"
-
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-  #include <SoftwareSerial.h>
+#ifdef ESP8266
+  #include <ESP8266WiFi.h>
+  #include <ESP8266mDNS.h>
+  #include <WiFiUdp.h>
+  #include <ArduinoOTA.h>
+  #define WIFI_STATUS_LED 2
+#else
+  #include <SPI.h>
+  #include <WiFi.h>
+  #define WIFI_STATUS_LED 13
 #endif
 
-// Configure your WiFi options here. MAC address and IP address are not configurable.
+// Define 'serial' as the serial interface we want to use.
+// Defaults to Native USB port on the Due, whatever class "Serial" is on everything else.
+// Classes need to inherit from Stream to be compatible with the Dino library.
+#if defined(__SAM3X8E__)
+  #define serial SerialUSB
+  //#define serial Serial
+#else
+  #define serial Serial
+#endif
+
+// Configure your WiFi options here. IP address is not configurable. Uses DHCP.
 int port = 3466;
-char ssid [] = "yourNetwork";
-char pass [] = "yourPassword";
-int keyIndex = 0;
-int status = WL_IDLE_STATUS;
+char* ssid = "yourNetwork";
+char* pass = "yourPassword";
+boolean connected = false;
+long lastConnectAttempt;
+int WiFiConnectTimeout = 10000;
 
 Dino dino;
 WiFiServer server(port);
 WiFiClient client;
-char responseBuffer[65];
 
-
-// Dino.h doesn't handle TXRX.
-// Setup a callback to buffer responses for writing.
-void bufferResponse(char *response) {
-  if (strlen(responseBuffer) > 56 ) writeResponses();
-  strcpy(responseBuffer, response);
-}
-void (*writeCallback)(char *str) = bufferResponse;
-
-// Write the buffered responses to the client.
-void writeResponses() {
-  if (responseBuffer[0] != '\0')
-    client.write(responseBuffer);
-    responseBuffer[0] = '\0';
+// Use the built in LED to indicate WiFi status.
+void indicateWiFi(byte value) {
+  pinMode(WIFI_STATUS_LED, OUTPUT);
+  #ifdef ESP8266
+    digitalWrite(WIFI_STATUS_LED, !value);
+  #else
+    digitalWrite(WIFI_STATUS_LED, value);
+  #endif
 }
 
 void printWifiStatus() {
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-  Serial.print("Signal Strength (RSSI):");
-  Serial.print(WiFi.RSSI());
-  Serial.println(" dBm");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Port: ");
-  Serial.println(port);
+  serial.println("WiFi Connected");
+  serial.print("SSID: ");
+  serial.println(WiFi.SSID());
+  serial.print("Signal Strength (RSSI):");
+  serial.print(WiFi.RSSI());
+  serial.println(" dBm");
+  serial.print("IP Address: ");
+  serial.println(WiFi.localIP());
+  serial.print("Dino TCP Port: ");
+  serial.println(port);
+  indicateWiFi(true);
 }
 
+void connect(){
+  #ifdef ESP8266
+    WiFi.mode(WIFI_STA);
+  #endif
+  if (millis() - lastConnectAttempt > WiFiConnectTimeout){
+    WiFi.begin(ssid, pass);
+    lastConnectAttempt = millis();
+  }
+}
+
+void maintainWiFi(){
+  if (connected == true){
+    if (WiFi.status() == WL_CONNECTED) return;
+    connected = false;
+    connect();
+  }
+  if (connected == false){
+    if (WiFi.status() != WL_CONNECTED) {
+      connect();
+      return;
+    }
+    connected = true;
+    printWifiStatus();
+  }
+}
 
 void setup() {
-  // Start serial for debugging.
-  Serial.begin(9600);
+  // Wait for serial ready.
+  serial.begin(115200);
+  while(!serial);
 
-  // Try to connect to the specified network.
-  while ( status != WL_CONNECTED) { 
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
-    delay(10000);
-  } 
-  
-  // Start the server.
+  // Enable over the air updates and "EEPROM" on the ESP8266.
+  #ifdef ESP8266
+    EEPROM.begin(512);
+    ArduinoOTA.begin();
+  #endif
+  // Start the dino TCP server.
   server.begin();
-  printWifiStatus();
 
-  // Attach the write callback.
-  dino.setupWrite(writeCallback);
+  delay(2000);
+
+  // Attempt initial WiFi connection.
+  #ifdef debug
+    indicateWiFi(false);
+    serial.println();
+    serial.print("Attempting to connect to SSID: ");
+    serial.println(ssid);
+  #endif
+  connect();
+
+  // Add listener callbacks for local logic.
+  dino.digitalListenCallback = onDigitalListen;
+  dino.analogListenCallback = onAnalogListen;
+
+  // Use serial as the dino IO stream until we get a TCP connection.
+  dino.stream = &serial;
 }
 
 void loop() {
-  // Listen for connections.
-  client = server.available();
-  
-  // Handle a connection.
-  if (client) {
-    while (client.connected()) {
-      while (client.available()) dino.parse(client.read());
-      dino.updateListeners();
-      writeResponses();
-    }
+  // Reconnect if we've lost WiFi.
+  maintainWiFi();
+
+  // Allow one client at a time to be connected. Set it as the dino IO stream.
+  if (!client){
+    client = server.available();
+    if (client) dino.stream = &client;
   }
-  client.stop();
+
+  // Main loop of the dino library.
+  dino.run();
+
+  // End the connection when client disconnects and revert to serial IO.
+  if (client && !client.connected()){
+    client.stop();
+    dino.stream = &serial;
+  }
+
+  // Handle OTA updates.
+  #ifdef ESP8266
+    ArduinoOTA.handle();
+  #endif
+}
+
+// This runs every time a digital pin that dino is listening to changes value.
+// p = pin number, v = current value
+void onDigitalListen(byte p, byte v){
+}
+
+// This runs every time an analog pin that dino is listening to gets read.
+// p = pin number, v = read value
+void onAnalogListen(byte p, int v){
 }

@@ -3,55 +3,69 @@ require 'timeout'
 
 module Dino
   module TxRx
+    class SerialConnectError < StandardError; end
+    class TCPConnectError    < StandardError; end
+    class HandshakeError     < StandardError; end
+    class RxFlushTimeout     < StandardError; end
+
     class Base
       include Observable
-
-      def read
-        @thread ||= Thread.new do
-          loop do
-            line = gets
-            if line && line.match(/\A\d+:/)
-              pin, message = line.chop.split(/:/)
-              pin && message && changed && notify_observers(pin, message)
-            end
-          end
-        end
+      include Handshake
+      # We need the methods in FlowControl to wrap subclass methods too.
+      def self.inherited(subclass)
+        subclass.send(:prepend, FlowControl)
       end
 
-      def close_read
-        return nil if @thread.nil?
-        Thread.kill(@thread)
-        @thread = nil
+    private
+    
+      def parse(line)
+        changed && notify_observers(line) if line
       end
 
-      def write(message)
-        loop do
-          if IO.select(nil, [io], nil)
-            io.syswrite(message)
-            break
-          end
-        end
+      def io
+        @io ||= connect
       end
 
-      def handshake
+      def io_reset
         flush_read
-        10.times do
-          write Dino::Message.encode(command: 90)
-          line = gets(1)
-          if line && line.match(/ACK:/)
-            flush_read
-            return line.chop.split(/:/)[1]
-          end
-        end
-       raise BoardNotFound
+        stop_read
+        start_read
+        stop_write
+        start_write
       end
 
       def flush_read
-        gets until gets == nil
+        Timeout.timeout(5) { _read until _read == nil }
+      rescue Timeout::Error
+        raise RxFlushTimeout, "Cannot read from device, or device not running dino"
       end
 
-      def gets(timeout=0.005)
-        IO.select([io], nil, nil, timeout) && io.gets
+      def start_read
+        @read_thread ||= Thread.new do
+          loop { parse(read) }
+        end
+      end
+
+      def stop_read
+        Thread.kill(@read_thread) if @read_thread
+        @read_thread = nil
+      end
+      
+      def start_write
+        @write_thread ||= Thread.new do
+          # Tell the board to reset if our script is interrupted.
+          trap("INT") do
+            _write "\n91\n"
+            raise Interrupt
+          end
+          
+          loop { write_from_buffer }
+        end
+      end
+      
+      def stop_write
+        Thread.kill(@write_thread) if @write_thread
+        @write_thread = nil
       end
     end
   end

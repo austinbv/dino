@@ -1,4 +1,4 @@
-require 'serialport'
+require 'rubyserial'
 
 module Dino
   module TxRx
@@ -8,24 +8,60 @@ module Dino
       def initialize(options={})
         @device = options[:device]
         @baud = options[:baud] || BAUD
-        @first_write = true
       end
 
-      def io
-        @io ||= connect
+      def to_s
+        "#{@device} @ #{@baud} baud"
       end
 
-      def handshake
-        io
-        sleep 3 if on_windows?
-        super
+      def _write(message)
+        io.write(message)
       end
 
-      private
+      def _read
+        buff, escaped = "", false
+        loop do
+          char = io.read(1)
+          if ["\n", "\\"].include? char
+            if escaped
+              buff << char
+              escaped = false
+            elsif (char == "\n")
+              return buff
+            elsif (char == "\\")
+              escaped = true
+            end
+          else
+            escaped = false
+            buff << char
+          end
+          return nil if (buff.empty? && !escaped)
+        end
+      end
+
+    private
 
       def connect
-        tty_devices.each { |device| return SerialPort.new(device, @baud) rescue nil }
-        raise BoardNotFound
+        tty_devices.each do |device|
+          begin
+            @device = device
+            print "Trying serial device: #{self.to_s}... "
+            connection = ::Serial.new(@device, @baud)
+            puts "Connected"
+            return connection
+          rescue RubySerial::Error => error
+            handle_error(error); next
+          end
+        end
+        raise SerialConnectError, "Could not connect to a serial device."
+      end
+
+      def handle_error(error)
+        if error.message == "EBUSY"
+          puts "Device Busy! (EBUSY)"
+        else
+          puts "RubySerial Error (#{error.message})"
+        end
       end
 
       def tty_devices
@@ -35,7 +71,7 @@ module Dino
       end
 
       def on_windows?
-        RUBY_PLATFORM.match /mswin|mingw/i
+        RUBY_PLATFORM.match(/mswin|mingw/i)
       end
     end
   end

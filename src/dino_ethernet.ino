@@ -1,13 +1,15 @@
 #include "Dino.h"
 #include <SPI.h>
 #include <Ethernet.h>
-#include <Servo.h>
-#include <LiquidCrystal.h>
-#include "DHT.h"
 
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-  #include <SoftwareSerial.h>
+// Define 'serial' as the serial interface we want to use.
+// Defaults to Native USB port on the Due, whatever class "Serial" is on everything else.
+// Classes need to inherit from Stream to be compatible with the Dino library.
+#if defined(__SAM3X8E__)
+  #define serial SerialUSB
+  //#define serial Serial
+#else
+  #define serial Serial
 #endif
 
 // Configure your MAC address, IP address, and HTTP port here.
@@ -18,36 +20,18 @@ int port = 3466;
 Dino dino;
 EthernetServer server(port);
 EthernetClient client;
-char responseBuffer[65];
-
-
-// Dino.h doesn't handle TXRX.
-// Setup a callback to buffer responses for writing.
-void bufferResponse(char *response) {
-  if (strlen(responseBuffer) > 56 ) writeResponses();
-  strcpy(responseBuffer, response);
-}
-void (*writeCallback)(char *str) = bufferResponse;
-
-// Write the buffered responses to the client.
-void writeResponses() {
-  if (responseBuffer[0] != '\0')
-    client.write(responseBuffer);
-    responseBuffer[0] = '\0';
-}
 
 void printEthernetStatus() {
-  // Print ethernet status.
   Serial.print("IP Address: ");
   Serial.println(Ethernet.localIP());
   Serial.print("Port: ");
   Serial.println(port);
 }
 
-
 void setup() {
-  // Start serial for debugging.
-  Serial.begin(9600);
+  // Wait for serial ready.
+  serial.begin(115200);
+  while(!serial);
 
   // Explicitly disable the SD card.
   pinMode(4,OUTPUT);
@@ -56,23 +40,38 @@ void setup() {
   // Start up the network connection and server.
   Ethernet.begin(mac, ip);
   server.begin();
-  printEthernetStatus();
+  #ifdef debug
+    printEthernetStatus();
+  #endif
 
-  // Attach the write callback.
-  dino.setupWrite(writeCallback);
+  // Add listener callbacks for local logic.
+  dino.digitalListenCallback = onDigitalListen;
+  dino.analogListenCallback = onAnalogListen;
 }
 
 void loop() {
-  // Listen for connections.
-  client = server.available();
-  
-  // Handle a connection.
-  if (client) {
-    while (client.connected()) {
-      while (client.available()) dino.parse(client.read());
-      dino.updateListeners();
-      writeResponses();
-    }
+  // Allow one client at a time to be connected. Set it as the dino IO stream.
+  if (!client){
+    client = server.available();
+    if (client) dino.stream = &client;
   }
-  client.stop();
+
+  // Main loop of the dino library.
+  dino.run();
+
+  // End the connection when client disconnects and revert to serial IO.
+  if (client && !client.connected()){
+    client.stop();
+    dino.stream = &serial;
+  }
+}
+
+// This runs every time a digital pin that dino is listening to changes value.
+// p = pin number, v = current value
+void onDigitalListen(byte p, byte v){
+}
+
+// This runs every time an analog pin that dino is listening to gets read.
+// p = pin number, v = read value
+void onAnalogListen(byte p, int v){
 }

@@ -1,17 +1,26 @@
 module Dino
   module Message
+    BYTE_RANGE = (0..255)
+
     def self.encode(options={})
       cmd = options[:command]
       pin = options[:pin]
       val = options[:value]
       aux = options[:aux_message]
-      aux.to_s.gsub!("\n", "\\\n") if aux
+      aux = aux.to_s.gsub("\\","\\\\\\\\").gsub("\n", "\\\n") if aux
 
-      raise Exception.new('command must be specified') unless cmd
-      raise Exception.new('commands can only be four digits') if cmd.to_s.length > 4
-      raise Exception.new('pins can only be four digits') if pin.to_s.length > 4
-      raise Exception.new('values can only be four digits') if val.to_s.length > 4
-      raise Exception.new('auxillary messages are limited to 255 characters') if aux.to_s.length > 255
+      unless cmd && BYTE_RANGE.include?(cmd)
+        raise ArgumentError, 'command missing or not integer in range 0 to 255'
+      end
+      if pin && !BYTE_RANGE.include?(pin)
+        raise ArgumentError, 'pin must be integer in range 0 to 255'
+      end
+      if val && !BYTE_RANGE.include?(val)
+        raise ArgumentError, 'value must be integer in range 0 to 255'
+      end
+      if aux.to_s.length > 512
+        raise ArgumentError, 'auxillary messages are limited to 512 characters'
+      end
 
       message = ""
       [aux, val, pin].each do |fragment|

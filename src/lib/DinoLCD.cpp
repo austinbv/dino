@@ -1,3 +1,5 @@
+#include "Dino.h"
+#ifdef DINO_LCD
 #include "Arduino.h"
 #include "DinoLCD.h"
 
@@ -66,3 +68,4 @@ void DinoLCD::setLCDCursor(char *aux) {
   int *values = parse(aux);
   lcd.setCursor(values[0], values[1]);
 }
+#endif

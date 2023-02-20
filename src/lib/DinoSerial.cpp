@@ -1,6 +1,5 @@
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-
+#include "Dino.h"
+#ifdef DINO_SERIAL
 #include "Arduino.h"
 #include "DinoSerial.h"
 
@@ -41,5 +40,4 @@ void DinoSerial::begin(char *aux) {
   int baud = atoi(aux);
   softSerial.begin(baud);
 }
-
 #endif

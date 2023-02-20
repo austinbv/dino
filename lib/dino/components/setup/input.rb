@@ -2,6 +2,7 @@ module Dino
   module Components
     module Setup
       module Input
+        include SinglePin
         attr_reader :pullup
 
         def pullup=(pullup)
@@ -9,13 +10,16 @@ module Dino
           board.set_pullup(self.pin, pullup)
         end
 
-        protected
+        def _stop_listener
+          board.stop_listener(pin)
+        end
 
+      protected
+      
         def initialize_pins(options={})
           super(options)
           self.mode = :in
           self.pullup = options[:pullup]
-          board.start_read
         end
       end
     end

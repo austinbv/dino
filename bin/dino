@@ -5,13 +5,18 @@
 require "pathname"
 bin_file = Pathname.new(__FILE__).realpath
 
-# Make sure dino is in the load path
-$:.unshift File.expand_path("../../lib", bin_file)
-
-# Work out paths for the CLI
-working_dir = Dir.pwd
+# Find everything else
 src_dir = bin_file.to_s.chomp("/bin/dino") + "/src"
+lib_dir = bin_file.to_s.chomp("/bin/dino") + "/lib"
+cli_dir = bin_file.to_s.chomp("/bin/dino") + "/lib/dino_cli"
+working_dir = Dir.pwd
+
+# Make sure dino is in the load path
+$:.unshift lib_dir
 
 # Start the CLI
 require "dino_cli"
-DinoCLI.start(working_dir: working_dir, src_dir: src_dir, args: ARGV)
+DinoCLI.start working_dir: working_dir,
+              src_dir: src_dir,
+              cli_dir: cli_dir,
+              args: ARGV

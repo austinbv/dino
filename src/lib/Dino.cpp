@@ -1,45 +1,63 @@
 /*
   Library for dino ruby gem.
 */
-
-#include "Arduino.h"
 #include "Dino.h"
-DinoLCD dinoLCD;
-DHT dht;
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-  DinoSerial dinoSerial;
-#endif  
-
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
   messageFragments[1] = pinStr;
   messageFragments[2] = valStr;
   messageFragments[3] = auxMsg;
-  reset();
+  resetState();
 }
 
-void Dino::parse(char c) {
-  // Handle escaped newlines.
-  if (backslash) {
-    if (c != '\n') append('\\');
-    append(c);
-    backslash = false;
+
+void Dino::rxNotify() {
+  stream->print("Rx");
+  stream->print(rxBytes);
+  stream->print("\n");
+  rxBytes = 0;
+}
+
+void Dino::run(){
+  while(stream->available() > 0) {
+    rxBytes ++;
+    parse(stream->read());
+
+    // Acknowledge when we've received half as many bytes as the serial buffer.
+    if (rxBytes >= rxNotifyLimit) rxNotify();
   }
 
-  // If EOL process and reset.
-  else if (c == '\n') {
-    append('\0');
-    process();
-    fragmentIndex = 0;
-    charIndex = 0;
+  // Run dino's listeners.
+  updateListeners();
+}
+
+
+void Dino::parse(byte c) {
+  if ((c == '\n') || (c == '\\')) {
+    // If last char was a \, this \ or \n is escaped.
+    if(escaping){
+      append(c);
+      escaping = false;
+    }
+
+    // If EOL, process and reset.
+    else if (c == '\n'){
+      append('\0');
+      if ((fragmentIndex > 0) || (charIndex > 1)) process();
+      fragmentIndex = 0;
+      charIndex = 0;
+    }
+
+    // Backslash is the escape character.
+    else if (c == '\\') escaping = true;
   }
 
   // If fragment delimiter, terminate current fragment and move to next.
   // Unless we're in the auxillary message fragment, then just append.
   else if (c == '.') {
     if (fragmentIndex < 3) {
+      escaping = false;
       append('\0');
       fragmentIndex++;
       charIndex = 0;
@@ -48,326 +66,216 @@ void Dino::parse(char c) {
     }
   }
 
-  // Catch backslash so we can escape the next character.
-  else if (c == '\\') backslash = true;
-
   // Else just append the character.
-  else append(c);
+  else {
+    escaping = false;
+    append(c);
+  }
 }
 
-void Dino::append(char c) {
-  messageFragments[fragmentIndex][charIndex++] = c;
+void Dino::append(byte c) {
+  messageFragments[fragmentIndex][charIndex] = c;
+  charIndex++;
 }
 
 void Dino::process() {
-  cmd = atoi(cmdStr);
-  pin = atoi(pinStr);
-  val = atoi(valStr);
-  response[0] = '\0';
+  cmd = atoi((char *)cmdStr);
+  pin = atoi((char *)pinStr);
+  val = atoi((char *)valStr);
 
   #ifdef debug
-   Serial.print("Command - ");          Serial.println(cmdStr);
-   Serial.print("Pin - ");              Serial.println(pinStr);
-   Serial.print("Value - ");            Serial.println(valStr);
+    if (cmd != 90) {
+      Serial.print("cmd:");   Serial.print(cmd);
+      Serial.print(", pin:"); Serial.print(pin);
+      Serial.print(", val:"); Serial.println(val);
+    }
   #endif
 
   // Call the command.
   switch(cmd) {
-    case 0:  setMode             ();  break;
-    case 1:  dWrite              ();  break;
-    case 2:  dRead               ();  break;
-    case 3:  aWrite              ();  break;
-    case 4:  aRead               ();  break;
-    case 5:  addDigitalListener  ();  break;
-    case 6:  addAnalogListener   ();  break;
-    case 7:  removeListener      ();  break;
-    case 8:  servoToggle         ();  break;
-    case 9:  servoWrite          ();  break;
-    case 10: handleLCD           ();  break;
-    case 11: shiftWrite          ();  break;
-    case 12: handleSerial        ();  break;
-    case 13: handleDHT           ();  break;
-    case 90: reset               ();  break;
+    // Implemented in DinoCoreIO.cpp
+    case 0:  setMode             (pin, val);        break;
+    case 1:  dWrite              (pin, val, false); break;
+    case 2:  dRead               (pin);             break;
+    case 3:  aWrite              (pin, val, false); break;
+    case 4:  aRead               (pin);             break;
+    case 5:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
+
+	#ifdef EEPROM_PRESENT
+    // Implemented in DinoEEPROM.cpp
+    case 6:  eepromRead          ();    break;
+    case 7:  eepromWrite         ();    break;
+	#endif
+
+    // Implemented in DinoServo.cpp
+    #ifdef DINO_SERVO
+    case 8:  servoToggle         ();    break;
+    case 9:  servoWrite          ();    break;
+    #endif
+
+    // Implemented in DinoLCD.cpp
+    #ifdef DINO_LCD
+    case 10: handleLCD           ();    break;
+    #endif
+
+    // Implemented in DinoPulseInput.cpp
+    case 11: pulseRead           ();    break;
+
+    // Implemented in DinoSerial.cpp
+    #ifdef DINO_SERIAL
+    case 12: handleSerial        ();    break;
+    #endif
+
+    // Implemented in DinoIROut.cpp
+    #ifdef DINO_IR_OUT
+    case 16: irSend              ();    break;
+    #endif
+
+    // Implemented in DinoTone.cpp
+    #ifdef DINO_TONE
+    case 17: tone                ();    break;
+    case 18: noTone              ();    break;
+    #endif
+
+    // Implemented in DinoShift.cpp
+    #ifdef DINO_SHIFT
+    case 21: shiftWrite          (pin, val, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[3]); break;
+    case 22: shiftRead           (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);             break;
+    case 23: addShiftListener    ();  break;
+    case 24: removeShiftListener ();  break;
+    #endif
+
+    // Implemented in DinoSPI.cpp
+    #ifdef DINO_SPI
+    case 26: spiTransfer      (pin, auxMsg[0], auxMsg[1], auxMsg[2], (uint32_t)auxMsg[3], &auxMsg[7]); break;
+    case 27: addSpiListener   ();  break;
+    case 28: removeSpiListener();  break;
+    #endif
+
+    // Implemented in DinoI2C.cpp
+    #ifdef DINO_I2C
+    case 33: i2cSearch           ();  break;
+    case 34: i2cWrite            ();  break;
+    case 35: i2cRead             ();  break;
+    #endif
+
+    // Implemented in DinoOneWire.cpp
+    #ifdef DINO_ONE_WIRE
+    case 41: owReset             ();  break;
+    case 42: owSearch            ();  break;
+    case 43: owWrite             ();  break;
+    case 44: owRead              ();  break;
+    #endif
+
+    // Implemented in this file.
+    case 90: handshake           ();  break;
+    case 91: resetState          ();  break;
+    case 95: setRegisterDivider  ();  break;
     case 96: setAnalogResolution ();  break;
-    case 97: setAnalogDivider    ();  break;
-    case 98: setHeartRate        ();  break;
+
+    // Should send a "feature not implemented" message as default.
     default:                          break;
   }
-  
-  // Write the response.
-  if (response[0] != '\0') writeResponse();
-  
-  #ifdef debug
-   Serial.print("Responded with - "); Serial.println(response);
-   Serial.println();
-  #endif
 }
 
-
-
-// WRITE CALLBACK
-void Dino::setupWrite(void (*writeCallback)(char *str)) {
-  _writeCallback = writeCallback;
-}
-void Dino::writeResponse() {
-  _writeCallback(response);
-  _writeCallback("\n");
-}
-
-// LISTNENERS
+//
+// Every 1000 microseconds count a tick and call the listeners.
+// Each core listener has its own divider, so it can read every
+// 1, 2, 4, 8, 16, 32, 64 or 128 ticks, independent of the others.
+//
+// Register listeners are still on a global divider for now.
+// Analog and register listeners always send values even if not changed.
+// Digital listeners only send values on change.
+//
 void Dino::updateListeners() {
-  if (timeSince(lastUpdate) > heartRate || timeSince(lastUpdate) < 0) {
-    lastUpdate = micros();
-    loopCount++;
-    updateDigitalListeners();
-    if (loopCount % analogDivider == 0) updateAnalogListeners();
-  }
-}
-void Dino::updateDigitalListeners() {
-  for (int i = 0; i < PIN_COUNT; i++) {
-    if (digitalListeners[i]) {
-      pin = i;
-      dRead();
-      if (rval != digitalListenerValues[i]) {
-        digitalListenerValues[i] = rval;
-        writeResponse();
-      } 
-    }
-  }
-}
-void Dino::updateAnalogListeners() {
-  for (int i = 0; i < PIN_COUNT; i++) {
-    if (analogListeners[i]) {
-      pin = i;
-      aRead();
-      writeResponse();
-    }
-  }
-}
-long Dino::timeSince(long event) {
- long time = micros() - event;
- return time;
-}
+  currentTime = micros();
+  timeDiff = currentTime - lastTime;
+  
+  if (timeDiff > 999) {
+    // Add a tick for every 1000us passed
+    tickCount = tickCount + (timeDiff / 1000);
+      
+    // lastTime for next run is currentTime offset by remainder.
+    lastTime = currentTime - (timeDiff % 1000);
 
+    updateCoreListeners();
 
-
-// API FUNCTIONS
-// CMD = 00 // Pin Mode
-void Dino::setMode() {
-  if (val == 0) {
-    removeListener();
-    pinMode(pin, OUTPUT);
-    #ifdef debug
-      Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("OUTPUT mode");
+    // Register Listeners
+    #ifdef DINO_SHIFT
+      if (tickCount % registerDivider == 0) updateShiftListeners();
+    #endif
+    #ifdef DINO_SPI
+      if (tickCount % registerDivider == 0) updateSpiListeners();
     #endif
   }
-  else {
-    pinMode(pin, INPUT);
-    #ifdef debug
-      Serial.print("Set pin "); Serial.print(pin); Serial.print(" to "); Serial.println("INPTUT mode");
-    #endif
-  }
-}
-
-// CMD = 01 // Digital Write
-void Dino::dWrite() {
-  if (val == 0) {
-    digitalWrite(pin, LOW);
-    #ifdef debug
-      Serial.print("Digital write "); Serial.print(LOW); Serial.print(" to pin "); Serial.println(pin);
-    #endif
-  }
-  else {
-    digitalWrite(pin, HIGH);
-    #ifdef debug
-      Serial.print("Digital write "); Serial.print(HIGH); Serial.print(" to pin "); Serial.println(pin);
-    #endif
-  }
-}
-
-// CMD = 02 // Digital Read
-void Dino::dRead() { 
-  rval = digitalRead(pin);
-  sprintf(response, "%02d:%02d", pin, rval);
-}
-
-// CMD = 03 // Analog (PWM) Write
-void Dino::aWrite() {
-  analogWrite(pin,val);
-  #ifdef debug
-    Serial.print("Analog write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
-  #endif
-}
-
-// CMD = 04 // Analog Read
-void Dino::aRead() {
-  rval = analogRead(pin);
-  sprintf(response, "%02d:%02d", pin, rval);
-}
-
-// CMD = 05
-// Listen for a digital signal on any pin.
-void Dino::addDigitalListener() {
-  removeListener();
-  digitalListeners[pin] = true;
-  digitalListenerValues[pin] = 2;
-  #ifdef debug
-    Serial.print("Added digital listener on pin "); Serial.println(pin);
-  #endif
-}
-
-// CMD = 06
-// Listen for an analog signal on analog pins only.
-void Dino::addAnalogListener() {
-  removeListener();
-  analogListeners[pin] = true;
-  #ifdef debug
-    Serial.print("Added analog listener on pin "); Serial.println(pin);
-  #endif
-}
-
-// CMD = 07
-// Remove analog and digital listeners from any pin.
-void Dino::removeListener() {
-  analogListeners[pin] = false;
-  digitalListeners[pin] = false;
-  #ifdef debug
-    Serial.print("Removed listeners on pin "); Serial.println(pin);
-  #endif
-}
-
-// CMD = 08
-// Attach the servo object to pin or detach it.
-void Dino::servoToggle() {
-  if (val == 0) {
-    #ifdef debug
-      Serial.print("Detaching servo"); Serial.print(" on pin "); Serial.println(pin);
-    #endif
-    servos[pin - SERVO_OFFSET].detach();
-  }
-  else {
-    #ifdef debug
-      Serial.print("Attaching servo"); Serial.print(" on pin "); Serial.println(pin);
-    #endif
-    servos[pin - SERVO_OFFSET].attach(pin);
-  }
-}
-
-// CMD = 09
-// Write a value to the servo object.
-void Dino::servoWrite() {
-  #ifdef debug
-    Serial.print("Servo write "); Serial.print(val); Serial.print(" to pin "); Serial.println(pin);
-  #endif
-  servos[pin - SERVO_OFFSET].write(val);
-}
-
-// CMD = 10
-// Write a value to the servo object.
-void Dino::handleLCD() {
-  #ifdef debug
-    Serial.print("DinoLCD command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
-  #endif
-  dinoLCD.process(val, auxMsg);
-}
-
-// CMD = 11
-// Write to a shift register.
-void Dino::shiftWrite() {
-  #ifdef debug
-    Serial.print("Shift write :"); Serial.print(val); Serial.print(" to pin "); Serial.print(pin); Serial.print(". Clock pin: "); Serial.println(auxMsg);
-  #endif
-  // auxMsg should be the clock pin.
-  shiftOut(pin, atoi(auxMsg), MSBFIRST, val);
-}
-
-
-// CMD = 12
-// Control the SoftwareSerial.
-void Dino::handleSerial() {
-  #ifdef debug
-    Serial.print("DinoSerial command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
-  #endif
-  // SoftwareSerial doesn't work on the Due yet.
-  #if !defined(__SAM3X8E__)
-  dinoSerial.process(val, auxMsg);
-  #endif
-}
-
-
-// CMD = 13
-// Read a DHT sensor
-void Dino::handleDHT() {
-  #ifdef debug
-    Serial.print("DinoDHT command: "); Serial.print(val); Serial.print(" with data: "); Serial.println(auxMsg);
-  #endif
-  // dtostrf doesn't work on the Due yet.
-  #if !defined(__SAM3X8E__)
-  if (pin != dht.pin) dht.setup(pin);
-  float reading;
-  char readingBuff[10];
-  char prefix;
-  if (val == 0) {
-    reading = dht.getTemperature();
-    prefix = 'T';
-  } else {
-    reading = dht.getHumidity();
-    prefix = 'H';
-  }
-  if (! isnan(reading)) {
-    dtostrf(reading, 6, 4, readingBuff);
-    sprintf(response, "%d:%c%s", pin, prefix, readingBuff);
-  }
-  #endif
 }
 
 
 // CMD = 90
-void Dino::reset() {
-  heartRate = 4000; // Default heartRate is ~4ms.
-  loopCount = 0;
-  analogDivider = 4; // Update analog listeners every ~16ms.
-  for (int i = 0; i < PIN_COUNT; i++) digitalListeners[i] = false;
-  for (int i = 0; i < PIN_COUNT; i++) digitalListenerValues[i] = 2;
-  for (int i = 0; i < PIN_COUNT; i++)  analogListeners[i] = false;
-  lastUpdate = micros();
+void Dino::handshake() {
+  resetState();
+
+  // Reset this so we never send Rx along with ACK:
+  rxBytes = 0;
+
+  stream->print("ACK:");
+  stream->print(AUX_SIZE);
+  stream->print(',');
+  
+  // Send the defined length for ESP8266 EEPROM and initialize later.
+  // Read the value and send that for other boards, except the Due.
+  #ifdef ESP8266
+  	stream->print(ESP8266_EEPROM_LENGTH);
+  #elif defined(EEPROM_PRESENT)
+	stream->print(EEPROM.length());
+  #else
+     stream->print('0');
+  #endif
+	
+  stream->print(',');
+  stream->print(A0);
+  #if defined(__SAM3X8E__)
+    stream->print(',');
+    stream->print(DAC0);
+  #endif
+  stream->print('\n');
+}
+
+// CMD = 91
+void Dino::resetState() {
+  clearCoreListeners();
+  #ifdef DINO_SPI
+    clearSpiListeners();
+  #endif
+  #ifdef DINO_SHIFT
+    clearShiftListeners();
+  #endif
+  registerDivider = 8; // Update register listeners every ~8ms.
   fragmentIndex = 0;
   charIndex = 0;
+  tickCount = 0;
+  lastTime = micros();
+}
 
-  #if defined(__SAM3X8E__)
-    sprintf(response, "ACK:%d,%d", A0, DAC0);
-  #else
-    sprintf(response, "ACK:%d", A0);
+
+// CMD = 95
+// Set the register read divider. Powers of 2 up to 128 are valid.
+void Dino::setRegisterDivider() {
+  registerDivider = val;
+  #ifdef debug
+    Serial.print("Called Dino::setRegisterDivider()\n");
   #endif
 }
 
-// CMD = 97
+
+// CMD = 96
 // Set the analog read and write resolution.
 void Dino::setAnalogResolution() {
   #if defined(__SAM3X8E__)
     analogReadResolution(val);
     analogWriteResolution(val);
-    #ifdef debug
-      Serial.print("Analog R/W resolution set to "); Serial.println(val);
-    #endif
   #endif
-}
-
-// CMD = 97
-// Set the analog divider. Powers of 2 up to 128 are valid.
-void Dino::setAnalogDivider() {
-  analogDivider = val;
   #ifdef debug
-    Serial.print("Analog divider set to "); Serial.println(analogDivider);
+    Serial.print("Called Dino::setAnalogResolution()\n");
   #endif
 }
-
-// CMD = 98
-// Set the heart rate in milliseconds. Store it in microseconds.
-void Dino::setHeartRate() {
-  heartRate = atoi(auxMsg);
-  #ifdef debug
-    Serial.print("Heart rate set to "); Serial.print(heartRate); Serial.println(" microseconds");
-  #endif
-}
-

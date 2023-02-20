@@ -9,10 +9,12 @@ module Dino
         end
 
         def write(value)
-          unless [board.low, board.high].include? value
-            analog_write(value)
+          if value == board.low
+            digital_write(board.low)
+          elsif value == board.analog_high
+            digital_write(board.high)
           else
-            digital_write(value)
+            analog_write(value)
           end
         end
       end

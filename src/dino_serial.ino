@@ -1,41 +1,40 @@
 #include "Dino.h"
-#include <Servo.h>
-#include <LiquidCrystal.h>
-#include "DHT.h"
-
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-  #include <SoftwareSerial.h>
-#endif
 
 Dino dino;
 
-// Use 'serial' to reference the right interface depending on the device.
-// Uses native USB connection on the Due by default.
+// Define 'serial' as the serial interface we want to use.
+// Defaults to Native USB port on the Due, whatever class "Serial" is on everything else.
+// Classes need to inherit from Stream to be compatible with the Dino library.
 #if defined(__SAM3X8E__)
-  Serial_ &serial = SerialUSB;
-#elif defined(__AVR_ATmega32U4__)
-  Serial_ &serial = Serial;
+  #define serial SerialUSB
+  //#define serial Serial
 #else
-  HardwareSerial &serial = Serial;
+  #define serial Serial
 #endif
 
-// Dino.h doesn't handle TXRX. Create a callback so it can write to serial.
-void writeResponse(char *response) { serial.print(response); }
-void (*writeCallback)(char *str) = writeResponse;
-
 void setup() {
+  // Wait for serial ready.
   serial.begin(115200);
-  
-  // Wait for Leonardo serial port to connect.
-  #if defined(__AVR_ATmega32U4__)
-    while(!serial);
-  #endif
+  while(!serial);
 
-  dino.setupWrite(writeCallback);
+  // Pass serial stream to dino so it can read/write.
+  dino.stream = &serial;
+
+  // Add listener callbacks for local logic.
+  dino.digitalListenCallback = onDigitalListen;
+  dino.analogListenCallback = onAnalogListen;
 }
 
 void loop() {
-  while(serial.available() > 0) dino.parse(serial.read());
-  dino.updateListeners();
+  dino.run();
+}
+
+// This runs every time a digital pin that dino is listening to changes value.
+// p = pin number, v = current value
+void onDigitalListen(byte p, byte v){
+}
+
+// This runs every time an analog pin that dino is listening to gets read.
+// p = pin number, v = read value
+void onAnalogListen(byte p, int v){
 }

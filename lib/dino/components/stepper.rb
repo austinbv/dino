@@ -1,8 +1,8 @@
 module Dino
   module Components
     class Stepper
-      include Setup::MultiPin 
-
+      include Setup::MultiPin
+      
       proxy_pins  step:      Basic::DigitalOutput,
                   direction: Basic::DigitalOutput
 
@@ -61,6 +61,8 @@ module Dino
         step.high
         step.low
       end
+
+      alias :step_ccw :step_cc
     end
   end
 end

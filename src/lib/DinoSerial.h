@@ -1,6 +1,5 @@
-// SoftwareSerial doesn't work on the Due yet.
-#if !defined(__SAM3X8E__)
-
+#include "Dino.h"
+#ifdef DINO_SERIAL
 #ifndef DinoSerial_h
 #define DinoSerial_h
 
@@ -19,5 +18,4 @@ class DinoSerial {
 };
 
 #endif
-
 #endif

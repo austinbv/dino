@@ -5,16 +5,20 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
+dht = Dino::Components::DHT.new(pin: 4, board: board)
 
-# The temperature and humidity functions of the DHT sensors are
-# modelled separately, but both isntances can be set up on the same pin.
-temp = Dino::Components::DHT::Temperature.new(pin: 4, board: board)
-humidity = Dino::Components::DHT::Humidity.new(pin: 4, board: board)
-
-temp.read do |temperature|
-  puts "The temperature is #{temperature} degrees C"
+# The DHT class pre-processes raw data from the board. When it reaches callbacks
+# it's already hash of :temperature and :humidity keys, both with Float values.
+dht.add_callback do |reading|
+  print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
+  if reading[:error]
+    puts "Error: #{reading[:error]}"
+  else
+    print "#{reading[:celsius]} \xC2\xB0C | #{reading[:fahrenheit]} \xC2\xB0F | "
+    puts "#{reading[:humidity]}% relative humidity"
+  end
 end
 
-humidity.read do |humidity|
-  puts "The relative humidity is #{humidity}%"
-end
+# Read it every 5 seconds.
+dht.poll(5)
+sleep
