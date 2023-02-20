@@ -22,7 +22,7 @@ module Dino
           value = board.high unless (value == board.low)
           board.digital_write(pin, @state = value)
         end
-
+        
         alias :write :digital_write
 
         def low
@@ -36,12 +36,15 @@ module Dino
         def toggle
           state == board.low ? high : low
         end
-
+        
         alias :off :low
         alias :on  :high
-
+        
         def high?; state == board.high end
         def low?;  state == board.low  end
+        
+        alias :on?  :high?
+        alias :off? :low?
       end
     end
   end
