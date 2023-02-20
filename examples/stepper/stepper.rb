@@ -35,6 +35,9 @@ stepper.microsteps = 1
   sleep 0.006
 end
 
+# Sleep the driver once we're done.
+stepper.sleep
+
 # We write to the board asynchronously.
 # Make sure we send all step commands before exit.
 board.finish_write
