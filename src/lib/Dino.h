@@ -69,6 +69,21 @@ class Dino {
     void findLastActiveListener();
 
     //
+    // Tanslating aWrite to ledcWrite for PWM out on the ESP32.
+    //
+    #ifdef ESP32
+    //
+    // Track which pin is assigned to each LEDC channel.
+    // Byte 0 = enabled or disabled
+    // Byte 1 = pin number attached to that channel
+    #define LEDC_CHANNEL_COUNT 16
+    byte ledcPins[LEDC_CHANNEL_COUNT][2];
+
+    byte ledcChannel(byte p);
+    void clearLedcChannels();
+    #endif
+
+    //
     // Store listeners as a 2 dimensional array where each gets 2 bytes:
     //
     // byte 0, bit 7   : 1 = enabled, 0  = disabled

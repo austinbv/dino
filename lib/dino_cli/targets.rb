@@ -16,7 +16,10 @@ class DinoCLI::Generator
     # ARM includes everytyhing except specific incompatibilities.
     sam3x: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
 
-    # A surprising amount "just works" on the ESP, notably not LCD.
+    # ESP8266 mostly working.
     esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
+    
+    # Just core implementation on the ESP32 for now.
+    esp32: [:core]
   }
 end

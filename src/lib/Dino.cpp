@@ -227,7 +227,7 @@ void Dino::handshake() {
   #ifdef ESP8266
   	stream->print(ESP8266_EEPROM_LENGTH);
   #elif defined(EEPROM_PRESENT)
-	stream->print(EEPROM.length());
+	  stream->print(EEPROM.length());
   #else
      stream->print('0');
   #endif
@@ -244,6 +244,9 @@ void Dino::handshake() {
 // CMD = 91
 void Dino::resetState() {
   clearCoreListeners();
+  #ifdef ESP32
+    clearLedcChannels();
+  #endif
   #ifdef DINO_SPI
     clearSpiListeners();
   #endif

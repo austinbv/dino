@@ -14,7 +14,11 @@ void Dino::setMode(byte p, byte m) {
     pinMode(p, OUTPUT);
   }
   else {
+    #ifdef ESP32
+    pinMode(p, INPUT_PULLUP);
+    #else
     pinMode(p, INPUT);
+    #endif
   }
 }
 
@@ -64,9 +68,56 @@ void Dino::aWrite(byte p, int v, boolean echo) {
     Serial.println(echo);
   #endif
 
-  analogWrite(p,v);
+  #ifdef ESP32
+    byte channel = ledcChannel(p);
+    ledcWrite(channel, v);
+  #else
+    analogWrite(p,v);
+  #endif
+
   if (echo) coreResponse(p, v);
 }
+
+//
+// Manage ESP32 LEDC channels so we can do PWM write.
+//
+#ifdef ESP32
+byte Dino::ledcChannel(byte p) {
+  // Return a useless channel if none available.
+  byte channel = 255;
+
+  // Search for existing LEDC channel with our pin first.
+  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+    if (ledcPins[i][1] == p) {
+      channel = i;
+      break;
+    }
+  }
+
+  // If channel is still 255 we didn't find one, so make one.
+  if (channel == 255){
+    for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+      // 0th byte being 0 means not in use.
+      if (ledcPins[i][0] == 0) {
+        // Just use similar settings to ATmega for now.
+        ledcSetup(i, 1000, 8);
+        ledcAttachPin(p, i);
+        ledcPins[i][1] = p;
+        channel = i;
+        break;
+      }
+    }
+  }
+  return channel;
+};
+
+// 0th byte = 0 for not in use.
+void Dino::clearLedcChannels(){
+  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+    ledcPins[i][0] = 0;
+  }
+}
+#endif
 
 // CMD = 04
 // Read an analog input pin. 0 for LOW, up to 1023 for HIGH @ 10-bit resolution.

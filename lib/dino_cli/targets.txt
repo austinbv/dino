@@ -7,10 +7,11 @@
       primary target and default setting. All component features are included.
 
       Chips:  ATmega328p, ATmega32u4, ATmega1280, ATmega2560
-      Boards: UNO, Nano, Mini, Ethernet
+      Boards: Arduino Uno, Nano, Mini, Ethernet
               Leonardo, Micro, Esplora, Leonardo ETH
               Mega 1280, Mega 2560, Mega ADK
               Most Lilypads (excluding ones with an ATmega168)
+
 
     esp8266
 
@@ -26,6 +27,29 @@
 
       Note: After the initial upload via serial, the WiFi sketch for this target
             supports over-the-air updates from the Arduino IDE using ArduinoOTA.
+            
+            
+    esp32
+
+      Based on the ESP32 chip by Espressif with integrated 2.4Ghz WiFi.
+      This is still EXPERIMENTAL! Only includes the core subset. WiFi not working.
+
+      Chips:  ESP32, ESP32-S2, ESP32-S3
+      Boards: ESP32 DevKit, LOLIN D32 / D32 Pro, LOLIN S2 Pico / Mini,
+              LOLIN S3 Pico / Mini
+              
+              
+    sam3x
+
+      This is the same as mega, but omits libraries specifically known to be
+      incompatible with the Atmel SAMD (ARM Cortex M0) chips. Use this when
+      you need to load a sketch on the Arduino Due or similar boards.
+      This option includes all component features EXCEPT:
+          Serial, Tone, IR Out, I2C
+
+      Chips:  AT91SAM3X8E
+      Boards: Arduino Due
+
 
     core
 
@@ -36,6 +60,7 @@
 
       This is mostly useful for testing, or if severely limited on memory, as it
       is the smallest sketch possible and should be universally compatible.
+
 
     mega168
 
@@ -58,16 +83,6 @@
             These limits apply as long as an Atmega168 is selected in the
             Arduino IDE, regardless of the options passed to this sketch generator.
 
-    sam3x
-
-      This is the same as mega, but omits libraries specifically known to be
-      incompatible with the Atmel SAMD (ARM Cortex M0) chips. Use this when
-      you need to load a sketch on the Arduino Due or similar boards.
-      This option includes all component features EXCEPT:
-          Serial, Tone, IR Out, I2C
-
-      Chips:  AT91SAM3X8E
-      Boards: Due
 
   NOTE: While different targets include different libraries, you can manually
   control which libraries are included at compile time by editing DinoDefines.h.
