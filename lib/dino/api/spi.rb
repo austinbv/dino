@@ -7,7 +7,7 @@ module Dino
         options[:read]       ||= 0
         options[:write]        = [options[:write]].flatten.compact || []
         options[:mode]       ||= 0
-        options[:frequency]  ||= 3000000
+        options[:frequency]  ||= 1000000
         options[:bit_order]  ||= :msbfrst
                   
         # Bit 0..3 of settings control the SPI mode
@@ -17,18 +17,14 @@ module Dino
         # 1000 = SPI_MODE2
         # 1100 = SPI_MODE3
         #
-        settings = case options[:mode]
-        when 0
-          0b0000
-        when 1
-          0b0100
-        when 2
-          0b1000
-        when 3
-          0b1100
-        else
-          raise ArgumentError, "invalid SPI mode. Must be 0, 1, 2, or 3"
-        end
+        settings =  case options[:mode]
+                    when 0; 0b0000
+                    when 1; 0b0100
+                    when 2; 0b1000
+                    when 3; 0b1100
+                    else
+                      raise ArgumentError, "invalid SPI mode. Must be 0, 1, 2, or 3"
+                    end
         
         # Bit 7 of settings toggles MSBFIRST (1) or LSBFIRST (0) transmission order.
         settings = settings | 0b10000000 unless options[:bit_order] == :lsbfirst
@@ -36,8 +32,9 @@ module Dino
         raise ArgumentError, "can't read more than 255 SPI bytes at a time" if options[:read] > 255
         raise ArgumentError, "can't write more than 255 SPI bytes at a time" if options[:write].length > 255
         
-        uint8 = pack(:uint8, [settings, options[:read], options[:write].length])
-        [uint8 + pack(:uint32, options[:frequency]), options]
+        header = pack :uint8, [settings, options[:read], options[:write].length]
+        header = header + pack(:uint32, options[:frequency])
+        [header, options]
       end
 
       # CMD = 26

@@ -46,6 +46,7 @@ Dino uses Arduino "cores" which add microcontroller support, and a few C++ libra
 * Search for `ESP8266 Boards` and install the latest version.
 * Now go to: Tools > Manage Libraries.
 * Find and install the following libraries, at the version numbers given:
+  * `Servo by Michael Margolis, Arduino` at latest version
   * `Liquid Crystal by Arduino, Adafruit` at latest version
   * `WiFi by Arduino` at latest version
   * `IRremote by shirriff, z3to, ArminJo` at `version 2.2.3`
@@ -54,6 +55,7 @@ Dino uses Arduino "cores" which add microcontroller support, and a few C++ libra
 **CLI:**
 ````shell
 arduino-cli core install esp8266:esp8266
+arduino-cli lib install Servo
 arduino-cli lib install LiquidCrystal
 arduino-cli lib install WiFi
 arduino-cli lib install IRremote@2.2.3

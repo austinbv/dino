@@ -20,6 +20,6 @@ class DinoCLI::Generator
     esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
     
     # Just core implementation on the ESP32 for now.
-    esp32: [:core]
+    esp32: [:core, :shift, :spi]
   }
 end
