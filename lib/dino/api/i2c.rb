@@ -10,9 +10,9 @@ module Dino
 
       # CMD = 34
       def i2c_write(address, bytes=[], options={})
-        # Bit 1 of settings controls repeated start.
+        # Bit 0 of settings controls stop (1), or repated start (0)
         settings  = 0b00
-        settings |= 0b01 if options[:repeated_start]
+        settings |= 0b01 unless options[:repeated_start]
         
         aux = pack :uint8, [address, 0, bytes.length, bytes].flatten
         write Message.encode command: 34,
@@ -24,11 +24,11 @@ module Dino
       def i2c_read(address, register, num_bytes, options={})
         raise ArgumentError, 'maximum read length from I2C devices is 32 bytes' if num_bytes > 32
         
-        # Bit 1 of settings controls repeated start.
+        # Bit 0 of settings controls stop (1), or repated start (0)
         settings  = 0b00
-        settings |= 0b01 if options[:repeated_start]
+        settings |= 0b01 unless options[:repeated_start]
         
-        # Bit 2 of settings controls whether to write a start register before reading.
+        # Bit 1 of settings controls whether to write a start register before reading.
         settings |= 0b10 if register
         register = 0 unless register
 

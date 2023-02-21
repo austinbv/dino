@@ -229,7 +229,7 @@ void Dino::handshake() {
   #elif defined(EEPROM_PRESENT)
 	stream->print(EEPROM.length());
   #else
-     stream->print('0');
+    stream->print('0');
   #endif
 	
   stream->print(',');

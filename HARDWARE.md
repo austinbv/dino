@@ -56,7 +56,7 @@
 
 | Name             | Status         | SW/HW     | Version  | Component Class | Notes |
 | :--------------- | :------:       | :-------- | :-----   | :---------------  |------ |
-| I2C              | :green_heart:  | Hardware  | 0.12.0   | `I2C::Bus`
+| I2C              | :green_heart:  | Hardware  | 0.12.0   | `I2C::Bus` | Only default clocks
 | SPI              | :green_heart:  | Hardware  | 0.12.0   | `Register::Select` | Hardware register I/O
 | Shift In/Out     | :green_heart:  | Software  | 0.12.0   | `Register::Select` | Bit bang register I/O
 | Software Serial  | :yellow_heart: | Software  | 0.12.0   | `SoftwareSerial` | No read, only write
