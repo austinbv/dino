@@ -229,7 +229,7 @@ void Dino::handshake() {
   #elif defined(EEPROM_PRESENT)
 	  stream->print(EEPROM.length());
   #else
-     stream->print('0');
+    stream->print('0');
   #endif
   
   // Third is A0. Ignore for ESP32. Pins aren't in order.
