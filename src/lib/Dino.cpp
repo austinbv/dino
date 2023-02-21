@@ -147,7 +147,7 @@ void Dino::process() {
 
     // Implemented in DinoSPI.cpp
     #ifdef DINO_SPI
-    case 26: spiTransfer      (pin, auxMsg[0], auxMsg[1], auxMsg[2], (uint32_t)auxMsg[3], &auxMsg[7]); break;
+    case 26: spiTransfer      (pin, auxMsg[0], auxMsg[1], auxMsg[2], *((uint32_t*)(auxMsg + 3)), &auxMsg[7]); break;
     case 27: addSpiListener   ();  break;
     case 28: removeSpiListener();  break;
     #endif
