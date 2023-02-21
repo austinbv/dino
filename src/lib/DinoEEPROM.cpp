@@ -13,8 +13,8 @@
 //
 void Dino::eepromRead(){
   if (val > 0) {
-	#ifdef ESP8266
-	  EEPROM.begin(ESP8266_EEPROM_LENGTH);
+	  #if defined(ESP8266) || defined(ESP32)
+	    EEPROM.begin(ESP_EEPROM_LENGTH);
     #endif
 	  
     uint16_t startAddress = ((uint16_t)auxMsg[1] << 8) | auxMsg[0];
@@ -30,9 +30,9 @@ void Dino::eepromRead(){
       stream->print((i+1 == val) ? '\n' : ',');
     }
 	
-	#ifdef ESP8266
-	  EEPROM.end();
-	#endif
+  	#if defined(ESP8266) || defined(ESP32)
+  	  EEPROM.end();
+  	#endif
   }
 }
 
@@ -46,9 +46,9 @@ void Dino::eepromRead(){
 //
 void Dino::eepromWrite(){
   if (val > 0) {
-	#ifdef ESP8266
-	  EEPROM.begin(ESP8266_EEPROM_LENGTH);
-	#endif
+  	#if defined(ESP8266) || defined(ESP32)
+  	  EEPROM.begin(ESP_EEPROM_LENGTH);
+  	#endif
 	  
     uint16_t startAddress = ((uint16_t)auxMsg[1] << 8) | auxMsg[0];
 
@@ -56,10 +56,10 @@ void Dino::eepromWrite(){
 	  EEPROM.write(startAddress + i, auxMsg[2+i]);
     }
 	
-	#ifdef ESP8266
-	  EEPROM.end();
-	  EEPROM.commit();
-	#endif
+  	#if defined(ESP8266) || defined(ESP32)
+  	  EEPROM.end();
+  	  EEPROM.commit();
+  	#endif
   }
 }
 #endif

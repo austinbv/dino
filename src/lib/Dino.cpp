@@ -101,11 +101,11 @@ void Dino::process() {
     case 4:  aRead               (pin);             break;
     case 5:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
 
-	#ifdef EEPROM_PRESENT
+  	#ifdef EEPROM_PRESENT
     // Implemented in DinoEEPROM.cpp
     case 6:  eepromRead          ();    break;
     case 7:  eepromWrite         ();    break;
-	#endif
+	  #endif
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
@@ -217,27 +217,34 @@ void Dino::handshake() {
 
   // Reset this so we never send Rx along with ACK:
   rxBytes = 0;
-
+  
+  // First value is aux size in bytes.
   stream->print("ACK:");
   stream->print(AUX_SIZE);
-  stream->print(',');
   
-  // Send the defined length for ESP8266 EEPROM and initialize later.
-  // Read the value and send that for other boards, except the Due.
-  #ifdef ESP8266
-  	stream->print(ESP8266_EEPROM_LENGTH);
+  // Second is EEPROM size in bytes. None on Due.
+  stream->print(',');
+  #if defined(ESP8266) || defined(ESP32)
+  	stream->print(ESP_EEPROM_LENGTH);
   #elif defined(EEPROM_PRESENT)
 	  stream->print(EEPROM.length());
   #else
      stream->print('0');
   #endif
-	
-  stream->print(',');
-  stream->print(A0);
+  
+  // Third is A0. Ignore for ESP32. Pins aren't in order.
+  #if !defined(ESP32)
+    stream->print(',');  
+    stream->print(A0);
+  #endif
+
+  // 4th is DAC0 if available. Ignore fore ESP32. Also not in order.
   #if defined(__SAM3X8E__)
     stream->print(',');
     stream->print(DAC0);
   #endif
+  
+  // End
   stream->print('\n');
 }
 

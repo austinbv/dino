@@ -32,7 +32,7 @@
     esp32
 
       Based on the ESP32 chip by Espressif with integrated 2.4Ghz WiFi.
-      This is still EXPERIMENTAL! Only includes the core subset. WiFi not working.
+      This is still EXPERIMENTAL! Only includes the core subset. WiFi works. No OTA yet.
 
       Chips:  ESP32, ESP32-S2, ESP32-S3
       Boards: ESP32 DevKit, LOLIN D32 / D32 Pro, LOLIN S2 Pico / Mini,

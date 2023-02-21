@@ -11,13 +11,17 @@
 #  define PIN_COUNT 70
 #elif defined(__SAM3X8E__)
 #  define PIN_COUNT 66
+#elif defined(ESP8266)
+#  define PIN_COUNT 17
+#elif defined(ESP32)
+#  define PIN_COUNT 40
 #else
 #  define PIN_COUNT 22
 #endif
 
 // Use the maximum length for the ESP8266 EEPROM.
-#ifdef ESP8266
-#  define ESP8266_EEPROM_LENGTH 4096
+#if defined(ESP8266) || defined(ESP32)
+#  define ESP_EEPROM_LENGTH 512
 #endif
 
 class Dino {
@@ -182,7 +186,9 @@ class Dino {
     byte valStr[4]; byte val;
 
     // Scale aux message allocation based on enabled features and chip.
-    #if defined(DINO_IR_OUT) && !defined (__AVR_ATmega168__)
+    # if defined(ESP8266) || defined(ESP32)
+    #  define AUX_SIZE 528
+    #elif defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
     #  define AUX_SIZE 528
     #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
     #  define AUX_SIZE 264
