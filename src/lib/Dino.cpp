@@ -289,3 +289,13 @@ void Dino::setAnalogResolution() {
     Serial.print("Called Dino::setAnalogResolution()\n");
   #endif
 }
+
+// Use a different blocking microsecond delay on different platforms.
+void Dino::microDelay(uint32_t microseconds){
+  #if defined(ESP32)
+    ets_delay_us(microseconds);
+  #else
+    delayMicroseconds(microseconds);
+  #endif
+}
+

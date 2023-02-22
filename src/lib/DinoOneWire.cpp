@@ -14,11 +14,12 @@ void Dino::owReset(){
   byte present;
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
-  delayMicroseconds(500);
+  microDelay(500);
   pinMode(pin, INPUT);
-  delayMicroseconds(80);
+  digitalWrite(pin, HIGH); // Essential on ESP32. Enables pullup on others.
+  microDelay(80);
   present = digitalRead(pin);
-  delayMicroseconds(420);
+  microDelay(420);
   if(val>0) coreResponse(pin, present);
 }
 
@@ -96,19 +97,21 @@ void Dino::owWriteBit(byte b){
   // Write slot always starts with pulling the bus low for at least 1us.
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
-  delayMicroseconds(1);
+  microDelay(1);
 
   // If 1, release so the bus idles high, and wait out the 60us write slot.
   if(b == 1){
     pinMode(pin, INPUT);
-    delayMicroseconds(59);
+    digitalWrite(pin, HIGH); // Essential on ESP32. Enables pullup on others.
+    microDelay(59);
   // If 0, keep it low for the rest of the 60us write slot, then release.
   } else {
-    delayMicroseconds(59);
+    microDelay(59);
     pinMode(pin, INPUT);
+    digitalWrite(pin, HIGH); // Essential on ESP32. Enables pullup on others.
   }
   // Minimum 1us recovery time after each slot.
-  delayMicroseconds(1);
+  microDelay(1);
 }
 
 // CMD = 44
@@ -137,17 +140,18 @@ byte Dino::owReadBit(){
   // Pull low for at least 1us to start a read slot, then release.
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
-  delayMicroseconds(1);
+  microDelay(1);
   pinMode(pin, INPUT);
+  digitalWrite(pin, HIGH); // Essential on ESP32. Enables pullup on others.
 
   // Wait for the slave to write to the bus. It should hold for up to 15us.
-  delayMicroseconds(5);
+  microDelay(5);
 
   // If slave pulled the bus high, the bit is a 1, else 0.
   b = digitalRead(pin);
 
   // Wait out the 60us read slot + recovery time.
-  delayMicroseconds(55);
+  microDelay(55);
   return b;
 }
 #endif

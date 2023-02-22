@@ -19,7 +19,7 @@ class DinoCLI::Generator
     # ESP8266 mostly working.
     esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
     
-    # Just core implementation on the ESP32 for now.
-    esp32: [:core, :servo, :shift, :spi, :i2c]
+    # ESP is missing LCD, IR, and Software Serial
+    esp32: [:core, :tone, :one_wire, :servo, :shift, :spi, :i2c]
   }
 end

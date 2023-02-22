@@ -168,6 +168,9 @@ class Dino {
     unsigned long lastTime;
     unsigned long timeDiff;
     byte registerDivider;
+    
+    // Wrapper for different delay implementations by platform.
+    void microDelay(uint32_t microseconds);
 
     //
     // Main loop input functions.
