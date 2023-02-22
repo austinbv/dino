@@ -84,6 +84,8 @@ class Dino {
     byte ledcPins[LEDC_CHANNEL_COUNT][2];
 
     byte ledcChannel(byte p);
+    byte attachLEDC(byte channel, byte pin);
+    void detachLEDC(byte p);
     void clearLedcChannels();
     #endif
 

@@ -15,9 +15,10 @@ void Dino::setMode(byte p, byte m) {
   }
   else {
     #ifdef ESP32
-    pinMode(p, INPUT_PULLUP);
+      detachLEDC(p);
+      pinMode(p, INPUT_PULLUP);
     #else
-    pinMode(p, INPUT);
+      pinMode(p, INPUT);
     #endif
   }
 }
@@ -34,6 +35,11 @@ void Dino::dWrite(byte p, byte v, boolean echo) {
     Serial.println(echo);
   #endif
 
+  // Stop using a LEDC channel if the pin was using one.
+  #ifdef ESP32
+    detachLEDC(p);
+  #endif
+    
   if (v == 0) {
     digitalWrite(p, LOW);
   }
@@ -49,6 +55,11 @@ byte Dino::dRead(byte p) {
   #ifdef debug
     Serial.print("dread, pin:");
     Serial.println(p);
+  #endif
+  
+  // Stop using a LEDC channel if the pin was using one.
+  #ifdef ESP32
+    detachLEDC(p);
   #endif
 
   byte rval = digitalRead(p);
@@ -69,8 +80,9 @@ void Dino::aWrite(byte p, int v, boolean echo) {
   #endif
 
   #ifdef ESP32
-    byte channel = ledcChannel(p);
-    ledcWrite(channel, v);
+    // analogWrite is implemented but we can use manual control to do more.
+    // analogWrite(p,v);
+    ledcWrite(ledcChannel(p), v);
   #else
     analogWrite(p,v);
   #endif
@@ -83,37 +95,59 @@ void Dino::aWrite(byte p, int v, boolean echo) {
 //
 #ifdef ESP32
 byte Dino::ledcChannel(byte p) {
-  // Return a useless channel if none available.
-  byte channel = 255;
-
-  // Search for existing LEDC channel with our pin first.
+  // Search for enabled LEDC channel with given pin and use that if found.
   for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
-    if (ledcPins[i][1] == p) {
-      channel = i;
-      break;
+    if ((ledcPins[i][0] == 1) && (ledcPins[i][1] == p)){
+      return i;
     }
   }
 
-  // If channel is still 255 we didn't find one, so make one.
-  if (channel == 255){
-    for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
-      // 0th byte being 0 means not in use.
-      if (ledcPins[i][0] == 0) {
-        // Just use similar settings to ATmega for now.
-        ledcSetup(i, 1000, 8);
-        ledcAttachPin(p, i);
-        ledcPins[i][1] = p;
-        channel = i;
-        break;
-      }
+  // We didn't find a channel to reuse.
+  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+    // If the channel isn't initialized and it isn't marked as used, use it.
+    // should find some way to check if the channel itslef is being used
+    if ((ledcPins[i][0] == 0)) {
+      attachLEDC(i, p);
+      return i;
     }
   }
-  return channel;
+  
+  // Return a useless channel if none available.
+  return 255;
 };
 
-// 0th byte = 0 for not in use.
+// Attach a pin to a channel and save it.
+byte Dino::attachLEDC(byte channel, byte p){
+  // First 8 channels: up to 40Mhz @ 16-bits
+  // Last 8 channels: up to 500kHz @ 13-bits
+  // Just use similar settings to ATmega for now.
+  ledcSetup(channel, 1000, 8);
+  ledcAttachPin(p, channel);
+  
+  // Save the pin and mark it as in use.
+  ledcPins[channel][0] = 1;
+  ledcPins[channel][1] = p;
+  return channel;
+}
+
+// Stop using a LEDC channel when we're done.
+void Dino::detachLEDC(byte p){
+  // Detach the pin from the channel.
+  ledcDetachPin(p);
+  
+  // Mark any channel associated with our pin as unused.
+  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+    if (ledcPins[i][1] == p) ledcPins[i][0] = 0;
+  }
+}
+
+// Clear all the LEDC channels on reset.
 void Dino::clearLedcChannels(){
   for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+    // Stop the channel if it was still enabled.
+    if (ledcPins[i][0] != 0) ledcDetachPin(ledcPins[i][1]);
+    
+    // Mark the channel as unused.
     ledcPins[i][0] = 0;
   }
 }
