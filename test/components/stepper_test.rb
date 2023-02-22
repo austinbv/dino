@@ -16,7 +16,9 @@ class StepperTest < MiniTest::Test
   end
 
   def test_step_cw
-    dir_mock = MiniTest::Mock.new.expect :low, nil
+    dir_mock = MiniTest::Mock.new
+    dir_mock.expect :low?, false
+    dir_mock.expect :low, nil
     step_mock = MiniTest::Mock.new
     step_mock.expect :high, nil
     step_mock.expect :low, nil
@@ -31,7 +33,9 @@ class StepperTest < MiniTest::Test
   end
 
   def test_step_cc
-    dir_mock = MiniTest::Mock.new.expect :high, nil
+    dir_mock = MiniTest::Mock.new
+    dir_mock.expect :high?, false
+    dir_mock.expect :high, nil
     step_mock = MiniTest::Mock.new
     step_mock.expect :high, nil
     step_mock.expect :low, nil
