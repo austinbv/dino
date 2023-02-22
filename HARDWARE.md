@@ -31,9 +31,11 @@
 | ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | SoftwareSerial and LCD don't work yet
 | ESP32          | :test_tube:     | -      | DOIT ESP32 DevKit V1 | Original ESP-WROOM-32
 | ESP32-S2       | :test_tube:     | -      | LOLIN S2 Pico | Single core Xtensa, native USB
-| ESP32-S3       | :test_tube:     | -      | LOLIN S3 V1.0.0 | Dual core RISC-V, native USB
+| ESP32-S3       | :test_tube:     | -      | LOLIN S3 V1.0.0 | Dual core Xtensa, native USB
 
 **Note:** There are too many boards using these chips to be comprehensive. Most should work. These are the exact ones used for testing, chosen based on popularity.
+
+**Note:** For these boards, "pin" numbers are always based on GPIO numbers defined by the CHIP, not the pin numbers labeled on the BOARD. They might coincide, but not always. Keep a mapping reference handy for your particular board.
 
 # Supported Components
 
@@ -59,10 +61,10 @@
 | I2C              | :green_heart:  | Hardware  | 0.12.0   | `I2C::Bus` | Only default clocks
 | SPI              | :green_heart:  | Hardware  | 0.12.0   | `Register::Select` | Hardware register I/O
 | Shift In/Out     | :green_heart:  | Software  | 0.12.0   | `Register::Select` | Bit bang register I/O
-| Software Serial  | :yellow_heart: | Software  | 0.12.0   | `SoftwareSerial` | No read, only write
+| Software Serial  | :yellow_heart: | Software  | 0.12.0   | `SoftwareSerial` | Library on Board. Write only
 | Hardware Serial  | :heart:        | Hardware  | -        | - | For boards with native USB and UARTs
-| Maxim OneWire    | :green_heart:  | Software  | 0.12.0   | `OneWire::Bus` | No overdrivee support
-| Infrared Emitter | :green_heart:  | Software  | 0.12.0   | `IREmitter` |
+| Maxim OneWire    | :green_heart:  | Software  | 0.12.0   | `OneWire::Bus` | No overdrive support
+| Infrared Emitter | :green_heart:  | Software  | 0.12.0   | `IREmitter` | Library on Board
 
 ### Generic Components
 
@@ -79,28 +81,28 @@
 | Analog Sensor    | :green_heart:  | Analog In   | 0.11.0   | `Sensor` |
 | Potentiometer    | :green_heart:  | Analog In   | 0.12.0   | `Potentiometer` | Smoothing on by default
 | Piezo Buzzer     | :green_heart:  | Tone Out    | 0.12.0   | `Piezo` | Frequency > 30Hz
-| Input Register   | :green_heart:  | ShiftIn     | 0.12.0   | `Register::ShiftIn` | Tested on CD4021B
+| Input Register   | :green_heart:  | Shift In    | 0.12.0   | `Register::ShiftIn` | Tested on CD4021B
 | Input Register   | :green_heart:  | SPI         | 0.12.0   | `Register::SPIIn` | Tested on CD4021B
-| Output Register  | :green_heart:  | ShiftOut    | 0.12.0   | `Register::ShiftOut` | Tested on 74HC595
+| Output Register  | :green_heart:  | Shift Out   | 0.12.0   | `Register::ShiftOut` | Tested on 74HC595
 | Output Register  | :green_heart:  | SPI         | 0.12.0   | `Register::SPIOut` | Tested on 74HC595
 
 **Note:** Most Digital In and Out components can be used seamlessley through Input and Output Registers respectively.
 
 ### Motors / Motor Drivers
 
-| Name                 | Status         | Interface | Version  | Component Class   | Notes |
-| :---------------     | :------:       | :-------- | :-----   | :---------------  |------ |
-| Servo                | :green_heart:  | Direct    | 0.11.2   | `Servo`  | Max 6 servos on the ATmega168, 12 otherwise
-| L298N                | :heart:        | Direct    |          | -        | 2ch DC motor driver
-| A3967                | :green_heart:  | Direct    | 0.12.0   | `Stepper`| 1ch microstepper. Tested with EasyDriver board
-| PCA9685              | :heart:        | I2C       | -        | -        | 16ch 12-bit PWM for servo, DC motor, or LED
+| Name                 | Status         | Interface           | Version  | Component Class   | Notes |
+| :---------------     | :------:       | :--------           | :-----   | :---------------  |------ |
+| Servo                | :green_heart:  | PWM + Library       | 0.11.2   | `Servo`  | Max 6 servos on ATmega168, 12 otherwise
+| L298N                | :heart:        | PWM Out             | -        | | 2ch DC motor driver
+| A3967                | :green_heart:  | Digital Out         | 0.12.0   | `Stepper`| 1ch microstepper (EasyDriver)
+| PCA9685              | :heart:        | I2C                 | -        | -        | 16ch 12-bit PWM for servo, DC motor, or LED
 
 ### Displays
 
-| Name                     | Status         | Interface        | Version  | Component Class   | Notes |
-| :---------------         | :------:       | :--------        | :-----   | :---------------  |------ |
-| HD44780 LCD              | :green_heart:  | Direct, C++ Lib  | 0.12.0   | `LCD` | Could make it work through registers
-| SSD1306 OLED             | :heart:        | I2C              | -        | -     |
+| Name                     | Status         | Interface               | Version  | Component Class   | Notes |
+| :---------------         | :------:       | :--------               | :-----   | :---------------  |------ |
+| HD44780 LCD              | :green_heart:  | Digital Out + Library | 0.12.0   | `LCD` | No register passthrough
+| SSD1306 OLED             | :heart:        | I2C                     | -        | -     |
 
 ### Addressable LEDs
 
@@ -122,7 +124,7 @@
 
 | Name             | Status         | Interface | Version  | Component Class   | Notes |
 | :--------------- | :------:       | :-------- | :-----   | :---------------  |------ |
-| DHT 11/21/22     | :green_heart:  | Direct    | 0.12.0   | `DHT` | Temperature, Humidity
+| DHT 11/21/22     | :green_heart:  | Digi In/Out| 0.12.0   | `DHT` | Temperature, Humidity
 | DS18B20          | :green_heart:  | OneWire   | 0.12.0   | `OneWire::DS18B20`| Temperature
 | MAX31850         | :grey_exclamation: | OneWire   | -        | - | Thermocouple
 | BME280           | :heart:        | I2C       | -        | - | Pressure, Temperature, Humidity
