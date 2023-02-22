@@ -37,9 +37,9 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
 // Convenience wrapper for SPI.end
 void Dino::spiEnd(){
   SPI.endTransaction();
-  // If the sketch is using SPI for TxRx (Wi-Fi/Ethernet) we don't want to end.
-  // CLI generator will define TXRX_SPI in Dino.h for those cases.
-  #ifndef TXRX_SPI
+  // CLI generator will define TXRX_SPI in Dino.h for all WiFi sketches.
+  // Only matters if using the SPI-based WiFi Arduino shield. We don't want to end.
+  #if !defined(TXRX_SPI) || defined(ESP8266) || defined(ESP32)
     SPI.end();
   #endif
 }
