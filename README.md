@@ -39,27 +39,52 @@ brew install arduino-cli
 ````
 
 #### 3) Install Arduino Dependencies
-Dino uses Arduino "cores" which add microcontroller support, and a few C++ libraries for now. Let's install them.
+Dino uses Arduino "cores" which add microcontroller support, and a few libraries. Let's install them now.
 
-**IDE:**
-* Open the IDE and select Tools > Board > Board Manager from the menus.
-* Search for `ESP8266 Boards` and install the latest version.
-* Now go to: Tools > Manage Libraries.
+**IDE method for Arduino & Clones:**
+* Go to: Tools > Manage Libraries.
 * Find and install the following libraries, at the version numbers given:
   * `Servo by Michael Margolis, Arduino` at latest version
   * `Liquid Crystal by Arduino, Adafruit` at latest version
   * `WiFi by Arduino` at latest version
   * `IRremote by shirriff, z3to, ArminJo` at `version 2.2.3`
-  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.3.2`
 
-**CLI:**
+**CLI method for Arduino & Clones:**
 ````shell
-arduino-cli core install esp8266:esp8266
 arduino-cli lib install Servo
 arduino-cli lib install LiquidCrystal
 arduino-cli lib install WiFi
 arduino-cli lib install IRremote@2.2.3
+````
+
+**IDE method for ESP8266:**
+* Go to Tools > Board > Board Manager.
+* Search for `ESP8266 Boards` and install the latest version.
+* Go to: Tools > Manage Libraries.
+* Find and install the following libraries, at the version numbers given:
+  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.3.2`
+
+**CLI method for ESP8266:**
+````shell
+arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+arduino-cli core update-index
+arduino-cli core install esp8266:esp8266
 arduino-cli lib install IRremoteESP8266@2.3.2
+````
+
+**IDE method for ESP32:**
+* Go to Tools > Board > Board Manager.
+* Search for `esp32` and install the latest version.
+* Go to: Tools > Manage Libraries.
+* Find and install the following libraries, at the version numbers given:
+  * `ESP32Servo by Kevin Harrington, John K. Bennett` at latest version
+
+**CLI method for ESP32:**
+````shell
+arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+arduino-cli core update-index
+arduino-cli core install esp32
+arduino-cli lib install ESP32Servo
 ````
 
 #### 4) Generate the Arduino Sketch
@@ -75,11 +100,11 @@ dino sketch serial
 dino sketch serial -target esp8266
 ````
 
-**For ESP8266 over WiFi (2.4Ghz and DHCP Only):**
+**For ESP32 over WiFi (2.4Ghz and DHCP Only):**
 ```shell
-dino sketch wifi -target esp8266 -ssid YOUR_SSID -password YOUR_PASSWORD
+dino sketch wifi -target esp32 -ssid YOUR_SSID -password YOUR_PASSWORD
 ````
-**Note:** [This example](examples/tcp.rb) shows how to instantiate a board over the network. You'll need to figure out what IP address your board got, and modify the TxRx line in other examples you wish to run. They are written for serial.
+**Note:** [This example](examples/tcp.rb) shows how to use a board over a TCP connection, but the WiFi sketches fall back to the serial interface if no TCP client is connected. You should be able to run the examples over serial while still connected.
 
 #### 5a) IDE Flashing
 

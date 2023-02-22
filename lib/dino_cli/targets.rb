@@ -11,7 +11,7 @@ class DinoCLI::Generator
     core: [:core],
 
     # Specific features for the old mega168 chips.
-    mega168: [:core, :servo, :shift,:tone, :spi, :i2c],
+    mega168: [:core, :servo, :shift, :tone, :spi, :i2c],
 
     # ARM includes everytyhing except specific incompatibilities.
     sam3x: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
@@ -20,6 +20,6 @@ class DinoCLI::Generator
     esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
     
     # Just core implementation on the ESP32 for now.
-    esp32: [:core, :shift, :spi, :i2c]
+    esp32: [:core, :servo, :shift, :spi, :i2c]
   }
 end

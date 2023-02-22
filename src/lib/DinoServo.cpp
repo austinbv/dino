@@ -4,7 +4,11 @@
 #include "Dino.h"
 #ifdef DINO_SERVO
 
-#include <Servo.h>
+#ifdef ESP32
+  #include <ESP32Servo.h>
+#else if
+  #include <Servo.h>
+#endif
 
 // 12 servos on most boards. 6 on the ATmega168.
 // Could be up to 48 on Arduino Mega.
