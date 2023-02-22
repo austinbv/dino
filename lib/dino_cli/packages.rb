@@ -61,26 +61,17 @@ PACKAGES = {
   ir_out: {
     description: "Transmit infrared signals",
     directive: "DINO_IR_OUT",
-    exclude: [:esp8266],
+    exclude: [:esp8266, :esp32],
     files: [
       "lib/DinoIROut.cpp",
-      "vendor/Arduino-IRremote/boarddefs.h",
-      "vendor/Arduino-IRremote/IRremote.h",
-      "vendor/Arduino-IRremote/IRremoteInt.h",
-      "vendor/Arduino-IRremote/irSend.cpp",
     ]
   },
-  ir_out_esp8266: {
-    description: "Transmit infrared signals with the ESP8266",
+  ir_out_esp: {
+    description: "Transmit infrared signals with the ESP8266 and ESP32",
     directive: "DINO_IR_OUT",
-    only: [:esp8266],
+    only: [:esp8266, :esp32],
     files: [
-      "lib/DinoIROut.cpp",
-      "vendor/IRremoteESP8266/src/IRremoteESP8266.h",
-      "vendor/IRremoteESP8266/src/IRsend.h",
-      "vendor/IRremoteESP8266/src/IRsend.cpp",
-      "vendor/IRremoteESP8266/src/IRtimer.h",
-      "vendor/IRremoteESP8266/src/IRtimer.cpp",
+      "lib/DinoIROutESP.cpp",
     ]
   },
   one_wire: {

@@ -17,9 +17,9 @@ class DinoCLI::Generator
     sam3x: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
 
     # ESP8266 mostly working.
-    esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp8266],
+    esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp],
     
-    # ESP is missing LCD, IR, and Software Serial
-    esp32: [:core, :tone, :one_wire, :servo, :shift, :spi, :i2c]
+    # ESP32 mostly working.
+    esp32: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp],
   }
 end

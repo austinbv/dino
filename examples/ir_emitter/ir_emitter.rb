@@ -1,21 +1,18 @@
 #
 # This is a simple test of the IREmitter (infrared blaster) class.
-# It is based on part of "IRtest2" from the included Arduino library:
-#   https://github.com/z3t0/Arduino-IRremote/tree/master/examples
+# It is based on this example from the Arduino library:
+# https://github.com/Arduino-IRremote/Arduino-IRremote/tree/master/examples/SendDemo
 #
-# To verify your emitter is working, you could flash "IRrecvDump2" from that
-# examples directory to a second board. With an IR receiver on the correct pin
-# of the board (see https://github.com/z3t0/Arduino-IRremote#hardware-specifications),
-# open a serial monitor at 9600 and check that it receives the signal sent by this script.
+# To verify your emitter is working, you can flash this sketch on a second board:
+# https://github.com/Arduino-IRremote/Arduino-IRremote/tree/master/examples/ReceiveDemo
 #
-# If you don't have 2 boards, use "IRrecvDump2" to capture a code from a button
+# Attach an IR receiver to the receive pin (2 for Atmel AVR) and observe for serial output.
+#
+# If you don't have 2 boards, use the receive sketch to capture a code from a button
 # of a remote you have. Copy the raw code (long list of numbers in curly braces),
-# from the serial output, replace the curly braces with square brackets, and
-# those raw values are now compatible with Ruby and this script.
+# and modify it into a Ruby array. 
 #
-# Flash the dino sketch onto your board and connect the IR emitter.
-# Substitute a code you captured for the NEC example below.
-# The corresponding action should happen on your device, eg. "Power" on your TV.
+# Reflash the dino sketch onto your board and test the IR code operates your device.
 #
 # Both of these methods require you to have an IR receiver handy.
 # If you do not have one, there are IR codes in Raw format for many devices
@@ -30,26 +27,29 @@ require 'dino'
 # explicit about which serial device this script must use. The relevant
 # TxRx call is below, but commented out. Enable it and substitute the approriate
 # device  for the board that has the IR emitter connected and dino sketch loaded.
+# Open the receiver board in the Arduino IDE's or another serial monitor.
+#
 txrx = Dino::TxRx::Serial.new
 # txrx = Dino::TxRx::Serial.new(device: "/dev/ttyACM0")
 board = Dino::Board.new(txrx)
 
-# Setting the IR emitter pin is currently unsupported.
-# Although the value gets passed to the board, it always uses the default pin
-# for your specfic board/chip, as defined by the library (in bold) at:
-# https://github.com/z3t0/Arduino-IRremote#hardware-specifications
-ir = Dino::Components::IREmitter.new(board: board, pin: 3)
+#
+# The IR emitter can be set up on most pins for most boards, but there might be conflicts
+# with other hardware or libraries. Try different pins if one doesn't work.
+#
+ir = Dino::Components::IREmitter.new(board: board, pin: 4)
 
-# This is the raw data corresponding to NEC 0x12345678
-code = [9000, 4500,
-        560, 560, 560, 560, 560, 560, 560, 1690,
-        560, 560, 560, 560, 560, 1690, 560, 560,
-        560, 560, 560, 560, 560, 1690, 560, 1690,
-        560, 560, 560, 1690, 560, 560, 560, 560,
-        560, 560, 560, 1690, 560, 560, 560, 1690,
-        560, 560, 560, 1690, 560, 1690, 560, 560,
-        560, 560, 560, 1690, 560, 1690, 560, 1690,
-        560, 1690, 560, 560, 560, 560, 560, 560,
-        560]
+# NEC Raw-Data=0xF708FB04. LSBFIRST, so the binary for each hex digit below is backward.
+code =  [ 9000, 4500,                                 # Start bit
+          560, 560, 560, 560, 560, 1690, 560, 560,    # 0010 0x4 command
+          560, 560, 560, 560, 560, 560, 560, 560,     # 0000 0x0 command
+          560, 1690, 560, 1690, 560,560, 560, 1690,   # 1101 0xB command inverted
+          560, 1690, 560, 1690, 560, 1690, 560, 1690, # 1111 0xF command inverted
+          560, 560, 560, 560, 560, 560, 560, 1690,    # 0001 0x8 address
+          560, 560, 560, 560, 560, 560, 560, 560,     # 0000 0x0 address
+          560, 1690, 560, 1690, 560, 1690, 560, 560,  # 1110 0x7 address inverted
+          560, 1690, 560, 1690, 560, 1690, 560, 1690, # 1111 0xF address inverted
+          560]                                        # Stop bit
 
 ir.emit(code)
+board.finish_write

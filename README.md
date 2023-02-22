@@ -47,14 +47,14 @@ Dino uses Arduino "cores" which add microcontroller support, and a few libraries
   * `Servo by Michael Margolis, Arduino` at latest version
   * `Liquid Crystal by Arduino, Adafruit` at latest version
   * `WiFi by Arduino` at latest version
-  * `IRremote by shirriff, z3to, ArminJo` at `version 2.2.3`
+  * `IRremote by shirriff, z3to, ArminJo` at `version 4.0.0`
 
 **CLI method for Arduino & Clones:**
 ````shell
 arduino-cli lib install Servo
 arduino-cli lib install LiquidCrystal
 arduino-cli lib install WiFi
-arduino-cli lib install IRremote@2.2.3
+arduino-cli lib install IRremote@4.0.0
 ````
 
 **IDE method for ESP8266:**
@@ -62,14 +62,14 @@ arduino-cli lib install IRremote@2.2.3
 * Search for `ESP8266 Boards` and install the latest version.
 * Go to: Tools > Manage Libraries.
 * Find and install the following libraries, at the version numbers given:
-  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.3.2`
+  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.8.4`
 
 **CLI method for ESP8266:**
 ````shell
 arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
 arduino-cli core update-index
 arduino-cli core install esp8266:esp8266
-arduino-cli lib install IRremoteESP8266@2.3.2
+arduino-cli lib install IRremoteESP8266@2.8.4
 ````
 
 **IDE method for ESP32:**
@@ -78,6 +78,7 @@ arduino-cli lib install IRremoteESP8266@2.3.2
 * Go to: Tools > Manage Libraries.
 * Find and install the following libraries, at the version numbers given:
   * `ESP32Servo by Kevin Harrington, John K. Bennett` at latest version
+  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.8.4`
 
 **CLI method for ESP32:**
 ````shell
@@ -85,6 +86,7 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 arduino-cli core install esp32
 arduino-cli lib install ESP32Servo
+arduino-cli lib install IRremoteESP8266@2.8.4
 ````
 
 #### 4) Generate the Arduino Sketch

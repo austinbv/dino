@@ -2,33 +2,29 @@
 // This file adds to the Dino class only if DINO_IR_OUT is defined in Dino.h.
 //
 #include "Dino.h"
-#ifdef DINO_IR_OUT
+#if defined(DINO_IR_OUT) && !defined(ESP8266) && !defined(ESP32)
 
-#ifdef ESP8266
-  #include "IRremoteESP8266.h"
-  #include "Irsend.h"
-#else
-  #include "IRremote.h"
-  IRsend infraredOut;
-#endif
+#include <IRremote.hpp>
+
+// Save memory?
+#define RAW_BUFFER_LENGTH 2
+#define DISABLE_CODE_FOR_RECEIVER
+#define IR_REMOTE_DISABLE_RECEIVE_COMPLETE_CALLBACK
+#define EXCLUDE_UNIVERSAL_PROTOCOLS
+#define EXCLUDE_EXOTIC_PROTOCOLS
+#define NO_LED_FEEDBACK_CODE
 
 // CMD = 16
 // Send an infrared signal.
 void Dino::irSend(){
-  #ifdef ESP8266
-    IRsend infraredOut(pin);
-  #endif
+  // Byte 1+ of auxMsg is already little-endian uint16 pulses.
+  uint16_t *pulseArray = reinterpret_cast<uint16_t *>(auxMsg + 1);
+  
+  // Dynamically set the sending pin. Needs to be PWM capable.
+  IrSender.setSendPin(pin);
 
-  infraredOut.enableIROut(val);
-
-  for (int i=0; i<(uint8_t)auxMsg[0]; i++){
-    uint16_t pulse = ((uint16_t)auxMsg[(i*2)+2] << 8) | auxMsg[(i*2)+1];
-    if ((i % 2) == 0) {
-      infraredOut.mark(pulse);
-    } else {
-      infraredOut.space(pulse);
-    }
-  }
-  infraredOut.space(0);
+  // auxMsg[0] contains number of uint16_t
+  // Val contains frequency
+  IrSender.sendRaw(pulseArray, auxMsg[0], val);
 }
 #endif

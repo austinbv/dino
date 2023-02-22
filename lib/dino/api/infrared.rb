@@ -4,10 +4,13 @@ module Dino
       include Helper
 
       def infrared_emit(pin, frequency, pulses)
-        # Need to start using length - 1, but doesn't work on board yet.
-        # 0 = 1 pulse, 255 = 256 pulses.
+        #
+        # Limit to 255 marks/spaces (not pairs) for now.
+        #
+        # Length must be 1-byte long, not literally 1
+        # Pulses max is 2x255 bytes long since each is 2 bytes.
         length = pack :uint8,  pulses.length,  max: 1
-        bytes  = pack :uint16, pulses, min: 1, max: 512
+        bytes  = pack :uint16, pulses, min: 1, max: 510
 
         write Message.encode command: 16,
                              pin: convert_pin(pin),
