@@ -9,10 +9,6 @@
 # The Button object is created by using the register in place of board, and
 # the register output pin that it's connected to.
 #
-# Note: rising_clock must be set to true if using TI CD4021B register or similar.
-# This should apply to any register which outputs on a rising clock edge.
-# Change as needed.
-#
 require 'bundler/setup'
 require 'dino'
 

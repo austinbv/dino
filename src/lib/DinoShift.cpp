@@ -11,7 +11,7 @@ struct shiftListener{
   byte     len;
   byte     dataPin;
   byte     clockPin;
-  byte     clockHighFirst;
+  byte     settings;
   boolean  enabled;
 };
 shiftListener shiftListeners[SHIFT_LISTENER_COUNT];
@@ -24,8 +24,9 @@ shiftListener shiftListeners[SHIFT_LISTENER_COUNT];
 // auxMsg[0]  = data pin (byte)
 // auxMsg[1]  = clock pin (byte)
 // auxMsg[2]  = settings
-//     bit 0  = transmission bit order (1 = MSBFIRST, 0 = LSBFIRST)
-//     bit 1  = send clock high before reading (byte) (0/1) (only matters for reading)
+//     bit 0  = transmission bit order, 1 = MSBFIRST, 0 = LSBFIRST (default)
+//     bit 1  = clock state before reading (only), 1 = HIGH, 0 = LOW (default)
+//     but 2+ = unused
 // auxMsg[3]+ = data (bytes) (write func only)
 //
 // CMD = 21
@@ -51,10 +52,19 @@ void Dino::shiftWrite(int latchPin, int len, byte dataPin, byte clockPin, byte s
 // CMD = 22
 // Read from a shift register.
 void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte settings) {
-  // Send clock pin high if using a register that clocks on rising edges.
-  // If not, the MSB will not be read on those registers (always 1),
-  // and all other bits will be shifted by 1 towards the LSB.
-  if (bitRead(settings, 1)) digitalWrite(clockPin, HIGH);
+  // This matters on the ESP32 for some reason.
+  pinMode(dataPin, INPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(latchPin, OUTPUT);
+  
+  // Some registers want the clock pin high at the start. If not, first bit won't be read,
+  // and other bits will shift by 1 toward the new "first" bit.
+  // Default is to start with clock low.
+  if (bitRead(settings, 1)) {
+    digitalWrite(clockPin, HIGH);
+  } else {
+    digitalWrite(clockPin, LOW);
+  }
 
   // Latch high to read parallel state, then low again to stop.
   digitalWrite(latchPin, HIGH);
@@ -66,14 +76,15 @@ void Dino::shiftRead(int latchPin, int len, byte dataPin, byte clockPin, byte se
   stream->print(':');
   byte reading = 0;
 
+  // Read a number of bytes from the register.
   for (int i = 1;  i <= len;  i++) {
-	
-	// Read a single byte from the register.
-	if (bitRead(settings, 0)) {
-	  reading = shiftIn(dataPin, clockPin, MSBFIRST);
-	} else {
+    	
+  	// Read a single byte from the register.
+  	if (bitRead(settings, 0)) {
+  	  reading = shiftIn(dataPin, clockPin, MSBFIRST);
+  	} else {
       reading = shiftIn(dataPin, clockPin, LSBFIRST);
-	}
+  	}
 	
     // Print it, then a comma or \n if it's the last byte.
     stream->print(reading);
@@ -126,7 +137,7 @@ void Dino::updateShiftListeners() {
                 shiftListeners[i].len,
                 shiftListeners[i].dataPin,
                 shiftListeners[i].clockPin,
-                shiftListeners[i].clockHighFirst);
+                shiftListeners[i].settings);
     }
   }
 }
