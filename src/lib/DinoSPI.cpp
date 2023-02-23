@@ -21,25 +21,36 @@ SpiListener spiListeners[SPI_LISTENER_COUNT];
 void Dino::spiBegin(byte settings, uint32_t clockRate){
   SPI.begin();
 
-  // SPI mode is the lowest 4 bits of settings.
-  byte mode = settings & 0B00001111;
-
-  // Bit 7 of settings toggles MSBFIRST.
-  // Don't try to refactor t his and just pass bit 7.
-  // On the Due, MSBFIRST and LSBFIRST are ByteOrder class objects.
-  if (bitRead(settings, 7)) {
-  	SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, mode));
+  // SPI mode is the lowest 2 bits of settings.
+  byte mode = settings & 0B00000011;
+  // Bit 7 of settings controls bit order. 0 = LSBFIRST, 1 = MSBFIRST.
+  byte bitOrder = bitRead(settings, 7);
+  
+  // Do this nonsense so I don't have to care about varying macro definitions.
+  if (bitOrder == 0) {
+    switch(mode){
+      case 0: SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE0)); break;
+      case 1: SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE1)); break;
+      case 2: SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE2)); break;
+      case 3: SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE3)); break;
+    }
   } else {
-  	SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, mode));
+    switch(mode){
+      case 0: SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, SPI_MODE0)); break;
+      case 1: SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, SPI_MODE1)); break;
+      case 2: SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, SPI_MODE2)); break;
+      case 3: SPI.beginTransaction(SPISettings(clockRate, MSBFIRST, SPI_MODE3)); break;
+    }
   }
 }
 
 // Convenience wrapper for SPI.end
 void Dino::spiEnd(){
   SPI.endTransaction();
-  // If the sketch is using SPI for TxRx (Wi-Fi/Ethernet) we don't want to end.
-  // CLI generator will define TXRX_SPI in Dino.h for those cases.
-  #ifndef TXRX_SPI
+  // CLI generator will define TXRX_SPI in Dino.h for all WiFi sketches.
+  // Only matters if using the SPI-based WiFi Arduino shield. We don't want to end.
+  // ESP32 doesn't like when SPI.end is called either. Might be safe to never do it.
+  #if !defined(TXRX_SPI) && defined(__AVR__)
     SPI.end();
   #endif
 }
@@ -51,7 +62,8 @@ void Dino::spiEnd(){
 // pin         = slave select pin (int)
 // val         = empty
 // auxMsg[0]   = SPI settings
-//   Bit 0..3  = SPI mode
+//   Bit 0..1  = SPI mode
+//   Bit 2..6  = unused
 //   Bit 7     = MSBFIRST(1) or LSBFIRST(0)
 // auxMsg[1]   = read length  (number of bytes)
 // auxMsg[2]   = write length (number of bytes)

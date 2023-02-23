@@ -22,13 +22,13 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 
-# SPI mode and frequency are specific to a TI CD4021B register. Change as needed.
+# Tested with CD4021B register, which is LSBFIRST, but needs SPI mode 0 on some boards and 2 on others.
 shift_register = Dino::Components::Register::SPIIn.new  board: board,
                                                         pin: 8,
-                                                        spi_mode: 0,
-                                                        frequency: 3000000
+                                                        spi_mode: 2,
+                                                        bit_order: :lsbfirst
+                                                        # frequency: 1000000
                                                         # bytes: 1
-                                                        # bit_order: :lsbfirst
 
 button = Dino::Components::Button.new(pin: 0, board: shift_register)
 

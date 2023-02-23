@@ -16,9 +16,9 @@ class APISPITest < Minitest::Test
   
   def test_spi_modes
     assert_equal (board.spi_header(mode: nil)[0][0]), (pack :uint8, 0b10000000)
-    assert_equal (board.spi_header(mode: 1  )[0][0]), (pack :uint8, 0b10000100)
-    assert_equal (board.spi_header(mode: 2  )[0][0]), (pack :uint8, 0b10001000)
-    assert_equal (board.spi_header(mode: 3  )[0][0]), (pack :uint8, 0b10001100)
+    assert_equal (board.spi_header(mode: 1  )[0][0]), (pack :uint8, 0b10000001)
+    assert_equal (board.spi_header(mode: 2  )[0][0]), (pack :uint8, 0b10000010)
+    assert_equal (board.spi_header(mode: 3  )[0][0]), (pack :uint8, 0b10000011)
     assert_raises(ArgumentError) { board.spi_header(mode: 4) }
   end
   

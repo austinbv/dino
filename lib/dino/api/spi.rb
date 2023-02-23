@@ -10,21 +10,11 @@ module Dino
         options[:frequency]  ||= 1000000
         options[:bit_order]  ||= :msbfrst
                   
-        # Bit 0..3 of settings control the SPI mode
-        #
-        # 0000 = SPI_MODE0
-        # 0100 = SPI_MODE1
-        # 1000 = SPI_MODE2
-        # 1100 = SPI_MODE3
-        #
-        settings =  case options[:mode]
-                    when 0; 0b0000
-                    when 1; 0b0100
-                    when 2; 0b1000
-                    when 3; 0b1100
-                    else
-                      raise ArgumentError, "invalid SPI mode. Must be 0, 1, 2, or 3"
-                    end
+        # Lowest 2 bits of settings control the SPI mode
+        settings =  options[:mode] 
+        unless (0..3).include? settings
+          raise ArgumentError, "invalid SPI mode. Must be 0, 1, 2, or 3"
+        end
         
         # Bit 7 of settings toggles MSBFIRST (1) or LSBFIRST (0) transmission order.
         settings = settings | 0b10000000 unless options[:bit_order] == :lsbfirst
