@@ -9,26 +9,26 @@
 
   Global options:
 
-    -target TARGET    (default: mega. Run 'dino targets' for more info)
-    -debug            (default: off)
+    --target TARGET    (default: mega. Run 'dino targets' for more info)
+    --debug            (default: off)
 
   Available sketches and sketch for each sketch:
 
     serial
-      -baud BAUD    (default: 115200)
+      --baud BAUD    (default: 115200)
 
     ethernet
-      -mac XX:XX:XX:XX:XX:XX    (required)
-      -ip XXX.XXX.XXX.XXX       (required, no DHCP)
-      -port PORT                (default: 3466)
+      --mac XX:XX:XX:XX:XX:XX    (required)
+      --ip XXX.XXX.XXX.XXX       (required, no DHCP)
+      --port PORT                (default: 3466)
 
     wifi
-      -ssid SSID            (required)
-      -password PASSWORD    (required)
-      -port PORT            (default: 3466)
+      --ssid SSID            (required)
+      --password PASSWORD    (required)
+      --port PORT            (default: 3466)
 
   Examples:
 
-    dino sketch ethernet -mac 12:34:56:78:90:12 - ip 192.168.1.2
-    dino sketch serial -baud 57600
-    dino sketch serial -baud 9600 -target core
+    dino sketch ethernet --mac 12:34:56:78:90:12 --ip 192.168.1.2
+    dino sketch serial --baud 57600
+    dino sketch serial --baud 9600 -target core

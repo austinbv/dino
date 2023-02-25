@@ -99,12 +99,12 @@ dino sketch serial
 
 **For ESP8266, Serial over USB:**
 ```shell
-dino sketch serial -target esp8266
+dino sketch serial --target esp8266
 ````
 
 **For ESP32 over WiFi (2.4Ghz and DHCP Only):**
 ```shell
-dino sketch wifi -target esp32 -ssid YOUR_SSID -password YOUR_PASSWORD
+dino sketch wifi --target esp32 --ssid YOUR_SSID --password YOUR_PASSWORD
 ````
 **Note:** [This example](examples/tcp.rb) shows how to use a board over a TCP connection, but the WiFi sketches fall back to the serial interface if no TCP client is connected. You should be able to run the examples over serial while still connected.
 
