@@ -61,13 +61,22 @@ module Dino
         end
 
         #
-        # Convert an array of cached bytes into an array of integer 1s and 0s
-        # Convenient for bubbling to proxy components, but is used for all callbacks.
+        # Convert array of bytes coming from the register into an array of bits
+        # to update self state and give to component callbacks.
         #
         def byte_array_to_bit_array(byte_array)
-          byte_array.map do |byte|
-            byte.to_i.to_s(2).rjust(8, "0").split("").reverse
-          end.flatten.map { |bit| bit.to_i }
+          #
+          # For each array element (1 byte):
+          # decimal number as string -> integer -> padded string of binary digits 
+          # -> reverse digits from reading order to array indexing order
+          # -> join digits of all bytes into one string
+          #
+          binary_string = byte_array.map do |byte|
+            byte.to_i.to_s(2).rjust(8, "0").reverse
+          end.join
+          
+          # Split the digits out of the string into individual integers.
+          bits = binary_string.split("").map { |bit| bit.to_i }
         end
 
         def read
