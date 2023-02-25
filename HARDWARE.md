@@ -22,16 +22,16 @@
 | :--------             | :------:        | :----- | :--------------- |------ |
 | Wiznet W5100/5500     | :green_heart:   | 0.11.1 | Ethernet Shield  | Wired Ethernet for Uno/Mega pin-compatible boards
 | HDG204 + AT32UC3      | :man_shrugging: | 0.12.0 | WiFi Shield      | WiFi for Uno. No hardware to test, but compiles
-| ATWINC1500            | :man_shrugging: | 0.12.0 | WiFi Shield 101  | As above, but heavy on RAM. Compiles for Mega only
+| ATWINC1500            | :man_shrugging: | 0.12.0 | WiFi Shield 101  | As above, high memory use, Mega only
 
 ### Espressif Chips with Built-In WiFi
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
 | ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | SoftwareSerial and LCD don't work yet
-| ESP32          | :test_tube:     | -      | DOIT ESP32 DevKit V1 | Original ESP-WROOM-32
-| ESP32-S2       | :test_tube:     | -      | LOLIN S2 Pico | Single core Xtensa, native USB
-| ESP32-S3       | :test_tube:     | -      | LOLIN S3 V1.0.0 | Dual core Xtensa, native USB
+| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD or SoftSerial. SPI input bug. See changelog
+| ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Might work, not tested yet
+| ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Might work, not tested yet
 
 **Note:** There are too many boards using these chips to be comprehensive. Most should work. These are the exact ones used for testing, chosen based on popularity.
 

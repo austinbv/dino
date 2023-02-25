@@ -9,22 +9,25 @@
   - This is the default sketch if `--target` isn't specified, and works for Arduino (and other) products based on the ATmega AVR chips, like the Uno, Nano, Leonardo and Mega.
 
 - ESP8266 (`--target esp8266`):
-  - Works with `Dino::Board.new`, but calling `Dino::Board::ESP8266.new` instead allows pins to be referred to as any of `'GPIO4'`, `4`, or `'D2'`, specifically for the NodeMCU dev board. When in doubt, look up your board's GPIO mapping and use those numbers instead.
   - Works with either built in WiFi or Serial.
   - WiFi version supports OTA (over-the-air) update in the Arduino IDE. Initial flash must still be done via serial.
-  - **Note:** SoftwareSerial and LiquidCrystal (LCD) both do not work on the ESP8266, and are excluded from th sketch.
+  - Dev boards can map GPIOs to physical pins differently. Always look up the GPIO numbers and use those for pin numbers.
+  - **Note:** SoftwareSerial and LiquidCrystal (LCD) both do not work on the ESP8266, and are excluded from the sketch.
   
 - ESP32 (`--target esp32`):
   - Works with either built in WiFi or Serial.
   - WiFi version does NOT support OTA (over-the-air) updates yet.
+  - Only tested with the original ESP32 module so far, not the later revisions with slightly different hardware.
+  - Dev boards can map GPIOs to physical pins differently. Always look up the GPIO numbers and use those for pin numbers.
   - **Note:** Servos and analog outputs share the `LEDC` channels on the board. Maximum of 16 combined.
-  - **Note:** SoftwareSerial and LiquidCrystal (LCD) both do not work on the ESP32, and are excluded from th sketch.
+  - **Note:** SoftwareSerial and LiquidCrystal (LCD) both do not work on the ESP32, and are excluded from the sketch.
+  - **Note:** SPI bug exists where input modes don't match other platforms. Eg. For a register using mode 0 on AVR, mode 2 needs to be set on ESP32 for it to work. Using mode 0 misses a bit.
   
 - Arduino Due (`--target sam3x`) :
   - Up to 12-bit analog in/out. Pass a `bits:` option to `Board#new` to set resolution for both.
   - DAC support. Refer to DAC pins as `'DAC0'`, `'DAC1'`, just as labeled on the board. Call `#analog_write` or just `#write` on an `AnalogOutput` component that uses the pin.
   - Uses the native ARM serial port by default. Configurable in sketch to use programming port.
-  - **Note**: SoftwareSerial, Infrared, and Tone are currently incompatible with the Arduino Due, and excluded from the sketch.
+  - **Note**: SoftwareSerial, Infrared, and Tone are incompatible with the Arduino Due, and excluded from the sketch.
 
 - ATmega168 (`--target mega168`):
   - By excluding a lot of features, we can still fit the memory constraints of the ATmega168 chips found in older Arduinos.
