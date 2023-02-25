@@ -18,7 +18,7 @@ module Dino
         def before_initialize(options={})
           super(options)
           self.rising_clock = options[:rising_clock] || false
-          self.bit_order = options[:bit_order] || :msbfirst
+          self.bit_order = options[:bit_order] || :lsbfirst
         end
         
         def after_initialize(options={})
@@ -38,14 +38,14 @@ module Dino
           @rising_clock = [0, nil, false].include?(value) ? false : true
         end
 
-        def read(num_bytes=@bytes)
-          board.shift_read latch.pin, data.pin, clock.pin, num_bytes, 
+        def read
+          board.shift_read latch.pin, data.pin, clock.pin, @bytes, 
                            preclock_high: rising_clock,
                            bit_order: bit_order
         end
 
-        def listen(num_bytes=@bytes)
-          board.shift_listen latch.pin, data.pin, clock.pin, num_bytes,
+        def listen
+          board.shift_listen latch.pin, data.pin, clock.pin, @bytes,
                              preclock_high: rising_clock,
                              bit_order: bit_order
         end

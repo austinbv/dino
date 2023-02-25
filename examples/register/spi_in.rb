@@ -26,7 +26,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 shift_register = Dino::Components::Register::SPIIn.new  board: board,
                                                         pin: 8,
                                                         spi_mode: 2,
-                                                        bit_order: :lsbfirst
+                                                        # bit_order: :lsbfirst
                                                         # frequency: 1000000
                                                         # bytes: 1
 

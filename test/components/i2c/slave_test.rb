@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class I2SlaveTest < MiniTest::Test
+class I2CSlaveTest < MiniTest::Test
   def board
     @board ||= BoardMock.new
   end

@@ -20,14 +20,14 @@ module Dino
           # When used as a board proxy, store the state of each register
           # pin as a 0 or 1 in an array that is (@bytes * 8) long. Zero out to start.
           #
-          @state = Array.new(@bytes*8) {|i| 0}
+          @state = Array.new(@bytes*8) { 0 }
 
           #
           # Keep track of whether anything is listening or reading a specific pin.
           # This might be separate from whether a component is attached or not.
           #
-          @reading_pins   = Array.new(@bytes*8) {|i| false}
-          @listening_pins = Array.new(@bytes*8) {|i| false}
+          @reading_pins   = Array.new(@bytes*8) { false}
+          @listening_pins = Array.new(@bytes*8) { false}
         end
 
         def after_initialize(options={})
@@ -66,7 +66,7 @@ module Dino
         #
         def byte_array_to_bit_array(byte_array)
           byte_array.map do |byte|
-            byte.to_i.to_s(2).rjust(8, "0").split("")
+            byte.to_i.to_s(2).rjust(8, "0").split("").reverse
           end.flatten.map { |bit| bit.to_i }
         end
 
