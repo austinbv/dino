@@ -26,9 +26,9 @@ class APII2CTest < Minitest::Test
     board
     aux = pack :uint8, [0x30, 0, 4, [1,2,3,4]]
     # Normal
-    message1 = Dino::Message.encode command: 34, value: 0b00, aux_message: aux
+    message1 = Dino::Message.encode command: 34, value: 0b01, aux_message: aux
     # Repeated start
-    message2 = Dino::Message.encode command: 34, value: 0b01, aux_message: aux
+    message2 = Dino::Message.encode command: 34, value: 0b00, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message1]
@@ -45,9 +45,9 @@ class APII2CTest < Minitest::Test
     board
     aux = pack :uint8, [0x30, 0, 0x03, 4]
     # Normal
-    message1 = Dino::Message.encode command: 35, value: 0b10, aux_message: aux
+    message1 = Dino::Message.encode command: 35, value: 0b11, aux_message: aux
     # Repeated start
-    message2 = Dino::Message.encode command: 35, value: 0b11, aux_message: aux
+    message2 = Dino::Message.encode command: 35, value: 0b10, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message1]
@@ -63,7 +63,7 @@ class APII2CTest < Minitest::Test
   def test_read_without_register
     board
     aux = pack :uint8, [0x30, 0, 0, 4]
-    message = Dino::Message.encode command: 35, value: 0b00, aux_message: aux
+    message = Dino::Message.encode command: 35, value: 0b01, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message]

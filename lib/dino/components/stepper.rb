@@ -16,7 +16,10 @@ module Dino
                   
       def after_initialize(options={})
         wake; on;
-        self.microsteps = 8
+        
+        if (ms1 && ms2)
+          self.microsteps = 8
+        end
       end
 
       def sleep

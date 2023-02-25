@@ -27,7 +27,7 @@ class APISPITest < Minitest::Test
   end
 
   def test_spi_frequency
-    assert_equal (board.spi_header(frequency: nil    )[0][3..6]), (pack :uint32, 3000000)
+    assert_equal (board.spi_header(frequency: nil    )[0][3..6]), (pack :uint32, 1000000)
     assert_equal (board.spi_header(frequency: 8000000)[0][3..6]), (pack :uint32, 8000000)
   end
   

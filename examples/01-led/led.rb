@@ -30,9 +30,9 @@ puts "Blinking every half second..."
 # We can use led.write to set it directly, or named convenience methods.
 # These 3 lines all do the same thing: turn on, wait half a second, turn off.
 #
-led.write(1); sleep 0.5; led.write(0)
-led.high;     sleep 0.5; led.low
-led.on;       sleep 0.5; led.off
+led.digital_write(1); sleep 0.5; led.digital_write(0)
+led.high;             sleep 0.5; led.low
+led.on;               sleep 0.5; led.off
 
 #
 # led.toggle will set it to the opposite state each time it's called.
