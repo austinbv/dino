@@ -105,14 +105,14 @@ void Dino::aWrite(byte p, int v, boolean echo) {
 #ifdef ESP32
 byte Dino::ledcChannel(byte p) {
   // Search for enabled LEDC channel with given pin and use that if found.
-  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+  for (int i = LEDC_CHANNEL_COUNT -1; i > 0; i--){
     if ((ledcPins[i][0] == 1) && (ledcPins[i][1] == p)){
       return i;
     }
   }
 
   // We didn't find a channel to reuse.
-  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+  for (int i = LEDC_CHANNEL_COUNT -1; i > 0; i--){
     // If the channel isn't initialized and it isn't marked as used, use it.
     // should find some way to check if the channel itslef is being used
     if ((ledcPins[i][0] == 0)) {
@@ -145,14 +145,14 @@ void Dino::detachLEDC(byte p){
   ledcDetachPin(p);
   
   // Mark any channel associated with our pin as unused.
-  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+  for (int i = LEDC_CHANNEL_COUNT -1; i > 0; i--){
     if (ledcPins[i][1] == p) ledcPins[i][0] = 0;
   }
 }
 
 // Clear all the LEDC channels on reset.
 void Dino::clearLedcChannels(){
-  for (byte i = 0; i < LEDC_CHANNEL_COUNT; i++){
+  for (int i = LEDC_CHANNEL_COUNT -1; i > 0; i--){
     // Stop the channel if it was still enabled.
     if (ledcPins[i][0] != 0) ledcDetachPin(ledcPins[i][1]);
     

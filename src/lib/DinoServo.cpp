@@ -14,10 +14,11 @@
 // Could be up to 48 on Arduino Mega.
 #if defined (__AVR_ATmega168__)
   #define SERVO_COUNT 6
+#elif defined(ESP32)
+  #define SERVO_COUNT 16
 #else
   #define SERVO_COUNT 12
 #endif
-
 
 // Create an array of wrapper structs that link pins to servo objects.
 struct ServoWrapper{

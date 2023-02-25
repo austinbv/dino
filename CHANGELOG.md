@@ -9,10 +9,16 @@
   - This is the default sketch if `--target` isn't specified, and works for Arduino (and other) products based on the ATmega AVR chips, like the Uno, Nano, Leonardo and Mega.
 
 - ESP8266 (`--target esp8266`):
-  - Works with `Dino::Board.new`, but calling `Dino::Board::ESP8266.new` instead allows pins to be referred to as any of `'GPIO4'`, `4`, or `'D2'`, as printed on the NodeMCU dev board. When in doubt, look up your board's GPIO mapping and use those numbers instead.
+  - Works with `Dino::Board.new`, but calling `Dino::Board::ESP8266.new` instead allows pins to be referred to as any of `'GPIO4'`, `4`, or `'D2'`, specifically for the NodeMCU dev board. When in doubt, look up your board's GPIO mapping and use those numbers instead.
   - Works with either built in WiFi or Serial.
   - WiFi version supports OTA (over-the-air) update in the Arduino IDE. Initial flash must still be done via serial.
-  - **Note**: SoftwareSerial is incompatible with the ESP8266. LiquidCrystal (LCD) compiles for the ESP8266, but does not work. Both of these are excluded.
+  - **Note:** SoftwareSerial and LiquidCrystal (LCD) both do not work on the ESP8266, and are excluded from th sketch.
+  
+- ESP32 (`--target esp32`):
+  - Works with either built in WiFi or Serial.
+  - WiFi version does NOT support OTA (over-the-air) updates yet.
+  - **Note:** Servos and analog outputs share the `LEDC` channels on the board. Maximum of 16 combined.
+  - **Note:** SoftwareSerial and LiquidCrystal (LCD) both do not work on the ESP32, and are excluded from th sketch.
   
 - Arduino Due (`--target sam3x`) :
   - Up to 12-bit analog in/out. Pass a `bits:` option to `Board#new` to set resolution for both.
