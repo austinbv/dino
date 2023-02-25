@@ -11,6 +11,7 @@
 | ATmega32u4     | :green_heart:   | 0.11.0 | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB | **v0.11.1** for Leonardo ETH
 | ATmega1280     | :green_heart:   | 0.11.1 | Mega | 
 | ATmega2560     | :green_heart:   | 0.11.1 | Mega2560, Arduino Mega ADK | 
+| ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every | No hardware to test, but should work
 | ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. SoftSerial, Tone, IR Out, and I2C don't work yet
 | ATSAMD21       | :heart:         | -      | Zero, M0, M0 Pro | 
 
