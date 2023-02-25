@@ -13,24 +13,16 @@ class APICoreTest < Minitest::Test
 
   def test_set_pin_mode
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [Dino::Message.encode(command: 0, pin: 1, value: board.low)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 0, pin: 1, value: board.high)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 0, pin: 1, value: 0)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 0, pin: 1, value: 1)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 0, pin: 1, value: 0b011)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 0, pin: 1, value: 0b101)])
 
     board.stub(:write, mock) do
-      board.set_pin_mode 1, :out
-      board.set_pin_mode 1, :in
-    end
-    mock.verify
-  end
-
-  def test_set_pullup
-    mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [Dino::Message.encode(command: 1, pin: 1, value: board.low)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 1, pin: 1, value: board.high)])
-
-    board.stub(:write, mock) do
-      board.set_pullup 1, false
-      board.set_pullup 1, true
+      board.set_pin_mode 1, :output
+      board.set_pin_mode 1, :input
+      board.set_pin_mode 1, :input, :pulldown
+      board.set_pin_mode 1, :input, :pullup
     end
     mock.verify
   end

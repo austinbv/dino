@@ -6,11 +6,21 @@ module Dino
       DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
       # CMD = 0
-      def set_pin_mode(pin, mode)
-        pin, value = convert_pin(pin), mode == :out ? 0 : 1
+      def set_pin_mode(pin, direction, pull=nil)
+        pin = convert_pin(pin)
+        
+        # bit 0: 1 = input, 0 = output
+        # bit 1: 1 = pulldown
+        # but 2: 1 = pullup
+        #
+        settings = 0b001
+        settings = 0b000 if direction == :output
+        settings |= 0b010 if pull == :pulldown
+        settings |= 0b100 if pull == :pullup
+        
         write Message.encode command: 0,
                              pin: convert_pin(pin),
-                             value: value
+                             value: settings
       end
 
       # CMD = 1
@@ -31,11 +41,6 @@ module Dino
       # CMD = 4
       def analog_read(pin)
         write Message.encode command: 4, pin: convert_pin(pin)
-      end
-
-      def set_pullup(pin, pullup)
-        pin = convert_pin(pin)
-        pullup ? digital_write(pin, @high) : digital_write(pin, @low)
       end
 
       # CMD = 5

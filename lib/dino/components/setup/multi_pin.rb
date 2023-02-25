@@ -9,7 +9,7 @@ module Dino
         # class and stores it in @proxies.
         #
         include Base
-        attr_reader :pin, :pins, :pullups, :proxies
+        attr_reader :pin, :pins, :pulldowns, :pullups, :proxies
 
         # Return a hash with the state of each proxy component.
         def proxy_states
@@ -22,7 +22,7 @@ module Dino
 
       protected
 
-        attr_writer :pins, :pullups, :proxies
+        attr_writer :pins, :pulldowns, :pullups, :proxies
 
         def self.included(base)
           base.extend ClassMethods
@@ -69,6 +69,7 @@ module Dino
 
         def initialize_pins(options={})
           self.pins = options[:pins]
+          self.pulldowns = options[:pulldowns] || {}
           self.pullups = options[:pullups] || {}
           self.proxies = {}
           validate_pins
@@ -88,7 +89,8 @@ module Dino
           # Build proxies for named pins once a pin number was given.
           pins.each_pair do |pin_name, pin_number|
             if proxy_classes[pin_name]
-              component = proxy_classes[pin_name].new(board: board, pin: pin_number, pullup: pullups[pin_name])
+              params = { board: board, pin: pin_number, pullup: pullups[pin_name], pulldown: pulldowns[pin_name] }
+              component = proxy_classes[pin_name].new(params)
               self.proxies[pin_name] = component
               instance_variable_set("@#{pin_name}", component)
               singleton_class.class_eval { attr_reader pin_name }

@@ -19,9 +19,15 @@ class SinglePinSetupTest < Minitest::Test
   
   def test_mode=
     mock = Minitest::Mock.new
-    mock.expect :call, nil, [1, :out] 
+    mock.expect :call, nil, [1, :output, nil] 
+    mock.expect :call, nil, [1, :input, :pullup] 
+    mock.expect :call, nil, [1, :input, :pulldown] 
+    
     board.stub(:set_pin_mode, mock) do
-      part.send(:mode=, :out)
+      part.mode = :output
+      part.mode = :input_pullup
+      part.mode = :input_pulldown
     end
+    mock.verify
   end
 end

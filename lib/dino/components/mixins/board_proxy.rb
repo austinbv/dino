@@ -16,9 +16,7 @@ module Dino
           pin.to_i
         end
 
-        def set_pin_mode(pin, mode); end
-
-        def set_pullup(pin, pullup); end
+        def set_pin_mode(pin, mode, pull=nil); end
 
         def start_read; end
       end

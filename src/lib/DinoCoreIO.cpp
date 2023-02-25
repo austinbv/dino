@@ -10,17 +10,26 @@ void Dino::setMode(byte p, byte m) {
     Serial.println(m);
   #endif
 
-  if (m == 0) {
+  // bit 0: 1=input, 0=output
+  // bit 1: 1=pulldown
+  // bit 2: 1=pullup
+    
+  if (bitRead(m, 0) == 0) {
     pinMode(p, OUTPUT);
+  } else {
+    pinMode(p, INPUT);
   }
-  else {
-    #ifdef ESP32
-      detachLEDC(p);
-      pinMode(p, INPUT_PULLUP);
-    #else
-      pinMode(p, INPUT);
-    #endif
-  }
+  
+  // Set pullup or pulldown for ESP32
+  #ifdef ESP32
+    detachLEDC(p);
+    if(bitRead(m, 1)) pinMode(p, INPUT_PULLDOWN);
+    if(bitRead(m, 2)) pinMode(p, INPUT_PULLUP);
+    
+  // Write high on other platforms if pullup.
+  #else
+    if (bitRead(m, 2)) digitalWrite(p, HIGH);
+  #endif
 }
 
 // CMD = 01

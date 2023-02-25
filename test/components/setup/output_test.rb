@@ -14,6 +14,6 @@ class OutputSetupTest < Minitest::Test
   end
 
   def test_pin_mode
-    assert_equal part.mode, :out
+    assert_equal part.mode, :output
   end
 end
