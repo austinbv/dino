@@ -16,8 +16,9 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 
 shift_register = Dino::Components::Register::ShiftIn.new  board: board,
                                                           pins: {latch: 10, data: 12, clock: 13},
-                                                          rising_clock: true,
-                                                          bytes: 1
+                                                          rising_clock: true
+                                                          # bit_order: :lsbfirst
+                                                          # bytes: 1
 
 button = Dino::Components::Button.new(pin: 0, board: shift_register)
 

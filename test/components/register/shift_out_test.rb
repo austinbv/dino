@@ -21,7 +21,7 @@ class RegisterShiftOutTest < Minitest::Test
 
   def test_write
     new_part = Dino::Components::Register::ShiftOut.new(options.merge(bytes: 2))
-    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, [255,127]]
+    mock = MiniTest::Mock.new.expect :call, nil, [8, 11, 12, [255,127]], bit_order: :msbfirst
     board.stub(:shift_write, mock) do
       new_part.write(255,127)
     end

@@ -16,7 +16,7 @@ module Dino
           super(options)
           @spi_mode  = options[:spi_mode]  || 0
           @frequency = options[:frequency] || 1000000
-          @bit_order = options[:bit_order] || :lsbfirst
+          @bit_order = options[:bit_order] || :msbfirst
         end
 
         def write(*bytes)

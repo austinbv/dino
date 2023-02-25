@@ -26,7 +26,9 @@ module Dino
           # have passed since this object last got input. Better for things like SSDs
           # where many bits change in sequence, but not at exactly the same time.
           #
-          @write_delay = options[:write_delay] || 0.005
+          @buffer_writes = true
+          @buffer_writes = false if options[:buffer_writes] == false
+          @write_delay = options[:write_delay] || 0.001
         end
         
         def after_initialize(options={})
@@ -44,8 +46,8 @@ module Dino
         #
         include Mixins::BoardProxy
         def digital_write(pin, value)
-          state[pin] = value
-          delayed_write(state)
+          state[pin] = value  # Might not be atomic?
+          @buffer_writes ? write_buffered(state) : write_state
         end
         
         def digital_read(pin)
@@ -57,7 +59,7 @@ module Dino
         # Lets us catch multiple changed bits, like when hosting an SSD.
         #
         include Mixins::Threaded
-        def delayed_write(old_state)
+        def write_buffered(old_state)
           threaded do
             sleep @write_delay
             # Keep delaying if state has changed.
@@ -71,9 +73,15 @@ module Dino
         def write_state
           bytes = []
           state.each_slice(8) do |slice|
-            # Convert nil to 0 to ensure bit order is consistent.
-            zeroed = slice.map { |bit| bit.to_i }.join.to_i(2)
-            bytes << zeroed
+            # Convert nils in the slice to zero.
+            zeroed = slice.map { |bit| bit.to_i }
+            
+            # Each slice is 8 bits of a byte, with the lowest on the left.
+            # Reverse to reading order (lowest right) then join into string, and convert to integer.
+            byte = zeroed.reverse.join.to_i(2)
+            
+            # Pack bytes in reverse order.
+            bytes.unshift byte
           end
           write(bytes)
         end

@@ -17,13 +17,13 @@ module Dino
                     
         def before_initialize(options={})
           super(options)
-          self.bit_order = options[:bit_order] || :lsbfirst
+          self.bit_order = options[:bit_order] || :msbfirst
         end
         
         attr_accessor :bit_order
 
         def write(*bytes)
-          board.shift_write(latch.pin, data.pin, clock.pin, bytes)
+          board.shift_write(latch.pin, data.pin, clock.pin, bytes, bit_order: bit_order)
         end
       end
     end

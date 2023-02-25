@@ -26,7 +26,8 @@ shift_register = Dino::Components::Register::SPIOut.new  board: board,
                                                          # frequency: 3000000,
                                                          # spi_mode: 0,
                                                          # bytes: 1
-                                                         # bit_order: :lsbfirst
+                                                         # bit_order: :msbfirst
+                                                         # buffer_writes: true
 
 ssd = Dino::Components::SSD.new   board: shift_register,
                                   pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }

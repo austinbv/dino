@@ -8,21 +8,22 @@ require 'dino'
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 output_register = Dino::Components::Register::SPIOut.new board: board,
                                                          pin: 9
-                                                         # frequency: 3000000,
-                                                         # spi_mode: 0,
+                                                         # frequency: 1000000
+                                                         # spi_mode: 0
+                                                         # bit_order: :msbfirst
                                                          # bytes: 1
-                                                         # bit_order: :lsbfirst
+                                                         # buffer_writes: true
 
 ssd = Dino::Components::SSD.new   board: output_register,
                                   pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
 input_register = Dino::Components::Register::SPIIn.new  board: board,
-                                                        pin: 8,
-                                                        spi_mode: 0,
-                                                        frequency: 3000000
-                                                        # bytes: 1
+                                                        pin: 8
+                                                        # frequency: 1000000
+                                                        # spi_mode: 0
                                                         # bit_order: :lsbfirst
-
+                                                        # bytes: 1
+                                                        
 button = Dino::Components::Button.new(pin: 0, board: input_register)
 
 button.down { puts "down"}

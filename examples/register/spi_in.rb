@@ -24,10 +24,10 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 
 # Tested with CD4021B register, which is LSBFIRST, but needs SPI mode 0 on some boards and 2 on others.
 shift_register = Dino::Components::Register::SPIIn.new  board: board,
-                                                        pin: 8,
-                                                        spi_mode: 2,
-                                                        # bit_order: :lsbfirst
+                                                        pin: 8
                                                         # frequency: 1000000
+                                                        # spi_mode: 0
+                                                        # bit_order: :lsbfirst
                                                         # bytes: 1
 
 button = Dino::Components::Button.new(pin: 0, board: shift_register)
