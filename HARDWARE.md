@@ -21,22 +21,30 @@
 
 |    Chip               | Status          | Version| Product          | Notes |
 | :--------             | :------:        | :----- | :--------------- |------ |
-| Wiznet W5100/5500     | :green_heart:   | 0.11.1 | Ethernet Shield  | Wired Ethernet for Uno/Mega pin-compatible boards
+| Wiznet W5100/5500     | :green_heart:   | 0.11.1 | Ethernet Shield  | Wired Ethernet for Uno/Mega pin-compatibles
 | HDG204 + AT32UC3      | :man_shrugging: | 0.12.0 | WiFi Shield      | WiFi for Uno. No hardware to test, but compiles
-| ATWINC1500            | :man_shrugging: | 0.12.0 | WiFi Shield 101  | As above, high memory use, Mega only
+| ATWINC1500            | :man_shrugging: | 0.12.0 | WiFi Shield 101  | Same as above, high memory use, Mega only
 
 ### Espressif Chips with Built-In WiFi
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
 | ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | SoftwareSerial and LCD don't work yet
-| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD or SoftSerial. SPI input bug. See changelog
-| ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Might work, not tested yet
-| ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Might work, not tested yet
+| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD or SoftSerial. SPI mode bug (see changelog).
+| ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Should work, hardware limits will be wrong
+| ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Should work, hardware limits will be wrong
 
 **Note:** There are too many boards using these chips to be comprehensive. Most should work. These are the exact ones used for testing, chosen based on popularity.
 
 **Note:** For these boards, "pin" numbers are always based on GPIO numbers defined by the CHIP, not the pin numbers labeled on the BOARD. They might coincide, but not always. Keep a mapping reference handy for your particular board.
+
+### Raspberry Pi Microcontrollers
+
+|    Chip        | Status          | Version| Boards           | Notes |
+| :--------      | :------:        | :----- | :--------------- |------ |
+| RP2040         | :heart:         | -      | Raspberry Pi Pico (W) |
+
+**Note:** There are many boards built around the RP2040. Check your board's GPIO pin map, and use GPIO numbers in dino.
 
 # Supported Components
 
@@ -66,7 +74,7 @@
 | Hardware Serial  | :heart:        | Hardware  | -        | - | For boards with native USB and UARTs
 | Maxim OneWire    | :green_heart:  | Software  | 0.12.0   | `OneWire::Bus` | No overdrive support
 | Infrared Emitter | :green_heart:  | Software  | 0.12.0   | `IREmitter` | Library on Board
-| Infrared Receiver| :red_heart:    | Software  | -        | -           | Doable with existing library
+| Infrared Receiver| :heart:        | Software  | -        | -           | Doable with existing library
 
 ### Generic Components
 
@@ -96,7 +104,7 @@
 | :---------------     | :------:       | :--------           | :-----   | :---------------  |------ |
 | Servo                | :green_heart:  | PWM + Library       | 0.11.2   | `Servo`  | Maximum of 6 on ATmega168, 16 on ESP32 and 12 otherwise
 | L298N                | :heart:        | PWM Out             | -        | | 2ch DC motor driver
-| A3967                | :green_heart:  | Digital Out         | 0.12.0   | `Stepper`| 1ch microstepper (EasyDriver)å
+| A3967                | :green_heart:  | Digital Out         | 0.12.0   | `Stepper`| 1ch microstepper (EasyDriver)
 | PCA9685              | :heart:        | I2C                 | -        | -        | 16ch 12-bit PWM for servo, DC motor, or LED
 
 ### Displays

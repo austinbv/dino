@@ -18,7 +18,11 @@ Dino doesn't run Ruby on the microcontroller either, like [mruby-esp32](https://
 
 High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They multitask a single core microcontroller, with thread-safe state and callbacks for inputs, but no "task" priority. If you need more I/O, integration is seamless. Connect another board and instantiate.
 
-Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between. See supported hardware [here](HARDWARE.md).
+Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between.
+
+### Supported Hardware
+
+See a full list of supported mircocontroller platforms, interfaces, and components [here](HARDWARE.md).
 
 ## Getting Started
 #### 1) Install the Gem
