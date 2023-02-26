@@ -34,7 +34,7 @@ led = Dino::Components::Led.new(board: board, pin: 11)
 end
 puts
 
-# Now let's add the potentiometer from the previous examp to control it.
+# Now let's add the potentiometer from the previous example to control it.
 potentiometer = Dino::Components::Potentiometer.new(pin: 'A0', board: board)
 
 # Helper method to calculate brightness.
@@ -44,10 +44,10 @@ def map_pot_value(value)
 
   # Linearization hack for audio taper potentiometers.
   # Adjust k for different tapers. This was an A500K.
-  k = 5
-  linearized = (fraction * (k + 1)) / ((k * fraction) + 1)
+  # k = 5
+  # linearized = (fraction * (k + 1)) / ((k * fraction) + 1)
   # Use this for linear potentiometers instead.
-  # linearized = fraction 
+  linearized = fraction 
   
   # Map to the linearized 0-1 range to a 0-255 range for 8-bit PWM.
   (linearized * 255).floor
