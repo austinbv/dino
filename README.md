@@ -14,11 +14,11 @@ button.down do
 end
 ````
 
-Dino doesn't run Ruby on the microcontroller either, like [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32). The board runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
+Dino doesn't run Ruby on the microcontroller (try [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) for that). It runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
 
-High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They multitask a single core microcontroller, with thread-safe state and callbacks for inputs, but no "task" priority. If you need more I/O, integration is seamless. Connect another board and instantiate.
+High-level abstraction in Ruby makes hardware classes easy to implement, with intuitive interfaces. They multitask a single core microcontroller, with thread-safe state, and callbacks for inputs, but no "task" priority. If you need more I/O, integration is seamless. Connect another board and instantiate it in Ruby.
 
-Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between.
+Each physical component connected to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not everything in between.
 
 ### Supported Hardware
 
@@ -30,7 +30,7 @@ See a full list of supported mircocontroller platforms, interfaces, and componen
 gem install dino
 ```
 
-Before using the microcontroller in Ruby, we need to flash it with the dino firmware (or "sketch" in Arduino slang). This is needed **only once** for each board, but future dino versions may need reflashing for firmware functions.
+Before using the microcontroller in Ruby, we need to flash it with the dino firmware (or "sketch" in Arduino lingo). This is needed **only once** for each board, but future dino versions may need reflashing for firmware functions.
 
 #### 2) Install the Arduino IDE OR CLI
 
@@ -43,55 +43,9 @@ brew install arduino-cli
 ````
 
 #### 3) Install Arduino Dependencies
-Dino uses Arduino "cores" which add microcontroller support, and a few libraries. Let's install them now.
-
-**IDE method for Arduino & Clones:**
-* Go to: Tools > Manage Libraries.
-* Find and install the following libraries, at the version numbers given:
-  * `Servo by Michael Margolis, Arduino` at latest version
-  * `Liquid Crystal by Arduino, Adafruit` at latest version
-  * `WiFi by Arduino` at latest version
-  * `IRremote by shirriff, z3to, ArminJo` at `version 4.0.0`
-
-**CLI method for Arduino & Clones:**
-````shell
-arduino-cli lib install Servo
-arduino-cli lib install LiquidCrystal
-arduino-cli lib install WiFi
-arduino-cli lib install IRremote@4.0.0
-````
-
-**IDE method for ESP8266:**
-* Go to Tools > Board > Board Manager.
-* Search for `ESP8266 Boards` and install the latest version.
-* Go to: Tools > Manage Libraries.
-* Find and install the following libraries, at the version numbers given:
-  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.8.4`
-
-**CLI method for ESP8266:**
-````shell
-arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
-arduino-cli core update-index
-arduino-cli core install esp8266:esp8266
-arduino-cli lib install IRremoteESP8266@2.8.4
-````
-
-**IDE method for ESP32:**
-* Go to Tools > Board > Board Manager.
-* Search for `esp32` and install the latest version.
-* Go to: Tools > Manage Libraries.
-* Find and install the following libraries, at the version numbers given:
-  * `ESP32Servo by Kevin Harrington, John K. Bennett` at latest version
-  * `IRremoteESP82666 by David Conran, Sebastien Warin` at `version 2.8.4`
-
-**CLI method for ESP32:**
-````shell
-arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-arduino-cli core update-index
-arduino-cli core install esp32
-arduino-cli lib install ESP32Servo
-arduino-cli lib install IRremoteESP8266@2.8.4
-````
+Dino uses Arduino cores, which add support for microcontrollers, and a few libraries. Install only the ones for your microcontroller, or install everything. They are no conflcits. Instructions for all supported microcontrollers are here:
+  * [Install Dependencies in IDE](DEP_INSTALL_IDE.md) 
+  * [Install Dependencies in CLI](DEP_INSTALL_CLI.md) 
 
 #### 4) Generate the Arduino Sketch
 The `dino` command is included with the gem. It will make the Arduino sketch folder for you, and configure it.
@@ -106,8 +60,9 @@ dino sketch serial
 dino sketch serial --target esp8266
 ````
 
-**For ESP32 over WiFi (2.4Ghz and DHCP Only):**
+**For ESP8266 or ESP32 over WiFi (2.4Ghz and DHCP Only):**
 ```shell
+dino sketch wifi --target esp8266 --ssid YOUR_SSID --password YOUR_PASSWORD
 dino sketch wifi --target esp32 --ssid YOUR_SSID --password YOUR_PASSWORD
 ````
 **Note:** [This example](examples/tcp.rb) shows how to use a board over a TCP connection, but the WiFi sketches fall back to the serial interface if no TCP client is connected. You should be able to run the examples over serial while still connected.
