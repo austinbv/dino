@@ -66,6 +66,7 @@
 | Hardware Serial  | :heart:        | Hardware  | -        | - | For boards with native USB and UARTs
 | Maxim OneWire    | :green_heart:  | Software  | 0.12.0   | `OneWire::Bus` | No overdrive support
 | Infrared Emitter | :green_heart:  | Software  | 0.12.0   | `IREmitter` | Library on Board
+| Infrared Receiver| :red_heart:    | Software  | -        | -           | Doable with existing library
 
 ### Generic Components
 

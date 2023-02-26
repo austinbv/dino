@@ -7,6 +7,11 @@ module Dino
         end
 
         def self.crc_check(data)
+          calculated, received = self.calculate_crc(data)
+          calculated == received
+        end
+        
+        def self.calculate_crc(data)
           if data.class == Integer
             bytes = address_to_bytes(data)
           else
@@ -22,7 +27,7 @@ module Dino
               crc = crc | (xor * (2 ** 7))
             end
           end
-          crc == bytes.last
+          [crc, bytes.last]
         end
       end
     end

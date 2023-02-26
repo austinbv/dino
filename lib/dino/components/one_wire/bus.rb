@@ -16,7 +16,7 @@ module Dino
         def read_power_supply
           mutex.synchronize do
             # Without driving low first, results are inconsistent.
-            board.set_pin_mode(self.pin, :out)
+            board.set_pin_mode(self.pin, :output)
             board.digital_write(self.pin, board.low)
             sleep 0.1
 

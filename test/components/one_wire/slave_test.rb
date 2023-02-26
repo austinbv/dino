@@ -10,8 +10,6 @@ module Dino
             data << "," unless data.empty?
             data << "255"
           end
-          self.update(data)
-          self.pre_callback_filter(data)
         end
       end
     end

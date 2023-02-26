@@ -1,12 +1,16 @@
 require 'test_helper'
 
-# State machine simulating a bus during address search. Initialize with n for
-# n devices with random (CRC-invalid) addresses. Call #reset before each search.
+# State machine simulating a bus during address search. Initialize with
+# n devices with random addresses. Call #reset before each search.
 class BusSimulator
   def initialize(device_count)
     @devices = []
     device_count.times do
-      @devices << { rom: rand(2**64), in_search: true }
+      rando = rand(2**56)
+      crc = Dino::Components::OneWire::Helper.calculate_crc(rando)[0]
+      crc = crc << 56
+      rando = rando & crc
+      @devices << { rom: rando, in_search: true }
     end
     @devices = @devices.uniq
     @index = -1
@@ -96,7 +100,7 @@ module Dino
   module Components
     module OneWire
 
-      class Bus
+      class BusStub < Bus
         def read_power_supply
           @parasite_power = false
         end
@@ -113,12 +117,6 @@ module Dino
           self.update(result)
         end
       end
-
-      class Helper
-        def self.crc_check(bytes)
-          true
-        end
-      end
     end
   end
 end
@@ -126,11 +124,11 @@ end
 class OneWireEnumeratorTest < Minitest::Test
   def test_find_all_addresses
     # This gets slow with large number of devices.
-    bus_sim = BusSimulator.new(100)
+    bus_sim = BusSimulator.new(20)
     board_sim = BoardSimulator.new(bus_sim)
-    bus = Dino::Components::OneWire::Bus.new board: BoardMock.new,
-                                             pin: 1,
-                                             board_sim: board_sim
+    bus = Dino::Components::OneWire::BusStub.new board: BoardMock.new,
+                                                 pin: 1,
+                                                 board_sim: board_sim
     bus.search
 
     found_addresses = bus.found_devices.map { |d| d[:address] }
