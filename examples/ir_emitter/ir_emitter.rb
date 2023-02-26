@@ -37,7 +37,7 @@ board = Dino::Board.new(txrx)
 # The IR emitter can be set up on most pins for most boards, but there might be conflicts
 # with other hardware or libraries. Try different pins if one doesn't work.
 #
-ir = Dino::Components::IREmitter.new(board: board, pin: 4)
+ir = Dino::Components::IREmitter.new(board: board, pin: 3)
 
 # NEC Raw-Data=0xF708FB04. LSBFIRST, so the binary for each hex digit below is backward.
 code =  [ 9000, 4500,                                 # Start bit

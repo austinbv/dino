@@ -6,7 +6,7 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 stepper = Dino::Components::Stepper.new board: board,
-                                        pins: { slp: 6, enable: 7, direction: 8, step: 9, ms1: 10, ms2: 11 }
+                                        pins: { slp: 6, enable: 7, direction: 8, step: 10, ms1: 11, ms2: 12 }
                                         
 # Default is 8 microsteps. Set to 2 so we can move faster.
 stepper.microsteps = 2

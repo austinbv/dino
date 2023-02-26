@@ -14,9 +14,9 @@ button.down do
 end
 ````
 
-Dino doesn't run Ruby on the microcontroller board either, like [mruby](https://github.com/mruby/mruby). The board runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
+Dino doesn't run Ruby on the microcontroller either, like [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32). The board runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
 
-High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They "multitask" a single core microcontroller, with thread-safe state and callbacks for inputs, but no "task" priority. If you need more, integration is seamless. Simply connect another board and instantiate.
+High-level abstraction in Ruby makes hardware classes easy to implement, with interfaces we expect. They multitask a single core microcontroller, with thread-safe state and callbacks for inputs, but no "task" priority. If you need more I/O, integration is seamless. Connect another board and instantiate.
 
 Each physical component you connect to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not all the stuff in between. See supported hardware [here](HARDWARE.md).
 

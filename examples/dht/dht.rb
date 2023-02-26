@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-dht = Dino::Components::DHT.new(pin: 4, board: board)
+dht = Dino::Components::DHT.new(pin: 5, board: board)
 
 # The DHT class pre-processes raw data from the board. When it reaches callbacks
 # it's already hash of :temperature and :humidity keys, both with Float values.

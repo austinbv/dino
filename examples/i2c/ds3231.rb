@@ -18,7 +18,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 # On the ESP8266, 'D2' and 'D1' also map to SDA and SCL respectively.
 # This is for convenience when working with common development boards.
 #
-bus = Dino::Components::I2C::Bus.new(board: board, pin: 4)
+bus = Dino::Components::I2C::Bus.new(board: board, pin: 'A4')
 
 # The bus auto searches for devices on intiailization.
 puts "No I2C devices connected!" if bus.found_devices.empty?

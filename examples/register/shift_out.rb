@@ -10,7 +10,7 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 register = Dino::Components::Register::ShiftOut.new  board: board,
-                                                     pins:  {latch: 9, data: 11, clock: 13}
+                                                     pins:  {latch: 9, data: 11, clock: 12}
                                                      # bit_order: :msbfirst
                                                      # bytes: 1
                                                      # buffer_writes: true

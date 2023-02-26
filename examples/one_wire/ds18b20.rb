@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-bus = Dino::Components::OneWire::Bus.new(pin:16, board: board)
+bus = Dino::Components::OneWire::Bus.new(pin:4, board: board)
 
 # The bus detects parasite power automatically when initialized.
 # It can tell that parasite power is in use, but not by WHICH devices.
