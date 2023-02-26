@@ -27,7 +27,7 @@ shift_register = Dino::Components::Register::SPIIn.new  board: board,
                                                         pin: 8
                                                         # frequency: 1000000
                                                         # spi_mode: 0
-                                                        # bit_order: :lsbfirst
+                                                        # bit_order: :msbfirst
                                                         # bytes: 1
 
 button = Dino::Components::Button.new(pin: 0, board: shift_register)

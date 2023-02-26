@@ -18,7 +18,7 @@ module Dino
         def before_initialize(options={})
           super(options)
           self.rising_clock = options[:rising_clock] || false
-          self.bit_order = options[:bit_order] || :lsbfirst
+          self.bit_order = options[:bit_order] || :msbfirst
         end
         
         def after_initialize(options={})

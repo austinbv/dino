@@ -14,7 +14,7 @@ register = Dino::Components::Register::ShiftOut.new  board: board,
                                                      # bit_order: :msbfirst
                                                      # bytes: 1
                                                      # buffer_writes: true
-                                 
+
 # Write a single byte
 register.write(255)
 
