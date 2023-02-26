@@ -22,7 +22,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 # Note: If you have pins labeled "DAC", do not use them here. DACs generate steady
 # analog voltages, not waves, but we access both DACs and PWM with #analog_write.
 #
-# Set up LED on a PWM pin. See pwm_led.png in this folder for hook-up diagram.
+# Set up LED on a PWM pin. See pwm_led.pdf in this folder for hook-up diagram.
 #
 led = Dino::Components::Led.new(board: board, pin: 11)
 

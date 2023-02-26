@@ -12,7 +12,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 # The center is the wiper, and should be connected to one of the board's analog
 # pins. On most boards these pins start with 'A' and can be given as strings.
 #
-# See potentiometer.png in this folder for a hook-up diagram.
+# See potentiometer.pdf in this folder for a hook-up diagram.
 # 
 potentiometer = Dino::Components::Potentiometer.new(pin: 'A0', board: board)
 

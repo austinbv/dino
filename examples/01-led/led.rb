@@ -12,8 +12,10 @@ board = Dino::Board.new(io)
 
 #
 # Create an object for the LED, giving the board, and the pin that the positive
-# leg of your LED is connected to. The longer leg is usually positive.
-# See led.png in this folder for a hook-up diagram. 
+# leg of the LED is connected to. The longer leg is usually positive.
+#
+# See led.pdf in this folder for a hook-up diagram.
+# Use a current limiting resistor with external LEDs to protect them.
 #
 # The on-board LED (marked "L") is internally connected to pin 13 on most Arduinos,
 # and can be used without connecting anything.
