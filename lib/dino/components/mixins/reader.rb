@@ -8,8 +8,8 @@ module Dino
         # Defalt behavior for #read is to delegate to #_read.
         # Define #_read in including classes.
         #
-        def read(*args, &block)
-          read_using(self.method(:_read), *args, &block)
+        def read(*args, **kwargs, &block)
+          read_using(self.method(:_read), *args, **kwargs, &block)
         end
 
         #
@@ -20,7 +20,7 @@ module Dino
         #
         # Give procs as methods to build more complex functionality for buses.
         #
-        def read_using(method, *args, &block)
+        def read_using(method, *args, **kwargs, &block)
           add_callback(:read, &block) if block_given?
 
           value = nil
@@ -28,7 +28,7 @@ module Dino
             value = filtered_data
           end
           
-          method.call(*args)
+          method.call(*args, **kwargs)
           block_until_read
 
           value

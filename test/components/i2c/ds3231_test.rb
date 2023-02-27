@@ -53,7 +53,7 @@ class DS3231Test < MiniTest::Test
   def test_read
     bus; inject_read("5:104-0,0,0,6,1,1,48")
     
-    mock = MiniTest::Mock.new.expect :call, nil, [part.address, 0x00, 7, repeated_start: false]
+    mock = MiniTest::Mock.new.expect :call, nil, [part.address, 0x00, 7], repeated_start: false
     bus.stub(:_read, mock) do
       part.time
     end

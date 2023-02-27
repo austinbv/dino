@@ -22,12 +22,12 @@ module Dino
           end
         end
 
-        def write(address, bytes=[], options={})
-          board.i2c_write(address, [bytes].flatten, options)
+        def write(address, bytes=[], **kwargs)
+          board.i2c_write(address, [bytes].flatten, **kwargs)
         end
 
-        def _read(address, register=nil, num_bytes=1, options={})
-          board.i2c_read(address, register, num_bytes, options)
+        def _read(address, register=nil, num_bytes=1, **kwargs)
+          board.i2c_read(address, register, num_bytes, **kwargs)
         end
 
         def bubble_callbacks
