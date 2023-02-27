@@ -7,15 +7,12 @@ module Dino
       def after_initialize(options={})
         super(options)
         
-        # Read 2x as often than regular AnalogInput.
-        @divider = 8
-        
         # Keep values to smooth with moving average by default.
         self.smoothing = true
         @moving_set = []
         
-        # Start listening immediately.
-        listen
+        # Start listening immediately. Read 2x as often than regular AnalogInput.
+        listen(@divider = 8)
       end
       
       def smoothing_on
