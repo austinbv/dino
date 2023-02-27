@@ -67,7 +67,7 @@ class RotaryEncoderTest < MiniTest::Test
     part.clock.send(:update, 1)
     callback_value = nil
     part.add_callback do |value|
-      callback_value = value
+      callback_value = value.dup
     end
     part.data.send(:update, 1)
     part.clock.send(:update, 1)
