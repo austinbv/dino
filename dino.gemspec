@@ -10,11 +10,34 @@ Gem::Specification.new do |gem|
   gem.homepage      = 'https://github.com/austinbv/dino'
 
   gem.files         = `git ls-files`.split($\)
+
+  # Copy full submodule contents into the gem when building.
+  # Credit:
+  # https://gist.github.com/mattconnolly/5875987#file-gem-with-git-submodules-gemspec
+  #
+  # get an array of submodule dirs by executing 'pwd' inside each submodule
+  gem_dir = File.expand_path(File.dirname(__FILE__)) + "/"
+  `git submodule --quiet foreach pwd`.split($\).each do |submodule_path|
+    Dir.chdir(submodule_path) do
+      submodule_relative_path = submodule_path.sub gem_dir, ""
+      # issue git ls-files in submodule's directory and
+      # prepend the submodule path to create absolute file paths
+      `git ls-files`.split($\).each do |filename|
+        gem.files << "#{submodule_relative_path}/#{filename}"
+      end
+    end
+  end
+
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "dino"
   gem.require_paths = ["lib"]
   gem.version       = Dino::VERSION
   gem.executables   = ["dino"]
 
-  gem.add_dependency 'serialport'
+  gem.add_dependency 'rubyserial'
+  gem.add_dependency 'bcd'
+
+  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'minitest'
+  gem.add_development_dependency 'simplecov'
 end

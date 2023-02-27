@@ -1,27 +1,70 @@
 module Dino
   module Components
-    class Stepper < BaseComponent
+    class Stepper
+      include Setup::MultiPin
+      
+      proxy_pins  step:      Basic::DigitalOutput,
+                  direction: Basic::DigitalOutput
 
+      proxy_pins  ms1:       Basic::DigitalOutput,
+                  ms2:       Basic::DigitalOutput,
+                  enable:    Basic::DigitalOutput,
+                  slp:       Basic::DigitalOutput,
+                  optional:  true
+                  
+      attr_reader :microsteps
+                  
       def after_initialize(options={})
-        raise 'missing pins[:step] pin' unless self.pins[:step]
-        raise 'missing pins[:direction] pin' unless self.pins[:direction]
+        wake; on;
+        
+        if (ms1 && ms2)
+          self.microsteps = 8
+        end
+      end
 
-        set_pin_mode(pins[:step], :out)
-        set_pin_mode(pins[:direction], :out)
-        digital_write(pins[:step], Board::LOW)
+      def sleep
+        slp.low if slp
+      end
+
+      def wake
+        slp.high if slp
+      end
+
+      def off
+        enable.high if enable
+      end
+
+      def on
+        enable.low if enable
+      end
+
+      def microsteps=(steps)
+        if (ms1 && ms2)
+          case steps.to_i
+          when 1; ms2.low;  ms1.low
+          when 2; ms2.low;  ms1.high
+          when 4; ms2.high; ms1.low
+          when 8; ms2.high; ms1.high
+          end
+        else
+          raise ArgumentError, "ms1 and ms2 pins must be connected to GPIO pins to control microstepping."
+        end
+        @microsteps = steps
       end
 
       def step_cc
-        digital_write(self.pins[:direction], Board::HIGH)
-        digital_write(self.pins[:step],      Board::HIGH)
-        digital_write(self.pins[:step],      Board::LOW)
+        direction.high unless direction.high?
+        step.high
+        step.low
       end
 
       def step_cw
-        digital_write(self.pins[:direction], Board::LOW)
-        digital_write(self.pins[:step],      Board::HIGH)
-        digital_write(self.pins[:step],      Board::LOW)
+        direction.low unless direction.low?
+        step.high
+        step.low
       end
+
+      alias :step_ccw :step_cc
     end
   end
 end

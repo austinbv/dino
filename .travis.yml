@@ -1,5 +1,11 @@
 language: ruby
+
+before_install:
+  - gem install bundler
+
 rvm:
-  - 1.9.3
-  - 1.9.2
-script: bundle exec rspec spec
+  - 2.4.1
+  - 2.0.0
+  - jruby-9.1.15.0
+
+script: bundle exec rake test

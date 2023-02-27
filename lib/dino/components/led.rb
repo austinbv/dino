@@ -1,17 +1,11 @@
 module Dino
   module Components
-    class Led < BaseComponent
-      def after_initialize(options={})
-        set_pin_mode(:out)
-        off
-      end
-
-      def on
-        digital_write(Board::HIGH)
-      end
-
-      def off
-        digital_write(Board::LOW)
+    class Led < Basic::AnalogOutput
+      def blink(interval=0.5)
+        threaded_loop do 
+          toggle
+          sleep interval
+        end
       end
     end
   end

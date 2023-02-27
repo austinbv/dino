@@ -1,0 +1,20 @@
+  
+  If all the missing files are from the vendor directory, you have 2 options:
+
+  1) If you cloned the dino repo with git, please run:
+
+     git submodule update --init --recursive
+
+     Then try generating the sketch again.
+     This command clones the needed repos into dino's src/vendor folder.
+
+  2) If you installed the gem via gem install, you can ignore missing vendor
+    files and install the libraries in your Arduino app instead.
+
+     The libraries used are:
+     
+       IRremote v2.3.2
+       IRremoteESP8266 v2.3.2
+
+     In the Arduino app's library manager, search for them by name. Please
+     install the versions listed here. Newer or older versions may be incompatible.
