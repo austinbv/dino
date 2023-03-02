@@ -1,18 +1,18 @@
-name: Arduino Compile Test
+name: Compile / AVR
 
 on:
   pull_request:
     paths:
       - 'src'
-      - '.github/workflows/arduino.yml'
+      - '.github/workflows/compile_avr.yml'
 
   push:
     paths:
       - 'src'
-      - '.github/workflows/arduino.yml'
+      - '.github/workflows/compile_avr.yml'
 
 jobs:
-  avr-uno:
+  avr-serial:
     runs-on: ubuntu-latest
     
     strategy:
@@ -31,13 +31,20 @@ jobs:
                 version: 4.0.0
               - name: WiFi
                 version: 1.2.7
+        sketches:
+          - sketch_name: serial
+            sketch_path: dino_serial_0.12.0
+          - sketch_name: ethernet
+            sketch_path: dino_ethernet_0.12.0
+          - sketch_name: wifi
+            sketch_path: dino_wifi_0.12.0
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       
       - name: Generate
-        run: ./bin/dino sketch serial --target mega
+        run: ./bin/dino sketch ${{ matrix.sketches.sketch_name }} --target mega
         shell: bash
         
       - name: Compile Arduino Sketches
@@ -47,5 +54,5 @@ jobs:
           fqbn: ${{ matrix.board.fqbn }}
           libraries: ${{ matrix.board.libraries }}
           sketch-paths: |
-            - dino_serial_0.12.0
+            - ${{ matrix.sketches.sketch_path }}
             
