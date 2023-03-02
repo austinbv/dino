@@ -29,18 +29,13 @@ jobs:
           - fqbn: arduino:avr:uno
             platforms: |
               - name: arduino:avr
-                version: 1.8.6
             libraries: |
               - name: Servo
-                version: 1.1.8
               - name: LiquidCrystal
-                version: 1.0.7
               - name: IRremote
                 version: 4.0.0
               - name: Ethernet
-                version: 2.0.1
               - name: WiFi
-                version: 1.2.7
                 
     steps:
       - name: Checkout
