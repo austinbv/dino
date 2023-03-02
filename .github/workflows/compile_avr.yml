@@ -42,7 +42,7 @@ jobs:
       
       - name: Generate
         id: generate
-        run: echo "path=./bin/dino sketch ${{ matrix.sketches.name }} --target mega" >> $GITHUB_OUTPUT
+        run: echo "path=$(./bin/dino sketch ${{ matrix.sketches.name }} --target mega)" >> $GITHUB_OUTPUT
 
       - name: Compile Arduino Sketches
         uses: arduino/compile-sketches@v1.0.1
@@ -51,5 +51,5 @@ jobs:
           fqbn: ${{ matrix.board.fqbn }}
           libraries: ${{ matrix.board.libraries }}
           sketch-paths: |
-            - ${{ steps.generate.outputs.sketches.path }}
+            - ${{ steps.generate.outputs.path }}
             
