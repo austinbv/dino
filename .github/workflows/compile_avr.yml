@@ -51,5 +51,5 @@ jobs:
           fqbn: ${{ matrix.board.fqbn }}
           libraries: ${{ matrix.board.libraries }}
           sketch-paths: |
-            - ${{ steps.generate.outputs..sketches.path }}
+            - ${{ steps.generate.outputs.sketches.path }}
             
