@@ -26,6 +26,7 @@ jobs:
             
         board:
           - fqbn: arduino:avr:uno
+            dino-target: mega
             platforms: |
               - name: arduino:avr
             libraries: |
@@ -42,7 +43,7 @@ jobs:
       
       - name: Generate
         id: generate
-        run: echo "path=$(./bin/dino sketch ${{ matrix.sketches.name }} --target mega)" >> $GITHUB_OUTPUT
+        run: echo "path=$(./bin/dino sketch ${{ matrix.sketches.name }} --target ${{ matrix.board.dino-target }})" >> $GITHUB_OUTPUT
 
       - name: Compile Arduino Sketches
         uses: arduino/compile-sketches@v1.0.1
