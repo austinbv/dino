@@ -17,6 +17,14 @@ jobs:
     
     strategy:
       matrix:
+        sketches:
+          - name: serial
+            path: dino_serial_0.12.0
+          - name: ethernet
+            path: dino_ethernet_0.12.0
+          - name: wifi
+            path: dino_wifi_0.12.0
+            
         board:
           - fqbn: arduino:avr:uno
             platforms: |
@@ -33,14 +41,7 @@ jobs:
                 version: 2.0.1
               - name: WiFi
                 version: 1.2.7
-        sketches:
-          - name: serial
-            path: dino_serial_0.12.0
-          - name: ethernet
-            path: dino_ethernet_0.12.0
-          - name: wifi
-            path: dino_wifi_0.12.0
-
+                
     steps:
       - name: Checkout
         uses: actions/checkout@v3
