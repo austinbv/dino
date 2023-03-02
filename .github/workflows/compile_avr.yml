@@ -12,7 +12,7 @@ on:
       - '.github/workflows/compile_avr.yml'
 
 jobs:
-  avr-serial:
+  avr-uno:
     runs-on: ubuntu-latest
     
     strategy:
@@ -29,22 +29,24 @@ jobs:
                 version: 1.0.7
               - name: IRremote
                 version: 4.0.0
+              - name: Ethernet
+                version: 2.0.1
               - name: WiFi
                 version: 1.2.7
         sketches:
-          - sketch_name: serial
-            sketch_path: dino_serial_0.12.0
-          - sketch_name: ethernet
-            sketch_path: dino_ethernet_0.12.0
-          - sketch_name: wifi
-            sketch_path: dino_wifi_0.12.0
+          - name: serial
+            path: dino_serial_0.12.0
+          - name: ethernet
+            path: dino_ethernet_0.12.0
+          - name: wifi
+            path: dino_wifi_0.12.0
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       
       - name: Generate
-        run: ./bin/dino sketch ${{ matrix.sketches.sketch_name }} --target mega
+        run: ./bin/dino sketch ${{ matrix.sketches.name }} --target mega
         shell: bash
         
       - name: Compile Arduino Sketches
@@ -54,5 +56,5 @@ jobs:
           fqbn: ${{ matrix.board.fqbn }}
           libraries: ${{ matrix.board.libraries }}
           sketch-paths: |
-            - ${{ matrix.sketches.sketch_path }}
+            - ${{ matrix.sketches.path }}
             

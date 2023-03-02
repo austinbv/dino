@@ -12,6 +12,7 @@ arduino-cli core install esp8266:esp8266
 arduino-cli core install esp32:esp32
 arduino-cli lib install Servo
 arduino-cli lib install LiquidCrystal
+arduino-cli lib install Ethernet
 arduino-cli lib install WiFi
 arduino-cli lib install IRremote@4.0.0
 arduino-cli core install esp8266:esp8266
@@ -25,6 +26,7 @@ arduino-cli core update-index
 arduino-cli core install arduino:megaavr
 arduino-cli lib install Servo
 arduino-cli lib install LiquidCrystal
+arduino-cli lib install Ethernet
 arduino-cli lib install WiFi
 arduino-cli lib install IRremote@4.0.0
 ````

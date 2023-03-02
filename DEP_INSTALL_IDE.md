@@ -33,6 +33,7 @@ All platforms will require libraries to be installed. To install a library do th
     ````shell
     Servo                       by Michael Margolis, Arduino
     Liquid Crystal              by Arduino, Adafruit
+    Ethernet                    by Various
     WiFi                        by Arduino
     IRremote          @ v4.0.0  by shirriff, z3to, ArminJo
     IRremoteESP82666  @ v2.8.4  by David Conran, Sebastien Warin
@@ -48,6 +49,7 @@ All platforms will require libraries to be installed. To install a library do th
     ````shell
     Servo                       by Michael Margolis, Arduino
     Liquid Crystal              by Arduino, Adafruit
+    Ethernet                    by Various
     WiFi                        by Arduino
     IRremote          @ v4.0.0  by shirriff, z3to, ArminJoß
     ````
