@@ -1,0 +1,56 @@
+name: Compile / MegaAVR
+
+on:
+  pull_request:
+    paths:
+      - 'src'
+      - '.github/workflows/compile_megaavr.yml'
+
+  push:
+    paths:
+      - 'src'
+      - '.github/workflows/compile_megaavr.yml'
+      
+jobs:
+  megaavr-uno2018:
+    name: megaavr ${{ matrix.sketches.name }}
+    
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        sketches:
+          - name: serial
+          - name: ethernet
+          - name: wifi
+            
+        board:
+          - fqbn: arduino:megaavr:uno2018
+            dino-target: mega
+            platforms: |
+              - name: arduino:megaavr
+            libraries: |
+              - name: Servo
+              - name: LiquidCrystal
+              - name: IRremote
+                version: 4.0.0
+              - name: Ethernet
+              - name: WiFi
+                
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Generate
+        id: generate
+        run: echo "path=$(./bin/dino sketch ${{ matrix.sketches.name }} --target ${{ matrix.board.dino-target }})" >> $GITHUB_OUTPUT
+
+      - name: Compile Arduino Sketches
+        uses: arduino/compile-sketches@v1.0.1
+        with:
+          platforms: ${{ matrix.board.platforms }}
+          fqbn: ${{ matrix.board.fqbn }}
+          libraries: ${{ matrix.board.libraries }}
+          sketch-paths: |
+            - ${{ steps.generate.outputs.path }}
+            

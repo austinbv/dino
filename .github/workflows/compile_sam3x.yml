@@ -1,0 +1,54 @@
+name: Compile / SAM3X
+
+on:
+  pull_request:
+    paths:
+      - 'src'
+      - '.github/workflows/compile_sam3x.yml'
+
+  push:
+    paths:
+      - 'src'
+      - '.github/workflows/compile_sam3x.yml'
+      
+jobs:
+  sam3x-due:
+    name: sam3x ${{ matrix.sketches.name }}
+    
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        sketches:
+          - name: serial
+          - name: ethernet
+          - name: wifi
+            
+        board:
+          - fqbn: arduino:sam:arduino_due_x
+            dino-target: sam3x
+            platforms: |
+              - name: arduino:sam
+            libraries: |
+              - name: Servo
+              - name: LiquidCrystal
+              - name: Ethernet
+              - name: WiFi
+                
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Generate
+        id: generate
+        run: echo "path=$(./bin/dino sketch ${{ matrix.sketches.name }} --target ${{ matrix.board.dino-target }})" >> $GITHUB_OUTPUT
+
+      - name: Compile Arduino Sketches
+        uses: arduino/compile-sketches@v1.0.1
+        with:
+          platforms: ${{ matrix.board.platforms }}
+          fqbn: ${{ matrix.board.fqbn }}
+          libraries: ${{ matrix.board.libraries }}
+          sketch-paths: |
+            - ${{ steps.generate.outputs.path }}
+            
