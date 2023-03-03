@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.0
+
+### New Boards
+
+- SAMD Based Boards, Arduino Zero (`--target samd`):
+  - More notes here
+
+- RP2040 Based Boards, Raspberry Pi Pico (W) (`--target rp2040`):
+  - More notes here
+  
 ## 0.12.0
 
 ### New Boards

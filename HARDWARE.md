@@ -32,6 +32,7 @@
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
 | ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | SoftwareSerial and LCD don't work yet
+| ESP8285        | :man_shrugging: | 0.12.0 | DOIT ESP-Mx DevKit | Should be identical to 8266. Not tested in hardware.
 | ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD or SoftSerial. SPI mode bug (see changelog).
 | ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Should work, hardware limits will be wrong
 | ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Should work, hardware limits will be wrong
@@ -44,7 +45,7 @@
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
-| RP2040         | :heart:         | -      | Raspberry Pi Pico (W) |
+| RP2040         | :test_tube:     | -      | Raspberry Pi Pico (W) | Sofware Serial disabled
 
 **Note:** There are many boards built around the RP2040. Check your board's GPIO pin map, and use GPIO numbers in dino.
 

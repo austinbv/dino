@@ -3,24 +3,38 @@
 
     mega (default)
 
-      Covers popular Atmel chips and associated Arduino boards. This is the
-      primary target and default setting. All component features are included.
+      Covers the Atmel/Microchip AVR 8-bit chips and associated Arduino boards.
+      This is the default target. All component features are included.
 
       Chips:  ATmega328p, ATmega32u4, ATmega1280, ATmega2560
-      Boards: Arduino Uno, Nano, Mini, Ethernet
-              Leonardo, Micro, Esplora, Leonardo ETH
+              Atmega4809 (unconfirmed)
+      Boards: Arduino Uno, Nano, Mini, Ethernet, Pro (some), Pro Mini (some)
+              Leonardo, Micro, Esplora, Leonardo ETH, Lilypad USB
               Mega 1280, Mega 2560, Mega ADK
-              Most Lilypads (excluding ones with an ATmega168)
+              Nano Every, Uno WiFi Rev2 (unconfirmed)
 
+
+    esp32
+
+      For the the ESP32 chip by Espressif, with integrated 2.4Ghz WiFi.
+      No WiFi OTA updates yet.
+      This option includes all component features EXCEPT:
+          Serial, LCD
+
+      Chips:  ESP32, ESP32-S2, ESP32-S3
+      Boards: ESP32 DevKit, LOLIN D32 / D32 Pro, LOLIN S2 Pico / Mini,
+              LOLIN S3 Pico / Mini
+         
 
     esp8266
 
-      Based on the ESP8266 chip by Espressif with integrated 2.4Ghz WiFi.
+      For the ESP8266 chip by Espressif, with integrated 2.4Ghz WiFi.
+      WiFi over-the-air updates are enabled by default.
       This option includes all component features EXCEPT:
           Serial, LCD
 
       Chips:  ES8266, ESP8285
-      Boards: WeMos D1, Node MCU, Generic ESP8266 Modules
+      Boards: WeMos D1, Node MCU, Bare Modules
 
       Note: Building the (default) serial sketch will only allow connections via
             serial. Build the WiFi sketch to connect via the integrated WiFi.
@@ -29,35 +43,34 @@
             supports over-the-air updates from the Arduino IDE using ArduinoOTA.
             
             
-    esp32
+   rp2040
 
-      Based on the ESP32 chip by Espressif with integrated 2.4Ghz WiFi. No WiFi OTA
-      updates yet.
-      This option includes all component features EXCEPT:
-          Serial, LCD
+     For the Raspberry Pi RP2040 microcontroller.
+     Software Serial doesn't work.
+     This option includes all component features EXCEPT:
+         Serial
 
-      Chips:  ESP32, ESP32-S2, ESP32-S3
-      Boards: ESP32 DevKit, LOLIN D32 / D32 Pro, LOLIN S2 Pico / Mini,
-              LOLIN S3 Pico / Mini
-              
-              
-    samd
+     Chips:  RP2040
+     Boards: Raspberry Pi Pico, Raspberry Pi Pico W, and many others
+     
 
-      Similar to the mega option, but Software Serial doesn't work.
-      The ATSAMD21G18 uses native USB, and has no EEPROM.
-      This option includes all component features EXCEPT:
-          EEPROM Serial
+   samd
 
-      Chips:  ATSAMD21G18
-      Boards: Arduino Zero, M0, M0 Pro
-      
-      
+     For the ATSAMD21G18, with native USB and no EEPROM.
+     Similar to the mega option, but Software Serial doesn't work.
+     This option includes all component features EXCEPT:
+         EEPROM, Serial
+
+     Chips:  ATSAMD21G18
+     Boards: Arduino Zero, M0, M0 Pro
+
+
     sam3x
 
+      Fpr the ATSAM3X8E, with native USB and no EEPROM.
       Similar to the mega option, but some features don't work.
-      The ATSAM3X8E uses native USB, and has no EEPROM.
       This option includes all component features EXCEPT:
-          EEPROM Serial, Tone, IR Out
+          EEPROM, Serial, Tone, IR Out
 
       Chips:  ATSAM3X8E
       Boards: Arduino Due
@@ -71,18 +84,18 @@
         Analog Read/Write/Listen
 
       This is mostly useful for testing, or if severely limited on memory, as it
-      is the smallest sketch possible and should be universally compatible.
+      is the smallest sketch possible, and should be universally compatible.
 
 
     mega168
 
-      This specifically targets the older ATmega168 chip used in early Arduinos.
+      This targets the older ATmega168 chip used in early Arduinos.
       With half the RAM and flash available, we need to cut the sketch down.
       This option includes core functionality AND:
           Servo (6 maxmium), DHT, Shift In/Out, Tone, SPI, I2C
 
       Chips:  ATmega168
-      Boards: Duemilanove, Diecimila, Pro, Pro Mini
+      Boards: Duemilanove, Diecimila, Pro (some), Pro Mini (some)
               (Later versions of these may carry an ATmega328)
 
       Note: While you can generate this sketch using any connection type,
@@ -96,8 +109,5 @@
             Arduino IDE, regardless of the options passed to this sketch generator.
 
 
-  NOTE: While different targets include different libraries, you can manually
-  control which libraries are included at compile time by editing DinoDefines.h.
-  To enable this, libraries unused by the sketch are copied to the sketch output
-  folder anyway, provided they are not incompatible with the target architecture.
-  Uncomment or comment #define lines in DinoDefines.h as needed.
+  NOTE: You can manually control which features are enabled before compiling, by editing
+  by editing DinoDefines.h. (Un)comment #define lines there to toggle features as needed.
