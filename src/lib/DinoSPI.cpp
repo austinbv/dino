@@ -114,7 +114,7 @@ void Dino::addSpiListener() {
         pin,
         auxMsg[0],
         auxMsg[1],
-        *((uint32_t*)(auxMsg + 3)),
+        *reinterpret_cast<uint32_t*>(auxMsg + 3),
         true
       };
       return;

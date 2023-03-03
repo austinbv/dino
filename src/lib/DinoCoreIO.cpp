@@ -189,9 +189,9 @@ void Dino::coreResponse(int p, int v){
 void Dino::setListener(byte p, boolean enabled, byte analog, byte exponent, boolean local){
   // Pre-format the settings into a mask byte.
   byte settingMask = 0;
-  if (enabled)  settingMask = settingMask | B10000000;
-  if (analog)   settingMask = settingMask | B01000000;
-  if (local)    settingMask = settingMask | B00010000;
+  if (enabled)  settingMask = settingMask | 0b10000000;
+  if (analog)   settingMask = settingMask | 0b1000000;
+  if (local)    settingMask = settingMask | 0b0010000;
   settingMask = settingMask | exponent;
 
   #ifdef debug

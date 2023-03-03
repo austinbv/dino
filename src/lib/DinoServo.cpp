@@ -6,7 +6,7 @@
 
 #ifdef ESP32
   #include <ESP32Servo.h>
-#else if
+#else
   #include <Servo.h>
 #endif
 
