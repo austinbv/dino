@@ -46,7 +46,7 @@
    rp2040
 
      For the Raspberry Pi RP2040 microcontroller.
-     Software Serial doesn't work.
+     Software Serial doesn't work. WiFi available only on the W version.
      This option includes all component features EXCEPT:
          Serial
 

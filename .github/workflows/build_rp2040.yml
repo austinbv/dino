@@ -27,7 +27,7 @@ jobs:
           - name: wifi
             
         board:
-          - fqbn: rp2040:rp2040:rpipico
+          - fqbn: rp2040:rp2040:rpipicow
             dino-target: rp2040
             platforms: |
               - name: rp2040:rp2040

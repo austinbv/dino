@@ -42,10 +42,11 @@
 **Note:** For these boards, "pin" numbers are always based on GPIO numbers defined by the CHIP, not the pin numbers labeled on the BOARD. They might coincide, but not always. Keep a mapping reference handy for your particular board.
 
 ### Raspberry Pi Microcontrollers
+[![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
-| RP2040         | :test_tube:     | -      | Raspberry Pi Pico (W) | Sofware Serial disabled
+| RP2040         | :test_tube:     | -      | Raspberry Pi Pico (W) | Sofware Serial disabled. WiFi only on W version.
 
 **Note:** There are many boards built around the RP2040. Check your board's GPIO pin map, and use GPIO numbers in dino.
 
