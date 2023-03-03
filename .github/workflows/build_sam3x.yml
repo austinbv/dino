@@ -1,4 +1,4 @@
-name: Compile / ESP32
+name: Build / SAM3X
 
 on:
   workflow_dispatch:
@@ -6,16 +6,16 @@ on:
   pull_request:
     paths:
       - 'src/**'
-      - '.github/workflows/compile_esp32.yml'
+      - '.github/workflows/build_sam3x.yml'
 
   push:
     paths:
       - 'src/**'
-      - '.github/workflows/compile_esp32.yml'
+      - '.github/workflows/build_sam3x.yml'
       
 jobs:
-  esp8266-nodemcuv2:
-    name: esp32 ${{ matrix.sketches.name }}
+  sam3x-due:
+    name: sam3x ${{ matrix.sketches.name }}
     
     runs-on: ubuntu-latest
     
@@ -23,19 +23,20 @@ jobs:
       matrix:
         sketches:
           - name: serial
+          - name: ethernet
           - name: wifi
             
         board:
-          - fqbn: esp32:esp32:esp32doit-devkit-v1
-            dino-target: esp32
+          - fqbn: arduino:sam:arduino_due_x
+            dino-target: sam3x
             platforms: |
-              - name: esp32:esp32
-                source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+              - name: arduino:sam
             libraries: |
-              - name: IRremoteESP8266
-                version: 2.8.4
-              - name: ESP32Servo
-              
+              - name: Servo
+              - name: LiquidCrystal
+              - name: Ethernet
+              - name: WiFi
+                
     steps:
       - name: Checkout
         uses: actions/checkout@v3

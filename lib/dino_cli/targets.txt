@@ -31,26 +31,38 @@
             
     esp32
 
-      Based on the ESP32 chip by Espressif with integrated 2.4Ghz WiFi.
-      This is still EXPERIMENTAL! Only includes the core subset. WiFi works. No OTA yet.
+      Based on the ESP32 chip by Espressif with integrated 2.4Ghz WiFi. No WiFi OTA
+      updates yet.
+      This option includes all component features EXCEPT:
+          Serial, LCD
 
       Chips:  ESP32, ESP32-S2, ESP32-S3
       Boards: ESP32 DevKit, LOLIN D32 / D32 Pro, LOLIN S2 Pico / Mini,
               LOLIN S3 Pico / Mini
               
               
+    samd
+
+      Similar to the mega option, but Software Serial doesn't work.
+      The ATSAMD21G18 uses native USB, and has no EEPROM.
+      This option includes all component features EXCEPT:
+          EEPROM Serial
+
+      Chips:  ATSAMD21G18
+      Boards: Arduino Zero, M0, M0 Pro
+      
+      
     sam3x
 
-      This is the same as mega, but omits libraries specifically known to be
-      incompatible with the Atmel SAMD (ARM Cortex M0) chips. Use this when
-      you need to load a sketch on the Arduino Due or similar boards.
+      Similar to the mega option, but some features don't work.
+      The ATSAM3X8E uses native USB, and has no EEPROM.
       This option includes all component features EXCEPT:
-          Serial, Tone, IR Out, I2C
+          EEPROM Serial, Tone, IR Out
 
-      Chips:  AT91SAM3X8E
+      Chips:  ATSAM3X8E
       Boards: Arduino Due
-
-
+      
+      
     core
 
       This includes only the core component feature set of dino:

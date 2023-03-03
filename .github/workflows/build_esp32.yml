@@ -1,0 +1,55 @@
+name: Build / ESP32
+
+on:
+  workflow_dispatch:
+  
+  pull_request:
+    paths:
+      - 'src/**'
+      - '.github/workflows/build_esp32.yml'
+
+  push:
+    paths:
+      - 'src/**'
+      - '.github/workflows/build_esp32.yml'
+      
+jobs:
+  esp8266-nodemcuv2:
+    name: esp32 ${{ matrix.sketches.name }}
+    
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        sketches:
+          - name: serial
+          - name: wifi
+            
+        board:
+          - fqbn: esp32:esp32:esp32doit-devkit-v1
+            dino-target: esp32
+            platforms: |
+              - name: esp32:esp32
+                source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+            libraries: |
+              - name: IRremoteESP8266
+                version: 2.8.4
+              - name: ESP32Servo
+              
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Generate
+        id: generate
+        run: echo "path=$(./bin/dino sketch ${{ matrix.sketches.name }} --target ${{ matrix.board.dino-target }})" >> $GITHUB_OUTPUT
+
+      - name: Compile Arduino Sketches
+        uses: arduino/compile-sketches@v1.0.1
+        with:
+          platforms: ${{ matrix.board.platforms }}
+          fqbn: ${{ matrix.board.fqbn }}
+          libraries: ${{ matrix.board.libraries }}
+          sketch-paths: |
+            - ${{ steps.generate.outputs.path }}
+            

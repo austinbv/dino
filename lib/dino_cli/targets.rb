@@ -13,8 +13,11 @@ class DinoCLI::Generator
     # Specific features for the old mega168 chips.
     mega168: [:core, :servo, :shift, :tone, :spi, :i2c],
 
-    # ARM includes everytyhing except specific incompatibilities.
+    # SAM3X includes everytyhing except specific incompatibilities.
     sam3x: STANDARD_PACKAGES - [:serial, :tone, :ir_out],
+    
+    # SAMD includes everytyhing except specific incompatibilities.
+    samd: STANDARD_PACKAGES - [:serial],
 
     # ESP8266 mostly working.
     esp8266: STANDARD_PACKAGES - [:lcd, :serial, :ir_out] + [:ir_out_esp],

@@ -15,8 +15,8 @@
 // #define DINO_SPI
 // #define DINO_I2C
 
-// No EEPROM on the Due.
-#ifndef __SAM3X8E__
+// No EEPROM on the Due or Zero.
+#if !defined(__SAM3X8E__) && !defined(ARDUINO_SAMD_ZERO)
   #define EEPROM_PRESENT
   #include <EEPROM.h>
 #endif

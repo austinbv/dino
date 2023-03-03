@@ -1,4 +1,4 @@
-# Dino 0.12.0 ![Build Status](https://github.com/austinbv/dino/actions/workflows/ruby.yml/badge.svg)
+# Dino 0.12.0 [![Test Status](https://github.com/austinbv/dino/actions/workflows/ruby.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/ruby.yml)
 ### Ruby Meets Microcontrollers
 Dino gives you a high-level Ruby interface to low-level hardware, without writing microcontroller code. Use LEDs, buttons, sensors and more, just as easily as any Ruby object:
 
@@ -43,9 +43,9 @@ brew install arduino-cli
 ````
 
 #### 3) Install Arduino Dependencies
-Dino uses Arduino cores, which add support for microcontrollers, and a few libraries. Install only the ones for your microcontroller, or install everything. They are no conflcits. Instructions for all supported microcontrollers are here:
-  * [Install Dependencies in IDE](DEP_INSTALL_IDE.md) 
-  * [Install Dependencies in CLI](DEP_INSTALL_CLI.md) 
+Dino uses Arduino cores, which add support for microcontrollers, and a few libraries. Install only the ones for your microcontroller, or install everything. There are no conflcits. Instructions for supported microcontrollers:
+  * [Install Dependencies in IDE](DEPS_IDE.md) 
+  * [Install Dependencies in CLI](DEPS_CLI.md) 
 
 #### 4) Generate the Arduino Sketch
 The `dino` command is included with the gem. It will make the Arduino sketch folder for you, and configure it.
@@ -65,7 +65,7 @@ dino sketch serial --target esp8266
 dino sketch wifi --target esp8266 --ssid YOUR_SSID --password YOUR_PASSWORD
 dino sketch wifi --target esp32 --ssid YOUR_SSID --password YOUR_PASSWORD
 ````
-**Note:** [This example](examples/tcp.rb) shows how to use a board over a TCP connection, but the WiFi sketches fall back to the serial interface if no TCP client is connected. You should be able to run the examples over serial while still connected.
+**Note:** [This example](examples/tcp.rb) shows how to connect to a board with a TCP socket, but the WiFi & Ethernet sketches fall back to the serial interface when no TCP client is connected.
 
 #### 5a) IDE Flashing
 

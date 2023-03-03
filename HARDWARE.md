@@ -2,7 +2,8 @@
 
 :green_heart: Full support :yellow_heart: Partial support :heart: Planned. No support yet
 
-### Microchip/Atmel Chips in Arduino Products (and Compatibles) 
+### Microchip/Atmel Chips in Arduino Products (and Compatibles)
+[![AVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_avr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_avr.yml) [![MegaAVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml) [![SAM3X Build Satus](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml) [![SAMD Build Satus](https://github.com/austinbv/dino/actions/workflows/build_samd.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_samd.yml) 
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
@@ -11,9 +12,9 @@
 | ATmega32u4     | :green_heart:   | 0.11.0 | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB | **v0.11.1** for Leonardo ETH
 | ATmega1280     | :green_heart:   | 0.11.1 | Mega | 
 | ATmega2560     | :green_heart:   | 0.11.1 | Mega2560, Arduino Mega ADK | 
-| ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every | No hardware to test, but should work
+| ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
 | ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. SoftSerial, Tone, IR Out, and I2C don't work yet
-| ATSAMD21       | :heart:         | -      | Zero, M0, M0 Pro | 
+| ATSAMD21       | :test_tube:     | -      | Zero, M0, M0 Pro | 
 
 **Note:** Only USB boards listed. Any supported chip should work, once you can flash it and connect to serial.
 
@@ -26,6 +27,7 @@
 | ATWINC1500            | :man_shrugging: | 0.12.0 | WiFi Shield 101  | Same as above, high memory use, Mega only
 
 ### Espressif Chips with Built-In WiFi
+[![ESP8266 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml) [![ESP32 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml)
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |

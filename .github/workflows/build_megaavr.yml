@@ -1,4 +1,4 @@
-name: Compile / MegaAVR
+name: Build / MegaAVR
 
 on:
   workflow_dispatch:
@@ -6,12 +6,12 @@ on:
   pull_request:
     paths:
       - 'src/**'
-      - '.github/workflows/compile_megaavr.yml'
+      - '.github/workflows/build_megaavr.yml'
 
   push:
     paths:
       - 'src/**'
-      - '.github/workflows/compile_megaavr.yml'
+      - '.github/workflows/build_megaavr.yml'
       
 jobs:
   megaavr-uno2018:

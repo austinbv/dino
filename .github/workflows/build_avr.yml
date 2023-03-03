@@ -1,4 +1,4 @@
-name: Compile / AVR
+name: Build / AVR
 
 on:
   workflow_dispatch:
@@ -6,12 +6,12 @@ on:
   pull_request:
     paths:
       - 'src/**'
-      - '.github/workflows/compile_avr.yml'
+      - '.github/workflows/build_avr.yml'
 
   push:
     paths:
       - 'src/**'
-      - '.github/workflows/compile_avr.yml'
+      - '.github/workflows/build_avr.yml'
       
 jobs:
   avr-uno:
