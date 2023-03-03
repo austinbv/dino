@@ -7,7 +7,7 @@
 #if defined(DINO_IR_OUT) && (defined(ESP8266) || defined(ESP32))
 
 #include <IRremoteESP8266.h>
-#include <Irsend.h>
+#include <IRsend.h>
 
 // CMD = 16
 // Send an infrared signal.
