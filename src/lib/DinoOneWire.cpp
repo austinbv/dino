@@ -28,8 +28,8 @@ void Dino::owReset(){
 // unless we are searching a branch that has that bit set to 1, then echo 1.
 //
 void Dino::owSearch(){
-  byte addr;
-  byte comp;
+  byte addr = 0x00;
+  byte comp = 0x00;
 
   // Start streaming the message.
   stream->print(pin); stream->print(':');
@@ -120,7 +120,7 @@ void Dino::owWriteBit(byte b){
 // val = number of bytes to read
 //
 void Dino::owRead(){
-  byte b;
+  byte b = 0x00;
 
   // Start streaming the message.
   stream->print(pin); stream->print(':');
@@ -136,7 +136,7 @@ void Dino::owRead(){
 }
 
 byte Dino::owReadBit(){
-  byte b;
+  byte b = 0x00;
   // Pull low for at least 1us to start a read slot, then release.
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);

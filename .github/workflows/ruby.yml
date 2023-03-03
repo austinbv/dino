@@ -12,8 +12,13 @@ on:
   
   push:
     branches: [ "master" ]
+    paths-ignore:
+      - 'src/**'
+
   pull_request:
     branches: [ "master" ]
+    paths-ignore:
+      - 'src/**'
 
 permissions:
   contents: read
