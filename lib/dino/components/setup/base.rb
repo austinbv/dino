@@ -25,11 +25,8 @@ module Dino
         end
 
         def initialize_board(options={})
-          if options[:board]
-            @board = options[:board]
-          else
-            raise ArgumentError, 'a board is required for a component'
-          end
+          raise ArgumentError, 'a board is required for a component' unless options[:board]
+          @board = options[:board]
         end
 
         def register
@@ -43,8 +40,8 @@ module Dino
         # Setup::Base only requires a board.
         # Include modules from Setup or override this to use pins.
         #
-        def before_initialize(options={}) ; end
-        def initialize_pins(options={}) ; end
+        def before_initialize(options={}); end
+        def initialize_pins(options={});   end
         alias :initialize_pin :initialize_pins
 
         # Override in components. Call super when inheriting or mixing in.

@@ -7,7 +7,7 @@ module Dino
 
         def initialize_pins(options={})
           super(options)
-          self.mode = :out
+          self.mode = :output
         end
       end
     end

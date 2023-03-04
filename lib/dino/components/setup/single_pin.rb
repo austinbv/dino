@@ -27,11 +27,8 @@ module Dino
         attr_writer :pin
 
         def initialize_pins(options={})
-          if options[:pin]
-            self.pin = options[:pin]
-          else
-            raise ArgumentError, 'a pin is required for this component'
-          end
+          raise ArgumentError, 'a pin is required for this component' unless options[:pin]
+          self.pin = options[:pin]
         end
       end
     end
