@@ -36,7 +36,7 @@ module Dino
           # to say what pins we are using, but don't need to do more in Ruby.
           #
           def require_pins(*args)
-            required_pins = self.class_eval('@@required_pins') rescue []
+            required_pins = self.class_variable_get(:@@required_pins) rescue []
             required_pins = (required_pins + args).uniq
             self.class_variable_set(:@@required_pins, required_pins)
           end
@@ -60,7 +60,7 @@ module Dino
             require_pins(*options.keys) unless options[:optional]
             options.reject! { |k| k == :optional }
             
-            proxied_pins = self.class_eval('@@proxied_pins') rescue {}
+            proxied_pins = self.class_variable_get(:@@proxied_pins) rescue {}
             proxied_pins.merge!(options)
             self.class_variable_set(:@@proxied_pins, proxied_pins)
           end
