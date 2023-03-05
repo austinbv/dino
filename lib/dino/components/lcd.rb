@@ -2,8 +2,13 @@ module Dino
   module Components
     class LCD
       include Setup::MultiPin
+      def initialize_pins(options={})
+        require_pins :rs, :enable, :d4, :d5, :d6, :d7
+        
+        # If any of d0-d3 was given, require them all.
+        require_pins(:d0, :d1, :d2, :d3) unless (self.pins.keys & [:d0, :d1, :d2, :d3]).empty?
+      end
 
-      require_pins :rs, :enable, :d4, :d5, :d6, :d7
       # Initialize in 4 bits mode
       #
       # Dino::Componentes::LCD.new(

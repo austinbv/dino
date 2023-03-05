@@ -2,9 +2,12 @@ require 'test_helper'
 
 class MultiPinComponent
   include Dino::Components::Setup::MultiPin
-  require_pin :one
-  proxy_pin   two:   Dino::Components::Basic::DigitalOutput
-  proxy_pin   maybe: Dino::Components::Basic::DigitalInput, optional: true
+  
+  def initialize_pins(options={})
+    require_pin :one
+    proxy_pin   :two,   Dino::Components::Basic::DigitalOutput
+    proxy_pin   :maybe, Dino::Components::Basic::DigitalInput, optional: true
+  end
 end
 
 class MultiPinSetupTest < Minitest::Test
@@ -15,16 +18,6 @@ class MultiPinSetupTest < Minitest::Test
   def part
     @part ||= MultiPinComponent.new board: board,
                                     pins: { one: 9, two: 10, maybe: 11 }
-  end
-
-  def test_require_pins
-    assert_equal MultiPinComponent.class_variable_get(:@@required_pins), [:one, :two]
-  end
-
-  def test_proxy_pins
-    assert_equal MultiPinComponent.class_variable_get(:@@proxied_pins),
-                 {two:   Dino::Components::Basic::DigitalOutput,
-                  maybe: Dino::Components::Basic::DigitalInput}
   end
 
   def test_validate_pins

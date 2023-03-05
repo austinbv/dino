@@ -3,15 +3,16 @@ module Dino
     class Stepper
       include Setup::MultiPin
       
-      proxy_pins  step:      Basic::DigitalOutput,
-                  direction: Basic::DigitalOutput
-
-      proxy_pins  ms1:       Basic::DigitalOutput,
-                  ms2:       Basic::DigitalOutput,
-                  enable:    Basic::DigitalOutput,
-                  slp:       Basic::DigitalOutput,
-                  optional:  true
-                  
+      def initialize_pins(options={})
+        proxy_pin :step,      Basic::DigitalOutput
+        proxy_pin :direction, Basic::DigitalOutput
+        
+        proxy_pin :ms1,    Basic::DigitalOutput, optional: true
+        proxy_pin :ms2,    Basic::DigitalOutput, optional: true
+        proxy_pin :enable, Basic::DigitalOutput, optional: true
+        proxy_pin :slp,    Basic::DigitalOutput, optional: true        
+      end
+      
       attr_reader :microsteps
                   
       def after_initialize(options={})

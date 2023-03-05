@@ -4,8 +4,10 @@ module Dino
       include Setup::MultiPin
       include Mixins::Callbacks
 
-      proxy_pins clock: Basic::DigitalInput,
-                 data: Basic::DigitalInput
+      def initialize_pins(options={})
+        proxy_pin :clock, Basic::DigitalInput
+        proxy_pin :data,  Basic::DigitalInput
+      end
                  
       attr_accessor :degrees_per_step
       

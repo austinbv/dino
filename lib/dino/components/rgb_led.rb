@@ -3,9 +3,11 @@ module Dino
     class RGBLed
       include Setup::MultiPin
 
-      proxy_pins red:   Basic::AnalogOutput,
-                 green: Basic::AnalogOutput,
-                 blue:  Basic::AnalogOutput
+      def initialize_pins(options={})
+        proxy_pin :red,   Basic::AnalogOutput
+        proxy_pin :green, Basic::AnalogOutput
+        proxy_pin :blue,  Basic::AnalogOutput
+      end
 
       # Format: [R, G, B]
       COLORS = {

@@ -3,18 +3,19 @@ module Dino
     class SSD
       include Setup::MultiPin
       
-      proxy_pins   cathode: Basic::DigitalOutput,
-                   anode:   Basic::DigitalOutput,
-                   optional: true
-
-      proxy_pins  a:     Basic::DigitalOutput,
-                  b:     Basic::DigitalOutput,
-                  c:     Basic::DigitalOutput,
-                  d:     Basic::DigitalOutput,
-                  e:     Basic::DigitalOutput,
-                  f:     Basic::DigitalOutput,
-                  g:     Basic::DigitalOutput
-
+      def initialize_pins(options={})        
+        proxy_pin :a, Basic::DigitalOutput
+        proxy_pin :b, Basic::DigitalOutput
+        proxy_pin :c, Basic::DigitalOutput
+        proxy_pin :d, Basic::DigitalOutput
+        proxy_pin :e, Basic::DigitalOutput
+        proxy_pin :f, Basic::DigitalOutput
+        proxy_pin :g, Basic::DigitalOutput
+        
+        proxy_pin :cathode, Basic::DigitalOutput, optional: true
+        proxy_pin :anode,   Basic::DigitalOutput, optional: true
+      end
+      
       # ssd = SevenSegmentDisplay.new(
       #   board: board,
       #   pins:  {anode: 11, a: 12, b: 13, c: 3,d: 4, e: 5, f: 10, g: 9}

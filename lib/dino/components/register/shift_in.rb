@@ -3,6 +3,7 @@ module Dino
     module Register
       class ShiftIn
         include Input
+        include Setup::MultiPin
         #
         # Model registers that use the arduino shift functions as multi-pin
         # components, specifying clock, data and latch pins.
@@ -10,10 +11,11 @@ module Dino
         # options = board: my_board,
         #           pins: {clock: clock_pin, latch: latch_pin, data: data_pin}
         #
-        include Setup::MultiPin
-        proxy_pins  clock: Basic::DigitalOutput,
-                    data:  Basic::DigitalInput,
-                    latch: Register::Select
+        def initialize_pins(options={})
+          proxy_pin :clock, Basic::DigitalOutput
+          proxy_pin :data,  Basic::DigitalInput
+          proxy_pin :latch, Register::Select
+        end
 
         def before_initialize(options={})
           super(options)

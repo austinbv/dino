@@ -21,6 +21,15 @@ class LCDTest < MiniTest::Test
     end
     mock.verify
   end
+  
+  def test_pin_validation
+    # Only given one pin out of d0-d3.
+    assert_raises do
+      Dino::Components::LCD.new board: board, pins: { rs: 12, enable: 11,
+                                                      d4: 5, d5: 4, d6: 3, d7: 2, d3: 1 }
+    
+    end 
+  end
 
   Dino::Components::LCD::LIBRARY_COMMANDS.each_pair do |command, command_id|
     define_method("test_#{command.to_s}".to_sym) do
