@@ -14,7 +14,7 @@ button.down do
 end
 ````
 
-Dino doesn't run Ruby on the microcontroller (try [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) for that). It runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
+Dino doesn't run Ruby on the microcontroller (see the [mruby-dino](#mruby) project). It runs a C++ firmware that exposes as much low-level I/O as possible, so we can use it in Ruby. It becomes a peripheral for your computer.
 
 High-level abstraction in Ruby makes hardware classes easy to implement, with intuitive interfaces. They multitask a single core microcontroller, with thread-safe state, and callbacks for inputs, but no "task" priority. If you need more I/O, integration is seamless. Connect another board and instantiate it in Ruby.
 
@@ -134,3 +134,9 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
 * "Arduino the Ruby Way" at RubyConf 2012
   * [Video by ConFreaks](https://www.youtube.com/watch?v=oUIor6GK-qA)
   * [Slides on SpeakerDeck](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
+  
+## mruby
+
+A single board computer with a microcontroller can be a great standalone solution, especially if your project needs the computer anyway. For example, a Raspberry Pi Zero and Arduino Nano combo, running CRuby, Dino and other software.
+
+But what if you want to be _really_ small? That's where [mruby](https://github.com/mruby/mruby) comes in. Building on the [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) project, which has mruby running on the ESP32 chip, Dino is being ported to run directly on the ESP32 here: [mruby-dino-template](https://github.com/dino-rb/mruby-dino-template).

@@ -1,5 +1,5 @@
 #
-# Example looping the Arduino Zero's DAC back into one of it's ADC pins.
+# Example looping the Arduino Zero's DAC back into one of its ADC pins.
 #
 require 'bundler/setup'
 require 'dino'
