@@ -3,10 +3,10 @@
 #include <Ethernet.h>
 
 // Define 'serial' as the serial interface we want to use.
-// Defaults to Native USB port on the Due, whatever class "Serial" is on everything else.
-// Classes need to inherit from Stream to be compatible with the Dino library.
-#if defined(__SAM3X8E__)
+// Defaults to Native USB port (left) on Due and Zero, or Serial otherwise.
+#if defined(__SAM3X8E__) || defined(ARDUINO_SAMD_ZERO)
   #define serial SerialUSB
+  // Use this for Programming USB port (right) on Due and Zero.
   //#define serial Serial
 #else
   #define serial Serial
