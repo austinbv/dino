@@ -14,7 +14,7 @@
 | ATmega2560     | :green_heart:   | 0.11.1 | Mega2560, Arduino Mega ADK | 
 | ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
 | ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. SoftSerial, Tone, IR Out, and I2C don't work yet
-| ATSAMD21       | :test_tube:     | -      | Zero, M0, M0 Pro | 
+| ATSAMD21       | :yellow_heart:  | 0.13.0 | Zero, M0, M0 Pro | LCD library doesn't work
 
 **Note:** Only USB boards listed. Any supported chip should work, once you can flash it and connect to serial.
 
@@ -33,7 +33,7 @@
 | :--------      | :------:        | :----- | :--------------- |------ |
 | ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | SoftwareSerial and LCD don't work yet
 | ESP8285        | :man_shrugging: | 0.12.0 | DOIT ESP-Mx DevKit | Should be identical to 8266. Not tested in hardware.
-| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD or SoftSerial. SPI mode bug (see changelog).
+| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD, SoftSerial, DAC Out. SPI mode bug (see changelog).
 | ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Should work, hardware limits will be wrong
 | ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Should work, hardware limits will be wrong
 
@@ -62,7 +62,7 @@
 | Digital In            | :green_heart:   | 0.11.0   | `DigitalInput`  | 1ms - 128ms (4ms default) listen, poll, or read
 | Analog (PWM) Out      | :green_heart:   | 0.11.0   | `AnalogOutput`  |
 | Analog (ADC) In       | :green_heart:   | 0.11.0   | `AnalogInput`   | 1ms - 128ms (16ms default) listen, poll, or read
-| Analog (DAC) Out      | :green_heart:   | 0.12.0   | `AnalogOutput`  | Only present on Arduino Due and ESP32
+| Analog (DAC) Out      | :green_heart:   | 0.12.0   | `AnalogOutput`  | On Due, Zero and ESP32
 | Tone Out (Square Wave)| :green_heart:   | 0.12.0   | -               | Not working on Due yet
 
 **Note:** When listening, the board checks the pin's value every **_2^n_** ms (**_n_** from **_0_** to **_7_**), without further prompting. Polling and reading follow a call and response pattern.

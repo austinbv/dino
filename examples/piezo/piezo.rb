@@ -22,7 +22,6 @@ bpm = 240
 beat_time = 60.to_f / bpm
 
 notes.each do |note|
-  # Note
   buzzer.tone(note[0])
   sleep note[1] * beat_time
 end
