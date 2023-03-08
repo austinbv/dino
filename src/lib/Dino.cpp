@@ -238,8 +238,8 @@ void Dino::handshake() {
     stream->print(A0);
   #endif
 
-  // 4th is DAC0 if available. Ignore fore ESP32. Also not in order.
-  #if defined(__SAM3X8E__)
+  // 4th is DAC0 if available. Ignore for ESP32. Also not in order.
+  #if defined(__SAM3X8E__) || defined(ARDUINO_SAMD_ZERO)
     stream->print(',');
     stream->print(DAC0);
   #endif
