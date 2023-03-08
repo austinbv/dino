@@ -13,7 +13,7 @@ class APIToneTest < Minitest::Test
 
   def test_tone
     mock = MiniTest::Mock.new
-    aux1 = pack(:uint16, 150) + pack(:uint32, 2000)
+    aux1 = pack(:uint16, 150) + pack(:uint16, 2000)
     aux2 = pack(:uint16, 300)
     
     mock.expect :call, nil, [Dino::Message.encode(command: 17, pin: 10, value: 1, aux_message: aux1)]

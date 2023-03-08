@@ -8,9 +8,9 @@ module Dino
           raise ArgumentError, "Tone cannot generate frequencies lower than 31Hz"
         end
         
-        # Pack the frequency and optiona duration as binary.
+        # Pack the frequency and optional duration as binary.
         aux = pack(:uint16, frequency)
-        aux << pack(:uint32, duration) if duration
+        aux << pack(:uint16, duration) if duration
 
         write Dino::Message.encode command: 17,
                                    pin: convert_pin(pin),
