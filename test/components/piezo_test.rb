@@ -21,13 +21,28 @@ class PiezoTest < MiniTest::Test
       part.tone(60)
       part.tone(120, 2000)
     end
+    mock.verify
   end
   
   def test_no_tone
+    part
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [part.pin]
-    board.stub(:tone, mock) do
+    board.stub(:no_tone, mock) do
       part.no_tone
     end
+    mock.verify
+  end
+  
+  def stop
+    mock = MiniTest::Mock.new
+    mock.expect :call, nil
+    mock.expect :call, nil
+    part.stub(:kill_thread, mock) do
+      part.stub(:no_tone, mock) do
+        part.stop
+      end
+    end
+    mock.verify
   end
 end

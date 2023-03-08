@@ -12,8 +12,6 @@ class RotaryEncoderTest < MiniTest::Test
   def test_sets_steps_per_revolution
     assert_equal 30,      part.steps_per_revolution
     assert_equal 12.to_f, part.instance_variable_get(:@degrees_per_step)
-    # part2 = Dino::Components::RotaryEncoder.new board: board, pins: {data:3, clock: 4}, steps_per_revolution: 40
-    # assert_equal 40,  part2.steps_per_revolution
   end
   
   def test_resets_on_initialize

@@ -1,6 +1,5 @@
 #
-# This is a simple example to blink an led
-# every half a second
+# Example showing how to load, modify and save the board's EEPROM.
 #
 require 'bundler/setup'
 require 'dino'
@@ -31,5 +30,3 @@ eeprom.each_with_index do |byte, address|
     puts "Address #{address} contains #{byte}"
   end
 end
-
-

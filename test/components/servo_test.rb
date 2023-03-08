@@ -14,6 +14,7 @@ class ServoTest < MiniTest::Test
     board.stub(:servo_toggle, mock) do
       Dino::Components::Servo.new(board: board, pin:1)
     end
+    mock.verify
   end
 
   def test_attach
