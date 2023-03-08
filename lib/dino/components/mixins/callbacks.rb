@@ -2,11 +2,11 @@ module Dino
   module Components
     module Mixins
       module Callbacks
-        attr_reader :callback_mutex, :callbacks
+        attr_reader :callback_mutex
 
         def after_initialize(options={})
           super(options)
-          @callbacks = {}
+          remove_callbacks
           @callback_mutex = Mutex.new
         end
         
@@ -46,12 +46,12 @@ module Dino
           update_state(filtered_data)
         end
 
-        # Override this to process data before passing to callbacks.
+        # Override to process data before giving to callbacks and state.
         def pre_callback_filter(data)
           data
         end
 
-        # Override if behavior other than @state = filtered data is needed.
+        # Override for behavior other than @state = filtered data.
         def update_state(filtered_data)
           self.state = filtered_data
         end

@@ -7,8 +7,8 @@ module Dino
         # with one pin each. 
         #
         include Base
-
         attr_reader :pins, :proxies
+        
         # Return a hash with the state of each proxy component.
         def proxy_states
           hash = {}
@@ -36,7 +36,7 @@ module Dino
       
           # Make the proxy, passing through options, and store it.
           if self.pins[name]
-            proxy = klass.new pin_options.merge(pin: self.pins[name], board: self.board)          
+            proxy = klass.new pin_options.merge(board: self.board, pin: self.pins[name])          
             self.proxies[name] = proxy
             instance_variable_set("@#{name}", proxy)
           end
