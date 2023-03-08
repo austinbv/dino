@@ -8,25 +8,26 @@ module Dino
         proxy_pin :clock, Basic::DigitalInput
         proxy_pin :data,  Basic::DigitalInput
       end
-                 
-      attr_accessor :degrees_per_step
-      
+
       def after_initialize(options={})
         super(options)
-                
-        if options[:steps_per_revolution] 
-          self.degrees_per_step = (360 / options[:steps_per_revolution])
-        else
-          self.degrees_per_step = 12
-        end
-        reset
+        self.steps_per_revolution = options[:steps_per_revolution] || 30
         
         # DigitalInputs listen with default divider automatically. Override here.
         divider = options[:divider] || 1
         clock.listen(divider)
         data.listen(divider)
-
+        
+        reset
         observe_pins
+      end
+      
+      def steps_per_revolution
+        (360 / @degrees_per_step).to_i
+      end
+      
+      def steps_per_revolution=(step_count)
+        @degrees_per_step = 360.to_f / step_count
       end
       
       def angle
@@ -71,8 +72,8 @@ module Dino
         # Copy old state through the mutex wrapped reader.
         temp_state = state.dup
         temp_state[:change] = step
-        temp_state[:steps]  = temp_state[:steps]  + step
-        temp_state[:angle]  = (temp_state[:angle] + (step * degrees_per_step)) % 360
+        temp_state[:steps]  = temp_state[:steps] + step
+        temp_state[:angle]  = temp_state[:steps] * @degrees_per_step % 360
         temp_state
       end
 

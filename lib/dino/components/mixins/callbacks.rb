@@ -6,8 +6,8 @@ module Dino
 
         def after_initialize(options={})
           super(options)
-          remove_callbacks
           @callback_mutex = Mutex.new
+          remove_callbacks
         end
         
         def callbacks
