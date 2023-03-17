@@ -148,8 +148,6 @@ module Dino
       def set_cursor(col, row)
         # Limit to the highest row, 0 indexed.
         row = (@rows - 1) if row > (@rows - 1)
-        
-        # 
         command(LCD_SETDDRAMADDR | (col + @row_offsets[row]))
       end
       alias :move_to :set_cursor
@@ -206,8 +204,11 @@ module Dino
         command(LCD_ENTRYMODESET | @mode);
       end
       
-      # Define custom characters as bit maps.
-      def create_char
+      # Define custom characters as bitmaps.
+      def create_char(location, bitmap)
+        location &= 0x7
+        command(LCD_SETCGRAMADDR | (location << 3))
+        bitmap.each { |byte| write byte }
       end
       
       def command(byte)
