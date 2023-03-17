@@ -14,6 +14,7 @@ module Dino
     autoload :SSD,              'dino/components/ssd'
     autoload :Stepper,          'dino/components/stepper'
     autoload :LCD,              'dino/components/lcd'
+    autoload :HD44780,          'dino/components/hd44780'
     autoload :Relay,            'dino/components/relay'
     autoload :SoftwareSerial,   'dino/components/software_serial'
     autoload :DHT,              'dino/components/dht'

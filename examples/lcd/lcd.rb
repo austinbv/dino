@@ -5,12 +5,19 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
-lcd = Dino::Components::LCD.new(
+lcd = Dino::Components::HD44780.new(
           board: board,
-          pins: { rs: 12, enable: 11, d4: 5, d5: 4, d6: 3, d7: 2 },
+          pins: { rs: 8, enable: 9, d4: 4, d5: 5, d6: 6, d7: 7 },
           cols: 16,
           rows: 2
 )
 
-lcd.puts("Hello World!")
-sleep
+# First line.
+lcd.print "Hello World!"
+
+# Display a clock on second line, updating approximately every second.
+loop do
+  lcd.set_cursor 0,1
+  lcd.print(Time.now.strftime("%I:%M:%S"))
+  sleep 1
+end
