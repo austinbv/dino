@@ -31,7 +31,7 @@ class MultiPinSetupTest < Minitest::Test
   end
   
   def test_has_nil_pin
-    assert_equal nil, part.pin
+    assert_nil part.pin
   end
 
   def test_build_proxies

@@ -162,4 +162,16 @@ class APICoreTest < Minitest::Test
     assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: 256) }
     assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: -1) }    
   end
+  
+  def micro_delay   
+    aux = pack(:uint16, [1000])
+    message = Dino::Message.encode command: 99, aux_message: aux
+    mock = MiniTest::Mock.new.expect :call, nil, [message]
+    
+    board.stub(:write, mock) do
+      board.micro_delay(1000)
+    end
+    
+    assert_raises(ArgumentError) { board.micro_delay(65536) }  
+  end
 end

@@ -45,4 +45,12 @@ class BaseSetupTest < Minitest::Test
     end
     mock.verify
   end
+  
+  def test_micro_delay
+    mock = MiniTest::Mock.new.expect :call, nil, [1000]
+    
+    board.stub(:micro_delay, mock) do
+      part.micro_delay(1000)
+    end
+  end
 end

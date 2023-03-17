@@ -77,6 +77,7 @@ module Dino
         set_listener(pin, :off)
       end
 
+      # CMD = 11
       def pulse_read(pin, options={})
         # Hold the input pin high or low (give as values) before reading
         reset = options[:reset] || false
@@ -111,6 +112,16 @@ module Dino
                              pin: convert_pin(pin),
                              value: settings,
                              aux_message: aux
+      end
+
+      # CMD = 99
+      def micro_delay(duration)
+        if duration < 0 || duration > 0xFFFF
+          raise ArgumentError, "delay must be between 0 and 65535 microseconds"
+        end
+        
+        write Message.encode command: 99,
+                             aux_message: pack(:uint16, [duration])
       end
     end
   end

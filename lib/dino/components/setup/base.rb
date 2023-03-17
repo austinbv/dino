@@ -17,6 +17,10 @@ module Dino
         def state
           @state_mutex.synchronize { @state }
         end
+        
+        def micro_delay(duration)
+          board.micro_delay(duration)
+        end
 
         protected
 

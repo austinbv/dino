@@ -172,6 +172,7 @@ void Dino::process() {
     case 91: resetState          ();  break;
     case 95: setRegisterDivider  ();  break;
     case 96: setAnalogResolution ();  break;
+    case 99: microDelay(*reinterpret_cast<uint16_t*>(auxMsg)); break;
 
     // Should send a "feature not implemented" message as default.
     default:                          break;
@@ -290,6 +291,7 @@ void Dino::setAnalogResolution() {
   #endif
 }
 
+// CMD = 99
 // Use a different blocking microsecond delay on different platforms.
 void Dino::microDelay(uint32_t microseconds){
   #if defined(ESP32)
@@ -298,4 +300,3 @@ void Dino::microDelay(uint32_t microseconds){
     delayMicroseconds(microseconds);
   #endif
 }
-
