@@ -29,6 +29,10 @@ class MultiPinSetupTest < Minitest::Test
     end
     MultiPinComponent.new board: board, pins: { one: 9, two:10 }
   end
+  
+  def test_has_nil_pin
+    assert_equal nil, part.pin
+  end
 
   def test_build_proxies
     assert_equal Dino::Components::Basic::DigitalOutput, part.proxies[:two].class

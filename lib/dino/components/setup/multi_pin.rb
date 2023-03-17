@@ -7,7 +7,7 @@ module Dino
         # with one pin each. 
         #
         include Base
-        attr_reader :pins, :proxies
+        attr_reader :pin, :pins, :proxies
         
         # Return a hash with the state of each proxy component.
         def proxy_states
