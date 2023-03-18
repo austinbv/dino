@@ -17,39 +17,58 @@ All platforms will require libraries to be installed. To install a library do th
 
 ### Platforms:
 
+**Note:** Always install the latest version of a package unless its version number is specified
+
 **Install Everything:**
   * Board Manager URLs:
     ````shell
     https://arduino.esp8266.com/stable/package_esp8266com_index.json
     https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+    https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
     ````
-  * Boards (latest version unless specified):
+  * Boards:
     ````shell
     Arduino megaAVR Boards
+    Arduino SAM Boards (32-bits ARM Cortex-M3)
+    Arduino SAMD Boards (32-bits ARM Cortex-M0+)
     ESP8266 Boards
     ESP32 Boards    
     ````    
-  * Libraries (latest version unless specified):
+  * Libraries:
     ````shell
-    Servo                       by Michael Margolis, Arduino
-    Ethernet                    by Various
-    WiFi                        by Arduino
-    IRremote          @ v4.0.0  by shirriff, z3to, ArminJo
-    IRremoteESP82666  @ v2.8.4  by David Conran, Sebastien Warin
-    ESP32Servo                  by Kevin Harrington, John K. Bennett
+    Servo                      by Michael Margolis, Arduino
+    Ethernet                   by Various
+    WiFi                       by Arduino
+    IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
+    IRremoteESP82666 @ v2.8.4  by David Conran, Sebastien Warin
+    ESP32Servo                 by Kevin Harrington, John K. Bennett
     ````
 
 **AVR-based Arduinos & Clones Only:**
-  * Boards (latest version unless specified):
+  * Boards:
     ````shell
     Arduino megaAVR Boards (only for Atmega4809 / Nano Every)
     ````    
-  * Libraries (latest version unless specified):
+  * Libraries:
     ````shell
-    Servo                       by Michael Margolis, Arduino
-    Ethernet                    by Various
-    WiFi                        by Arduino
-    IRremote          @ v4.0.0  by shirriff, z3to, ArminJoß
+    Servo                      by Michael Margolis, Arduino
+    Ethernet                   by Various
+    WiFi                       by Arduino
+    IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
+    ````
+    
+**ARM-based Arduinos & Clones Only:**
+  * Boards:
+    ````shell
+    Arduino SAM Boards (32-bits ARM Cortex-M3)
+    Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+    ````    
+  * Libraries:
+    ````shell
+    Servo                      by Michael Margolis, Arduino
+    Ethernet                   by Various
+    WiFi                       by Arduino
+    IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
     ````
 
 **ESP8266 Only:**
@@ -57,13 +76,13 @@ All platforms will require libraries to be installed. To install a library do th
     ````shell
     https://arduino.esp8266.com/stable/package_esp8266com_index.json
     ````
-  * Boards (latest version unless specified):
+  * Boards:
     ````shell
     ESP8266 Boards
     ````    
-  * Libraries (latest version unless specified):
+  * Libraries:
     ````shell
-    IRremoteESP82666  @ v2.8.4  by David Conran, Sebastien Warin
+    IRremoteESP82666 @ v2.8.4  by David Conran, Sebastien Warin
     ````
 
 **ESP32 Only:**
@@ -77,6 +96,20 @@ All platforms will require libraries to be installed. To install a library do th
     ````    
   * Libraries (latest version unless specified):
     ````shell
-    IRremoteESP82666  @ v2.8.4  by David Conran, Sebastien Warin
-    ESP32Servo                  by Kevin Harrington, John K. Bennett
+    IRremoteESP82666 @ v2.8.4  by David Conran, Sebastien Warin
+    ESP32Servo                 by Kevin Harrington, John K. Bennett
+    ````
+    
+**RP2040 Only:**
+  * Board Manager URLs:
+    ````shell
+    https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+    ````
+  * Boards:
+    ````shell
+    Raspberry Pi Pico/RP2040   
+    ````    
+  * Libraries:
+    ````shell
+    IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
     ````
