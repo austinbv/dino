@@ -10,6 +10,8 @@ module Dino
 
       # CMD = 34
       def i2c_write(address, bytes=[], options={})
+        raise ArgumentError, 'maximum write for a single I2C transaction is 32 bytes' if bytes.length > 32
+        
         # Bit 0 of settings controls stop (1), or repated start (0)
         settings  = 0b00
         settings |= 0b01 unless options[:repeated_start]
@@ -22,7 +24,7 @@ module Dino
 
       # CMD = 35
       def i2c_read(address, register, num_bytes, options={})
-        raise ArgumentError, 'maximum read length from I2C devices is 32 bytes' if num_bytes > 32
+        raise ArgumentError, 'maximum read for a single I2C transaction is 32 bytes' if num_bytes > 32
         
         # Bit 0 of settings controls stop (1), or repated start (0)
         settings  = 0b00

@@ -39,6 +39,8 @@ class APII2CTest < Minitest::Test
       board.i2c_write(0x30, [1,2,3,4], repeated_start: true)
     end
     mock.verify
+    
+    assert_raises { board.i2c_write(0x30, Array.new(33) {0x00}) }
   end
   
   def test_read
