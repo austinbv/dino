@@ -115,8 +115,8 @@
 
 | Name                     | Status         | Interface               | Version  | Component Class   | Notes |
 | :---------------         | :------:       | :--------               | :-----   | :---------------  |------ |
-| HD44780 LCD              | :green_heart:  | Digital Out + Library | 0.12.0   | `LCD` | No register passthrough
-| SSD1306 OLED             | :heart:        | I2C                     | -        | -     |
+| HD44780 LCD              | :green_heart:  | Digital Out + Library   | 0.12.0   | `LCD` | No register passthrough
+| SSD1306 OLED             | :yellow_heart: | I2C                     | 0.13.0   | `I2C::SSD1306` | Only basic character support
 
 ### Addressable LEDs
 
