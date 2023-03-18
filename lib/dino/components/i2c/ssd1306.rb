@@ -115,9 +115,8 @@ module Dino
           command(SET_PAGE_START | y)
           
           # Column address is sent as two nibbles.
-          column_start = 8 * x 
-          column_start_lower_4 = column_start & 0x0F
-          column_start_upper_4 = (column_start >> 4) & 0x0F
+          column_start_lower_4 = x & 0x0F
+          column_start_upper_4 = (x >> 4) & 0x0F
           
           command(SET_COLUMN_START_LOWER | column_start_lower_4)
           command(SET_COLUMN_START_UPPER | column_start_upper_4)
