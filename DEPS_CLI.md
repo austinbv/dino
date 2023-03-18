@@ -4,6 +4,7 @@ Once `arduino-cli` is installed, you can copy and paste into your shell for easy
 
 **Install Everything:**
 ````shell
+arduino-cli config init
 arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
 arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 arduino-cli core update-index
@@ -18,6 +19,7 @@ arduino-cli core install esp8266:esp8266
 arduino-cli lib install IRremoteESP8266@2.8.4
 arduino-cli lib install ESP32Servo
 ````
+**Note:** The first line here creates a CLI config file for new users. It's safe to ignore any errors generated if you already have one.
 
 **AVR-based Arduinos & Clones Only:**
 ````shell
