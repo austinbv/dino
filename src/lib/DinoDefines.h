@@ -5,15 +5,14 @@
 // #define debug
 
 // Uncomment these to include features beyond core features.
-// #define DINO_SERVO
-// #define DINO_LCD
-// #define DINO_SERIAL
 // #define DINO_ONE_WIRE
-// #define DINO_IR_OUT
 // #define DINO_TONE
 // #define DINO_SHIFT
-// #define DINO_SPI
 // #define DINO_I2C
+// #define DINO_SPI
+// #define DINO_SERVO
+// #define DINO_SERIAL
+// #define DINO_IR_OUT
 
 // No EEPROM on the Due or Zero.
 #if !defined(__SAM3X8E__) && !defined(ARDUINO_SAMD_ZERO)

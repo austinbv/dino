@@ -42,14 +42,6 @@ PACKAGES = {
       "lib/DinoSPI.cpp",
     ]
   },
-  lcd: {
-    description: "LCD based on Arduino LiquidCrystal",
-    directive: "DINO_LCD",
-    files: [
-      "lib/DinoLCD.cpp",
-      "lib/DinoLCD.h",
-    ]
-  },
   serial: {
     description: "Software serial output",
     directive: "DINO_SERIAL",

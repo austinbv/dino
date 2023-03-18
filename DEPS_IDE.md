@@ -32,7 +32,6 @@ All platforms will require libraries to be installed. To install a library do th
   * Libraries (latest version unless specified):
     ````shell
     Servo                       by Michael Margolis, Arduino
-    Liquid Crystal              by Arduino, Adafruit
     Ethernet                    by Various
     WiFi                        by Arduino
     IRremote          @ v4.0.0  by shirriff, z3to, ArminJo
@@ -48,7 +47,6 @@ All platforms will require libraries to be installed. To install a library do th
   * Libraries (latest version unless specified):
     ````shell
     Servo                       by Michael Margolis, Arduino
-    Liquid Crystal              by Arduino, Adafruit
     Ethernet                    by Various
     WiFi                        by Arduino
     IRremote          @ v4.0.0  by shirriff, z3to, ArminJoß

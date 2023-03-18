@@ -7,14 +7,14 @@
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
-| ATmega168      | :yellow_heart:  | 0.12.0 | Duemilanove, Diecimila, Pro | Features removed for memory. Configurable. Run `dino targets` for more
+| ATmega168      | :green_heart:  | 0.12.0 | Duemilanove, Diecimila, Pro | IR Out, Serial left out to save memory. Configurable features. Run `dino targets` for more info.
 | ATmega328      | :green_heart:   | 0.11.0 | Uno, Nano, Fio, Pro  | 
 | ATmega32u4     | :green_heart:   | 0.11.0 | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB | **v0.11.1** for Leonardo ETH
 | ATmega1280     | :green_heart:   | 0.11.1 | Mega | 
 | ATmega2560     | :green_heart:   | 0.11.1 | Mega2560, Arduino Mega ADK | 
 | ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
 | ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. SoftSerial, Tone, IR Out, and I2C don't work yet
-| ATSAMD21       | :yellow_heart:  | 0.13.0 | Zero, M0, M0 Pro | LCD library doesn't work
+| ATSAMD21       | :green_heart:   | 0.13.0 | Zero, M0, M0 Pro |
 
 **Note:** Only USB boards listed. Any supported chip should work, once you can flash it and connect to serial.
 
@@ -31,9 +31,9 @@
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
-| ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | SoftwareSerial and LCD don't work yet
+| ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | No Software Serial
 | ESP8285        | :man_shrugging: | 0.12.0 | DOIT ESP-Mx DevKit | Should be identical to 8266. Not tested in hardware.
-| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No LCD, SoftSerial, DAC Out. SPI mode bug (see changelog).
+| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No SoftSerial or DAC Out. SPI mode bug (see changelog).
 | ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Should work, hardware limits will be wrong
 | ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Should work, hardware limits will be wrong
 
@@ -113,10 +113,10 @@
 
 ### Displays
 
-| Name                     | Status         | Interface               | Version  | Component Class   | Notes |
-| :---------------         | :------:       | :--------               | :-----   | :---------------  |------ |
-| HD44780 LCD              | :green_heart:  | Digital Out + Library   | 0.12.0   | `LCD` | No register passthrough
-| SSD1306 OLED             | :yellow_heart: | I2C                     | 0.13.0   | `I2C::SSD1306` | Only basic character support
+| Name                     | Status         | Interface                    | Version  | Component Class   | Notes |
+| :---------------         | :------:       | :--------                    | :-----   | :---------------  |------ |
+| HD44780 LCD              | :green_heart:  | Digital Out, Outpu Register  | 0.13.0   | `HD44780` | 
+| SSD1306 OLED             | :yellow_heart: | I2C                          | 0.13.0   | `I2C::SSD1306` | Only basic character support
 
 ### Addressable LEDs
 

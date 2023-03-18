@@ -19,7 +19,7 @@
       For the the ESP32 chip by Espressif, with integrated 2.4Ghz WiFi.
       No WiFi OTA updates yet.
       This option includes all component features EXCEPT:
-          Serial, LCD
+          SoftwareSerial
 
       Chips:  ESP32, ESP32-S2, ESP32-S3
       Boards: ESP32 DevKit, LOLIN D32 / D32 Pro, LOLIN S2 Pico / Mini,
@@ -31,7 +31,7 @@
       For the ESP8266 chip by Espressif, with integrated 2.4Ghz WiFi.
       WiFi over-the-air updates are enabled by default.
       This option includes all component features EXCEPT:
-          Serial, LCD
+          SoftwareSerial
 
       Chips:  ES8266, ESP8285
       Boards: WeMos D1, Node MCU, Bare Modules
@@ -48,7 +48,7 @@
      For the Raspberry Pi RP2040 microcontroller.
      Software Serial doesn't work. WiFi available only on the W version.
      This option includes all component features EXCEPT:
-         Serial
+         SoftwareSerial
 
      Chips:  RP2040
      Boards: Raspberry Pi Pico, Raspberry Pi Pico W, and many others
@@ -59,7 +59,7 @@
      For the ATSAMD21G18, with native USB and no EEPROM.
      Similar to the mega option, but Software Serial doesn't work.
      This option includes all component features EXCEPT:
-         EEPROM, Serial
+         EEPROM, SoftwareSerial
 
      Chips:  ATSAMD21G18
      Boards: Arduino Zero, M0, M0 Pro
@@ -70,7 +70,7 @@
       Fpr the ATSAM3X8E, with native USB and no EEPROM.
       Similar to the mega option, but some features don't work.
       This option includes all component features EXCEPT:
-          EEPROM, Serial, Tone, IR Out
+          EEPROM, SoftwareSerial, Tone, IR Out
 
       Chips:  ATSAM3X8E
       Boards: Arduino Due
@@ -91,8 +91,8 @@
 
       This targets the older ATmega168 chip used in early Arduinos.
       With half the RAM and flash available, we need to cut the sketch down.
-      This option includes core functionality AND:
-          Servo (6 maxmium), DHT, Shift In/Out, Tone, SPI, I2C
+      This option includes all component features EXCEPT:
+          SoftwareSerial, IR Out 
 
       Chips:  ATmega168
       Boards: Duemilanove, Diecimila, Pro (some), Pro Mini (some)

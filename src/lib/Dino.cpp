@@ -113,11 +113,6 @@ void Dino::process() {
     case 9:  servoWrite          ();    break;
     #endif
 
-    // Implemented in DinoLCD.cpp
-    #ifdef DINO_LCD
-    case 10: handleLCD           ();    break;
-    #endif
-
     // Implemented in DinoPulseInput.cpp
     case 11: pulseRead           ();    break;
 

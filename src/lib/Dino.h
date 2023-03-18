@@ -119,7 +119,7 @@ class Dino {
     // Included Libraries
     void servoToggle           ();         //cmd = 8
     void servoWrite            ();         //cmd = 9
-    void handleLCD             ();         //cmd = 10
+                                          
     void pulseRead             ();         //cmd = 11
     void handleSerial          ();         //cmd = 12
     void irSend                ();         //cmd = 16
