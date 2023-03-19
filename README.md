@@ -1,4 +1,4 @@
-# Dino 0.12.0 [![Test Status](https://github.com/austinbv/dino/actions/workflows/ruby.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/ruby.yml)
+# Dino 0.13.0 [![Test Status](https://github.com/austinbv/dino/actions/workflows/ruby.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/ruby.yml)
 ### Ruby Meets Microcontrollers
 Dino gives you a high-level Ruby interface to low-level hardware, without writing microcontroller code. Use LEDs, buttons, sensors and more, just as easily as any Ruby object:
 

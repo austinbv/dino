@@ -3,12 +3,52 @@
 ## 0.13.0
 
 ### New Boards
-
 - SAMD Based Boards, Arduino Zero (`--target samd`):
-  - More notes here
+  - All features work except for SoftwareSerial
 
 - RP2040 Based Boards, Raspberry Pi Pico (W) (`--target rp2040`):
-  - More notes here
+  - Only core features tested so far
+  - WiFi untested
+
+### New Components
+- Bosch BME/BMP 280 environmental sensor support:
+  - All features in the datasheet are implemented, except status checking.
+  - Connects over I2C, driver written in Ruby.
+  - Component classes are `I2C::BME280` and `I2C::BMP280`.
+  - Mostly identical, except for BMP280 lacking humidity.
+  
+- SSD1306 OLED driver support:
+  - Only basic text support so far, with one 6x8 font.
+  - No graphics or drawing methods yet.
+  
+### Changed Components
+- Hitachi HD44780 LCD driver rewritten in Ruby:
+  - Class name changed from `LCD` to `HD44780`.
+  - `#puts` changed to `#print` to better represent functionality.
+  - No longer depends on the `LiquidCrystal` Arduino library, which has been removed.
+  - Depends only on `DigitalOutput` and `#micro_delay`.
+  - Old implementation in `LCD` class has been removed.
+  - This solves compatibility with booards that the library didn't work with.
+  
+### Board API Changes
+- `microDelay()` function exposed from the board:
+  - Implements a platform independent microsecond delay.
+  - All calls to `delayMicroseconds()` should be replaced with this.
+  - Exposed in Ruby via `CMD=99`. It takes one argument, uint_16 for delay length in microsceonds.
+  - `Board#micro_delay` and `Components::Base#micro_delay` are defined.
+  
+### Minor Changes
+- `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
+- Aux message size limits changed to:
+  - 512 + 16: When using IR output and not using ATmega168
+  - 256 + 16: When not using IR output, any board
+  - 32  + 16: When all the features that use lots of aux are disabled (core sketch)
+
+### Bug Fixes
+- Fixed `Piezo` functionality. Frequency and duration values weren't being properly cast on the board. Duration is also limited to 16 bits now, instead of 32, as it should be to match the Arduino function.
+- Added validation for I2C writes not exceeding 32 bytes, since this is a limit of the native library buffer. Can extend functionality on the board, so it splits up up to bigger messages automatically.
+- Stricter regex validation in `I2C::Bus` for identifying a series of bytes coming from a specific I2C address.
+- Fixed `DigitalOutput` not setting its state through its mutex.
   
 ## 0.12.0
 

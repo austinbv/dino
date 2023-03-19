@@ -115,7 +115,7 @@
 
 | Name                     | Status         | Interface                    | Version  | Component Class   | Notes |
 | :---------------         | :------:       | :--------                    | :-----   | :---------------  |------ |
-| HD44780 LCD              | :green_heart:  | Digital Out, Outpu Register  | 0.13.0   | `HD44780` | 
+| HD44780 LCD              | :green_heart:  | Digital Out, Output Register | 0.13.0   | `HD44780` | 
 | SSD1306 OLED             | :yellow_heart: | I2C                          | 0.13.0   | `I2C::SSD1306` | Only basic character support
 
 ### Addressable LEDs
@@ -138,11 +138,11 @@
 
 | Name             | Status         | Interface | Version  | Component Class   | Notes |
 | :--------------- | :------:       | :-------- | :-----   | :---------------  |------ |
-| DHT 11/21/22     | :green_heart:  | Digi In/Out| 0.12.0   | `DHT` | Temperature, Humidity
+| DHT 11/21/22     | :green_heart:  | Digi In/Out| 0.12.0  | `DHT`             | Temperature, Humidity
 | DS18B20          | :green_heart:  | OneWire   | 0.12.0   | `OneWire::DS18B20`| Temperature
 | MAX31850         | :grey_exclamation: | OneWire   | -        | - | Thermocouple
-| BME280           | :heart:        | I2C       | -        | - | Pressure, Temperature, Humidity
-| BMP280           | :heart:        | I2C       | -        | - | Pressure, Temperature
+| BME280           | :green_heart:  | I2C       | 0.13.0   | `I2C::BME280` | Temperature, Pressure, Humidity
+| BMP280           | :green_heart:  | I2C       | 0.13.0   | `I2C::BMP280` | Temperature, Pressure
 | HTU21D           | :heart:        | I2C       | -        | - | Temperature, Humidity
 | HTU31D           | :heart:        | I2C       | -        | - | Temperature, Humidity
 | AHT10            | :heart:        | I2C       | -        | - | Temperature, Humidity
