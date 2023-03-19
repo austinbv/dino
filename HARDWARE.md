@@ -107,9 +107,9 @@
 | Name                 | Status         | Interface           | Version  | Component Class   | Notes |
 | :---------------     | :------:       | :--------           | :-----   | :---------------  |------ |
 | Servo                | :green_heart:  | PWM + Library       | 0.11.2   | `Servo`  | Maximum of 6 on ATmega168, 16 on ESP32 and 12 otherwise
-| L298N                | :heart:        | PWM Out             | -        | | 2ch DC motor driver
+| L298N                | :green_heart:  | Digi + PWM Out      | 0.13.0   | `L298`   | H-Bridge DC motor driver
 | A3967                | :green_heart:  | Digital Out         | 0.12.0   | `Stepper`| 1ch microstepper (EasyDriver)
-| PCA9685              | :heart:        | I2C                 | -        | -        | 16ch 12-bit PWM for servo, DC motor, or LED
+| PCA9685              | :heart:        | I2C                 | -        | -        | 16ch 12-bit PWM for servo or LED
 
 ### Displays
 

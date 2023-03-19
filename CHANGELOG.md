@@ -21,6 +21,10 @@
   - Only basic text support so far, with one 6x8 font.
   - No graphics or drawing methods yet.
   
+- L298 H-Bridge motor driver:
+  - Forward, reverse, idle, and brake modes implemented.
+  - Speed controlled by PWM output on Enable pin.
+  
 ### Changed Components
 - Hitachi HD44780 LCD driver rewritten in Ruby:
   - Class name changed from `LCD` to `HD44780`.

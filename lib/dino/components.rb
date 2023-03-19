@@ -22,5 +22,6 @@ module Dino
     autoload :RotaryEncoder,    'dino/components/rotary_encoder'
     autoload :OneWire,          'dino/components/one_wire'
     autoload :Potentiometer,    'dino/components/potentiometer'
+    autoload :L298,             'dino/components/l298'
   end
 end
