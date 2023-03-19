@@ -190,18 +190,19 @@ class Dino {
     byte pinStr[4]; byte pin;
     byte valStr[4]; byte val;
 
-    // Scale aux message allocation based on enabled features and chip.
-    # if defined(ESP8266) || defined(ESP32)
+    // Default to 256 + 16 for aux size.
+    #define AUX_SIZE 272
+    
+    // If using IR_OUT and not on the ATmega168, 512 + 16.
+    #if defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
     #  define AUX_SIZE 528
-    #elif defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
-    #  define AUX_SIZE 528
-    #elif defined(DINO_SHIFT) || defined(DINO_SPI) || defined (DINO_I2C)
-    #  define AUX_SIZE 264
-    #elif defined (DINO_LCD)
-    #  define AUX_SIZE 136
-    #else
-    #  define AUX_SIZE 40
     #endif
+    
+    // Use 32 + 16 if none of the high usage features are enabled. Should catch the core sketch.
+    #if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_SERIAL) && !defined(DINO_IR_OUT)
+    #  define AUX_SIZE 48
+    #endif
+
     byte auxMsg[AUX_SIZE];
 
     // Flow control stuff. Notify when we've received half a serial buffer worth of bytes.
