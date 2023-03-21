@@ -1,18 +1,18 @@
 require 'test_helper'
 
-class AnalogOutputTest < Minitest::Test
+class PWMOutTest < Minitest::Test
   def board
     @board ||= BoardMock.new
   end
 
   def part
-    @part ||= Dino::Components::Basic::AnalogOutput.new(board: board, pin: 14)
+    @part ||= Dino::Components::Basic::PWMOut.new(board: board, pin: 14)
   end
 
-  def test_analog_write
+  def test_pwm_write
     mock = MiniTest::Mock.new.expect :call, nil, [14, 128]
-    board.stub(:analog_write, mock) do
-      part.analog_write(128)
+    board.stub(:pwm_write, mock) do
+      part.pwm_write(128)
     end
     mock.verify
     assert_equal part.state, 128
@@ -31,7 +31,7 @@ class AnalogOutputTest < Minitest::Test
 
   def test_write_uses_analog_write_between_limits
     mock = MiniTest::Mock.new.expect :call, nil, [128]
-    part.stub(:analog_write, mock) do
+    part.stub(:pwm_write, mock) do
       part.write(128)
     end
     mock.verify

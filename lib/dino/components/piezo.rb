@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class Piezo < Basic::AnalogOutput
+    class Piezo < Basic::PWMOut
       def after_initialize(options={})
         low
       end

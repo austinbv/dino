@@ -4,9 +4,9 @@ module Dino
       include Setup::MultiPin
 
       def initialize_pins(options={})
-        proxy_pin :red,   Basic::AnalogOutput
-        proxy_pin :green, Basic::AnalogOutput
-        proxy_pin :blue,  Basic::AnalogOutput
+        proxy_pin :red,   Basic::PWMOut
+        proxy_pin :green, Basic::PWMOut
+        proxy_pin :blue,  Basic::PWMOut
       end
 
       # Format: [R, G, B]

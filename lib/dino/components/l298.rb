@@ -6,7 +6,7 @@ module Dino
       def initialize_pins(options={})        
         proxy_pin :in1,    Basic::DigitalOutput
         proxy_pin :in2,    Basic::DigitalOutput
-        proxy_pin :enable, Basic::AnalogOutput 
+        proxy_pin :enable, Basic::DACOut 
       end
                   
       def after_initialize(options={})

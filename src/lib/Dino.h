@@ -33,9 +33,10 @@ class Dino {
     void setMode     (byte p, byte m);                     //cmd = 0
     void dWrite      (byte p, byte v, boolean echo=true);  //cmd = 1
     byte dRead       (byte p);                             //cmd = 2
-    void aWrite      (byte p, int v,  boolean echo=true);  //cmd = 3
-    int  aRead       (byte p);                             //cmd = 4
-    void setListener (byte p, boolean enabled, byte analog, byte exponent, boolean local=true); //cmd = 5
+    void pwmWrite    (byte p, int v,  boolean echo=true);  //cmd = 3
+    void dacWrite    (byte p, int v,  boolean echo=true);  //cmd = 4
+    int  aRead       (byte p);                             //cmd = 5
+    void setListener (byte p, boolean enabled, byte analog, byte exponent, boolean local=true); //cmd = 6
     
     // Read value of micros() every loop.
     unsigned long currentTime;
@@ -93,14 +94,13 @@ class Dino {
 
     // Functions with a cmd value can be called through the remote API.
     // EEPROM Access
-    void eepromRead            ();         //cmd = 6
-    void eepromWrite           ();         //cmd = 7
+    void eepromRead            ();         //cmd = 7
+    void eepromWrite           ();         //cmd = 8
 
     // Included Libraries
-    void servoToggle           ();         //cmd = 8
-    void servoWrite            ();         //cmd = 9
-                                          
-    void pulseRead             ();         //cmd = 11
+    void pulseRead             ();         //cmd = 9
+    void servoToggle           ();         //cmd = 10
+    void servoWrite            ();         //cmd = 11
     void handleSerial          ();         //cmd = 12
     void irSend                ();         //cmd = 16
     void tone                  ();         //cmd = 17

@@ -13,7 +13,6 @@ void Dino::setMode(byte p, byte m) {
   // bit 0: 1=input, 0=output
   // bit 1: 1=pulldown
   // bit 2: 1=pullup
-    
   if (bitRead(m, 0) == 0) {
     pinMode(p, OUTPUT);
   } else {
@@ -78,7 +77,7 @@ byte Dino::dRead(byte p) {
 
 // CMD = 03
 // Write an analog output pin. 0 for LOW, up to 255 for HIGH @ 8-bit resolution.
-void Dino::aWrite(byte p, int v, boolean echo) {
+void Dino::pwmWrite(byte p, int v, boolean echo) {
   #ifdef debug
     Serial.print("awrite, pin:");
     Serial.print(p);
@@ -163,6 +162,12 @@ void Dino::clearLedcChannels(){
 #endif
 
 // CMD = 04
+// Write to a DAC (digital to analog converter) pin.
+// This outputs a true analog resolution, unlike PWM.
+void Dino::dacWrite(byte p, int v, boolean echo) {
+}
+
+// CMD = 05
 // Read an analog input pin. 0 for LOW, up to 1023 for HIGH @ 10-bit resolution.
 int Dino::aRead(byte p) {
   #ifdef debug
@@ -183,7 +188,7 @@ void Dino::coreResponse(int p, int v){
   stream->print('\n');
 }
 
-// CMD = 05
+// CMD = 06
 // Enable, disable and change settings for core (digital/analog) listeners.
 // See Dino.h for settings and mask layout.
 void Dino::setListener(byte p, boolean enabled, byte analog, byte exponent, boolean local){

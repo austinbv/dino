@@ -34,16 +34,21 @@ module Dino
       end
 
       # CMD = 3
-      def analog_write(pin,value)
+      def pwm_write(pin,value)
         write Message.encode command: 3, pin: convert_pin(pin), value: value
       end
-
+      
       # CMD = 4
-      def analog_read(pin)
-        write Message.encode command: 4, pin: convert_pin(pin)
+      def dac_write(pin,value)
+        write Message.encode command: 4, pin: convert_pin(pin), value: value
       end
 
       # CMD = 5
+      def analog_read(pin)
+        write Message.encode command: 5, pin: convert_pin(pin)
+      end
+
+      # CMD = 6
       def set_listener(pin, state=:off, options={})
         mode    = options[:mode]    || :digital
         divider = options[:divider] || 16
@@ -58,7 +63,7 @@ module Dino
         exponent = Math.log2(divider).to_i
         aux = pack :uint8, [mode == :analog ? 1 : 0, exponent]
 
-        write Message.encode command: 5,
+        write Message.encode command: 6,
                              pin: convert_pin(pin),
                              value: (state == :on ? 1 : 0),
                              aux_message: aux
@@ -77,7 +82,7 @@ module Dino
         set_listener(pin, :off)
       end
 
-      # CMD = 11
+      # CMD = 9
       def pulse_read(pin, options={})
         # Hold the input pin high or low (give as values) before reading
         reset = options[:reset] || false
@@ -108,7 +113,7 @@ module Dino
         aux = pack :uint16, [reset_time, timeout]
         aux << pack(:uint8, pulse_limit)
 
-        write Message.encode command: 11,
+        write Message.encode command: 9,
                              pin: convert_pin(pin),
                              value: settings,
                              aux_message: aux

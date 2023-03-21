@@ -1,11 +1,11 @@
 module Dino
   module Components
     module Basic
-      class AnalogOutput < DigitalOutput
-        interrupt_with :analog_write
+      class PWMOut < DigitalOutput
+        interrupt_with :write
 
-        def analog_write(value)
-          board.analog_write(pin, @state = value)
+        def pwm_write(value)
+          board.pwm_write(pin, @state = value)
         end
 
         def write(value)
@@ -14,7 +14,7 @@ module Dino
           elsif value == board.analog_high
             digital_write(board.high)
           else
-            analog_write(value)
+            pwm_write(value)
           end
         end
       end

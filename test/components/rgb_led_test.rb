@@ -14,9 +14,9 @@ class RGBLedTest < MiniTest::Test
   end
 
   def test_proxies
-    assert_equal Dino::Components::Basic::AnalogOutput, part.red.class
-    assert_equal Dino::Components::Basic::AnalogOutput, part.green.class
-    assert_equal Dino::Components::Basic::AnalogOutput, part.blue.class
+    assert_equal Dino::Components::Basic::PWMOut, part.red.class
+    assert_equal Dino::Components::Basic::PWMOut, part.green.class
+    assert_equal Dino::Components::Basic::PWMOut, part.blue.class
   end
 
   def test_write

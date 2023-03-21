@@ -26,6 +26,15 @@
   - Speed controlled by PWM output on Enable pin.
   
 ### Changed Components
+- Basic components (pin I/O types) have been / will be  renamed as follows:
+  ````
+  AnalogInput   -> AnalogIn
+  AnalogOutput  -> PWMOut
+                   DACOut
+  DigitalInput  -> DigitalInOut
+  DigitalOutput
+  ````
+
 - Hitachi HD44780 LCD driver rewritten in Ruby:
   - Class name changed from `LCD` to `HD44780`.
   - `#puts` changed to `#print` to better represent functionality.
@@ -33,14 +42,28 @@
   - Depends only on `DigitalOutput` and `#micro_delay`.
   - Old implementation in `LCD` class has been removed.
   - This solves compatibility with booards that the library didn't work with.
-  
+
 ### Board API Changes
-- `microDelay()` function exposed from the board:
+- `microDelay` function exposed from the board library:
   - Implements a platform independent microsecond delay.
   - All calls to `delayMicroseconds()` should be replaced with this.
   - Exposed in Ruby via `CMD=99`. It takes one argument, uint_16 for delay length in microsceonds.
   - `Board#micro_delay` and `Components::Base#micro_delay` are defined.
   
+- `dacWrite` function added to board library. `aWrite` function renamed to `pwmWrite`. Need this separation to avoid conflict between DAC, PWM and digital output modes on some boards.
+
+- CMD numbers for some board functions have been changed to accomodate dacWrite:
+  ````
+  dacWrite       -> 4
+  aread        4 -> 5
+  setListener  5 -> 6
+  eepromRead   6 -> 7
+  eepromWrite  7 -> 8
+  pulseread   11 -> 9
+  servoToggle  8 -> 10
+  servoWrite   9 -> 11
+  ````  
+
 ### Minor Changes
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
 - Aux message size limits changed to:
@@ -79,7 +102,7 @@
   
 - Arduino Due (`--target sam3x`) :
   - Up to 12-bit analog in/out. Pass a `bits:` option to `Board#new` to set resolution for both.
-  - DAC support. Refer to DAC pins as `'DAC0'`, `'DAC1'`, just as labeled on the board. Call `#analog_write` or just `#write` on an `AnalogOutput` component that uses the pin.
+  - DAC support. Refer to DAC pins as `'DAC0'`, `'DAC1'`, just as labeled on the board. Call `#analog_write` or just `#write` on an `sensor` component that uses the pin.
   - Uses the native ARM serial port by default. Configurable in sketch to use programming port.
   - **Note**: SoftwareSerial, Infrared, and Tone are incompatible with the Arduino Due, and excluded from the sketch.
 
@@ -141,9 +164,9 @@
 ### Hardware Abstraction
 
 - `MultiPin` abstraction for components using more than one pin:
-  - Components connecting to more than 1 pin, like an RGB LED or rotary encoder, are now modeled as `MultiPin` and contain multiple `SinglePin` `proxies`. An `RGBLed` is built from 3 `AnalogOutput`s, for example, one for each color, connected to a separate pin.
+  - Components connecting to more than 1 pin, like an RGB LED or rotary encoder, are now modeled as `MultiPin` and contain multiple `SinglePin` `proxies`. An `RGBLed` is built from 3 `sensor`s, for example, one for each color, connected to a separate pin.
   - `MultiPin` implements a shortcut class method `proxy_pins`. Proxying a pin allows subcomponent pin numbers to be given as a hash when initializing an instance of a `MultiPin` component. Eg: `{red: 9, green: 10, blue: 11}` given as the `pins:` option for `RGBLed#new`.
-  -  When initialized, subcomponents corresponding to the proxied pins are automatically created. They're stored in `#proxies` and `attr_reader` methods are created for each, corresponding to their key in the `pins:` hash. Eg: `RGBLed#green` and `RGBLed#proxies[:green]` both give the `AnalogOutput` component that represents the green LED inside the RGB LED, connected to pin 10.
+  -  When initialized, subcomponents corresponding to the proxied pins are automatically created. They're stored in `#proxies` and `attr_reader` methods are created for each, corresponding to their key in the `pins:` hash. Eg: `RGBLed#green` and `RGBLed#proxies[:green]` both give the `sensor` component that represents the green LED inside the RGB LED, connected to pin 10.
 
 - `BoardProxy` abstraction for shift/SPI registers:
   - The `Register` classes implement enough of the `Board` interface to satisfy components based on `DigitalInput` and `DigitalOutput`, such as `Led` or `Button`.

@@ -1,6 +1,6 @@
 module Dino
   module Components
-    class Led < Basic::AnalogOutput
+    class Led < Basic::PWMOut
       def blink(interval=0.5)
         threaded_loop do 
           toggle

@@ -97,24 +97,25 @@ void Dino::process() {
     case 0:  setMode             (pin, val);        break;
     case 1:  dWrite              (pin, val, false); break;
     case 2:  dRead               (pin);             break;
-    case 3:  aWrite              (pin, val, false); break;
-    case 4:  aRead               (pin);             break;
-    case 5:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
+    case 3:  pwmWrite            (pin, val, false); break;
+    case 4:  dacWrite            (pin, val, false); break;
+    case 5:  aRead               (pin);             break;
+    case 6:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
 
   	#ifdef EEPROM_PRESENT
     // Implemented in DinoEEPROM.cpp
-    case 6:  eepromRead          ();    break;
-    case 7:  eepromWrite         ();    break;
+    case 7:  eepromRead          ();    break;
+    case 8:  eepromWrite         ();    break;
 	  #endif
+
+    // Implemented in DinoPulseInput.cpp
+    case 9: pulseRead           ();    break;
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
-    case 8:  servoToggle         ();    break;
-    case 9:  servoWrite          ();    break;
+    case 10:  servoToggle         ();    break;
+    case 11:  servoWrite          ();    break;
     #endif
-
-    // Implemented in DinoPulseInput.cpp
-    case 11: pulseRead           ();    break;
 
     // Implemented in DinoSerial.cpp
     #ifdef DINO_SERIAL

@@ -49,23 +49,23 @@ class APICoreTest < Minitest::Test
     mock.verify
   end
 
-  def test_analog_write
+  def test_pwm_write
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: board.low)])
     mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: board.analog_high)])
     mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: 128)])
 
     board.stub(:write, mock) do
-      board.analog_write 1, board.low
-      board.analog_write 1, board.analog_high
-      board.analog_write 1, 128
+      board.pwm_write 1, board.low
+      board.pwm_write 1, board.analog_high
+      board.pwm_write 1, 128
     end
     mock.verify
   end
 
   def test_analog_read
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1)])
 
     board.stub(:write, mock) do
       board.analog_read 1
@@ -77,10 +77,10 @@ class APICoreTest < Minitest::Test
     mock = MiniTest::Mock.new
 
     # \x00\x04 corresponds to the default divider of 16 (2^4)
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x00\x04")])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 0, aux_message: "\x01\x04")])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x04")])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 5, pin: 1, value: 1, aux_message: "\x01\x00")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 6, pin: 1, value: 0, aux_message: "\x00\x04")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 6, pin: 1, value: 0, aux_message: "\x01\x04")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 6, pin: 1, value: 1, aux_message: "\x01\x04")])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 6, pin: 1, value: 1, aux_message: "\x01\x00")])
 
     board.stub(:write, mock) do
       board.set_listener(1, :off)
@@ -132,7 +132,7 @@ class APICoreTest < Minitest::Test
     # Default settings
     mock = MiniTest::Mock.new
     aux = pack(:uint16, [0, 200]) << pack(:uint8, 100)
-    message = Dino::Message.encode command: 11, pin: 4, value: 0b00, aux_message: aux
+    message = Dino::Message.encode command: 9, pin: 4, value: 0b00, aux_message: aux
     
     mock.expect :call, nil, [message]
     board.stub(:write, mock) do
@@ -143,8 +143,8 @@ class APICoreTest < Minitest::Test
     # Good options
     mock = MiniTest::Mock.new
     aux = pack(:uint16, [1000, 200]) << pack(:uint8, 160)
-    message1 = Dino::Message.encode command: 11, pin: 4, value: 0b01, aux_message: aux
-    message2 = Dino::Message.encode command: 11, pin: 4, value: 0b11, aux_message: aux
+    message1 = Dino::Message.encode command: 9, pin: 4, value: 0b01, aux_message: aux
+    message2 = Dino::Message.encode command: 9, pin: 4, value: 0b11, aux_message: aux
     
     mock.expect :call, nil, [message1]
     mock.expect :call, nil, [message2]

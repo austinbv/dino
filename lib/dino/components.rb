@@ -4,7 +4,6 @@ module Dino
     require 'dino/components/mixins'
     require 'dino/components/basic'
     require 'dino/components/register'
-    # require 'dino/components/spi'
     require 'dino/components/i2c'
     autoload :Led,              'dino/components/led'
     autoload :Button,           'dino/components/button'
