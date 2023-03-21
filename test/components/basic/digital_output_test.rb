@@ -9,7 +9,7 @@ class DigitalOutputTest < Minitest::Test
     @part ||= Dino::Components::Basic::DigitalOutput.new(board: board, pin: 14)
   end
 
-  def read_state_on_initialize
+  def test_read_state_on_initialize
     mock = MiniTest::Mock.new.expect :call, nil, [14]
     board.stub(:digital_read, mock) do
       part

@@ -12,13 +12,13 @@ module Dino
       
         def initialize_pins(options={})
           super(options)
-          if options[:pullup]
-            self.mode = :input_pullup
-          elsif options[:pulldown]
-            self.mode = :input_pulldown
-          else
-            self.mode = :input
-          end
+          
+          initial_mode = :input
+          initial_mode = :input_pullup   if options[:pullup]
+          initial_mode = :input_pulldown if options[:pulldown]
+          initial_mode = options[:mode]  if options[:mode]
+          
+          self.mode = initial_mode
         end
       end
     end

@@ -1,7 +1,7 @@
 #include "Dino.h"
 
 // CMD = 00
-// Set a pin to output (0), or input (1).
+// Set up a single pin for the desired type of input or output.
 void Dino::setMode(byte p, byte m) {
   #ifdef debug
     Serial.print("setmode, pin:");
@@ -9,25 +9,72 @@ void Dino::setMode(byte p, byte m) {
     Serial.print(", mode:");
     Serial.println(m);
   #endif
+    
+  m = m & 0b00000111;
+  
+  // Use the lowest 3 bits of m to set different input/output modes, and enable 
+  // or disable needed peripherals on different platforms.
+  //
+  // OUTPUT MODES:  
+  // 000 = Digital Output
+  // 010 = PWM Ouptut
+  // 100 = DAC Output
+  //
+  // INPUT MODES
+  // 001 = Digital Input
+  // 011 = Digital Input with internal pulldown if available.
+  // 101 = Digital Input with internal pullup if available.
+  // 111 = Digital Input/Output (ESP32 Only?)
 
-  // bit 0: 1=input, 0=output
-  // bit 1: 1=pulldown
-  // bit 2: 1=pullup
+  #ifdef ESP32
+      // Free the LEDC channel if leaving PWM mode.
+    if (m != 0b010) releaseLEDC(p);
+    
+    // Disable attached DAC if leaving DAC mode.
+    if (m != 0b100) dacDisable(p);
+  #endif
+      
+  // On the SAMD21, mode needs to be INPUT when using the DAC.
+  #ifdef ARDUINO_SAMD_ZER0
+    if (m != 0b100){
+      pinMode(p, INPUT);
+      return;
+    }
+  #endif
+  
+  // Handle the named INPUT_* states on boards implementing them.
+  #ifdef INPUT_PULLDOWN
+  if (m == 0b011) {
+    pinMode(p, INPUT_PULLDOWN);
+    return;
+  }
+  #endif
+  
+  #ifdef INPUT_OUTPUT
+  if (m == 0b111) {
+    pinMode(p, INPUT_OUTPUT);
+    return;
+  }
+  #endif
+  
+  #ifdef INPUT_PULLUP
+  if (m == 0b101) {
+    pinMode(p, INPUT_PULLUP);
+    return;
+  }
+  #endif
+  
+  // Handle the standard INPUT and OUTPUT states.
+  // Allows INPUT_* to fallback to INPUT when not implemented.
   if (bitRead(m, 0) == 0) {
     pinMode(p, OUTPUT);
   } else {
     pinMode(p, INPUT);
   }
-  
-  // Set pullup or pulldown for ESP32
-  #ifdef ESP32
-    detachLEDC(p);
-    if(bitRead(m, 1)) pinMode(p, INPUT_PULLDOWN);
-    if(bitRead(m, 2)) pinMode(p, INPUT_PULLUP);
-    
-  // Write high on other platforms if pullup.
-  #else
-    if (bitRead(m, 2)) digitalWrite(p, HIGH);
+
+  // Write high to set pullup for AVRs that use this method.
+  #ifdef __AVR__
+    if (m == 0b101) digitalWrite(p, HIGH);
   #endif
 }
 
@@ -43,9 +90,17 @@ void Dino::dWrite(byte p, byte v, boolean echo) {
     Serial.println(echo);
   #endif
 
-  // Stop using a LEDC channel if the pin was using one.
+  #ifdef __SAMD21G18A__
+    // digitalWrite doesn't implicitly disconnect PWM on the SAMD21.
+    pinMode(p, OUTPUT);
+  #endif
+
   #ifdef ESP32
-    detachLEDC(p);
+    // Disconnect any DAC or LEDC peripheral the pin was using.
+    // Without this, setting GPIO level has no effect.
+    // NOTE: Does not release the LEDC channel or config. Can reattach in aWrite.
+    dacDisable(p);
+    ledcDetachPin(p);
   #endif
     
   if (v == 0) {
@@ -65,11 +120,6 @@ byte Dino::dRead(byte p) {
     Serial.println(p);
   #endif
   
-  // Stop using a LEDC channel if the pin was using one.
-  #ifdef ESP32
-    detachLEDC(p);
-  #endif
-
   byte rval = digitalRead(p);
   coreResponse(p, rval);
   return rval;
@@ -85,12 +135,16 @@ void Dino::pwmWrite(byte p, int v, boolean echo) {
     Serial.print(v);
     Serial.print(", echo:");
     Serial.println(echo);
-  #endif
+  #endif.
 
   #ifdef ESP32
-    // analogWrite is implemented but we can use manual control to do more.
-    // analogWrite(p,v);
-    ledcWrite(ledcChannel(p), v);
+    // Assign new or find existing LEDC channel for this pin.
+    byte channel = ledcChannel(p);
+    
+    // Reattach the pin in case dWrite detached it.
+    ledcAttachPin(p, channel);
+    
+    ledcWrite(channel, v);
   #else
     analogWrite(p,v);
   #endif
@@ -115,7 +169,7 @@ byte Dino::ledcChannel(byte p) {
     // If the channel isn't initialized and it isn't marked as used, use it.
     // should find some way to check if the channel itslef is being used
     if ((ledcPins[i][0] == 0)) {
-      attachLEDC(i, p);
+      assignLEDC(i, p);
       return i;
     }
   }
@@ -124,8 +178,8 @@ byte Dino::ledcChannel(byte p) {
   return 255;
 };
 
-// Attach a pin to a channel and save it.
-byte Dino::attachLEDC(byte channel, byte p){
+// Assign a LEDC channel to a pin and save it.
+byte Dino::assignLEDC(byte channel, byte p){
   // First 8 channels: up to 40Mhz @ 16-bits
   // Last 8 channels: up to 500kHz @ 13-bits
   // Just use similar settings to ATmega for now.
@@ -138,12 +192,12 @@ byte Dino::attachLEDC(byte channel, byte p){
   return channel;
 }
 
-// Stop using a LEDC channel when we're done.
-void Dino::detachLEDC(byte p){
+// Release a LEDC channel when done with it.
+void Dino::releaseLEDC(byte p){
   // Detach the pin from the channel.
   ledcDetachPin(p);
   
-  // Mark any channel associated with our pin as unused.
+  // Mark any channel associated with the pin as unused.
   for (int i = LEDC_CHANNEL_COUNT -1; i > 0; i--){
     if (ledcPins[i][1] == p) ledcPins[i][0] = 0;
   }

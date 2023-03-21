@@ -5,22 +5,23 @@ module Dino
 
       DIVIDERS = [1, 2, 4, 8, 16, 32, 64, 128]
 
+      PIN_MODES = {
+                    output:         0b000,
+                    output_pwm:     0b010,
+                    output_dac:     0b100,
+                    input:          0b001,
+                    input_pulldown: 0b011,
+                    input_pullup:   0b101,
+                    input_output:   0b111
+      }
+
       # CMD = 0
-      def set_pin_mode(pin, direction, pull=nil)
-        pin = convert_pin(pin)
-        
-        # bit 0: 1 = input, 0 = output
-        # bit 1: 1 = pulldown
-        # but 2: 1 = pullup
-        #
-        settings = 0b001
-        settings = 0b000 if direction == :output
-        settings |= 0b010 if pull == :pulldown
-        settings |= 0b100 if pull == :pullup
+      def set_pin_mode(pin, mode=:input)
+        raise ArgumentError, "invalid pin mode given: #{mode}" unless PIN_MODES.keys.include? mode
         
         write Message.encode command: 0,
                              pin: convert_pin(pin),
-                             value: settings
+                             value: PIN_MODES[mode]
       end
 
       # CMD = 1

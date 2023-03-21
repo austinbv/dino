@@ -42,6 +42,13 @@
   - Depends only on `DigitalOutput` and `#micro_delay`.
   - Old implementation in `LCD` class has been removed.
   - This solves compatibility with booards that the library didn't work with.
+  
+- `PWMOut` (previously `AnalogOutput`):
+  - Changed `#analog_write` to `#pwm_write`.
+  - Added `#pwm_enable` and `#pwm_disable` methods.
+  - `#pwm_enable` is implicit when calling `#pwm_write`. Lazy initialize PWM peripherals on the chip. Never happens if only `#digital_write` gets called.
+  - `#pwm_disable` sets the pin mode to `:output` (`OUTPUT` in Arduino), disconnects and deconfigures any PWM generating peripheral.
+  - On the ESP32 `#pwm_disable` releases the LEDC channel that the pin was using, so it can be reused.
 
 ### Board API Changes
 - `microDelay` function exposed from the board library:
@@ -50,7 +57,15 @@
   - Exposed in Ruby via `CMD=99`. It takes one argument, uint_16 for delay length in microsceonds.
   - `Board#micro_delay` and `Components::Base#micro_delay` are defined.
   
-- `dacWrite` function added to board library. `aWrite` function renamed to `pwmWrite`. Need this separation to avoid conflict between DAC, PWM and digital output modes on some boards.
+- `dacWrite` function added to board library. `aWrite` function renamed to `pwmWrite`. Need this to avoid conflict between DAC, PWM and regular output on some chips.
+
+- `Board#analog_write` is replaced by `Board#pwm_write` and `Board#dac_write`, matching the two C functions above.
+
+- `Board#set_pin_mode` significantly changed to better manage pullups, pulldowns, `:input_output` mode, and deconfiguring DAC and PWM peripherals for applicable chips.
+
+- `Board#digital_write` implicitly disconnects any PWM or DAC peripheral that the pin was connected to, but does not deconfigure it. This is necessary on chips like the ATSAMD21 and ESP32 or the `#digital_write` will not work.
+
+- `Board#analog_write` implicitly reconnects a PWM peripheral to the pin if one was previously assigned, or assigns a new one and connects it.
 
 - CMD numbers for some board functions have been changed to accomodate dacWrite:
   ````
