@@ -6,24 +6,6 @@
 #include <Arduino.h>
 #include "DinoDefines.h"
 
-// Figure out how many pins our hardware has.
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#  define PIN_COUNT 70
-#elif defined(__SAM3X8E__)
-#  define PIN_COUNT 66
-#elif defined(ESP8266)
-#  define PIN_COUNT 17
-#elif defined(ESP32)
-#  define PIN_COUNT 40
-#else
-#  define PIN_COUNT 22
-#endif
-
-// Use the maximum length for the ESP8266 EEPROM.
-#if defined(ESP8266) || defined(ESP32)
-#  define ESP_EEPROM_LENGTH 512
-#endif
-
 class Dino {
   public:
     Dino();
@@ -75,14 +57,12 @@ class Dino {
     //
     // Tanslating aWrite to ledcWrite for PWM out on the ESP32.
     //
-    #ifdef ESP32
-    //
     // Track which pin is assigned to each LEDC channel.
     // Byte 0 = enabled or disabled
     // Byte 1 = pin number attached to that channel
-    #define LEDC_CHANNEL_COUNT 16
+    //
+    #ifdef ESP32
     byte ledcPins[LEDC_CHANNEL_COUNT][2];
-
     byte ledcChannel(byte p);
     byte attachLEDC(byte channel, byte pin);
     void detachLEDC(byte p);
@@ -189,20 +169,6 @@ class Dino {
     byte cmdStr[4]; byte cmd;
     byte pinStr[4]; byte pin;
     byte valStr[4]; byte val;
-
-    // Default to 256 + 16 for aux size.
-    #define AUX_SIZE 272
-    
-    // If using IR_OUT and not on the ATmega168, 512 + 16.
-    #if defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
-    #  define AUX_SIZE 528
-    #endif
-    
-    // Use 32 + 16 if none of the high usage features are enabled. Should catch the core sketch.
-    #if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_SERIAL) && !defined(DINO_IR_OUT)
-    #  define AUX_SIZE 48
-    #endif
-
     byte auxMsg[AUX_SIZE];
 
     // Flow control stuff. Notify when we've received half a serial buffer worth of bytes.
