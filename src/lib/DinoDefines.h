@@ -39,7 +39,7 @@
 #endif
 
 // No EEPROM on the Due or Zero.
-#if !defined(__SAM3X8E__) && !defined(ARDUINO_SAMD_ZERO)
+#if !defined(__SAM3X8E__) && !defined(__SAMD21G18A__)
   #define EEPROM_PRESENT
   #include <EEPROM.h>
 #endif

@@ -236,7 +236,7 @@ void Dino::handshake() {
   #endif
 
   // 4th is DAC0 if available. Ignore for ESP32. Also not in order.
-  #if defined(__SAM3X8E__) || defined(ARDUINO_SAMD_ZERO)
+  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__)
     stream->print(',');
     stream->print(DAC0);
   #endif

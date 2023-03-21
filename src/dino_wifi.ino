@@ -20,7 +20,7 @@
 
 // Define 'serial' as the serial interface we want to use.
 // Defaults to Native USB port (left) on Due and Zero, or Serial otherwise.
-#if defined(__SAM3X8E__) || defined(ARDUINO_SAMD_ZERO)
+#if defined(__SAM3X8E__) || defined(__SAMD21G18A__)
   #define serial SerialUSB
   // Use this for Programming USB port (right) on Due and Zero.
   //#define serial Serial
