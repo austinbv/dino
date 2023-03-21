@@ -35,8 +35,8 @@ void Dino::setMode(byte p, byte m) {
   #endif
       
   // On the SAMD21, mode needs to be INPUT when using the DAC.
-  #ifdef ARDUINO_SAMD_ZER0
-    if (m != 0b100){
+  #ifdef __SAMD21G18A__
+    if (m == 0b100){
       pinMode(p, INPUT);
       return;
     }
