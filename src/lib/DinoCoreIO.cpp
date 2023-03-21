@@ -219,6 +219,13 @@ void Dino::clearLedcChannels(){
 // Write to a DAC (digital to analog converter) pin.
 // This outputs a true analog resolution, unlike PWM.
 void Dino::dacWrite(byte p, int v, boolean echo) {
+  #ifdef ESP32
+    ::dacWrite(p, v);
+  #endif
+    
+  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__)
+    analogWrite(p, v);
+  #endif
 }
 
 // CMD = 05

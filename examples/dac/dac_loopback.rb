@@ -4,27 +4,29 @@
 require 'bundler/setup'
 require 'dino'
 
+#
+# For the Arduino Zero: 'DAC0' = 'A0' = GPIO14.
+# For the ESP32 V1:     'DAC0' = GPIO25, 'DAC1' = GPIO26, `ADC1_4` = 32
+#
+# Connect DAC_PIN TO ADC_PIN with a jumper to test.
+#
+DAC_PIN = 'DAC0'
+ADC_PIN = 'A5'
+
 board = Dino::Board.new(Dino::TxRx::Serial.new)
+dac = Dino::Components::Basic::DACOut.new(pin: DAC_PIN, board: board)
+adc = Dino::Components::Basic::AnalogInput.new(pin: ADC_PIN, board: board)
 
-# For the Zero, pin 'DAC0' is the same as 'A0', same as 14.
-dac = Dino::Components::Basic::AnalogOutput.new(pin: 'DAC0', board: board)
-
-# Connect A0 to A5 with a jumper.
-input = Dino::Components::Basic::AnalogInput.new(pin: 'A5', board: board)
-
-# The Arduino library does something weird with DACs if mode is set to output.
-# Set it back to default input. Will separate DAC and PWM classes later.
-dac.mode = :input
-
-# Must use #analog_write and not #write because of issue above.
-# write(0) and write(255) would call #digital_write.
-# DAC resolution is 8 bits by default.
-dac.analog_write 128
-
-# ADC resolution is 10 bits default, so this should approximately 512.
-# Try writing different values above to test.
-input.poll(1) do |value|
-  puts "A5 reading: #{value}"
+#
+# DACOut resolution is 8 bits default on most chips.
+# AnalogIn resolution can be any of 10, 8 or 12-bits by default, depending on chip.
+# Read values should be close to 1x, 4x, or 16x the written values respectively.
+#
+[0, 32, 64, 128, 192, 255].each do |output_value|
+  dac.write output_value
+  sleep 1
+  loopback_value = adc.read
+  puts "ADC reads: #{loopback_value} when DAC writes: #{output_value}"
 end
 
-sleep
+board.finish_write

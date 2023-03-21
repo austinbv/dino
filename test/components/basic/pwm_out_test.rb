@@ -13,7 +13,6 @@ class PWMOutTest < Minitest::Test
     enable_mock = MiniTest::Mock.new.expect :call, nil
     write_mock = MiniTest::Mock.new
     write_mock.expect :call, nil, [14, 128]
-    # write_mock.expect :call, nil, [14, 64]
   
     board.stub(:pwm_write, write_mock) do
       part.stub(:pwm_enable, enable_mock) do

@@ -68,6 +68,20 @@ class APICoreTest < Minitest::Test
     end
     mock.verify
   end
+  
+  def test_dac_write
+    mock = MiniTest::Mock.new
+    mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: board.low)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: board.analog_high)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: 128)])
+
+    board.stub(:write, mock) do
+      board.dac_write 1, board.low
+      board.dac_write 1, board.analog_high
+      board.dac_write 1, 128
+    end
+    mock.verify
+  end
 
   def test_analog_read
     mock = MiniTest::Mock.new

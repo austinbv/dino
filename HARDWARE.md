@@ -61,7 +61,7 @@
 | Digital Out           | :green_heart:   | 0.11.0   | `DigitalOutput` | -     |
 | Digital In            | :green_heart:   | 0.11.0   | `DigitalInput`  | 1ms - 128ms (4ms default) listen, poll, or read
 | Analog (PWM) Out      | :green_heart:   | 0.13.0   | `PWMOut`        |
-| Analog (DAC) Out      | :green_heart:   | 0.13.0   | `DACOut`        | On Due, Zero and ESP32
+| Analog (DAC) Out      | :green_heart:   | 0.13.0   | `DACOut`        | On SAM3X, SAMD21 and ESP32
 | Analog (ADC) In       | :green_heart:   | 0.11.0   | `AnalogInput`   | 1ms - 128ms (16ms default) listen, poll, or read
 | Tone Out (Square Wave)| :green_heart:   | 0.12.0   | -               | Not working on Due yet
 
