@@ -22,7 +22,7 @@ module Dino
       if val && (val.class != Integer || val < VAL_MIN || val > VAL_MAX)
         raise ArgumentError, "value must be integer in range 0 to 9999"
       end
-      if aux.to_s.length > 528
+      if aux.to_s.length > 527
         raise ArgumentError, 'auxillary messages are limited to 528 characters'
       end
 

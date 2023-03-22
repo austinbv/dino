@@ -58,12 +58,12 @@ class APICoreTest < Minitest::Test
   def test_pwm_write
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: board.low)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: board.analog_high)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: board.pwm_high)])
     mock.expect(:call, nil, [Dino::Message.encode(command: 3, pin: 1, value: 128)])
 
     board.stub(:write, mock) do
       board.pwm_write 1, board.low
-      board.pwm_write 1, board.analog_high
+      board.pwm_write 1, board.pwm_high
       board.pwm_write 1, 128
     end
     mock.verify
@@ -72,12 +72,12 @@ class APICoreTest < Minitest::Test
   def test_dac_write
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: board.low)])
-    mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: board.analog_high)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: board.dac_high)])
     mock.expect(:call, nil, [Dino::Message.encode(command: 4, pin: 1, value: 128)])
 
     board.stub(:write, mock) do
       board.dac_write 1, board.low
-      board.dac_write 1, board.analog_high
+      board.dac_write 1, board.dac_high
       board.dac_write 1, 128
     end
     mock.verify
@@ -141,9 +141,11 @@ class APICoreTest < Minitest::Test
   def test_analog_resolution
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [Dino::Message.encode(command: 96, value: 10)])
+    mock.expect(:call, nil, [Dino::Message.encode(command: 97, value: 10)])
 
     board.stub(:write, mock) do
-      board.analog_resolution = 10
+      board.analog_write_resolution = 10
+      board.analog_read_resolution = 10
     end
     mock.verify
   end

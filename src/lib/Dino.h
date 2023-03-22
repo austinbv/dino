@@ -141,10 +141,11 @@ class Dino {
     //
     // Board level timings, resolutions and reset.
     //
-    void handshake             ();  //cmd = 90
-    void resetState            ();  //cmd = 91
-    void setRegisterDivider    ();  //cmd = 97
-    void setAnalogResolution   ();  //cmd = 96
+    void handshake                ();  //cmd = 90
+    void resetState               ();  //cmd = 91
+    void setRegisterDivider       ();  //cmd = 97
+    void setAnalogWriteResolution ();  //cmd = 96
+    void setAnalogReadResolution  ();  //cmd = 97
     unsigned long lastTime;
     unsigned long timeDiff;
     byte registerDivider;

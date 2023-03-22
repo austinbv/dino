@@ -11,7 +11,7 @@ module Dino
         def write(value)
           if value == board.low
             digital_write(board.low)
-          elsif value == board.analog_high
+          elsif value == board.pwm_high
             digital_write(board.high)
           else
             pwm_write(value)

@@ -35,7 +35,7 @@ class PWMOutTest < Minitest::Test
     mock.expect :call, nil, [board.high]
     mock.expect :call, nil, [board.low]
     part.stub(:digital_write, mock) do
-      part.write(board.analog_high)
+      part.write(board.pwm_high)
       part.write(board.low)
     end
     mock.verify

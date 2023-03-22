@@ -41,7 +41,7 @@ module Dino
       def brake
         in1.high
         in2.high
-        self.speed = board.analog_high
+        self.speed = board.pwm_high
       end
     end
   end

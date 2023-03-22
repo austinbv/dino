@@ -13,15 +13,15 @@ motor = Dino::Components::L298.new board: board, pins: {in1: 8, in2: 9, enable: 
 # motor.idle
 
 # Go forward at half speed for a while.
-motor.forward board.analog_high / 2
+motor.forward board.pwm_high / 2
 sleep 2
 
 # Change direction.
-motor.reverse board.analog_high / 2
+motor.reverse board.pwm_high / 2
 sleep 2
 
 # Speed up without changing direction.
-motor.speed = board.analog_high
+motor.speed = board.pwm_high
 sleep 2
 
 # Brake to stop quickly.
@@ -35,7 +35,7 @@ sleep 1
 # Gradually speed up.
 (1..20).each do |step|
   sleep 0.5
-  motor.speed = (board.analog_high * (step / 20.0)).round
+  motor.speed = (board.pwm_high * (step / 20.0)).round
 end
 
 # Turn it off.

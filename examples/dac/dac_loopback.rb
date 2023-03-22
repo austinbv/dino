@@ -18,9 +18,9 @@ dac = Dino::Components::Basic::DACOut.new(pin: DAC_PIN, board: board)
 adc = Dino::Components::Basic::AnalogInput.new(pin: ADC_PIN, board: board)
 
 #
-# DACOut resolution is 8 bits default on most chips.
-# AnalogIn resolution can be any of 10, 8 or 12-bits by default, depending on chip.
-# Read values should be close to 1x, 4x, or 16x the written values respectively.
+# Read values should be approximately 4x the written values, since Board#new tries to
+# set output resolution at 8-bits and input to 10-bits. Not configurable on all chips.
+# Scale may be off but, readings should still be proportional.
 #
 [0, 32, 64, 128, 192, 255].each do |output_value|
   dac.write output_value

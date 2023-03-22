@@ -164,10 +164,11 @@ void Dino::process() {
     #endif
 
     // Implemented in this file.
-    case 90: handshake           ();  break;
-    case 91: resetState          ();  break;
-    case 95: setRegisterDivider  ();  break;
-    case 96: setAnalogResolution ();  break;
+    case 90: handshake                ();  break;
+    case 91: resetState               ();  break;
+    case 95: setRegisterDivider       ();  break;
+    case 96: setAnalogWriteResolution ();  break;
+    case 97: setAnalogReadResolution  ();  break;
     case 99: microDelay(*reinterpret_cast<uint16_t*>(auxMsg)); break;
 
     // Should send a "feature not implemented" message as default.
@@ -276,14 +277,24 @@ void Dino::setRegisterDivider() {
 
 
 // CMD = 96
-// Set the analog read and write resolution.
-void Dino::setAnalogResolution() {
-  #if defined(__SAM3X8E__)
-    analogReadResolution(val);
+// Set the analog write resolution.
+void Dino::setAnalogWriteResolution() {
+  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32)
     analogWriteResolution(val);
   #endif
   #ifdef debug
-    Serial.print("Called Dino::setAnalogResolution()\n");
+    Serial.print("Called Dino::setAnalogWriteResolution()\n");
+  #endif
+}
+
+// CMD = 96
+// Set the analog read and write resolution.
+void Dino::setAnalogReadResolution() {
+  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32)
+    analogReadResolution(val);
+  #endif
+  #ifdef debug
+    Serial.print("Called Dino::setAnalogReadResolution()\n");
   #endif
 }
 

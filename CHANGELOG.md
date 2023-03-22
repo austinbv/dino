@@ -49,6 +49,10 @@
   - `#pwm_enable` is implicit when calling `#pwm_write`. Lazy initialize PWM peripherals on the chip. Never happens if only `#digital_write` gets called.
   - `#pwm_disable` sets the pin mode to `:output` (`OUTPUT` in Arduino), disconnects and deconfigures any PWM generating peripheral.
   - On the ESP32 `#pwm_disable` releases the LEDC channel that the pin was using, so it can be reused.
+  
+- `DACOut` (also previously `AnalogOutput`):
+  - Changed `#analog_write` to `#dac_write`.
+  - Does not implement `#digital_write` at all. Analog values must be used instead of `board.high` or `board.low`.
 
 ### Board API Changes
 - `microDelay` function exposed from the board library:
@@ -59,15 +63,7 @@
   
 - `dacWrite` function added to board library. `aWrite` function renamed to `pwmWrite`. Need this to avoid conflict between DAC, PWM and regular output on some chips.
 
-- `Board#analog_write` is replaced by `Board#pwm_write` and `Board#dac_write`, matching the two C functions above.
-
-- `Board#set_pin_mode` significantly changed to better manage pullups, pulldowns, `:input_output` mode, and deconfiguring DAC and PWM peripherals for applicable chips.
-
-- `Board#digital_write` implicitly disconnects any PWM or DAC peripheral that the pin was connected to, but does not deconfigure it. This is necessary on chips like the ATSAMD21 and ESP32 or the `#digital_write` will not work.
-
-- `Board#analog_write` implicitly reconnects a PWM peripheral to the pin if one was previously assigned, or assigns a new one and connects it.
-
-- CMD numbers for some board functions have been changed to accomodate dacWrite:
+- CMD numbers for some board functions changed to accomodate dacWrite:
   ````
   dacWrite       -> 4
   aread        4 -> 5
@@ -78,6 +74,18 @@
   servoToggle  8 -> 10
   servoWrite   9 -> 11
   ````  
+
+- `Board#analog_write` replaced by `Board#pwm_write` and `Board#dac_write`, matching the two C functions.
+
+- `Board#set_pin_mode` significantly changed to better manage pullups, pulldowns, `:input_output` mode, and freeing DAC and PWM peripherals for applicable chips.
+
+- `Board#digital_write` implicitly disconnects a PWM or DAC peripheral from the pin, but does not free it. This is necessary on chips like the ATSAMD21 and ESP32 or the `#digital_write` will not work.
+
+- `Board#analog_write` implicitly reconnects a PWM peripheral to the pin if one was previously assigned, or assigns a new one and connects it.
+
+- `Board#analog_resolution` has been split into `Board#analog_write_resolution` and `Board#analog_read_resoluton`, defaulting to 8 and 10-bits respectively. Read resolution applies to both PWM and DACs.
+
+- `Board#pwm_high`, `Board#dac_high` and `Board#adc_high` been defined for convenience.
 
 ### Minor Changes
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.

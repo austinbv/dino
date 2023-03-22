@@ -49,18 +49,25 @@ class BoardTest < Minitest::Test
   end
   
   def test_analog_resolution
-    assert_equal 255, board.analog_high
-    assert_equal 8,   board.analog_resolution
+    assert_equal 255, board.analog_write_high
+    assert_equal 8,   board.analog_write_resolution
+    assert_equal 1023, board.analog_read_high
+    assert_equal 10,   board.analog_read_resolution
     
-    mock = MiniTest::Mock.new.expect(:call, nil, [Dino::Message.encode(command:96, value:10)])
+    mock = MiniTest::Mock.new
+    mock.expect(:call, nil, [Dino::Message.encode(command:96, value:12)])
+    mock.expect(:call, nil, [Dino::Message.encode(command:97, value:12)])
     board.stub(:write, mock) do
-      board.analog_resolution = 10
+      board.analog_write_resolution = 12
+      board.analog_read_resolution = 12
     end
     mock.verify
     
-    assert_equal 10,   board.analog_resolution
     assert_equal 0,    board.low
-    assert_equal 1023, board.analog_high
+    assert_equal 12,   board.analog_write_resolution
+    assert_equal 4095, board.analog_write_high
+    assert_equal 12,   board.analog_read_resolution
+    assert_equal 4095, board.analog_read_high
   end
   
   def test_eeprom
