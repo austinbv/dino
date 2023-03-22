@@ -5,7 +5,7 @@ Dino gives you a high-level Ruby interface to low-level hardware, without writin
 ````ruby
 led.blink 0.5
 
-lcd.puts "Hello World!"
+lcd.print "Hello World!"
 
 reading = sensor.read
 
@@ -30,7 +30,7 @@ See a full list of supported mircocontroller platforms, interfaces, and componen
 gem install dino
 ```
 
-Before using the microcontroller in Ruby, we need to flash it with the dino firmware (or "sketch" in Arduino lingo). This is needed **only once** for each board, but future dino versions may need reflashing for firmware functions.
+Before using the microcontroller in Ruby, we need to flash it with the dino firmware (or "sketch" in Arduino lingo). This is needed **once** for each board, but future dino versions may need reflashing to add functionality.
 
 #### 2) Install the Arduino IDE OR CLI
 
@@ -75,7 +75,7 @@ dino sketch wifi --target esp32 --ssid YOUR_SSID --password YOUR_PASSWORD
 * Press the Upload :arrow_right: button. This will compile the sketch, and flash it to the board.
 
 **Troubleshooting:**
-* If your serial port is in the list, but the board is wrong, select the serial port anyway, then go to Tools > Board in the menus and choose your board from the list.
+* If your serial port is in the list, but the board is wrong, select the serial port anyway, then you will be asked to manually select a board.
 * If your board doesn't show up at all, make sure it is connected properly. Try disconnecting and reconnecting, use a different USB port or cable, or press the reset button after plugging it in.
 
 #### 5b) CLI Flashing
@@ -102,7 +102,7 @@ arduino-cli board listall
 
 #### 6)  Test It!
 
-Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Run the LED example [here](examples/01-led/led.rb). Change the pin number if needed. If the LED starts blinking, you're ready for Ruby!
+Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Change the pin number if needed, then run the [LED example](examples/01-led/led.rb). If the LED starts blinking, you're ready for Ruby!
 
 ## Examples and Tutorials
 
@@ -135,8 +135,8 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
   * [Video by ConFreaks](https://www.youtube.com/watch?v=oUIor6GK-qA)
   * [Slides on SpeakerDeck](https://speakerdeck.com/austinbv/arduino-the-ruby-way)
   
-## mruby
+## mruby Port
 
 A single board computer with a microcontroller can be a great standalone solution, especially if your project needs the computer anyway. For example, a Raspberry Pi Zero and Arduino Nano combo, running CRuby, Dino and other software.
 
-But what if you want to be _really_ small? That's where [mruby](https://github.com/mruby/mruby) comes in. Building on the [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) project, which has mruby running on the ESP32 chip, Dino is being ported to run directly on the ESP32 here: [mruby-dino-template](https://github.com/dino-rb/mruby-dino-template).
+But what if you want to be _really_ small? That's where [mruby](https://github.com/mruby/mruby) comes in. Building on the [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) project, Dino is being ported to run directly on the ESP32 here: [mruby-dino-template](https://github.com/dino-rb/mruby-dino-template).

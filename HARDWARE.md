@@ -13,7 +13,7 @@
 | ATmega1280     | :green_heart:   | 0.11.1 | Mega | 
 | ATmega2560     | :green_heart:   | 0.11.1 | Mega2560, Arduino Mega ADK | 
 | ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
-| ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. SoftSerial, Tone, IR Out, and I2C don't work yet
+| ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. SoftSerial, Tone, and IR Out don't work yet.
 | ATSAMD21       | :green_heart:   | 0.13.0 | Zero, M0, M0 Pro |
 
 **Note:** Only USB boards listed. Any supported chip should work, once you can flash it and connect to serial.
@@ -33,13 +33,11 @@
 | :--------      | :------:        | :----- | :--------------- |------ |
 | ESP8266        | :yellow_heart:  | 0.12.0 | NodeMCU | No Software Serial
 | ESP8285        | :man_shrugging: | 0.12.0 | DOIT ESP-Mx DevKit | Should be identical to 8266. Not tested in hardware.
-| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No SoftSerial or DAC Out. SPI mode bug (see changelog).
+| ESP32          | :yellow_heart:  | 0.12.0 | DOIT ESP32 DevKit V1 | No SoftSerial. SPI mode bug (see changelog).
 | ESP32-S2       | :test_tube:     | 0.12.0 | LOLIN S2 Pico | Should work, hardware limits will be wrong
 | ESP32-S3       | :test_tube:     | 0.12.0 | LOLIN S3 V1.0.0 | Should work, hardware limits will be wrong
 
-**Note:** There are too many boards using these chips to be comprehensive. Most should work. These are the exact ones used for testing, chosen based on popularity.
-
-**Note:** For these boards, "pin" numbers are always based on GPIO numbers defined by the CHIP, not the pin numbers labeled on the BOARD. They might coincide, but not always. Keep a mapping reference handy for your particular board.
+**Note:** There are many boards built around these ESP chips. Look up your board's pin map, and use the GPIO numbers directly. They may be labelled differently on the PCB.
 
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
@@ -48,7 +46,7 @@
 | :--------      | :------:        | :----- | :--------------- |------ |
 | RP2040         | :test_tube:     | -      | Raspberry Pi Pico (W) | Sofware Serial disabled. WiFi only on W version.
 
-**Note:** There are many boards built around the RP2040. Check your board's GPIO pin map, and use GPIO numbers in dino.
+**Note:** There are many boards built around the RP2040. Look up your board's pin map, and use the GPIO numbers directly. They may be labelled differently on the PCB.
 
 # Supported Components
 
