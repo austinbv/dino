@@ -9,16 +9,19 @@ class MessageTest < Minitest::Test
   def test_require_command_in_correct_range
     assert_raises(ArgumentError) { Dino::Message.encode command: -1 }
     assert_raises(ArgumentError) { Dino::Message.encode command: 256 }
+    assert_raises(ArgumentError) { Dino::Message.encode command: 42.2 }
   end
 
   def test_require_pin_in_correct_range
     assert_raises(ArgumentError) { Dino::Message.encode command: 0, pin: -1 }
     assert_raises(ArgumentError) { Dino::Message.encode command: 0, pin: 256 }
+    assert_raises(ArgumentError) { Dino::Message.encode command: 0, pin: 42.2 }
   end
 
   def test_require_value_in_correct_range
     assert_raises(ArgumentError) { Dino::Message.encode command: 0, value: -1 }
-    assert_raises(ArgumentError) { Dino::Message.encode command: 0, value: 256 }
+    assert_raises(ArgumentError) { Dino::Message.encode command: 0, value: 10000 }
+    assert_raises(ArgumentError) { Dino::Message.encode command: 0, value: 42.2 }
   end
 
   # Test that aux message is limited by board aux_limit
