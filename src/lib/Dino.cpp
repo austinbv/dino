@@ -11,12 +11,23 @@ Dino::Dino(){
   resetState();
 }
 
-
 void Dino::rxNotify() {
   stream->print("Rx");
   stream->print(rxBytes);
   stream->print("\n");
   rxBytes = 0;
+}
+
+void Dino::sendHalt() {
+  stream->print("Hlt");
+  stream->print("\n");
+}
+
+// CMD = 92
+// Expose this for diagnostics and testing.
+void Dino::sendReady() {
+  stream->print("Rdy");
+  stream->print("\n");
 }
 
 void Dino::run(){
@@ -166,6 +177,7 @@ void Dino::process() {
     // Implemented in this file.
     case 90: handshake                ();  break;
     case 91: resetState               ();  break;
+    case 92: sendReady                ();  break;
     case 95: setRegisterDivider       ();  break;
     case 96: setAnalogWriteResolution ();  break;
     case 97: setAnalogReadResolution  ();  break;
@@ -220,7 +232,7 @@ void Dino::handshake() {
   stream->print("ACK:");
   stream->print(AUX_SIZE);
   
-  // Second is EEPROM size in bytes. None on Due.
+  // Second is EEPROM size in bytes. None on Due or Zero.
   stream->print(',');
   #if defined(ESP8266) || defined(ESP32)
   	stream->print(ESP_EEPROM_LENGTH);

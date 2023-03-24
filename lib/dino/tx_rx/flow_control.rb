@@ -9,12 +9,17 @@ module Dino
       def initialize(*args)
         super(*args)
         reset_flow_control
+        tx_resume
       end
 
-      def write(message)
+      def write(message, tx_halt_after=nil)
         add_write_call
         @write_buffer_mutex.synchronize do
           @write_buffer << message
+
+          # Optionally halt transmission after this message.
+          # See comments on Board#write_and_halt for more info.
+          @tx_halt_points << @write_buffer.length if tx_halt_after
         end
       end
       
@@ -46,6 +51,7 @@ module Dino
         @write_buffer_mutex ||= Mutex.new
         @write_buffer_mutex.synchronize do
           @write_buffer = ""
+          @tx_halt_points = []
         end
 
         @last_interval_update = Time.now
@@ -53,27 +59,57 @@ module Dino
       
       def write_from_buffer
         fragment = nil
-        
-        # Check space on the remote read buffer. If available, take a fragment
-        # of that many bytes off the local write buffer.
+        halt_after_fragment = false
+
         @write_buffer_mutex.synchronize do
+          # Nothing to write.
           break if @write_buffer.empty?
-          bytes = reserve_bytes(@write_buffer.length)
+
+          # Try to send the entire buffer unless a halt point is coming up.
+          if @tx_halt_points.empty?
+            limit = @write_buffer.length
+          # Don't send beyond the first halt point if one is.
+          else
+            limit = @tx_halt_points[0]
+          end
+          # Try to reserve limit bytes on the remote read buffer.
+          bytes = reserve_bytes(limit)
+
           if bytes > 0
+            # Take fragment of bytes length off the write buffer.
             fragment = @write_buffer[0..(bytes-1)]
             @write_buffer = @write_buffer[bytes..-1]
+
+            # Update the halt points to reflect bytes removed.
+            @tx_halt_points.map! { |length| length - bytes }
+
+            # If the first halt point was reached, delete it, and halt after writing fragment.
+            if @tx_halt_points[0] == 0
+              @tx_halt_points.shift
+              halt_after_fragment = true
+            end
           end
         end
-        
-        # Write if we can. Wait otherwise.
-        if fragment
-          @io_mutex.synchronize { _write fragment }
-        else
+
+        # If no fragment, wait.
+        return tx_wait unless fragment
+
+        # If fragment, write it.
+        loop do
+          # Write and end loop if the board is ready.
+          @io_mutex.synchronize do
+            if @board_ready
+              _write fragment
+              @board_ready = false if halt_after_fragment
+              return
+            end
+          end
+          # Else wait outside the @io_mutex. Allow read thread to update @board_ready.
           tx_wait
         end
       end
 
-      # Use transit mutex for as short as possible by reserving bytes and writing later.
+      # Keep transit mutex as short as possible, by only reserving bytes, and writing outside.
       def reserve_bytes(length)
         @transit_mutex.synchronize do
           available = BOARD_BUFFER - @transit_bytes
@@ -88,7 +124,17 @@ module Dino
         
         if line
           add_read_line
-          if line.match(/\ARx/)
+
+          # Board says to resume transmission.
+          if line.match(/\ARdy/)
+            tx_resume
+            line = nil
+          # Board says to halt transmission.
+          elsif line.match(/\AHlt/)
+            tx_halt
+            line = nil
+          # Board read (freed) this many bytes from its input buffer.
+          elsif line.match(/\ARx/)
             remove_transit_bytes(line.split(/x/)[1].to_i)
             line = nil
           end
@@ -148,6 +194,14 @@ module Dino
       def tx_wait
         @tx_sleep_mutex.synchronize { @tx_sleep_calls += 1 }
         sleep @tx_sleep
+      end
+
+      def tx_halt
+        @io_mutex.synchronize { @board_ready = false } 
+      end
+
+      def tx_resume
+        @io_mutex.synchronize { @board_ready = true }
       end
 
       def add_transit_bytes(value)

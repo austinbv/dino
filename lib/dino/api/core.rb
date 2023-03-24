@@ -120,6 +120,18 @@ module Dino
                              aux_message: aux
       end
 
+      # CMD = 92
+      #
+      # For diagnostics and testing mostly. What this does:
+      # 1) Tell the TxRx to halt transmission immediately after this message.
+      # 2) Tell the board to send back a ready signal, which tells the TxRx to resume transmission.
+      #
+      # See comments on Board#write_and_halt for more info and use case.
+      #
+      def halt_resume_check
+        write_and_halt Message.encode command: 92
+      end
+
       # CMD = 99
       def micro_delay(duration)
         if duration < 0 || duration > 0xFFFF

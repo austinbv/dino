@@ -141,17 +141,15 @@ class Dino {
     //
     // Board level timings, resolutions and reset.
     //
-    void handshake                ();  //cmd = 90
-    void resetState               ();  //cmd = 91
-    void setRegisterDivider       ();  //cmd = 97
-    void setAnalogWriteResolution ();  //cmd = 96
-    void setAnalogReadResolution  ();  //cmd = 97
+    void handshake                      ();  //cmd = 90
+    void resetState                     ();  //cmd = 91
+    void setRegisterDivider             ();  //cmd = 97
+    void setAnalogWriteResolution       ();  //cmd = 96
+    void setAnalogReadResolution        ();  //cmd = 97
+    void microDelay(uint32_t microseconds);  //cmd = 99, Platform specific microsecond delay
     unsigned long lastTime;
     unsigned long timeDiff;
     byte registerDivider;
-    
-    // Wrapper for different delay implementations by platform.
-    void microDelay(uint32_t microseconds);
 
     //
     // Main loop input functions.
@@ -172,9 +170,30 @@ class Dino {
     byte valStr[4]; byte val;
     byte auxMsg[AUX_SIZE];
 
-    // Flow control stuff. Notify when we've received half a serial buffer worth of bytes.
+    //
+    // Flow control stuff.
+    //
+    // Notify the computer when the board has received half a serial buffer of bytes.
+    //
     void rxNotify();
     uint8_t rxBytes  = 0;
     uint8_t rxNotifyLimit = 32;
+    //
+    // Tell the computer to halt or resume sending data to the board.
+    //
+    // Only use these if running a function on the board that disables interrupts for
+    // longer than a single serial character (~85us at 115,200 baud).
+    //
+    // If the function was initiated by the computer (eg. writing to a WS2812 strip), do
+    // not call sendHalt(). The computer should have halted transmission itself after sending
+    // the WS2812 command. Only call sendReady() after data is written out to the strip.
+    //
+    // If the function was initiated on the board (eg. New IR input triggered by an interrupt),
+    // call sendHalt() as soon as possible, then call sendReady() when done.
+    //
+    // sendReady() is also exposed through the API for diagnostics and testing.
+    //
+    void sendHalt();
+    void sendReady(); // cmd = 92
 };
 #endif

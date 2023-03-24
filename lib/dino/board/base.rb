@@ -65,6 +65,20 @@ module Dino
         @io.write(msg)
       end
 
+      #
+      # Use Board#write_and_halt to call C++ board functions that disable interrupts
+      # for a long time. "Long" being more than 1 serial character (~85us for 115200 baud).
+      #
+      # The "halt" part tells the TxRx to halt transmission to the board after this message.
+      # Since it expects interrupts to be disabled, any data sent could be lost.
+      #  
+      # When the board function has re-enabled interrupts, it should call sendReady(). That
+      # signal is read by the TxRx, telling it to resume transmisison.
+      #
+      def write_and_halt(msg)
+        @io.write(msg, true)
+      end
+
       def update(line)
         update_component(line)
       end
