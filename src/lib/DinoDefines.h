@@ -27,15 +27,15 @@
 #  define PIN_COUNT 22
 #endif
 
-// Default aux message size to 256 + 16 bytes.
-#define AUX_SIZE 272
-// If using IR_OUT and not on the ATmega168, 512 + 16.
-#if defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
-#  define AUX_SIZE 528
-#endif
 // If no high usage features (core sketch), 32 + 16.
 #if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_SERIAL) && !defined(DINO_IR_OUT)
 #  define AUX_SIZE 48
+// If using IR_OUT and not on the ATmega168, 512 + 16.
+#elif defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
+# define AUX_SIZE 528
+// Default aux message size to 256 + 16 bytes.
+#else
+# define AUX_SIZE 272
 #endif
 
 // No EEPROM on the Due or Zero.

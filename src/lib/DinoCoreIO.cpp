@@ -135,7 +135,7 @@ void Dino::pwmWrite(byte p, int v, boolean echo) {
     Serial.print(v);
     Serial.print(", echo:");
     Serial.println(echo);
-  #endif.
+  #endif
 
   #ifdef ESP32
     // Assign new or find existing LEDC channel for this pin.
