@@ -6,26 +6,29 @@ require 'dino'
 
 board = Dino::Board.new(Dino::TxRx::Serial.new)
 
-# Only pass the SDA pin of the I2C bus. SCL (clock) pin must be 
+#
+# Default pins for the I2C0 (first) interface on most chips:
+#
+# ATmega 328p:       SDA = 'A4'  SCL = 'A5' - Arduino Uno, Nano
+# ATmega 32u4:       SDA =   2   SCL =   3  - Arduino Leonardo, Pro Micro
+# ATmega1280 / 2560: SDA =  20   SCL =  21  - Arduino Mega
+# SAM3X8E:           SDA =  20   SCL =  21  - Arduino Due
+# SAMD21G18:         SDA =  20   SCL =  21  - Arduino Zero, M0, M0 Pro
+# ESP8266:           SDA =   4   SCL =   5
+# ESP32:             SDA =  21   SCL =  22
+# RP2040:            SDA =   4   SCL =   5  - Raspberry Pi Pico (W)
+#
+# Only give the SDA pin of the I2C bus. SCL (clock) pin must be 
 # connected for it to work, but we don't need to control it.
 #
-# Arduino Uno:        SDA = 'A4'   SCL = 'A5'
-# Leonardo:           SDA =   2    SCL =   3
-# Due / Mega / Zero:  SDA =  20    SCL =  21
-# ESP8266 :           SDA =   4    SCL =   5
-# ESP32:              SDA =  21    SCL =  22
-#
-# On the ESP8266, 'D2' and 'D1' also map to SDA and SCL respectively.
-# This is for convenience when working with common development boards.
-#
-bus = Dino::Components::I2C::Bus.new(board: board, pin: 20)
+bus = Dino::Components::I2C::Bus.new(board: board, pin: 'A4')
 
 sensor = Dino::Components::I2C::BME280.new(bus: bus, address: 0x76)
 
 # Use A BMP280 with no humidity instead.
 # sensor = Dino::Components::I2C::BMP280.new(bus: bus, address: 0x76)
 
-# Default reading mode is oneshot (forced).
+# Default reading mode is oneshot ("forced" in datasheet).
 # sensor.oneshot_mode
 
 # Enable oversampling independently on each sensor.
@@ -33,7 +36,7 @@ sensor = Dino::Components::I2C::BME280.new(bus: bus, address: 0x76)
 # sensor.pressure_samples = 2
 # sensor.humidity_samples = 4
 
-# Enable continuous reading mode (normal), with standby time and IIR filter.
+# Enable continuous reading mode ("normal" in datasheet), with standby time and IIR filter.
 # sensor.continuous_mode
 # sensor.standby_time = 62.5
 # sensor.iir_coefficient = 4

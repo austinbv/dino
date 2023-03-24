@@ -10,7 +10,7 @@ dht = Dino::Components::DHT.new(pin: 5, board: board)
 # The DHT class pre-processes raw data from the board. When it reaches callbacks
 # it's already hash of :temperature and :humidity keys, both with Float values.
 dht.add_callback do |reading|
-  print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} - "
+  print "#{Time.now.strftime '%Y-%m-%d %H:%M:%S'} | "
   if reading[:error]
     puts "Error: #{reading[:error]}"
   else
