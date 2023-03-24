@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+require "pathname"
+require "yaml"
+
+# Find myself.
+build_file = Pathname.new(__FILE__).realpath
+
+# Find the target details.
+target_file =  build_file.to_s.chomp("build") + "target.yml"
+target = YAML.load_file(target_file)
+
+# Generate sketch.
+bin_file = build_file.to_s.chomp("build") + "bin/dino"
+sketch_folder = `#{bin_file} sketch serial --target #{target["name"]}`
+
+# Compile it.
+system "arduino-cli compile -b #{target["fqbn"]} #{sketch_folder}"
+
+# Upload it.
+system "arduino-cli upload -p #{target["port"]} -b #{target["fqbn"]} #{sketch_folder}"
+
+# Delete it.
+system "rm -r #{sketch_folder}"
