@@ -4,15 +4,18 @@
 #include "Dino.h"
 #if defined(DINO_IR_OUT) && !defined(ESP8266) && !defined(ESP32)
 
-#include <IRremote.hpp>
-
-// Save memory?
-#define RAW_BUFFER_LENGTH 2
+// Save memory by disabling receiver.
+#undef RAW_BUFFER_LENGTH
+#define RAW_BUFFER_LENGTH 0
 #define DISABLE_CODE_FOR_RECEIVER
-#define IR_REMOTE_DISABLE_RECEIVE_COMPLETE_CALLBACK
+
+// Save more memory.
+#define IR_REMOTE_DISABLE_RECEIVE_COMPLETE_CALLBACK true
 #define EXCLUDE_UNIVERSAL_PROTOCOLS
 #define EXCLUDE_EXOTIC_PROTOCOLS
 #define NO_LED_FEEDBACK_CODE
+
+#include <IRremote.hpp>
 
 // CMD = 16
 // Send an infrared signal.
