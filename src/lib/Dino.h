@@ -94,17 +94,18 @@ class Dino {
 
     // Functions with a cmd value can be called through the remote API.
     // EEPROM Access
-    void eepromRead            ();         //cmd = 7
-    void eepromWrite           ();         //cmd = 8
+    void eepromRead            ();   //cmd = 7
+    void eepromWrite           ();   //cmd = 8
 
     // Included Libraries
-    void pulseRead             ();         //cmd = 9
-    void servoToggle           ();         //cmd = 10
-    void servoWrite            ();         //cmd = 11
-    void handleSerial          ();         //cmd = 12
-    void irSend                ();         //cmd = 16
-    void tone                  ();         //cmd = 17
-    void noTone                ();         //cmd = 18
+    void pulseRead             ();   //cmd = 9
+    void servoToggle           ();   //cmd = 10
+    void servoWrite            ();   //cmd = 11
+    void handleSerial          ();   //cmd = 12
+    void irSend                ();   //cmd = 16
+    void tone                  ();   //cmd = 17
+    void noTone                ();   //cmd = 18
+    void showLEDArray          ();   //cmd = 19
 
     // Shift Registers
     void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte settings, byte *data); //cmd = 21

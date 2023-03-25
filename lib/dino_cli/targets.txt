@@ -48,7 +48,7 @@
      For the Raspberry Pi RP2040 microcontroller.
      Software Serial doesn't work. WiFi available only on the W version.
      This option includes all component features EXCEPT:
-         SoftwareSerial
+         SoftwareSerial, LEDArray
 
      Chips:  RP2040
      Boards: Raspberry Pi Pico, Raspberry Pi Pico W, and many others

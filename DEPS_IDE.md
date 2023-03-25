@@ -42,6 +42,7 @@ All platforms will require libraries to be installed. To install a library do th
     IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
     IRremoteESP82666 @ v2.8.4  by David Conran, Sebastien Warin
     ESP32Servo                 by Kevin Harrington, John K. Bennett
+    Adafruit NeoPixel          by Adafruit
     ````
 
 **AVR-based Arduinos & Clones Only:**
@@ -55,6 +56,7 @@ All platforms will require libraries to be installed. To install a library do th
     Ethernet                   by Various
     WiFi                       by Arduino
     IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
+    Adafruit NeoPixel          by Adafruit
     ````
     
 **ARM-based Arduinos & Clones Only:**
@@ -69,6 +71,7 @@ All platforms will require libraries to be installed. To install a library do th
     Ethernet                   by Various
     WiFi                       by Arduino
     IRremote         @ v4.0.0  by shirriff, z3to, ArminJo
+    Adafruit NeoPixel          by Adafruit
     ````
 
 **ESP8266 Only:**
@@ -98,6 +101,7 @@ All platforms will require libraries to be installed. To install a library do th
     ````
     IRremoteESP82666 @ v2.8.4  by David Conran, Sebastien Warin
     ESP32Servo                 by Kevin Harrington, John K. Bennett
+    Adafruit NeoPixel          by Adafruit
     ````
     
 **RP2040 Only:**

@@ -22,5 +22,6 @@ module Dino
     autoload :OneWire,          'dino/components/one_wire'
     autoload :Potentiometer,    'dino/components/potentiometer'
     autoload :L298,             'dino/components/l298'
+    autoload :WS2812,           'dino/components/ws2812'
   end
 end

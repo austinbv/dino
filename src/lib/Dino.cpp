@@ -144,6 +144,11 @@ void Dino::process() {
     case 18: noTone              ();    break;
     #endif
 
+    // Implemented in DinoAddressableLED.cppp
+    #ifdef DINO_LED_ARRAY
+    case 19: showLEDArray    ();   //cmd = 19
+    #endif
+
     // Implemented in DinoShift.cpp
     #ifdef DINO_SHIFT
     case 21: shiftWrite          (pin, val, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[3]); break;

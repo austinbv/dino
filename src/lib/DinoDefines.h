@@ -13,6 +13,12 @@
 // #define DINO_SERVO
 // #define DINO_SERIAL
 // #define DINO_IR_OUT
+// #define DINO_LED_ARRAY
+
+// Include libraries for specific LED array protocols.
+#ifdef DINO_LED_ARRAY
+# define DINO_LED_WS2812
+#endif
 
 // Figure out how many pins our hardware has.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -28,10 +34,10 @@
 #endif
 
 // If no high usage features (core sketch), 32 + 16.
-#if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_SERIAL) && !defined(DINO_IR_OUT)
+#if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_SERIAL) && !defined(DINO_IR_OUT) && !defined(DINO_LED_ARRAY)
 #  define AUX_SIZE 48
-// If using IR_OUT and not on the ATmega168, 512 + 16.
-#elif defined(DINO_IR_OUT) && !defined(__AVR_ATmega168__)
+// If using IR_OUT or LED_ARRAY, and not on the ATmega168, 512 + 16.
+#elif (defined(DINO_IR_OUT) || defined(DINO_LED_ARRAY)) && !defined(__AVR_ATmega168__)
 # define AUX_SIZE 528
 // Default aux message size to 256 + 16 bytes.
 #else

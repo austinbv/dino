@@ -120,7 +120,7 @@
 
 | Name               | Status             | Interface             | Version  | Component Class   | Notes |
 | :---------------   | :------:           | :--------             | :-----   | :---------------  |------ |
-| Neopixel / WS2812B | :heart:            | -                     | -        | - |
+| Neopixel / WS2812B | :yellow_heart:     | Adafruit Library      | 0.13.0   | `WS2812` | Not working on RP2040 |
 | Dotstar / APA102   | :grey_exclamation: | SPI                   | -        | - |
 
 ### I/O Expansion

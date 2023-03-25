@@ -25,7 +25,7 @@ class DinoCLI::Generator
     # ESP32 mostly working.
     esp32: STANDARD_PACKAGES - [:serial, :ir_out] + [:ir_out_esp],
     
-    # RP2040 includes everytyhing except specific incompatibilities.
-    rp2040: STANDARD_PACKAGES - [:serial],
+    # RP2040 includes everytyhing except SoftwareSerial and LEDArray.
+    rp2040: STANDARD_PACKAGES - [:serial, :led_array],
   }
 end

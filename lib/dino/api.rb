@@ -10,5 +10,6 @@ module Dino
     require 'dino/api/shift_io'
     require 'dino/api/spi'
     require 'dino/api/tone'
+    require 'dino/api/led_array'
   end
 end

@@ -6,7 +6,6 @@
 #include "Dino.h"
 #ifdef DINO_ONE_WIRE
 
-
 // CMD = 41
 // Reset the OneWire bus and return a presence value only if requested.
 //

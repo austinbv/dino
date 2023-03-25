@@ -8,6 +8,7 @@ module Dino
       include API::Infrared
       include API::OneWire
       include API::Tone
+      include API::LEDArray
 
       DIGITAL_REGEX = /\A\d+\z/i
       ANALOG_REGEX = /\A(a)\d+\z/i

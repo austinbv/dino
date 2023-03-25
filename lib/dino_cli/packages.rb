@@ -14,18 +14,11 @@ PACKAGES = {
       "lib/DinoIncludes.cpp",
     ]
   },
-  servo: {
-    description: "Servo support",
-    directive: "DINO_SERVO",
+  one_wire: {
+    description: "OneWire bus support",
+    directive: "DINO_ONE_WIRE",
     files: [
-      "lib/DinoServo.cpp",
-    ]
-  },
-  tone: {
-    description: "Tone support",
-    directive: "DINO_TONE",
-    files: [
-      "lib/DinoTone.cpp",
+      "lib/DinoOneWire.cpp",
     ]
   },
   shift: {
@@ -42,12 +35,33 @@ PACKAGES = {
       "lib/DinoSPI.cpp",
     ]
   },
+  i2c: {
+    description: "I2C device support",
+    directive: "DINO_I2C",
+    files: [
+      "lib/DinoI2C.cpp",
+    ]
+  },
   serial: {
     description: "Software serial output",
     directive: "DINO_SERIAL",
     files: [
       "lib/DinoSerial.cpp",
       "lib/DinoSerial.h",
+    ]
+  },
+  servo: {
+    description: "Servo support",
+    directive: "DINO_SERVO",
+    files: [
+      "lib/DinoServo.cpp",
+    ]
+  },
+  tone: {
+    description: "Tone support",
+    directive: "DINO_TONE",
+    files: [
+      "lib/DinoTone.cpp",
     ]
   },
   ir_out: {
@@ -66,18 +80,11 @@ PACKAGES = {
       "lib/DinoIROutESP.cpp",
     ]
   },
-  one_wire: {
-    description: "OneWire bus support",
-    directive: "DINO_ONE_WIRE",
+  led_array: {
+    description: "Support for various protocosl that control (RGB) LED arrays.",
+    directive: "DINO_LED_ARRAY",
     files: [
-      "lib/DinoOneWire.cpp",
-    ]
-  },
-  i2c: {
-    description: "I2C device support",
-    directive: "DINO_I2C",
-    files: [
-      "lib/DinoI2C.cpp",
+      "lib/DinoLEDArray.cpp",
     ]
   }
 }
