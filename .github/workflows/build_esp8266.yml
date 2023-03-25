@@ -34,6 +34,7 @@ jobs:
             libraries: |
               - name: IRremoteESP8266
                 version: 2.8.4
+              - name: Adafruit NeoPixel
 
     steps:
       - name: Checkout

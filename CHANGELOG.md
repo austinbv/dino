@@ -24,6 +24,10 @@
 - L298 H-Bridge motor driver:
   - Forward, reverse, idle, and brake modes implemented.
   - Speed controlled by PWM output on Enable pin.
+
+- WS2812 / WS2812B / NeoPixel Support:
+  - Doesn't work on RP2040 yet.
+  - No fancy functions yet. Just clear, set pixels and show.
   
 ### Changed Components
 - Basic components (pin I/O types) have been / will be  renamed as follows:

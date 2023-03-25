@@ -36,6 +36,7 @@ jobs:
               - name: LiquidCrystal
               - name: Ethernet
               - name: WiFi
+              - name: Adafruit NeoPixel
                 
     steps:
       - name: Checkout
