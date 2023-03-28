@@ -29,7 +29,7 @@ puts "Blinking every half second..."
 # A digital output can only have one of two states:
 # 1 / high / on
 # 0 / low / off
-# We can use led.write to set it directly, or named convenience methods.
+# We can use led.digital_write to set it directly, or named convenience methods.
 # These 3 lines all do the same thing: turn on, wait half a second, turn off.
 #
 led.digital_write(1); sleep 0.5; led.digital_write(0)
@@ -55,8 +55,10 @@ led.blink 0.5
 puts "Blinking in the background... Hello from the main thread!"
 sleep 3
 
-# Calling a method that sets the state (#write, #high, #low, #on, #off)
+#
+# Calling a method that sets the state (#digital_write, #high, #low, #on, #off)
 # automatically stops the blink thread.
+#
 puts "Turning off for 2 seconds..."
 led.off
 sleep 2
