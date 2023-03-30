@@ -7,6 +7,7 @@ SimpleCov.start do
   add_filter "lib/dino_cli"
 end
 
+require 'bundler/setup'
 require 'dino'
 
 # Nice little helper module to redefine constants quietly.
@@ -37,7 +38,7 @@ def suppress_output
   retval
 end
 
-class TxRxMock
+class ConnectionMock
   def add_observer(board); true; end
   def read; true; end
   def write(str); true; end
@@ -48,7 +49,6 @@ end
 
 class BoardMock < Dino::Board::Default
   def initialize
-    super(TxRxMock.new)
+    super(ConnectionMock.new)
   end
 end
-

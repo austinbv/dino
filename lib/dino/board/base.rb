@@ -31,12 +31,14 @@ module Dino
       end
             
       def analog_write_resolution=(value)
-        write Dino::Message.encode(command: 96, value: @write_bits = value)
+        set_analog_write_resolution(value)
+        @write_bits = value
         @analog_write_high = (2 ** @write_bits) - 1
       end
       
       def analog_read_resolution=(value)
-        write Dino::Message.encode(command: 97, value: @read_bits = value)
+        set_analog_read_resolution(value)
+        @read_bits = value
         @analog_read_high = (2 ** @read_bits) - 1
       end
       
@@ -58,7 +60,7 @@ module Dino
       end
       
       def eeprom
-        @eeprom ||= Components::Basic::BoardEEPROM.new(board: self)
+        @eeprom ||= EEPROM::BuiltIn.new(board: self)
       end
 
       def write(msg)
