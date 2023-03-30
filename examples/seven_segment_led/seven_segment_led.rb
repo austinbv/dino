@@ -4,11 +4,9 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-ssd   = Dino::Components::SSD.new(
-  board: board,
-  pins:  { cathode: 10, a: 3, b: 4, c: 5, d: 6, e: 7, f: 8, g: 9 }
-)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+ssd   = Dino::LED::SevenSegment.new board: board,
+                                    pins:  { cathode: 10, a: 3, b: 4, c: 5, d: 6, e: 7, f: 8, g: 9 }
 
 # Turn off the ssd on exit
 trap("SIGINT") { exit !ssd.off }

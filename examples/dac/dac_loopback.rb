@@ -13,9 +13,9 @@ require 'dino'
 DAC_PIN = 'DAC0'
 ADC_PIN = 'A5'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-dac = Dino::Components::Basic::DACOut.new(pin: DAC_PIN, board: board)
-adc = Dino::Components::Basic::AnalogInput.new(pin: ADC_PIN, board: board)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+dac = Dino::AnalogIO::Output.new(pin: DAC_PIN, board: board)
+adc = Dino::AnalogIO::Input.new(pin: ADC_PIN, board: board)
 
 #
 # Read values should be approximately 4x the written values, since Board#new tries to

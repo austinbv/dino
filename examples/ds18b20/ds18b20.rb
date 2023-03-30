@@ -4,8 +4,8 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-bus = Dino::Components::OneWire::Bus.new(pin:4, board: board)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+bus = Dino::OneWire::Bus.new(pin:4, board: board)
 
 # The bus detects parasite power automatically when initialized.
 # It can tell that parasite power is in use, but not by WHICH devices.
@@ -31,7 +31,7 @@ puts bus.found_devices.inspect; puts
 # We can use the search results to setup instances of the device classes.
 ds18b20s = []
 bus.found_devices.each do |d|
-  if d[:class] == Dino::Components::OneWire::DS18B20
+  if d[:class] == Dino::Sensor::DS18B20
     ds18b20s << d[:class].new(bus: bus, address: d[:address])
   end
 end

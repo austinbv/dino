@@ -25,19 +25,19 @@ require 'dino'
 
 # Note: If testing with 2 boards connected to the same computer, you want to be
 # explicit about which serial device this script must use. The relevant
-# TxRx call is below, but commented out. Enable it and substitute the approriate
+# Connection call is below, but commented out. Enable it and substitute the approriate
 # device  for the board that has the IR emitter connected and dino sketch loaded.
 # Open the receiver board in the Arduino IDE's or another serial monitor.
 #
-txrx = Dino::TxRx::Serial.new
-# txrx = Dino::TxRx::Serial.new(device: "/dev/ttyACM0")
-board = Dino::Board.new(txrx)
+connection = Dino::Board::Connection::Serial.new
+# connection = Dino::Board::Connection::Serial.new(device: "/dev/ttyACM0")
+board = Dino::Board.new(connection)
 
 #
 # The IR emitter can be set up on most pins for most boards, but there might be conflicts
 # with other hardware or libraries. Try different pins if one doesn't work.
 #
-ir = Dino::Components::IREmitter.new(board: board, pin: 3)
+ir = Dino::PulseIO::IRTransmitter.new(board: board, pin: 3)
 
 # NEC Raw-Data=0xF708FB04. LSBFIRST, so the binary for each hex digit below is backward.
 code =  [ 9000, 4500,                                 # Start bit

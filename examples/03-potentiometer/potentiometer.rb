@@ -4,8 +4,8 @@
 require 'bundler/setup'
 require 'dino'
 
-# Set up the board, connecting with serial over USB
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+# Set up the board, connecting with serial over USB.
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 #
 # Connect the potentiometer's outer 2 pins to Ground and Vcc respectively.
@@ -14,7 +14,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 #
 # See potentiometer.pdf in this folder for a hook-up diagram.
 # 
-potentiometer = Dino::Components::Potentiometer.new(pin: 'A0', board: board)
+potentiometer = Dino::AnalogIO::Potentiometer.new(pin: 'A0', board: board)
 
 #
 # Like with Button, the Board starts reading the Potentiometer value immediately,
@@ -34,7 +34,7 @@ potentiometer.remove_callbacks
 # values from 0 - 1023. We can use the value to control the blinking
 # speed of the LED from the earlier example.
 # 
-led = Dino::Components::Led.new(board: board, pin: 13)
+led = Dino::LED.new(board: board, pin: 13)
 
 # Helper method to calculate the blink time.
 def map_pot_value(value)

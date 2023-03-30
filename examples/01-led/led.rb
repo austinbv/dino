@@ -4,11 +4,11 @@
 require 'bundler/setup'
 require 'dino'
 
-# If the board is plugged into a USB port, we can talk to it with serial over USB.
-io = Dino::TxRx::Serial.new
+# If the board is plugged into a USB port, we can connect with serial over USB.
+connection = Dino::Board::Connection::Serial.new
 
-# Create an object to represent the board, giving the I/O object.
-board = Dino::Board.new(io)
+# Create a new board instance, giving it the connection.
+board = Dino::Board.new(connection)
 
 #
 # Create an object for the LED, giving the board, and the pin that the positive
@@ -20,7 +20,7 @@ board = Dino::Board.new(io)
 # The on-board LED (marked "L") is internally connected to pin 13 on most Arduinos,
 # and can be used without connecting anything.
 #
-led = Dino::Components::Led.new(board: board, pin: 13)
+led = Dino::LED.new(board: board, pin: 13)
 
 # Now we can make it blink.
 puts "Blinking every half second..."

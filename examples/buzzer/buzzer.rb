@@ -4,8 +4,8 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-buzzer = Dino::Components::Piezo.new(board: board, pin: 9)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+buzzer = Dino::PulseIO::Buzzer.new(board: board, pin: 9)
 
 C4 = 262
 D4 = 294

@@ -5,7 +5,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 #
 # Default pins for the I2C0 (first) interface on most chips:
@@ -22,7 +22,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 # Only give the SDA pin of the I2C bus. SCL (clock) pin must be 
 # connected for it to work, but we don't need to control it.
 #
-bus = Dino::Components::I2C::Bus.new(board: board, pin: 'A4')
+bus = Dino::I2C::Bus.new(board: board, pin: 'A4')
 
 # The bus auto searches for devices on intiailization.
 puts "No I2C devices connected!" if bus.found_devices.empty?
@@ -35,7 +35,7 @@ unless (bus.found_devices.include? 0x68)
   puts "No real time clock found!" unless bus.found_devices.empty?
 else
   puts; puts "Using real time clock at address 0x68"; puts
-  rtc = Dino::Components::I2C::DS3231.new(bus: bus, address: 0x68)
+  rtc = Dino::RTC::DS3231.new(bus: bus, address: 0x68)
   rtc.time = Time.now
 
   5.times do

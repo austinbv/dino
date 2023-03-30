@@ -12,15 +12,15 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
-shift_register = Dino::Components::Register::ShiftIn.new  board: board,
-                                                          pins: {latch: 8, data: 11, clock: 12},
-                                                          rising_clock: true
-                                                          # bit_order: :msbfirst
-                                                          # bytes: 1
+shift_register = Dino::Register::ShiftInput.new board: board,
+                                                pins: {latch: 8, data: 11, clock: 12},
+                                                rising_clock: true
+                                                # bit_order: :msbfirst
+                                                # bytes: 1
 
-button = Dino::Components::Button.new(pin: 0, board: shift_register)
+button = Dino::DigitalIO::Button.new(pin: 0, board: shift_register)
 
 button.down { puts "down"}
 button.up   { puts "up"  }

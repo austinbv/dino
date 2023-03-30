@@ -7,8 +7,8 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-sensor = Dino::Components::Sensor.new(pin: 'A0', board: board)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+sensor = Dino::AnalogIO::Sensor.new(pin: 'A0', board: board)
 
 # Single read with block as callback. Blocks main thread.
 # Callback fires only once then is removed automatically.

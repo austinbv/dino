@@ -7,8 +7,8 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-encoder = Dino::Components::RotaryEncoder.new board: board,
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+encoder = Dino::DigitalIO::RotaryEncoder.new  board: board,
                                               pins:{ clock: 4, data: 5 },
                                               divider: 1,                # (default) read approx every divider ms
                                               steps_per_revolution: 30   # (default)

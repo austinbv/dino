@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 # Set up the board, connecting with serial over USB
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 #
 # LEDs don't change brightness much with voltage, but we can vary it with a
@@ -24,7 +24,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 #
 # Set up LED on a PWM pin. See pwm_led.pdf in this folder for hook-up diagram.
 #
-led = Dino::Components::Led.new(board: board, pin: 11)
+led = Dino::LED.new(board: board, pin: 11)
 
 # led.analog_write sets duty cycle from 0 to 255, where 255 maps to 100%.
 [0, 63, 127, 191, 255].each do |duty|
@@ -35,7 +35,7 @@ end
 puts
 
 # Now let's add the potentiometer from the previous example to control it.
-potentiometer = Dino::Components::Potentiometer.new(pin: 'A0', board: board)
+potentiometer = Dino::AnalogIO::Potentiometer.new(pin: 'A0', board: board)
 
 # Helper method to calculate brightness.
 def map_pot_value(value)

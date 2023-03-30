@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 #
 # Default pins for the I2C0 (first) interface on most chips:
@@ -21,9 +21,9 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 # Only give the SDA pin of the I2C bus. SCL (clock) pin must be 
 # connected for it to work, but we don't need to control it.
 #
-bus = Dino::Components::I2C::Bus.new(board: board, pin: 'A4')
+bus = Dino::I2C::Bus.new(board: board, pin: 'A4')
 
-oled = Dino::Components::I2C::SSD1306.new(bus: bus, address: 0x3C)
+oled = Dino::Display::SSD1306.new(bus: bus, address: 0x3C)
 
 oled.print("Hello World!")
 

@@ -8,12 +8,12 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-register = Dino::Components::Register::ShiftOut.new  board: board,
-                                                     pins:  {latch: 9, data: 11, clock: 12}
-                                                     # bit_order: :msbfirst
-                                                     # bytes: 1
-                                                     # buffer_writes: true
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+register = Dino::Register::ShiftOutput.new  board: board,
+                                            pins: {latch: 9, data: 11, clock: 12}
+                                            # bit_order: :msbfirst
+                                            # bytes: 1
+                                            # buffer_writes: true
 
 # Write a single byte
 register.write(255)
@@ -22,7 +22,7 @@ register.write(255)
 register.write([255, 0])
 
 # Register can behave as a BoardProxy, with components addressable directly.
-led = Dino::Components::Led.new(board: register, pin: 0)
+led = Dino::Led.new(board: register, pin: 0)
 led.blink 1
 
 sleep

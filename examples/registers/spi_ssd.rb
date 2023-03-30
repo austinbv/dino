@@ -20,16 +20,16 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-shift_register = Dino::Components::Register::SPIOut.new  board: board,
-                                                         pin: 9
-                                                         # frequency: 3000000,
-                                                         # spi_mode: 0,
-                                                         # bytes: 1
-                                                         # bit_order: :msbfirst
-                                                         # buffer_writes: true
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+shift_register = Dino::Register::SPIOutput.new  board: board,
+                                                pin: 9
+                                                # frequency: 3000000,
+                                                # spi_mode: 0,
+                                                # bytes: 1
+                                                # bit_order: :msbfirst
+                                                # buffer_writes: true
 
-ssd = Dino::Components::SSD.new   board: shift_register,
+ssd = Dino::LED::SevenSegment.new board: shift_register,
                                   pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
 # Turn off the ssd on exit

@@ -4,10 +4,10 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 # Initialization automatically gets all EEPROM data from the board.
-# eeprom = Dino::Components::Basic::BoardEEPROM.new(board: board)
+# eeprom = Dino::EEPROM::BuiltIn(board: board)
 eeprom = board.eeprom
 
 # EEPROM size reported by the board.

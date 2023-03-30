@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 # Set up the board, connecting with serial over USB
-board = Dino::Board.new(Dino::TxRx::Serial.new)
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 #
 # To set up an RGB LED, connect its cathode leg to ground, and each of its 3 color
@@ -17,7 +17,7 @@ board = Dino::Board.new(Dino::TxRx::Serial.new)
 # An RGB LED is really 3 individual LEDS in one, sharing a cathode (sometimes anode).
 # We could initailize them separately, or use the RGBLed class, which takes all 3 pins.
 #
-rgb_led = Dino::Components::RGBLed.new(pins: {red: 11, green: 10, blue: 9}, board: board)
+rgb_led = Dino::LED::RGB.new(pins: {red: 11, green: 10, blue: 9}, board: board)
 
 #
 # We can call methods on the RGBLed as a whole. For example, these 8 defined colors.
@@ -38,7 +38,7 @@ rgb_led.blue.off
 print "Done. Changed to orange. Press Enter to continue..."; gets
 
 # Let's bring the potentiometer back from the previous examples.
-potentiometer = Dino::Components::Potentiometer.new(pin: 'A0', board: board)
+potentiometer = Dino::AnalogIO::Potentiometer.new(pin: 'A0', board: board)
 
 #
 # In a separate file (rgb_mapping.rb), there are methods to map the 0-1023 values

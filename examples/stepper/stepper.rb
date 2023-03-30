@@ -4,9 +4,9 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::TxRx::Serial.new)
-stepper = Dino::Components::Stepper.new board: board,
-                                        pins: { slp: 6, enable: 7, direction: 8, step: 10, ms1: 11, ms2: 12 }
+board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+stepper = Dino::Motor::Stepper.new  board: board,
+                                    pins: { slp: 6, enable: 7, direction: 8, step: 10, ms1: 11, ms2: 12 }
                                         
 # Default is 8 microsteps. Set to 2 so we can move faster.
 stepper.microsteps = 2
