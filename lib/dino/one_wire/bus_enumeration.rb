@@ -1,6 +1,6 @@
 module Dino
   module OneWire
-    class Bus
+    module BusEnumeration
       def _search(branch_mask)
         reset
         write(SEARCH_ROM)
@@ -73,7 +73,7 @@ module Dino
         [address, complement]
       end
 
-      # Set FAMILY_CODE in slave class to get it identified during search.
+      # Set FAMILY_CODE in peripheral class to get it identified during search.
       def family_lookup(family_code)
         OneWire.constants.each do |const|
           obj = OneWire.const_get(const)

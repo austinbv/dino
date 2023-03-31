@@ -4,6 +4,7 @@ module Dino
       include Behaviors::SinglePin
       include Behaviors::BusController
       include Behaviors::Reader
+      include BusEnumeration
       include Constants
 
       attr_reader :parasite_power
@@ -29,11 +30,6 @@ module Dino
         end
       end
 
-      def pre_callback_filter(bytes)
-        bytes = bytes.split(",").map(&:to_i)
-        bytes.length > 1 ? bytes : bytes[0]
-      end
-
       def device_present
         mutex.synchronize do
           byte = read_using -> { reset(1) }
@@ -53,6 +49,11 @@ module Dino
       def write(*bytes)
         pp = parasite_power && [CONVERT_T, COPY_SCRATCH].include?(bytes.last)
         board.one_wire_write(pin, pp, bytes)
+      end
+
+      def pre_callback_filter(bytes)
+        bytes = bytes.split(",").map(&:to_i)
+        bytes.length > 1 ? bytes : bytes[0]
       end
     end
   end

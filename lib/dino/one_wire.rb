@@ -1,9 +1,9 @@
 module Dino
   module OneWire
-    require_relative "one_wire/constants"
-    require_relative "one_wire/helper"
-    require_relative "one_wire/bus_enumerator"
-    require_relative "one_wire/bus"
-    require_relative "one_wire/peripheral"
+    autoload :Constants,      "#{__dir__}/one_wire/constants"
+    autoload :Helper,         "#{__dir__}/one_wire/Helper"
+    autoload :BusEnumeration, "#{__dir__}/one_wire/bus_enumeration"
+    autoload :Bus,            "#{__dir__}/one_wire/bus"
+    autoload :Peripheral,     "#{__dir__}/one_wire/peripheral"
   end
 end
