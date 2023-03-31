@@ -47,7 +47,7 @@ class SerialConnectionTest < Minitest::Test
       mock.expect(:call, nil) { raise RubySerial::Error }
       mock.expect :call, "serial-obj", ['/dev/tty.usbmodem1', Dino::Board::Connection::Serial::BAUD]
 
-      Serial.stub(:new, mock) do
+      ::Serial.stub(:new, mock) do
         assert_equal "serial-obj", io
       end
       mock.verify
@@ -64,7 +64,7 @@ class SerialConnectionTest < Minitest::Test
     mock.expect(:call, nil) { raise RubySerial::Error }
     mock.expect :call, "serial-obj", ["COM2", Dino::Board::Connection::Serial::BAUD]
 
-    Serial.stub(:new, mock) do
+    ::Serial.stub(:new, mock) do
       assert_equal "serial-obj", io
     end
     mock.verify
