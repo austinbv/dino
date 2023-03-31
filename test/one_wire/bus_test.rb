@@ -9,19 +9,9 @@ class OneWireBusTest < MiniTest::Test
     @part ||= Dino::OneWire::Bus.new(board: board, pin: 1)
   end
 
-  def inject_read(board, line, wait_for_callbacks = true)
-    Thread.new do
-      if wait_for_callbacks
-        sleep(0.01) while board.components.empty? 
-        sleep(0.01) while !board.components.first.callbacks[:read]
-      end
-      board.update(line)
-    end
-  end
-
   def test_read_power_supply_locks_mutex
     # Inject a response for no parasite power.
-    inject_read(board, "1:0")
+    board.inject_read("1:0")
 
     mock = MiniTest::Mock.new.expect(:call, nil)
     
@@ -33,7 +23,7 @@ class OneWireBusTest < MiniTest::Test
 
   def test_read_power_supply_sends_board_commands
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
     
     board_mock = MiniTest::Mock.new
     board_mock.expect(:set_pin_mode, nil, [part.pin, :output])
@@ -57,7 +47,7 @@ class OneWireBusTest < MiniTest::Test
 
   def test_device_present_in_mutex
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
 
     mock = MiniTest::Mock.new.expect(:call, nil)
     
@@ -69,7 +59,7 @@ class OneWireBusTest < MiniTest::Test
 
   def test_set_device_present
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
 
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [1])
@@ -77,11 +67,11 @@ class OneWireBusTest < MiniTest::Test
     
     part.stub(:reset, mock) do
       # Give 0 for first reading, device present
-      inject_read(board, "1:0")
+      board.inject_read("1:0")
       assert part.device_present
       
       # Give 1 for second reading, no device
-      inject_read(board, "1:1")
+      board.inject_read("1:1")
       refute part.device_present
     end
     mock.verify
@@ -89,7 +79,7 @@ class OneWireBusTest < MiniTest::Test
 
   def test_pre_callback_filter
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
 
     assert_equal part.pre_callback_filter("255,180,120"), [255, 180, 120]
     assert_equal part.pre_callback_filter("127"), 127
@@ -97,7 +87,7 @@ class OneWireBusTest < MiniTest::Test
 
   def reset_test
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
 
     mock = MiniTest::Mock.new
     mock.expect(:call, [1, true])
@@ -111,7 +101,7 @@ class OneWireBusTest < MiniTest::Test
   
   def _read_test
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
 
     mock = MiniTest::Mock.new.expect(:call, [1, 4])
     board.stub(:one_wire_read, mock) do
@@ -122,7 +112,7 @@ class OneWireBusTest < MiniTest::Test
 
   def write
     # Pre-initialize the bus. 
-    inject_read(board, "1:0"); part
+    board.inject_read("1:0"); part
 
     mock = MiniTest::Mock.new
     expect(:call, [1, true, [255, 177, 0x44]])

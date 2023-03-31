@@ -1,16 +1,6 @@
 require_relative '../test_helper'
 
 class DS18B20Test < MiniTest::Test
-  def inject_read(board, line, wait_for_callbacks = true)
-    Thread.new do
-      if wait_for_callbacks
-        sleep(0.01) while board.components.empty? 
-        sleep(0.01) while !board.components.first.callbacks[:read]
-      end
-      board.update(line)
-    end
-  end
-
   def board
     @board ||= BoardMock.new
   end
@@ -18,7 +8,7 @@ class DS18B20Test < MiniTest::Test
   def bus
     return @bus if @bus
     # Parasite power response.
-    inject_read(board, "1:0")
+    board.inject_read("1:0")
     @bus ||= Dino::OneWire::Bus.new(board: board, pin: 1)
   end
 
@@ -87,9 +77,9 @@ class DS18B20Test < MiniTest::Test
   def test_convert_sleeps_inside_lock_if_parasite_power
     bus.instance_variable_set(:@parasite_power, true)
     Thread.new do
-      sleep 0.05
-      assert_equal true, bus.mutex.locked?
+      part.convert
     end
-    part.convert
+    sleep 0.05
+    assert_equal true, bus.mutex.locked?
   end
 end

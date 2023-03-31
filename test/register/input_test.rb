@@ -63,7 +63,7 @@ class InputRegisterTest < Minitest::Test
     
     # Give #read some value so it stops blocking.
     Thread.new do
-      sleep while !part.callbacks[:force_update]
+      sleep(0.01) while !part.callbacks[:force_update]
       part.update("255")
     end
 

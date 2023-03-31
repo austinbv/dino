@@ -50,5 +50,30 @@ end
 class BoardMock < Dino::Board::Default
   def initialize
     super(ConnectionMock.new)
+    @read_injection_mutex = Mutex.new
+  end
+
+  #
+  # Inject a message into the Board instance as if it were coming from the phsyical board.
+  # Use this to mock input data for the blocking #read pattern in the Reader behavior.
+  #
+  def inject_read(line, wait_for_callbacks = true)
+    Thread.new do
+      if wait_for_callbacks
+        # Wait for a component to be added.
+        sleep(0.005) while self.components.empty?
+        component = self.components.first
+
+        # Wait for the callback mutex to exist, then callbacks, then the read callback.
+        sleep(0.05) while !component.callback_mutex
+        sleep(0.05) while !component.callbacks
+        sleep(0.05) while !component.callbacks[:read]
+      end
+
+      # Finally inject the message.
+      @read_injection_mutex.synchronize do
+        self.update(line)
+      end
+    end
   end
 end
