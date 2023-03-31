@@ -6,7 +6,7 @@ require 'dino'
 board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
 # This is only 1 channel of the driver. Make a new object for each channel.
-motor = Dino::Motor::L298.new board: board, pins: {in1: 8, in2: 9, enable: 10}
+motor = Dino::Motor::L298.new board: board, pins: {direction1: 8, direction2: 9, enable: 10}
 
 # Off without braking (initial state).
 # motor.off

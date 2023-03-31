@@ -2,45 +2,46 @@ module Dino
   module Motor
     class L298
       include Behaviors::MultiPin
+
+      attr_reader :speed
       
       def initialize_pins(options={})        
-        proxy_pin :in1,    DigitalIO::Output
-        proxy_pin :in2,    DigitalIO::Output
-        proxy_pin :enable, PulseIO::PWMOutput 
+        proxy_pin :direction1,  DigitalIO::Output
+        proxy_pin :direction2,  DigitalIO::Output
+        proxy_pin :enable,      PulseIO::PWMOutput 
       end
                   
       def after_initialize(options={})
-        in1.low
-        in2.low
-        enable.low
+        off
       end
 
-      def speed=(speed)
-        enable.write(speed)
+      def speed=(value)
+        enable.write(value)
+        @speed = value
       end
       
-      def forward(speed=0)
-        in1.high
-        in2.low
-        self.speed = speed
+      def forward(value=nil)
+        direction1.high
+        direction2.low
+        self.speed = value if value
       end
       
-      def reverse(speed=0)
-        in1.low
-        in2.high
-        self.speed = speed
+      def reverse(value=nil)
+        direction1.low
+        direction2.high
+        self.speed = value if value
       end
       
       def idle
-        in1.low
-        in2.low
+        direction1.low
+        direction2.low
         self.speed = 0
       end
       alias :off :idle
       
       def brake
-        in1.high
-        in2.high
+        direction1.high
+        direction2.high
         self.speed = board.pwm_high
       end
     end
