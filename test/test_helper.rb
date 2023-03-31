@@ -1,10 +1,12 @@
 require "minitest/autorun"
 
-require 'simplecov'
-SimpleCov.start do
-  track_files "lib/**/*.rb"
-  add_filter "test"
-  add_filter "lib/dino_cli"
+if RUBY_ENGINE == "ruby"
+  require 'simplecov'
+  SimpleCov.start do
+    track_files "lib/**/*.rb"
+    add_filter "test"
+    add_filter "lib/dino_cli"
+  end
 end
 
 require 'bundler/setup'
