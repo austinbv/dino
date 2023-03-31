@@ -27,7 +27,7 @@ class SerialConnectionTest < Minitest::Test
 
   def test_connect_with_device_specified
     mock = MiniTest::Mock.new.expect(:call, "serial-obj", ["/dev/ttyACM0", 9600])
-    Serial.stub(:new, mock) do
+    ::Serial.stub(:new, mock) do
       connection = Dino::Board::Connection::Serial.new(device: "/dev/ttyACM0", baud: 9600)
       assert_equal "serial-obj", suppress_output { connection.send(:io) }
     end
