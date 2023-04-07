@@ -41,7 +41,7 @@ class OutputRegisterTest < Minitest::Test
     mock = MiniTest::Mock.new.expect :call, nil, [[1]]
     part.stub(:write, mock) do
       led.on
-      sleep 0.002
+      sleep 0.050
     end
     mock.verify
     
