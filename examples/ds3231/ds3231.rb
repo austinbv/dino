@@ -24,7 +24,10 @@ board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 #
 bus = Dino::I2C::Bus.new(board: board, pin: 'A4')
 
-# The bus auto searches for devices on intiailization.
+# Tell the bus to search for devices.
+bus.search
+
+# Show the found devices.
 puts "No I2C devices connected!" if bus.found_devices.empty?
 bus.found_devices.each do |address|
   puts "I2C device connected with address: 0x#{address.to_s(16)}"

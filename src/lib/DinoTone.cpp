@@ -7,13 +7,13 @@
 // CMD = 20
 void Dino::tone() {
   uint16_t frequency = *reinterpret_cast<uint16_t*>(auxMsg);
-  uint16_t duration = *reinterpret_cast<uint16_t*>(auxMsg + 2);
+  uint16_t duration = *reinterpret_cast<uint16_t*>(auxMsg + 2); // in milliseconds
   
   // val is 1 if a duration was given, 0 if not.
   if (val !=0) {
     ::tone(pin, frequency, duration);
   } else {
-	::tone(pin, frequency);
+    ::tone(pin, frequency);
   }
 }
 

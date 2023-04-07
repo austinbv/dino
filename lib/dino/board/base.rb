@@ -54,7 +54,7 @@ module Dino
       alias :dac_high :analog_write_high
       alias :adc_high :analog_read_high
       
-      # Aux limits differ per board depending on RAM, 39 is the safe minimum.
+      # Aux limits differ per board depending on RAM, 32 + 16 is the safe minimum.
       def aux_limit
         @aux_limit ||= 48
       end

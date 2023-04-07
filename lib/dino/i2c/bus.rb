@@ -10,7 +10,6 @@ module Dino
       def after_initialize(options={})
         super(options)
         @found_devices = []
-        search
         bubble_callbacks
       end
 
