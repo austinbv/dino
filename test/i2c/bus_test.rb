@@ -6,7 +6,10 @@ class I2CBusTest < MiniTest::Test
   end
 
   def part
-    @part  ||= Dino::I2C::Bus.new(board: board, pin:5)
+    return @part if @part
+    @part = Dino::I2C::Bus.new(board: board, pin:5)
+    @part.search
+    @part
   end
   
   def peripheral

@@ -7,7 +7,7 @@ module Dino
         # CMD = 17
         def tone(pin, frequency, duration=nil)
           raise ArgumentError, "Tone cannot generate frequencies lower than 31Hz"     if frequency < 31
-          raise ArgumentError, "Tone duration cannot be more than 65535 milliseconds" if duration  > 0xFFFF
+          raise ArgumentError, "Tone duration cannot be more than 65535 milliseconds" if (duration && (duration > 0xFFFF))
 
           # Pack the frequency and optional duration as binary.
           aux = pack(:uint16, frequency)

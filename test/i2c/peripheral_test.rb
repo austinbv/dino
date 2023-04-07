@@ -9,6 +9,8 @@ class I2CPeripheralTest < MiniTest::Test
     return @bus if @bus
     board.inject_read("5:48")
     @bus = Dino::I2C::Bus.new(board: board, pin:5)
+    @bus.search
+    @bus
   end
   
   def part
