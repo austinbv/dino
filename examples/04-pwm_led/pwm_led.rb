@@ -20,15 +20,15 @@ board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 # symbol printed next to the pin number, but check your documentation. 
 #
 # Note: If you have pins labeled "DAC", do not use them here. DACs generate steady
-# analog voltages, not waves, but we access both DACs and PWM with #analog_write.
+# analog voltages, not pulses.
 #
 # Set up LED on a PWM pin. See pwm_led.pdf in this folder for hook-up diagram.
 #
 led = Dino::LED.new(board: board, pin: 11)
 
-# led.analog_write sets duty cycle from 0 to 255, where 255 maps to 100%.
+# led.pwm_write sets duty cycle from 0 to 255, where 255 maps to 100%.
 [0, 63, 127, 191, 255].each do |duty|
-  led.analog_write duty
+  led.pwm_write duty
   percentage = (((duty+1)/256.to_f) * 100).floor
   print "LED at #{percentage}% duty cycle. Press Enter..."; gets
 end
@@ -46,6 +46,7 @@ def map_pot_value(value)
   # Adjust k for different tapers. This was an A500K.
   # k = 5
   # linearized = (fraction * (k + 1)) / ((k * fraction) + 1)
+
   # Use this for linear potentiometers instead.
   linearized = fraction 
   
@@ -56,9 +57,7 @@ end
 # Callback to change brightness.
 potentiometer.on_change do |value|
   duty = map_pot_value(value)
-  
-  # led.write uses digital_write OR analog_write, based on argument given.
-  led.write(duty)
+  led.pwm_write(duty)
   percentage = (((duty+1)/256.to_f) * 100).floor
   print "LED brightness: #{percentage}%  \r"
 end
