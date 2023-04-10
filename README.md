@@ -25,6 +25,9 @@ Each physical component connected to your board(s) maps to a Ruby object you can
 See a full list of supported mircocontroller platforms, interfaces, and components [here](HARDWARE.md).
 
 ## Getting Started
+
+**Note:** If using Ruby in WSL on Windows, you can follow the Mac/Linux instructions, but it is not recommended. Serial (COM port) forwarding isn't currently working on WSL2, which would make it impossible to communicate with the microcontroller. There are workarounds, and you might get it working by switching to WSL1, but the [RubyInstaller for Windows](https://rubyinstaller.org/) and Arduino IDE are recommended instead.
+
 #### 1) Install the Gem
 ```shell
 gem install dino
@@ -34,9 +37,9 @@ Before using the microcontroller in Ruby, we need to flash it with the dino firm
 
 #### 2) Install the Arduino IDE OR CLI
 
-Get the Arduino IDE [here](http://arduino.cc/en/Main/Software) for a graphical interface, or use the command line interface from [here](https://github.com/arduino/arduino-cli/releases), or Homebrew.
+Get the Arduino IDE [here](http://arduino.cc/en/Main/Software) for a graphical interface (recommended for Windows), or use the command line interface from [here](https://github.com/arduino/arduino-cli/releases), or Homebrew.
 
-**CLI Installation with Homebrew on Mac, Linux, or WSL on Windows:**
+**CLI Installation with Homebrew on Mac or Linux:**
 ````shell
 brew update
 brew install arduino-cli
@@ -140,3 +143,7 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
 A single board computer with a microcontroller can be a great standalone solution, especially if your project needs the computer anyway. For example, a Raspberry Pi Zero and Arduino Nano combo, running CRuby, Dino and other software.
 
 But what if you want to be _really_ small? That's where [mruby](https://github.com/mruby/mruby) comes in. Building on the [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) project, Dino is being ported to run directly on the ESP32 here: [mruby-dino-template](https://github.com/dino-rb/mruby-dino-template).
+
+## dino-piboard
+
+There's an early stage add-on project for this gem, [dino-piboard](https://github.com/dino-rb/dino-piboard), which adds support for the Raspberry Pi's built in GPIO interface as a "board". `Dino::PiBoard` substitutes for `Dino::Board`, allowing you to connect hardware directly to the Pi, without a microcontroller, and use everything else from this gem.
