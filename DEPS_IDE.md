@@ -86,6 +86,7 @@ All platforms will require libraries to be installed. To install a library do th
   * Libraries:
     ````
     IRremoteESP82666 @ v2.8.4  by David Conran, Sebastien Warin
+    Adafruit NeoPixel          by Adafruit
     ````
 
 **ESP32 Only:**
