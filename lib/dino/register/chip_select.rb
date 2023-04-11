@@ -13,6 +13,7 @@ module Dino
       #
       include Behaviors::OutputPin
       include Behaviors::Callbacks
+      include Behaviors::BusPeripheral
     end
   end
 end

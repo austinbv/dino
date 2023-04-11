@@ -2,6 +2,7 @@ module Dino
   module OneWire
     class Peripheral
       include Behaviors::BusPeripheral
+      include Behaviors::BusAddressable
       include Behaviors::Poller
       include Constants
 

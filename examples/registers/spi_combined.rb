@@ -6,7 +6,10 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::Board::Connection::Serial.new)
-output_register = Dino::Register::SPIOutput.new board: board,
+
+spi = Dino::SPI::Bus.new(board: board)
+
+output_register = Dino::Register::SPIOutput.new bus: spi,
                                                 pin: 9
                                                 # frequency: 1000000
                                                 # spi_mode: 0
@@ -17,7 +20,7 @@ output_register = Dino::Register::SPIOutput.new board: board,
 ssd = Dino::LED::SevenSegment.new board: output_register,
                                   pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
-input_register = Dino::Register::SPIInput.new board: board,
+input_register = Dino::Register::SPIInput.new bus: spi,
                                               pin: 8
                                               # frequency: 1000000
                                               # spi_mode: 0

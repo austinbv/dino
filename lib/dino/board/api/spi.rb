@@ -22,9 +22,11 @@ module Dino
           
           raise ArgumentError, "can't read more than 255 SPI bytes at a time" if options[:read] > 255
           raise ArgumentError, "can't write more than 255 SPI bytes at a time" if options[:write].length > 255
-          
           header = pack :uint8, [settings, options[:read], options[:write].length]
+
+          raise ArgumentError, "invalid SPI frequency" unless [Integer, Float].include? options[:frequency].class
           header = header + pack(:uint32, options[:frequency])
+
           [header, options]
         end
 
@@ -36,9 +38,9 @@ module Dino
             raise ArgumentError, "no SPI bytes to read or write given"
           end
           
-          write Message.encode command: 26,
-                              pin: pin,
-                              aux_message: header + pack(:uint8, options[:write])
+          write Message.encode  command: 26,
+                                pin: pin,
+                                aux_message: header + pack(:uint8, options[:write])
         end
 
         # CMD = 27
@@ -47,9 +49,9 @@ module Dino
           
           raise ArgumentError, 'no SPI bytes to read' unless (options[:read] > 0)
           
-          write Message.encode command: 27,
-                              pin: pin,
-                              aux_message: header
+          write Message.encode  command: 27,
+                                pin: pin,
+                                aux_message: header
         end
 
         # CMD = 28

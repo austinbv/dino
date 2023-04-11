@@ -13,13 +13,13 @@ module Dino
 
       def before_initialize(options)
         super(options)
-        @spi_mode  = options[:spi_mode]  || 0
-        @frequency = options[:frequency] || 1000000
-        @bit_order = options[:bit_order] || :msbfirst
+        @spi_mode  = options[:spi_mode]
+        @frequency = options[:frequency]
+        @bit_order = options[:bit_order]
       end
 
       def write(*bytes)
-        board.spi_transfer(pin, mode: spi_mode, frequency: frequency, write: bytes.flatten, bit_order: bit_order)
+        bus.transfer(pin, mode: spi_mode, frequency: frequency, write: bytes.flatten, bit_order: bit_order)
       end
     end
   end

@@ -13,21 +13,21 @@ module Dino
 
       def initialize(options)
         super(options)
-        @spi_mode  = options[:spi_mode]  || 0
-        @frequency = options[:frequency] || 1000000
-        @bit_order = options[:bit_order] || :msbfirst
+        @spi_mode  = options[:spi_mode]
+        @frequency = options[:frequency]
+        @bit_order = options[:bit_order]
       end
 
       def read
-        board.spi_transfer(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
+        bus.transfer(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
       end
 
       def listen
-        board.spi_listen(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
+        bus.listen(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
       end
 
       def stop
-        board.spi_stop(pin)
+        bus.stop(pin)
       end
     end
   end

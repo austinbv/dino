@@ -40,6 +40,10 @@ class APISPITest < Minitest::Test
     assert_raises(ArgumentError) { board.spi_transfer(3, read: 0) }
     assert_raises(ArgumentError) { board.spi_listen(3, read: 0) }
   end
+
+  def test_spi_bad_frequency
+    assert_raises(ArgumentError) { board.spi_transfer(3, read: 0, frequency: "string") }
+  end
   
   def test_spi_transfer
     board

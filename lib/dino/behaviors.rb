@@ -10,6 +10,7 @@ module Dino
     # Subcomponent stuff
     autoload :BusController,  "#{__dir__}/behaviors/bus_controller"
     autoload :BusPeripheral,  "#{__dir__}/behaviors/bus_peripheral"
+    autoload :BusAddressable, "#{__dir__}/behaviors/bus_addressable"
     autoload :BoardProxy,     "#{__dir__}/behaviors/board_proxy"
 
     # Async stuff

@@ -5,8 +5,12 @@ class SPIInputRegisterTest < Minitest::Test
     @board ||= BoardMock.new
   end
 
+  def bus
+    @bus ||= Dino::SPI::Bus.new(board: board)
+  end
+
   def options
-    { board: board, pin: 9, frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
+    { bus: bus, pin: 9, frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
   end
 
   def part
@@ -14,10 +18,7 @@ class SPIInputRegisterTest < Minitest::Test
   end
 
   def test_defaults
-    part = Dino::Register::SPIInput.new board: board, pin: 9
-    assert_equal part.frequency, 1000000
-    assert_equal part.spi_mode,  0
-    assert_equal part.bit_order, :msbfirst
+    part = Dino::Register::SPIInput.new bus: bus, pin: 9
     assert_equal part.bytes, 1
   end
   
@@ -30,7 +31,7 @@ class SPIInputRegisterTest < Minitest::Test
 
   def test_read
     mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst
-    board.stub(:spi_transfer, mock) do
+    bus.stub(:transfer, mock) do
       part.read
     end
     mock.verify
@@ -38,7 +39,7 @@ class SPIInputRegisterTest < Minitest::Test
   
   def test_listen
     mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst
-    board.stub(:spi_listen, mock) do
+    bus.stub(:listen, mock) do
       part.listen
     end
     mock.verify
@@ -46,7 +47,7 @@ class SPIInputRegisterTest < Minitest::Test
   
   def test_stop
     mock = MiniTest::Mock.new.expect :call, nil, [9]
-    board.stub(:spi_stop, mock) do
+    bus.stub(:stop, mock) do
       part.stop
     end
     mock.verify

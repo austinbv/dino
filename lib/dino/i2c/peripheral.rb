@@ -2,6 +2,7 @@ module Dino
   module I2C
     class Peripheral
       include Behaviors::BusPeripheral
+      include Behaviors::BusAddressable
       include Behaviors::Reader
 
       def before_initialize(options)

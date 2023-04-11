@@ -21,7 +21,10 @@ require 'bundler/setup'
 require 'dino'
 
 board = Dino::Board.new(Dino::Board::Connection::Serial.new)
-shift_register = Dino::Register::SPIOutput.new  board: board,
+
+spi = Dino::SPI::Bus.new(board: board)
+
+shift_register = Dino::Register::SPIOutput.new  bus: spi,
                                                 pin: 9
                                                 # frequency: 3000000,
                                                 # spi_mode: 0,

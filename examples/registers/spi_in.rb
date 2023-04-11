@@ -22,8 +22,10 @@ require 'dino'
 
 board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
+spi = Dino::SPI::Bus.new(board: board)
+
 # Tested with CD4021B register, which is LSBFIRST, but needs SPI mode 0 on some boards and 2 on others.
-shift_register = Dino::Register::SPIInput.new board: board,
+shift_register = Dino::Register::SPIInput.new bus: spi,
                                               pin: 8
                                               # frequency: 1000000
                                               # spi_mode: 0

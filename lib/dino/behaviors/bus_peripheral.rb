@@ -8,13 +8,6 @@ module Dino
 
       def before_initialize(options={})
         options[:board] ||= options[:bus]
-        
-        unless options[:address]
-          raise ArgumentError,
-                'missing Slave device address; try Bus#search first'
-        end
-        @address = options[:address]
-        
         super(options)
       end
 
