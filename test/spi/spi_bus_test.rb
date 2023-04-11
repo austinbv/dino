@@ -9,34 +9,29 @@ class SPIBusTest < Minitest::Test
     @bus ||= Dino::SPI::Bus.new(board: board)
   end
 
-  def pin
-    9
-  end
-
-  def options
-   { mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst }
-  end
+  PIN = 9
+  OPTIONS = { mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst }
 
   def test_transfer
-    mock = MiniTest::Mock.new.expect :call, nil, [pin, options]
+    mock = MiniTest::Mock.new.expect :call, nil, [PIN], **OPTIONS
     board.stub(:spi_transfer, mock) do
-      part.transfer(pin, options)
+      part.transfer(PIN, **OPTIONS)
     end
     mock.verify
   end
   
   def test_listen
-    mock = MiniTest::Mock.new.expect :call, nil, [pin, options]
+    mock = MiniTest::Mock.new.expect :call, nil, [PIN], **OPTIONS
     board.stub(:spi_listen, mock) do
-      part.listen(pin, options)
+      part.listen(PIN, **OPTIONS)
     end
     mock.verify
   end
   
   def test_stop
-    mock = MiniTest::Mock.new.expect :call, nil, [pin]
+    mock = MiniTest::Mock.new.expect :call, nil, [PIN]
     board.stub(:spi_stop, mock) do
-      part.stop(pin)
+      part.stop(PIN)
     end
     mock.verify
   end

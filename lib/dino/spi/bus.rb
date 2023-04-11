@@ -5,12 +5,12 @@ module Dino
       include Behaviors::BusController
       include Behaviors::Reader
 
-      def transfer(pin, options={})
-        board.spi_transfer(pin, options)
+      def transfer(pin, **options)
+        board.spi_transfer(pin, **options)
       end
 
-      def listen(pin, options={})
-        board.spi_listen(pin, options)
+      def listen(pin, **options)
+        board.spi_listen(pin, **options)
       end
 
       def stop(pin)
@@ -18,8 +18,8 @@ module Dino
       end
 
       # Delegate necessary methods for chip enable and callbacks directly to the board.
-      def set_pin_mode(*args, **kwargs)
-        board.set_pin_mode(*args, **kwargs)
+      def set_pin_mode(*args)
+        board.set_pin_mode(*args)
       end
 
       def add_component(component)
