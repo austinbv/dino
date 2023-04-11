@@ -10,51 +10,66 @@
   - Only core features tested so far
   - WiFi untested
 
+- Raspberry Pi built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
+  - Use `Dino::PiBoard` instead of `Dino::Board` as board class.
+  - Not all interfaces and components are supported yet.
+
 ### New Components
-- Bosch BME/BMP 280 environmental sensor support:
+- Bosch BME/BMP 280 environmental sensor:
+  - Classes: `Dino::Sensor::BME280` and `Dino::Sensor::BMP280`
   - All features in the datasheet are implemented, except status checking.
   - Connects over I2C, driver written in Ruby.
-  - Component classes are `I2C::BME280` and `I2C::BMP280`.
-  - Mostly identical, except for BMP280 lacking humidity.
+  - Both are mostly identical, except for BMP280 lacking humidity.
   
 - SSD1306 OLED driver support:
+  - Class: `Dino::Display::SSD1306`
+  - Connects over I2C, driver written in Ruby.
   - Only basic text support so far, with one 6x8 font.
   - No graphics or drawing methods yet.
   
 - L298 H-Bridge motor driver:
+  - Class: `Dino::Motor::L298`
   - Forward, reverse, idle, and brake modes implemented.
-  - Speed controlled by PWM output on Enable pin.
+  - Speed controlled by PWM output on enable pin.
 
 - WS2812 / WS2812B / NeoPixel Support:
+  - Class: `Dino::LED::WS2812`
   - Doesn't work on RP2040 yet.
-  - No fancy functions yet. Just clear, set pixels and show.
+  - No fancy functions yet. Just clear, set pixels, and show.
   
 ### Changed Components
-- Basic components (pin I/O types) have been / will be  renamed as follows:
-  ````
-  AnalogInput   -> AnalogIn
-  AnalogOutput  -> PWMOut
-                   DACOut
-  DigitalInput  -> DigitalInOut
-  DigitalOutput
-  ````
+- Virtually every component has been renamed to stop using the `Dino::Components` namespace and make naming clearer.
+  - TODO: Update here with a list of renamed components.
+
+- SPI components now go through a `Dino::SPI::Bus` object:
+  - Instead of giving a board directly when creating a new SPI register object, a bus must be created first:
+    ```ruby
+      board = Dino::Board.new(options)
+      bus = Dino::SPI::Bus.new(board)
+      output_register = Dino::Register::SPIOutput.new(bus: bus, pin: 9)
+      input_register = Dino::Register::SPIInput.new(bus: bus, pin: 8)
+    ```
+  - For now, this only uses the default SPI device on the board, but this will allow the selection of alternate SPI devices in the future, on boards that have multiple.
+  - This allows a device to mutex lock the bus and make sure operations happen atomically.
+  - The Shift In/Out features (really bitbang SPI) will be refactored into a "bus" so components can use either a hardware SPI device, or bitbang interchangeably.
+  - When adding a device to the SPI bus, the bus passes its chip select pin and callback hook directly through to the board.
 
 - Hitachi HD44780 LCD driver rewritten in Ruby:
-  - Class name changed from `LCD` to `HD44780`.
+  - Class is now: `Dino::Display::HD44789`
   - `#puts` changed to `#print` to better represent functionality.
   - No longer depends on the `LiquidCrystal` Arduino library, which has been removed.
-  - Depends only on `DigitalOutput` and `#micro_delay`.
-  - Old implementation in `LCD` class has been removed.
+  - Depends only on `Dino::DigitalIO::Output` and `#micro_delay`.
+  - Old implementation in `Dino::Components::LCD` class has been removed.
   - This solves compatibility with booards that the library didn't work with.
   
-- `PWMOut` (previously `AnalogOutput`):
+- `Dino::PulseIO::PWMOutput` (previously `Dino::Components::Basic::AnalogOutput`):
   - Changed `#analog_write` to `#pwm_write`.
   - Added `#pwm_enable` and `#pwm_disable` methods.
   - `#pwm_enable` is implicit when calling `#pwm_write`. Lazy initialize PWM peripherals on the chip. Never happens if only `#digital_write` gets called.
   - `#pwm_disable` sets the pin mode to `:output` (`OUTPUT` in Arduino), disconnects and deconfigures any PWM generating peripheral.
   - On the ESP32 `#pwm_disable` releases the LEDC channel that the pin was using, so it can be reused.
   
-- `DACOut` (also previously `AnalogOutput`):
+- `Dino::AnalogIO::Output` (also previously `Dino::Components::Basic::AnalogOutput`):
   - Changed `#analog_write` to `#dac_write`.
   - Does not implement `#digital_write` at all. Analog values must be used instead of `board.high` or `board.low`.
 
@@ -87,23 +102,23 @@
 
 - `Board#analog_write` implicitly reconnects a PWM peripheral to the pin if one was previously assigned, or assigns a new one and connects it.
 
-- `Board#analog_resolution` has been split into `Board#analog_write_resolution` and `Board#analog_read_resoluton`, defaulting to 8 and 10-bits respectively. Read resolution applies to both PWM and DACs.
+- `Board#analog_resolution` has been split into `Board#analog_write_resolution` and `Board#analog_read_resoluton`, defaulting to 8 and 10-bits respectively. Write resolution applies to both PWM and DACs.
 
 - `Board#pwm_high`, `Board#dac_high` and `Board#adc_high` been defined for convenience.
 
 ### Minor Changes
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
 - Aux message size limits changed to:
-  - 512 + 16: When using IR output and not using ATmega168
-  - 256 + 16: When not using IR output, any board
+  - 512 + 16: When using IR output or WS2812 and not using ATmega168
+  - 256 + 16: When not using IR output or WS2812, any board
   - 32  + 16: When all the features that use lots of aux are disabled (core sketch)
 
 ### Bug Fixes
 - Fixed `Piezo` functionality. Frequency and duration values weren't being properly cast on the board. Duration is also limited to 16 bits now, instead of 32, as it should be to match the Arduino function.
-- Added validation for I2C writes not exceeding 32 bytes, since this is a limit of the native library buffer. Can extend functionality on the board, so it splits up up to bigger messages automatically.
+- Added validation for I2C writes not exceeding 32 bytes, since this is a limit of the native library buffer. May change functionality on the board in future, so it splits up bigger messages automatically.
 - Stricter regex validation in `I2C::Bus` for identifying a series of bytes coming from a specific I2C address.
-- Fixed `DigitalOutput` not setting its state through its mutex.
-  
+- Fixed `Dino::DigitalIO::Output` not setting its state through its mutex.
+
 ## 0.12.0
 
 ### New Boards
