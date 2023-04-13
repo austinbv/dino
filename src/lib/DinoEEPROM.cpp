@@ -58,7 +58,6 @@ void Dino::eepromWrite(){
 	
   	#if defined(ESP8266) || defined(ESP32)
   	  EEPROM.end();
-  	  EEPROM.commit();
   	#endif
   }
 }
