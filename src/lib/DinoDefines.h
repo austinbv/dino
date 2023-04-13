@@ -50,9 +50,10 @@
   #include <EEPROM.h>
 #endif
 
-// Use the maximum EEPROM size for the ESP boards.
-#if defined(ESP8266) || defined(ESP32)
-#  define ESP_EEPROM_LENGTH 512
+// Emulate 512 bytes of EEPROM on ESP chips and the RP2040.
+#if defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
+#  define EEPROM_EMULATED
+#  define EMULATED_EEPROM_LENGTH 512
 #endif
 
 // Figure out how many LEDC channels are available on ESP32 boards.

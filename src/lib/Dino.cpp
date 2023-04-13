@@ -239,8 +239,8 @@ void Dino::handshake() {
   
   // Second is EEPROM size in bytes. None on Due or Zero.
   stream->print(',');
-  #if defined(ESP8266) || defined(ESP32)
-  	stream->print(ESP_EEPROM_LENGTH);
+  #if defined(EEPROM_EMULATED)
+  	stream->print(EMULATED_EEPROM_LENGTH);
   #elif defined(EEPROM_PRESENT)
 	  stream->print(EEPROM.length());
   #else
