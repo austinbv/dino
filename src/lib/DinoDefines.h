@@ -62,3 +62,13 @@
 #ifdef ESP32
   #define LEDC_CHANNEL_COUNT 16
 #endif
+
+// Filter for boards that can set their analog write resolution.
+#if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(ESP8266)
+  #define WRITE_RESOLUTION_SETTER
+#endif
+
+// Filter for boards that can set their analog read resolution.
+#if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
+  #define READ_RESOLUTION_SETTER
+#endif

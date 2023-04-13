@@ -43,7 +43,6 @@ void Dino::run(){
   updateListeners();
 }
 
-
 void Dino::parse(byte c) {
   if ((c == '\n') || (c == '\\')) {
     // If last char was a \, this \ or \n is escaped.
@@ -225,7 +224,6 @@ void Dino::updateListeners() {
   }
 }
 
-
 // CMD = 90
 void Dino::handshake() {
   resetState();
@@ -282,7 +280,6 @@ void Dino::resetState() {
   lastTime = micros();
 }
 
-
 // CMD = 95
 // Set the register read divider. Powers of 2 up to 128 are valid.
 void Dino::setRegisterDivider() {
@@ -292,26 +289,19 @@ void Dino::setRegisterDivider() {
   #endif
 }
 
-
 // CMD = 96
 // Set the analog write resolution.
 void Dino::setAnalogWriteResolution() {
-  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32)
+  #ifdef WRITE_RESOLUTION_SETTER
     analogWriteResolution(val);
-  #endif
-  #ifdef debug
-    Serial.print("Called Dino::setAnalogWriteResolution()\n");
   #endif
 }
 
-// CMD = 96
-// Set the analog read and write resolution.
+// CMD = 97
+// Set the analog read resolution.
 void Dino::setAnalogReadResolution() {
-  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32)
+  #ifdef READ_RESOLUTION_SETTER
     analogReadResolution(val);
-  #endif
-  #ifdef debug
-    Serial.print("Called Dino::setAnalogReadResolution()\n");
   #endif
 }
 
