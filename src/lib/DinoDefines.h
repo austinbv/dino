@@ -20,15 +20,17 @@
 # define DINO_LED_WS2812
 #endif
 
-// Figure out how many pins our hardware has.
+// Define number of pins to set up listener storage.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #  define PIN_COUNT 70
 #elif defined(__SAM3X8E__)
-#  define PIN_COUNT 66
+#  define PIN_COUNT 72
 #elif defined(ESP8266)
-#  define PIN_COUNT 17
+#  define PIN_COUNT 18
 #elif defined(ESP32)
 #  define PIN_COUNT 40
+#elif defined(ARDUINO_ARCH_RP2040)
+#  define PIN_COUNT 26
 #else
 #  define PIN_COUNT 22
 #endif
