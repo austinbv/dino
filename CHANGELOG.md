@@ -11,8 +11,11 @@
   - WiFi untested
 
 - Raspberry Pi built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
-  - Use `Dino::PiBoard` instead of `Dino::Board` as board class.
-  - Not all interfaces and components are supported yet.
+  - Ruby needs to be running on the Pi itself.
+  - Folllow install instructions from `dino-piboard` gem's readme.
+  - `require "dino/piboard"` instead of `require "dino"`
+  - Substitute `Dino::PiBoard` for `Dino::Board` as board class.
+  - Not all interfaces and components from `dino` are supported yet.
 
 ### New Components
 - Bosch BME/BMP 280 environmental sensor:
@@ -36,20 +39,22 @@
   - Class: `Dino::LED::WS2812`
   - Doesn't work on RP2040 yet.
   - No fancy functions yet. Just clear, set pixels, and show.
+
+See new examples in the [examples](examples) folder to learn more.
   
 ### Changed Components
 - Virtually every component has been renamed to stop using the `Dino::Components` namespace and make naming clearer.
   - TODO: Update here with a list of renamed components.
 
 - SPI components now go through a `Dino::SPI::Bus` object:
-  - Instead of giving a board directly when creating a new SPI register object, a bus must be created first:
+  - Instead of giving a board directly when creating a new SPI register, a bus must be created first:
     ```ruby
-      board = Dino::Board.new(options)
-      bus = Dino::SPI::Bus.new(board)
+      board = Dino::Board.new(connection)
+      bus = Dino::SPI::Bus.new(board: board)
       output_register = Dino::Register::SPIOutput.new(bus: bus, pin: 9)
       input_register = Dino::Register::SPIInput.new(bus: bus, pin: 8)
     ```
-  - For now, this only uses the default SPI device on the board, but this will allow the selection of alternate SPI devices in the future, on boards that have multiple.
+  - For now, this always uses the default SPI device on the board, but will allow the selection of alternate SPI devices in the future, for boards that have multiple.
   - This allows a device to mutex lock the bus and make sure operations happen atomically.
   - The Shift In/Out features (really bitbang SPI) will be refactored into a "bus" so components can use either a hardware SPI device, or bitbang interchangeably.
   - When adding a device to the SPI bus, the bus passes its chip select pin and callback hook directly through to the board.

@@ -112,12 +112,12 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
 #### Included Examples
 
 * The first 5 [examples](examples) are sort of a mini-tutorial, to familiarize you with the basics. Read the comments and try modifying the code. You will need the following:
-  * 1 microcontroller (Arduino Uno, Leonardo and Mega are most compatible)
+  * 1 compatible microcontroller (see [supported hardware](HARDWARE.md))
   * 1 button or momentary switch
   * 1 potentiometer (any value)
   * 1 external RGB LED (4 legs common cathode, not a Neopixel or individually addressable)
-  * 1 external LED (any color, or use one color of the RGB LED)
-  * Current limiting resistors for the LEDs
+  * 1 external LED (any color, or use one color from the RGB LED)
+  * Current limiting resistors for LEDs
   * Breadboard
   * Jumper wires
   
@@ -140,10 +140,10 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
   
 ## mruby Port
 
-A single board computer with a microcontroller can be a great standalone solution, especially if your project needs the computer anyway. For example, a Raspberry Pi Zero and Arduino Nano combo, running CRuby, Dino and other software.
+A single-board computer plus microcontroller can be a great standalone solution, especially if your project needs the computer anyway. For example, a Raspberry Pi Zero and Arduino Nano combo, running CRuby, Dino and other software.
 
-But what if you want to be _really_ small? That's where [mruby](https://github.com/mruby/mruby) comes in. Building on the [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) project, Dino is being ported to run directly on the ESP32 here: [mruby-dino-template](https://github.com/dino-rb/mruby-dino-template).
+But what if you want to be _really_ small? Building on the [mruby-esp32](https://github.com/mruby-esp32/mruby-esp32) project, Dino is being ported to run directly on the ESP32 here: [mruby-dino-template](https://github.com/dino-rb/mruby-dino-template).
 
 ## dino-piboard
 
-There's an early stage add-on project for this gem, [dino-piboard](https://github.com/dino-rb/dino-piboard), which adds support for the Raspberry Pi's built in GPIO interface as a "board". `Dino::PiBoard` substitutes for `Dino::Board`, allowing you to connect hardware directly to the Pi, without a microcontroller, and use everything else from this gem.
+There's an add-on for this gem, [dino-piboard](https://github.com/dino-rb/dino-piboard), in early development, which adds support for the Raspberry Pi's built in GPIO interface as a class-compatible "board". This allows you to connect components directly to the Pi, without a microcontroller, and use the dino component classes as-is.
