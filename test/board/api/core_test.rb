@@ -31,6 +31,8 @@ class APICoreTest < Minitest::Test
       board.set_pin_mode 1, :input_output
     end
     mock.verify
+
+    assert_raises { board.set_pin_mode 1, "wrong" }
   end
 
   def test_digital_write
@@ -43,6 +45,8 @@ class APICoreTest < Minitest::Test
       board.digital_write 1, board.high
     end
     mock.verify
+
+    assert_raises { board.digital_write 1, "wrong" }
   end
 
   def test_digital_read
@@ -67,6 +71,8 @@ class APICoreTest < Minitest::Test
       board.pwm_write 1, 128
     end
     mock.verify
+
+    assert_raises { board.pwm_write 1, "wrong" }
   end
   
   def test_dac_write
@@ -81,6 +87,8 @@ class APICoreTest < Minitest::Test
       board.dac_write 1, 128
     end
     mock.verify
+
+    assert_raises { board.dac_write 1, "wrong" }
   end
 
   def test_analog_read
@@ -96,8 +104,9 @@ class APICoreTest < Minitest::Test
   def test_set_listener
     mock = MiniTest::Mock.new
 
-    # \x00\x04 corresponds to the default divider of 16 (2^4)
-    mock.expect(:call, nil, [Dino::Board::API::Message.encode(command: 6, pin: 1, value: 0, aux_message: "\x00\x04")])
+    # \x00\x02 corresponds to the default digital divider of 4 (2^2).
+    # \x00\x04 corresponds to the default analog divider of 16 (2^4).
+    mock.expect(:call, nil, [Dino::Board::API::Message.encode(command: 6, pin: 1, value: 0, aux_message: "\x00\x02")])
     mock.expect(:call, nil, [Dino::Board::API::Message.encode(command: 6, pin: 1, value: 0, aux_message: "\x01\x04")])
     mock.expect(:call, nil, [Dino::Board::API::Message.encode(command: 6, pin: 1, value: 1, aux_message: "\x01\x04")])
     mock.expect(:call, nil, [Dino::Board::API::Message.encode(command: 6, pin: 1, value: 1, aux_message: "\x01\x00")])
@@ -109,6 +118,9 @@ class APICoreTest < Minitest::Test
       board.set_listener(1, :on, mode: :analog, divider: 1)
     end
     mock.verify
+
+    assert_raises { board.set_listener 1, :on, mode: "wrong" }
+    assert_raises { board.set_listener 1, :on, divider: 256 }
   end
 
   def test_digital_listen
@@ -148,6 +160,11 @@ class APICoreTest < Minitest::Test
       board.analog_read_resolution = 10
     end
     mock.verify
+
+    assert_raises { board.analog_write_resolution= 17      }
+    assert_raises { board.analog_read_resolution= 17       }
+    assert_raises { board.analog_write_resolution= "wrong" }
+    assert_raises { board.analog_read_resolution= "wrong"  }
   end
   
   def test_pulse_read
@@ -177,12 +194,15 @@ class APICoreTest < Minitest::Test
     mock.verify
     
     # Bad options
-    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: 65536) }
-    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: -1) }
-    assert_raises(ArgumentError) { board.pulse_read(4, timeout: 65536) }
-    assert_raises(ArgumentError) { board.pulse_read(4, timeout: -1) }
-    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: 256) }
-    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: -1) }    
+    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: 65536)  }
+    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: -1)     }
+    assert_raises(ArgumentError) { board.pulse_read(4, reset_time: "bad")  }
+    assert_raises(ArgumentError) { board.pulse_read(4, timeout: 65536)     }
+    assert_raises(ArgumentError) { board.pulse_read(4, timeout: -1)        }
+    assert_raises(ArgumentError) { board.pulse_read(4, timeout: "bad")     }
+    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: 256)   }
+    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: -1)    }    
+    assert_raises(ArgumentError) { board.pulse_read(4, pulse_limit: "bad") }
   end
   
   def micro_delay   
@@ -194,6 +214,7 @@ class APICoreTest < Minitest::Test
       board.micro_delay(1000)
     end
     
-    assert_raises(ArgumentError) { board.micro_delay(65536) }  
+    assert_raises(ArgumentError) { board.micro_delay(65536)   }  
+    assert_raises(ArgumentError) { board.micro_delay("wrong") }  
   end
 end

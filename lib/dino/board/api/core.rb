@@ -18,15 +18,19 @@ module Dino
 
         # CMD = 0
         def set_pin_mode(pin, mode=:input)
-          raise ArgumentError, "invalid pin mode given: #{mode}" unless PIN_MODES.keys.include? mode
-          
-          write Message.encode command: 0,
-                              pin: convert_pin(pin),
-                              value: PIN_MODES[mode]
+          unless PIN_MODES.keys.include? mode
+            raise ArgumentError, "cannot set mode: #{mode}. Should be one of: #{PIN_MODES.keys.inspect}"
+          end
+          write Message.encode  command: 0,
+                                pin: convert_pin(pin),
+                                value: PIN_MODES[mode]
         end
 
         # CMD = 1
         def digital_write(pin,value)
+          unless (value == 1) || (value == 0)
+            raise ArgumentError, "cannot write digital value: #{value}. Should be one of: [0, 1]" 
+          end
           write Message.encode command: 1, pin: convert_pin(pin), value: value
         end
 
@@ -37,12 +41,22 @@ module Dino
 
         # CMD = 3
         def pwm_write(pin,value)
-          write Message.encode command: 3, pin: convert_pin(pin), value: value
+          begin
+            raise ArgumentError if (value < 0) || (value > pwm_high)
+          rescue => exception
+            raise ArgumentError, "cannot write PWM value: #{value}. Should be Integer in range 0..#{pwm_high} "
+          end
+          write Message.encode command: 3, pin: convert_pin(pin), value: value.round
         end
         
         # CMD = 4
         def dac_write(pin,value)
-          write Message.encode command: 4, pin: convert_pin(pin), value: value
+          begin
+            raise ArgumentError if (value < 0) || (value > dac_high)
+          rescue => exception
+            raise ArgumentError, "cannot write DAC value: #{value}. Should be Integer in range 0..#{dac_high} "
+          end
+          write Message.encode command: 4, pin: convert_pin(pin), value: value.round
         end
 
         # CMD = 5
@@ -51,27 +65,43 @@ module Dino
         end
 
         # CMD = 6
-        def set_listener(pin, state=:off, options={})
-          mode    = options[:mode]    || :digital
-          divider = options[:divider] || 16
-
-          unless [:digital, :analog].include? mode
-            raise "Mode must be either digital or analog"
+        def set_listener(pin, state=:off, **options)
+          # Default to digital listener and validate.
+          options[:mode] ||= :digital
+          unless (options[:mode] == :digital) || (options[:mode] == :analog) 
+            raise ArgumentError, "error in mode: #{options[:mode]}. Should be one of: [:digital, :analog]"
           end
-          unless DIVIDERS.include? divider
-            raise "Listener divider must be in #{DIVIDERS.inspect}"
+          mode_byte = (options[:mode] == :digital) ? 0 : 1
+
+          # Default to 4ms divider if digital, 16ms if analog.
+          if options[:mode] == :digital
+            options[:divider] ||= 4
+          else
+            options[:divider] ||= 16
+          end
+          
+          # Convert divider to exponent and validate.
+          begin
+            exponent = Math.log2(options[:divider]).round
+            raise ArgumentError if (exponent < 0) || (exponent > 7)
+          rescue => exception
+            raise ArgumentError, "error in divider: #{options[:divider]}. Should be one of: #{DIVIDERS.inspect}"
           end
 
-          exponent = Math.log2(divider).to_i
-          aux = pack :uint8, [mode == :analog ? 1 : 0, exponent]
+          # Validate state.
+          unless (state == :on) || (state == :off) 
+            raise ArgumentError, "error in state: #{options[:state]}. Should be one of: [:on, :off]"
+          end
+          state_byte = (state == :on) ? 1 : 0
 
-          write Message.encode command: 6,
-                              pin: convert_pin(pin),
-                              value: (state == :on ? 1 : 0),
-                              aux_message: aux
+          # Send it.
+          write Message.encode  command: 6,
+                                pin: convert_pin(pin),
+                                value: state_byte,
+                                aux_message: pack(:uint8, [mode_byte, exponent])
         end
 
-        # Convenience methods by wrapping set_listener with old defaults.
+        # Convenience methods that wrap set_listener.
         def digital_listen(pin, divider=4)
           set_listener(pin, :on, mode: :digital, divider: divider)
         end
@@ -85,47 +115,55 @@ module Dino
         end
 
         # CMD = 9
-        def pulse_read(pin, options={})
-          # Hold the input pin high or low (give as values) before reading
-          reset = options[:reset] || false
+        def pulse_read(pin, **options)
+          # Hold the input pin high or low before reading.
+          # Give as 1 (high) or 0 (low) values to the :reset key.
+          options[:reset] ||= false
           
-          # How long to reset the pin for in ms
-          reset_time = options[:reset_time] || 0
-          
-          # Maximum number of pulses to capture
-          pulse_limit = options[:pulse_limit] || 100
-          
-          # A pulse of this length will end the read
-          timeout = options[:timeout] || 200
-          
-          # Validate
-          if reset_time < 0 || reset_time > 0xFFFF
-            raise ArgumentError, "reset time must be betwen 0 and 65535 ms"
-          end
-          if timeout < 0 || timeout > 0xFFFF
-            raise ArgumentError, "timeout must be betwen 0 and 65535 ms"
-          end
-          if pulse_limit < 0 || pulse_limit > 0xFF
-            raise ArgumentError, "pulse limit must be betwen 0 and 255"
+          # How long to hold the rest for, in milliseconds.
+          options[:reset_time] ||= 0
+          begin
+            raise ArgumentError if (options[:reset_time] < 0) || (options[:reset_time] > 0xFFFF)
+          rescue => exception
+            raise ArgumentError, "error in reset time: #{options[:reset_time]}. Should be Integer in range 0..65535 ms"
           end
 
-          settings = reset ? 1 : 0
-          settings = settings | 0b10 if (reset && reset != low)
+          # Maximum number of pulses to capture.
+          options[:pulse_limit] ||= 100
+          begin
+            raise ArgumentError if (options[:pulse_limit] < 0) || (options[:pulse_limit] > 0xFF)
+          rescue => exception
+            raise ArgumentError, "error in pulse limit: #{options[:pulse_limit]}. Should be Integer in range 0..255 pulses"
+          end
 
-          aux = pack :uint16, [reset_time, timeout]
-          aux << pack(:uint8, pulse_limit)
+          # A pulse of this length will end the read.
+          options[:timeout] ||= 200
+          begin
+            raise ArgumentError if (options[:timeout] < 0) || (options[:timeout] > 0xFFFF)
+          rescue => exception
+            raise ArgumentError, "error in reset time: #{options[:timeout]}. Should be Integer in range 0..65535 ms"
+          end
+          
+          # Bit 0 of settings mask controls whether to hold high/low for reset.
+          settings = options[:reset] ? 1 : 0
 
-          write Message.encode command: 9,
-                              pin: convert_pin(pin),
-                              value: settings,
-                              aux_message: aux
+          # Bit 1 of settings mask controls whether to hold high (1) or to hold low (0).
+          settings = settings | 0b10 if (options[:reset] && options[:reset] != low)
+
+          # Pack and send.
+          aux = pack :uint16, [options[:reset_time], options[:timeout]]
+          aux << pack(:uint8, options[:pulse_limit])
+          write Message.encode  command: 9,
+                                pin: convert_pin(pin),
+                                value: settings,
+                                aux_message: aux
         end
 
         # CMD = 92
         #
         # For diagnostics and testing mostly. What this does:
-        # 1) Tell the TxRx to halt transmission immediately after this message.
-        # 2) Tell the board to send back a ready signal, which tells the TxRx to resume transmission.
+        # 1) Tell the Connection to halt transmission immediately, after this message.
+        # 2) The board will send back a ready signal, which the Connection should read and resume transmisison.
         #
         # See comments on Board#write_and_halt for more info and use case.
         #
@@ -135,22 +173,32 @@ module Dino
 
         # CMD = 96
         def set_analog_write_resolution(value)
+          begin
+            raise ArgumentError if (value < 0) || (value > 16)
+          rescue => exception
+            raise ArgumentError, "cannot set resolution: #{value}. Should be Integer in range 0..16"
+          end
           write Message.encode(command: 96, value: value)
         end
         
         # CMD = 97
         def set_analog_read_resolution(value)
+          begin
+            raise ArgumentError if (value < 0) || (value > 16)
+          rescue => exception
+            raise ArgumentError, "cannot set resolution: #{value}. Should be Integer in range 0..16"
+          end
           write Message.encode(command: 97, value: value)
         end
 
         # CMD = 99
         def micro_delay(duration)
-          if duration < 0 || duration > 0xFFFF
-            raise ArgumentError, "delay must be between 0 and 65535 microseconds"
+          begin
+            raise ArgumentError if (duration < 0) || (duration > 0xFFFF)
+          rescue => exception
+            raise ArgumentError, "error in duration: #{duration}. Should be Integer in range 0..65535"
           end
-          
-          write Message.encode command: 99,
-                              aux_message: pack(:uint16, [duration])
+          write Message.encode command: 99, aux_message: pack(:uint16, [duration])
         end
       end
     end
