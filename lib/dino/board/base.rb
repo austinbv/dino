@@ -2,6 +2,7 @@ module Dino
   module Board
     class Base
       include API::Core
+      include API::Pulse
       include API::EEPROM
 
       attr_reader :components, :high, :low, :analog_write_high, :analog_read_high
