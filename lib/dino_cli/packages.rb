@@ -1,67 +1,70 @@
 class DinoCLI::Generator
+
+# File locations are defined relative to the src/lib directory. 
 PACKAGES = {
-  # These files are always included when building a sketch.
+  # The core package is always included.
   core: {
     description: "Core Dino Library",
     directive: nil,
     files: [
-      "lib/Dino.h",
-      "lib/DinoDefines.h",
-      "lib/Dino.cpp",
-      "lib/DinoCoreIO.cpp",
-      "lib/DinoPulseInput.cpp",
-      "lib/DinoEEPROM.cpp",
-      "lib/DinoIncludes.cpp",
+      "Dino.h",
+      "DinoDefines.h",
+      "Dino.cpp",
+      "DinoCoreIO.cpp",
+      "DinoPulseInput.cpp",
+      "DinoEEPROM.cpp",
+      "DinoIncludes.cpp",
+      "../../vendor/board-maps/BoardMap.h",
     ]
   },
   one_wire: {
     description: "OneWire bus support",
     directive: "DINO_ONE_WIRE",
     files: [
-      "lib/DinoOneWire.cpp",
+      "DinoOneWire.cpp",
     ]
   },
   shift: {
     description: "Shift Register support",
     directive: "DINO_SHIFT",
     files: [
-      "lib/DinoShift.cpp",
+      "DinoShift.cpp",
     ]
   },
   spi: {
     description: "SPI support",
     directive: "DINO_SPI",
     files: [
-      "lib/DinoSPI.cpp",
+      "DinoSPI.cpp",
     ]
   },
   i2c: {
     description: "I2C device support",
     directive: "DINO_I2C",
     files: [
-      "lib/DinoI2C.cpp",
+      "DinoI2C.cpp",
     ]
   },
   serial: {
     description: "Software serial output",
     directive: "DINO_SERIAL",
     files: [
-      "lib/DinoSerial.cpp",
-      "lib/DinoSerial.h",
+      "DinoSerial.cpp",
+      "DinoSerial.h",
     ]
   },
   servo: {
     description: "Servo support",
     directive: "DINO_SERVO",
     files: [
-      "lib/DinoServo.cpp",
+      "DinoServo.cpp",
     ]
   },
   tone: {
     description: "Tone support",
     directive: "DINO_TONE",
     files: [
-      "lib/DinoTone.cpp",
+      "DinoTone.cpp",
     ]
   },
   ir_out: {
@@ -69,7 +72,7 @@ PACKAGES = {
     directive: "DINO_IR_OUT",
     exclude: [:esp8266, :esp32],
     files: [
-      "lib/DinoIROut.cpp",
+      "DinoIROut.cpp",
     ]
   },
   ir_out_esp: {
@@ -77,14 +80,14 @@ PACKAGES = {
     directive: "DINO_IR_OUT",
     only: [:esp8266, :esp32],
     files: [
-      "lib/DinoIROutESP.cpp",
+      "DinoIROutESP.cpp",
     ]
   },
   led_array: {
     description: "Support for various protocosl that control (RGB) LED arrays.",
     directive: "DINO_LED_ARRAY",
     files: [
-      "lib/DinoLEDArray.cpp",
+      "DinoLEDArray.cpp",
     ]
   }
 }

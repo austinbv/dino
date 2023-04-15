@@ -38,14 +38,17 @@ class DinoCLI::Generator
     # Replace each filepath with a hash containing the filepath and contents.
     @packages.each_key do |k|
       @packages[k][:files].map! do |f|
-        contents = File.read(File.join(options[:src_dir], f))
+        contents = File.read(File.join(options[:src_dir], "lib", f))
+        #
+        # Not using this anymroe. User has to install their own Arduino libraries.
+        #
         # If the file is in src/vendor, it gets wrapped in an #ifdef
         # corresponding to the package directive. The entire package can now
         # be toggled in DinoDefines.h. Without this, IDE would try to compile anyway.
-        if f.match /\Avendor/
-          directive = @packages[k][:directive]
-          contents = "#include \"DinoDefines.h\"\n#ifdef #{directive}\n" << contents << "\n#endif\n"
-        end
+        # if f.match /\Avendor/
+        #  directive = @packages[k][:directive]
+        #  contents = "#include \"DinoDefines.h\"\n#ifdef #{directive}\n" << contents << "\n#endif\n"
+        # end
         { path: f, contents: contents }
       rescue
         files_missing = true
@@ -97,6 +100,9 @@ class DinoCLI::Generator
       directive = PACKAGES[t][:directive]
       define(directive) if directive
     end
+
+    # Define the DINO VERSION
+    gsub_defines("#define DINO_VERSION __VERSION__", "#define DINO_VERSION \"#{::Dino::VERSION}\"");
   end
 
   def define(directive)
@@ -106,7 +112,7 @@ class DinoCLI::Generator
   # Run gsub! on contents of src/lib/Dino.h specifically.
   def gsub_defines(from, to)
     @packages[:core][:files].each do |f|
-      if f[:path] == "lib/DinoDefines.h"
+      if f[:path].match /DinoDefines.h/
         f[:contents].gsub!(from, to)
       end
     end

@@ -19,6 +19,8 @@ module Constants
     opts[:on].send(:remove_const, const) if self.class.const_defined?(const)
     opts[:on].const_set(const, value)
   end
+
+  ACK = "SAMD_ZERO,0.13.0,528,1024"
 end
 
 # Taken from: https://gist.github.com/moertel/11091573
@@ -45,7 +47,7 @@ class ConnectionMock
   def read; true; end
   def write(str); true; end
   def handshake
-    "528,1024,14,20"
+    Constants::ACK
   end
 end
 

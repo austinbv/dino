@@ -1,27 +1,49 @@
 module Dino
   module Board
     module Map
-      DIGITAL_REGEX = /\A\d+\z/i
-      ANALOG_REGEX = /\A(a)\d+\z/i
-      DAC_REGEX = /\A(dac)\d+\z/i
+      require 'yaml'
+      MAPS_FOLDER = File.join(Dino.root, "vendor/board-maps/yaml")
 
+      attr_reader :map
+      
+      def load_map(board_name)
+        if board_name
+          map_path = File.join(MAPS_FOLDER, "#{board_name}.yml")
+          @map = YAML.load_file(map_path)
+        else
+          @map = nil
+        end
+      rescue
+        raise StandardError, "error loading board map from file for board name: '#{board_name}'"
+      end
+      
       def convert_pin(pin)
-        return nil                  if pin == nil
-        pin = pin.to_s
-        return pin.to_i             if pin.match(DIGITAL_REGEX)
-        return analog_pin_to_i(pin) if pin.match(ANALOG_REGEX) && analog_zero
-        return dac_pin_to_i(pin)    if pin.match(DAC_REGEX) && dac_zero
-        return "EE"                 if pin == "EE"
-        raise ArgumentError, "incorrect pin format: #{pin.inspect}"
-      end
+        # Handle special case of built-in EEPROM "pin".
+        return "EE" if pin == "EE"
 
-      def analog_pin_to_i(pin)
-        @analog_zero + pin.gsub(/\Aa/i, '').to_i
-      end
+        # Convert non numerical strings to symbols.
+        pin = pin.to_sym if (pin.class == String) && !(pin.match /\A\d+\.*\d*/)
 
-      def dac_pin_to_i(pin)
-        raise ArgumentError, "board does not specify DAC pins" unless @dac_zero
-        @dac_zero + pin.gsub(/\Adac/i, '').to_i
+        # Handle symbols.
+        if (pin.class == Symbol)
+          if map && map[pin]
+            return map[pin]
+          elsif map
+            raise ArgumentError, "error in pin: #{pin.inspect}. Make sure that pin is defined for this board by calling Board#map"
+          else
+            raise ArgumentError, "error in pin: #{pin.inspect}. Given a Symbol, but board has no map. Try using GPIO integer instead"
+          end
+        end
+
+        # Handle integers.
+        return pin if pin.class == Integer
+
+        # Try #to_i on anyting else. Will catch numerical strings.
+        begin
+          return pin.to_i
+        rescue => exception
+          raise ArgumentError, "error in pin: #{pin.inspect}"
+        end
       end
     end
   end

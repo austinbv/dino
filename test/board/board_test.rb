@@ -23,7 +23,7 @@ class BoardTest < Minitest::Test
   end
 
   def test_calls_handshake_on_connection
-    mock = MiniTest::Mock.new.expect(:call, "528,1024,14,20")
+    mock = MiniTest::Mock.new.expect(:call, Constants::ACK)
     connection.stub(:handshake, mock) do
       Dino::Board.new(connection)
     end
@@ -38,11 +38,6 @@ class BoardTest < Minitest::Test
     assert_equal 1024, board.eeprom_length
   end
 
-  def test_set_dac_and_analog_zero
-    assert_equal 20, board.dac_zero
-    assert_equal 14, board.analog_zero
-  end
-  
   def test_set_low_high
     assert_equal 0, board.low
     assert_equal 1, board.high
@@ -125,16 +120,19 @@ class BoardTest < Minitest::Test
   end
 
   def test_convert_pin
-    assert_equal 9,  board.convert_pin(9)
-    assert_equal 13, board.convert_pin('13')
-    assert_equal 15, board.convert_pin('A1')
-    assert_equal 15, board.convert_pin(:A1)
-    assert_equal 21, board.convert_pin('DAC1')
+    assert_equal 9,     board.convert_pin(9)
+    assert_equal 13,    board.convert_pin(:LED_BUILTIN)
+    assert_equal 13,    board.convert_pin('13')
+    assert_equal 12,    board.convert_pin(12.0)
+    assert_equal 11,    board.convert_pin('11.0')
+    assert_equal 15,    board.convert_pin('A1')
+    assert_equal 15,    board.convert_pin(:A1)
+    assert_equal 14,    board.convert_pin('DAC0')
+    assert_equal "EE",  board.convert_pin('EE')
   end
 
-  def test_incorrect_pin_formats
-    assert_raises(ArgumentError) { board.convert_pin('ADC1') }
-    board.instance_variable_set(:@dac_zero, nil)
-    assert_raises(ArgumentError) { board.convert_pin('DAC1') }
+  def test_convert_pin_incorrect
+    assert_raises { board.convert_pin "DAC20"}
+    assert_raises { board.convert_pin :DAC20 }
   end
 end

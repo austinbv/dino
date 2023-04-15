@@ -4,6 +4,9 @@
 // Uncomment this line to enable debugging mode.
 // #define debug
 
+// Define the version of Dino the board was flashed with so we can verify in Ruby.
+#define DINO_VERSION __VERSION__
+
 // Uncomment these to include features beyond core features.
 // #define DINO_ONE_WIRE
 // #define DINO_TONE

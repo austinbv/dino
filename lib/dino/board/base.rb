@@ -14,24 +14,38 @@ module Dino
       include API::Tone
       include API::LEDArray
 
-      attr_reader :components, :high, :low, :analog_write_high, :analog_read_high
-      attr_reader :analog_zero, :dac_zero, :eeprom_length
+      attr_reader :board_name, :version, :aux_limit, :eeprom_length
+      attr_reader :components
+      attr_reader :low, :high, :analog_write_high, :analog_read_high
 
       def initialize(io, options={})
-        @io, @components = io, []
+        # Connect the IO, and get the ACK.
+        @io = io
+        ack = io.handshake
+        @name, @version, @aux_limit, @eeprom_length = ack.split(",")
 
-        ack = io.handshake.split(",").map(&:to_i)
-        @aux_limit, @eeprom_length, @analog_zero, @dac_zero = ack
+        # Parse map, version and eeprom_legnth.
+        @name          = nil if @name.empty?
+        @version       = nil if @version.empty?
+        @eeprom_length = @eeprom_length.to_i
 
         # Leave room for null termination of aux messages.
-        @aux_limit = @aux_limit - 1
+        @aux_limit = @aux_limit.to_i - 1
 
+        # Load the board map.
+        @map = load_map(@name)
+
+        # Allow the IO to call #update on the board when messages received.
         io.add_observer(self)
         
+        # Set digital and analog IO levels.
         @low  = 0
         @high = 1
         self.analog_write_resolution = options[:write_bits] || 8
         self.analog_read_resolution = options[:read_bits] || 10
+
+        # Component holder.
+        @components = []
       end
       
       def finish_write
@@ -64,15 +78,6 @@ module Dino
       alias :dac_high :analog_write_high
       alias :adc_high :analog_read_high
       
-      # Aux limits differ per board depending on RAM, 32 + 16 is the safe minimum.
-      def aux_limit
-        @aux_limit ||= 48
-      end
-      
-      def eeprom
-        @eeprom ||= EEPROM::BuiltIn.new(board: self)
-      end
-
       def write(msg)
         @io.write(msg)
       end
@@ -91,18 +96,16 @@ module Dino
         @io.write(msg, true)
       end
 
-      def update(line)
-        update_component(line)
+      #
+      # Component generating convenience methods. TODO: add more!
+      #
+      def eeprom
+        @eeprom ||= EEPROM::BuiltIn.new(board: self)
       end
 
-      def update_component(line)
-        pin, message = line.split(":", 2)
-        pin = pin.to_i unless pin == "EE"
-        @components.each do |part|
-          part.update(message) if pin == convert_pin(part.pin)
-        end
-      end
-
+      #
+      # Component management stuff.
+      #
       def add_component(component)
         @components << component
       end
@@ -110,6 +113,14 @@ module Dino
       def remove_component(component)
         component.stop if component.methods.include? :stop
         @components.delete(component)
+      end
+
+      def update(line)
+        pin, message = line.split(":", 2)
+        pin = pin.to_i unless pin == "EE"
+        @components.each do |part|
+          part.update(message) if pin == convert_pin(part.pin)
+        end
       end
     end
   end

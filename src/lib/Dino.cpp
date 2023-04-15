@@ -2,6 +2,7 @@
   Library for dino ruby gem.
 */
 #include "Dino.h"
+#include "BoardMap.h"
 
 Dino::Dino(){
   messageFragments[0] = cmdStr;
@@ -231,11 +232,23 @@ void Dino::handshake() {
   // Reset this so we never send Rx along with ACK:
   rxBytes = 0;
   
-  // First value is aux size in bytes.
+  // First value is BOARD_MAP if it is set.
   stream->print("ACK:");
+  #ifdef BOARD_MAP
+    stream->print(BOARD_MAP);
+  #endif
+
+  // Second is DINO_VERSION.
+  stream->print(',');
+  #ifdef DINO_VERSION
+    stream->print(DINO_VERSION);
+  #endif
+
+  // Third is AUX_SIZE.
+  stream->print(',');
   stream->print(AUX_SIZE);
   
-  // Second is EEPROM size in bytes. None on Due or Zero.
+  // Fourth is EEPROM size in bytes. None on Due or Zero.
   stream->print(',');
   #if defined(EEPROM_EMULATED)
   	stream->print(EMULATED_EEPROM_LENGTH);
@@ -243,18 +256,6 @@ void Dino::handshake() {
 	  stream->print(EEPROM.length());
   #else
     stream->print('0');
-  #endif
-  
-  // Third is A0. Ignore for ESP32. Pins aren't in order.
-  #if !defined(ESP32)
-    stream->print(',');  
-    stream->print(A0);
-  #endif
-
-  // 4th is DAC0 if available. Ignore for ESP32. Also not in order.
-  #if defined(__SAM3X8E__) || defined(__SAMD21G18A__)
-    stream->print(',');
-    stream->print(DAC0);
   #endif
   
   // End

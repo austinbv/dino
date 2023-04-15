@@ -27,3 +27,9 @@ require_relative 'dino/led'
 require_relative 'dino/motor'
 require_relative 'dino/rtc'
 require_relative 'dino/sensor'
+
+module Dino
+  def self.root
+    File.expand_path '../..', __FILE__
+  end
+end
