@@ -1,0 +1,3 @@
+[submodule "vendor/board-maps"]
+	path = vendor/board-maps
+	url = https://github.com/dino-rb/arduino-yaml-board-maps
