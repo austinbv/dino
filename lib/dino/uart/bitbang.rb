@@ -13,6 +13,11 @@ module Dino
       #       baud: 9600
       # )
       #
+      def initialize_pins(options={})
+        require_pin(:rx)
+        require_pin(:tx)
+      end
+
       def after_initialize(options={})
         self.baud = options[:baud]
         board.write Dino::Board::API::Message.encode command: COMMAND, value: 0, aux_message: encoded_pins
