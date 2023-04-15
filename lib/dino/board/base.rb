@@ -1,9 +1,18 @@
 module Dino
   module Board
     class Base
+      include Map
       include API::Core
       include API::Pulse
       include API::EEPROM
+      include API::I2C
+      include API::Servo
+      include API::ShiftIO
+      include API::SPI
+      include API::Infrared
+      include API::OneWire
+      include API::Tone
+      include API::LEDArray
 
       attr_reader :components, :high, :low, :analog_write_high, :analog_read_high
       attr_reader :analog_zero, :dac_zero, :eeprom_length

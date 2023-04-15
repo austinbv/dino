@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class BoardMock < Dino::Board::Default
+class BoardMock < Dino::Board::Base
   attr_reader :eeprom_stub
   
   def eeprom_read(start_address, length)

@@ -49,7 +49,7 @@ class ConnectionMock
   end
 end
 
-class BoardMock < Dino::Board::Default
+class BoardMock < Dino::Board::Base
   def initialize
     super(ConnectionMock.new)
     @read_injection_mutex = Mutex.new

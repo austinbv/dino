@@ -1,15 +1,6 @@
 module Dino
   module Board
-    class Default < Base
-      include API::I2C
-      include API::Servo
-      include API::ShiftIO
-      include API::SPI
-      include API::Infrared
-      include API::OneWire
-      include API::Tone
-      include API::LEDArray
-
+    module Map
       DIGITAL_REGEX = /\A\d+\z/i
       ANALOG_REGEX = /\A(a)\d+\z/i
       DAC_REGEX = /\A(dac)\d+\z/i

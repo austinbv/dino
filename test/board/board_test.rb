@@ -15,7 +15,7 @@ class BoardTest < Minitest::Test
 
   def test_starts_observing_connection
     io = ConnectionMock.new
-    mock = MiniTest::Mock.new.expect(:call, nil, [Dino::Board::Default])
+    mock = MiniTest::Mock.new.expect(:call, nil, [Dino::Board::Base])
     io.stub(:add_observer, mock) do
       Dino::Board.new(io)
     end
