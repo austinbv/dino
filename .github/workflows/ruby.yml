@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: Checkout
-    - uses: actions/checkout@v3
+      uses: actions/checkout@v3
       with:
         submodules: true
 
@@ -42,6 +42,6 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-        
+
     - name: Run tests
       run: bundle exec rake
