@@ -33,6 +33,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: true
     - name: Setup Ruby, JRuby and TruffleRuby
       uses: ruby/setup-ruby@v1
       with:
