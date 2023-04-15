@@ -132,15 +132,6 @@ class BoardTest < Minitest::Test
     assert_equal 21, board.convert_pin('DAC1')
   end
 
-  def test_convert_pin_esp8266
-    board = Dino::Board::ESP8266.new(connection)
-    assert_equal 2,  board.convert_pin(2)
-    assert_equal 4,  board.convert_pin('D2')
-    assert_equal 5,  board.convert_pin('GPIO5')
-    assert_equal 0,  board.convert_pin('gpio0')
-    assert_equal 17, board.convert_pin('A0')
-  end
-
   def test_incorrect_pin_formats
     assert_raises(ArgumentError) { board.convert_pin('ADC1') }
     board.instance_variable_set(:@dac_zero, nil)

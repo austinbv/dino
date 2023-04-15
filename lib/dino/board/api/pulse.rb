@@ -29,7 +29,7 @@ module Dino
           begin
             raise ArgumentError if (options[:timeout] < 0) || (options[:timeout] > 0xFFFF)
           rescue => exception
-            raise ArgumentError, "error in reset time: #{options[:timeout]}. Should be Integer in range 0..65535 ms"
+            raise ArgumentError, "error in timeout: #{options[:timeout]}. Should be Integer in range 0..65535 ms"
           end
           
           # Bit 0 of settings mask controls whether to hold high/low for reset.
