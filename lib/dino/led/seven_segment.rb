@@ -3,15 +3,11 @@ module Dino
     class SevenSegment
       include Behaviors::MultiPin
       
-      def initialize_pins(options={})        
-        proxy_pin :a, DigitalIO::Output
-        proxy_pin :b, DigitalIO::Output
-        proxy_pin :c, DigitalIO::Output
-        proxy_pin :d, DigitalIO::Output
-        proxy_pin :e, DigitalIO::Output
-        proxy_pin :f, DigitalIO::Output
-        proxy_pin :g, DigitalIO::Output
-        
+      def initialize_pins(options={})
+        [:a, :b, :c, :d, :e, :f, :g].each do |symbol|
+          proxy_pin(symbol, DigitalIO::Output)
+        end
+
         proxy_pin :cathode, DigitalIO::Output, optional: true
         proxy_pin :anode,   DigitalIO::Output, optional: true
       end
