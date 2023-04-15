@@ -1,5 +1,7 @@
 require_relative '../../test_helper'
 
+require "rubyserial"
+
 class DummySerial
   def read
     ""
@@ -26,10 +28,10 @@ class SerialConnectionTest < Minitest::Test
   end
 
   def test_connect_with_device_specified
-    mock = MiniTest::Mock.new.expect(:call, "serial-obj", ["/dev/ttyACM0", 9600])
+    mock = MiniTest::Mock.new.expect(:call, "SerialMock", ["/dev/ttyACM0", 9600])
     ::Serial.stub(:new, mock) do
       connection = Dino::Board::Connection::Serial.new(device: "/dev/ttyACM0", baud: 9600)
-      assert_equal "serial-obj", suppress_output { connection.send(:io) }
+      assert_equal "SerialMock", suppress_output { connection.send(:io) }
     end
     mock.verify
   end
