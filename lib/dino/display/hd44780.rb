@@ -47,22 +47,19 @@ module Dino
       LCD_5x8DOTS  = 0x00
 
       def initialize_pins(options={})
-        proxy_pin :rs,     Basic::DigitalOutput
-        proxy_pin :enable, Basic::DigitalOutput
-        proxy_pin :d4,     Basic::DigitalOutput
-        proxy_pin :d5,     Basic::DigitalOutput
-        proxy_pin :d6,     Basic::DigitalOutput
-        proxy_pin :d7,     Basic::DigitalOutput
+        # All the required pins.
+        [:rs, :enable, :d4, :d5, :d6, :d7].each do |symbol|
+          proxy_pin(symbol, DigitalIO::Output)
+        end
         
         # If any of d0-d3 was given, make them all non-optional.
         lower_bits_optional = (self.pins.keys & [:d0, :d1, :d2, :d3]).empty?
-        proxy_pin :d0,     Basic::DigitalOutput, optional: lower_bits_optional
-        proxy_pin :d1,     Basic::DigitalOutput, optional: lower_bits_optional
-        proxy_pin :d2,     Basic::DigitalOutput, optional: lower_bits_optional
-        proxy_pin :d3,     Basic::DigitalOutput, optional: lower_bits_optional
+        [:d0, :d1, :d2, :d3].each do |symbol|
+          proxy_pin(symbol, DigitalIO::Output, optional: lower_bits_optional)
+        end
         
         # RW pin is mostly hard-wired to ground, but can given.
-        proxy_pin :rw,     Basic::DigitalOutput, optional: true
+        proxy_pin(:rw, DigitalIO::Output, optional: true)
       end
 
       def after_initialize(options={})
