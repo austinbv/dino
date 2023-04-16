@@ -1,39 +1,40 @@
 #
-# Example using an output sfhit register (74HC595) to drive a seven segment display.
-# Can be used over either a bit bang or hardware SPI interface.
+# Example of SevenSegment LED driven though an output shift register (74HC595).
+# Can be used on either a bit bang or hardware SPI interface.
 #
 require 'bundler/setup'
 require 'dino'
 
+# SPI pins (on board)
+SPI_BIT_BANG_PINS   = { clock: 13, output: 11 }
+REGISTER_SELECT_PIN = 10
+
+# SevenSegment pins (on register parallel outputs)
+SEVEN_SEGMENT_PINS = { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
+
 board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
-# Create a 1-way bit bang SPI interface on any pins (slower, but flexible).
-bus = Dino::SPI::BitBang.new(board: board, pins: { clock: 13, input: 11 })
+# 1-way bit bang SPI bus (slower, but use any pins).
+bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)
 
-# Or use the default hardware SPI interface on its predefined pins (fast).
+# Use the default hardware SPI bus (faster, but predetermined pins).
 # bus = Dino::SPI::Bus.new(board: board)
 
-# Output register needs a bus and a pin (its latch / select pin).
-register = Dino::SPI::OutputRegister.new  bus: bus,
-                                          pin: 10
-                                          # bit_order: :msbfirst
-                                          # frequency: 1000000
-                                          # spi_mode: 0
-                                          # bytes: 1
-                                          # buffer_writes: true
-                                        
-#
-# The register is a BoardProxy, and implements enough Board methods that
-# DigitalOutputs can use its pins directly.
-#
-# ssd is created by using the register in place of board, and
-# the register output pins connected to the SevenSegment LED.
-#
-ssd = Dino::LED::SevenSegment.new board: register,
-                                  pins:  { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
+# Show the hardware SPI pins to aid connection.
+# MOSI = output | MISO = input | SCK = clock
+# puts board.map.select { |name, number| [:MOSI, :MISO, :SCK].include?(name) }
 
-# Turn off the ssd on exit
+# OutputRegister needs a bus and its select pin.
+register = Dino::SPI::OutputRegister.new(bus: bus, pin: REGISTER_SELECT_PIN)
+
+#
+# OutputRegister implements enough of the Board interface that digital output
+# components can treat it as a Board. Do that with the SSD.
+#
+ssd = Dino::LED::SevenSegment.new(board: register, pins: SEVEN_SEGMENT_PINS)
+
+# Turn off the ssd on exit.
 trap("SIGINT") { exit !ssd.off }
 
-# Display each new line on the ssd
+# Type a character and press Enter to show it on the SevenSegment LED.
 loop { ssd.display(gets.chomp) }

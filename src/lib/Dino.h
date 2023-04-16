@@ -113,7 +113,7 @@ class Dino {
     byte spiBBtransferByte     (uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
                                 uint8_t mode, uint8_t rBitOrder, uint8_t wBitOrder, byte data);
     void spiBBaddListener      ();  //cmd = 22
-    void spiBBremoveListener    ();  //cmd = 23
+    void spiBBremoveListener   ();  //cmd = 23
     void spiBBupdateListeners  ();
     void spiBBclearListeners   ();
 

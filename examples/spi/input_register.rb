@@ -5,36 +5,46 @@
 require 'bundler/setup'
 require 'dino'
 
+# SPI pins (on board)
+SPI_BIT_BANG_PINS   = { clock: 13, input: 12 }
+REGISTER_SELECT_PIN = 9
+
+# Button pin (on register parallel outputs)
+BUTTON_PIN = 0
+
 board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 
-# Create a 1-way bit bang SPI interface on any pins (slower, but flexible).
-bus = Dino::SPI::BitBang.new(board: board, pins: { clock: 13, input: 11 })
+# 1-way (input) bit bang SPI interface on any pins (slower, but flexible).
+bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)
 
-# Or use the default hardware SPI interface on its predefined pins (fast).
+# Use the default hardware SPI bus (faster, but predetermined pins).
 # bus = Dino::SPI::Bus.new(board: board)
 
-# Input register needs a bus and a pin (its latch / select pin).
-# The CD4021 register works most reliably in SPI mode 2.
-register = Dino::SPI::InputRegister.new bus: bus,
-                                        pin: 9,
-                                        spi_mode: 2
-                                        # frequency: 1000000
-                                        # spi_mode: 0
-                                        # bytes: 1
+# Show the hardware SPI pins to aid connection.
+# MOSI = output | MISO = input | SCK = clock
+# puts board.map.select { |name, number| [:MOSI, :MISO, :SCK].include?(name) }
 
+# InputRegister needs a bus and its select pin. The CD4021 likes SPI mode 2.
+# Other options and their defaults:
+#     bit_order:      :msbfirst
+#     frequency:      1000000    - Only affects hardware SPI interfaces
+#     spi_mode:       0
+#     bytes:          1          - For daisy-chaining registers
 #
-# The register is a BoardProxy, and implements enough Board methods that
-# DigitalInputs can use its pins directly.
+register = Dino::SPI::InputRegister.new(bus: bus, pin: REGISTER_SELECT_PIN, spi_mode: 2)
+
+# InputRegister implements enough of the Board interface that digital input
+# components can treat it as a Board. Do that with the Button.
 #
-# A Button is created by using the register in place of board, and the 
-# corresponding register pin connected to the Button.
+# button starts listening automatically, which triggers register to start listening,
+# so it can update button as needed. Registers listen with an 8ms interval by default,
+# compared to the 4ms default for a Button directly connected to a Board.
 #
 button = Dino::DigitalIO::Button.new(pin: 0, board: register)
 
-button.down { puts "down"}
-button.up   { puts "up"  }
+# Button callbacks.
+button.down { puts "Button pressed"  }
+button.up   { puts "Button released" }
 
-# Force callbacks to run at least once for the initial state.
-button.read
-
+# Sleep the main thread. Press the button and callbacks will run.
 sleep
