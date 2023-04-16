@@ -5,32 +5,38 @@ class OutputRegisterTest < Minitest::Test
     @board ||= BoardMock.new
   end
 
+  def bus
+    @bus ||= Dino::SPI::Bus.new(board: board)
+  end
+
   def options
-    { board: board, pins: { clock: 12, data: 11, latch: 8 } }
+    { bus: bus, pin: 9, frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
   end
 
   def part
-    @part ||= Dino::Register::ShiftOutput.new(options)
+    @part ||= Dino::SPI::OutputRegister.new(options)
   end
   
   def led
     @led ||= Dino::LED.new(board: part, pin: 0)
   end
-  
-  def test_sets_byte_length
-    new_part = Dino::Register::ShiftOutput.new(options.merge(bytes: 2))
-    assert_equal 2, new_part.bytes 
+
+  def test_write
+    part
+    mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, write: [255,127], bit_order: :lsbfirst
+    bus.stub(:transfer, mock) do
+      part.write(255,127)
+    end
+    mock.verify
   end
   
   def test_state_setup
-    new_part = Dino::Register::ShiftOutput.new(options.merge(bytes: 3))
-    assert_equal new_part.state, Array.new(24) {|i| 0}
-    assert_equal new_part.instance_variable_get(:@write_delay), 0.001
-    assert_equal new_part.instance_variable_get(:@buffer_writes), true
+    assert_equal part.instance_variable_get(:@write_delay), 0.001
+    assert_equal part.instance_variable_get(:@buffer_writes), true
   end
   
   def test_write_buffering_control
-    new_part = Dino::Register::ShiftOutput.new(options.merge(bytes: 3, buffer_writes: false, write_delay: 0.5))
+    new_part = Dino::SPI::OutputRegister.new(options.merge(buffer_writes: false, write_delay: 0.5))
     assert_equal new_part.instance_variable_get(:@write_delay), 0.5
     assert_equal new_part.instance_variable_get(:@buffer_writes), false
   end
@@ -38,14 +44,17 @@ class OutputRegisterTest < Minitest::Test
   def test_updates_and_writes_state_for_children
     led
     
-    mock = MiniTest::Mock.new.expect :call, nil, [[1]]
+    mock = MiniTest::Mock.new.expect :call, nil, [[0, 1]]
     part.stub(:write, mock) do
       led.on
       sleep 0.050
     end
     mock.verify
     
-    assert_equal part.state, [1,0,0,0,0,0,0,0]
+    expected_state = Array.new(options[:bytes] * 8) { |i| 0 }
+    expected_state[0] = 1
+
+    assert_equal expected_state, part.state
   end
   
   def test_implements_digital_read_for_children

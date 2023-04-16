@@ -59,7 +59,7 @@ void Dino::spiEnd(){
 // Simultaneous read from and write to an SPI device.
 //
 // Request format for SPI 2-way transfers
-// pin         = slave select pin (int)
+// pin         = select pin
 // val         = empty
 // auxMsg[0]   = SPI settings
 //   Bit 0..1  = SPI mode
@@ -70,19 +70,19 @@ void Dino::spiEnd(){
 // auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
 // auxMsg[7+]  = data (bytes) (write only)
 //
-void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data) {
-  // Pull select pin low.
-  pinMode(selectPin, OUTPUT);
-  digitalWrite(selectPin, LOW);
-  
+void Dino::spiTransfer(uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, uint32_t clockRate, byte *data) {
   spiBegin(settings, clockRate);
 
+  // Stream read bytes as if coming from select pin.
   if (rLength > 0) {
-    // Stream read bytes as if coming from select pin for easy identification.
     stream->print(selectPin);
     stream->print(':');
   }
 
+  // Pull select pin low.
+  pinMode(selectPin, OUTPUT);
+  digitalWrite(selectPin, LOW);
+  
   for (byte i = 0;  (i < rLength || i < wLength);  i++) {
     byte b;
 
@@ -98,10 +98,11 @@ void Dino::spiTransfer(int selectPin, byte settings, byte rLength, byte wLength,
       stream->print((i+1 == rLength) ? '\n' : ',');
     }
   }
-  spiEnd();
 
   // Leave select high.
   digitalWrite(selectPin, HIGH);
+
+  spiEnd();
 }
 
 // CMD = 27

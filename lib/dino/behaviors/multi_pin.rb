@@ -23,7 +23,14 @@ module Dino
         self.proxies = {}
         super(options)
       end
-      
+
+      def initialize_pins(options={})
+        super(options)
+        pins.each { |key,pin| pins[key] = board.convert_pin(pin) }
+        pin_array = pins.values
+        raise ArgumentError, "duplicate pins in: #{pins.inspect}" unless pin_array == pin_array.uniq
+      end
+
       #
       # Proxy a pin to a single-pin component. Set this up in the including
       # component's #initialize_pins method. Additional options for each proxy

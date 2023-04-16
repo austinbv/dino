@@ -1,25 +1,9 @@
 module Dino
-  module Register
-    module Output
-      include Behaviors::Component
-      
-      attr_reader :bytes
-      
+  module SPI
+    class OutputRegister < BaseRegister
+
       def before_initialize(options={})
         super(options)
-        #
-        # To use the register as a board proxy, we need to know how many
-        # bytes there are and map each bit to a virtual pin.
-        # Defaults to 1 byte. Ignore if writing to the register directly.
-        #
-        @bytes = options[:bytes] || 1
-
-        #
-        # When used as a board proxy, store the state of each register
-        # pin as a 0 or 1 in an array that is (@bytes * 8) long. Zero out to start.
-        #
-        self.state = Array.new(@bytes*8) { 0 }
-        
         #
         # When used as a board proxy, only write sate if @write_delay seconds
         # have passed since this object last got input. Better for things like SSDs
@@ -34,16 +18,16 @@ module Dino
         write_state
       end
 
-      def write
-        raise 'define #write in child class based on communication method'
+      #
+      # API method delegation
+      #
+      def write(*bytes)
+        bus.transfer(pin, mode: spi_mode, frequency: frequency, write: bytes.flatten, bit_order: bit_order)
       end
 
       #
-      # Make the register act as a board for components that need only digital
-      # output pins. Pass the register as a 'board' and pin numbers such that pin 0
-      # is the 1st bit of the 1st byte, pin 9 is 1st bit of the 2nd byte, and so on.
+      # BoardProxy interface
       #
-      include Behaviors::BoardProxy
       def digital_write(pin, value)
         state[pin] = value  # Might not be atomic?
         @buffer_writes ? write_buffered(state) : write_state

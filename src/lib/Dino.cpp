@@ -149,12 +149,11 @@ void Dino::process() {
     case 19: showLEDArray    ();   //cmd = 19
     #endif
 
-    // Implemented in DinoShift.cpp
-    #ifdef DINO_SHIFT
-    case 21: shiftWrite          (pin, val, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[3]); break;
-    case 22: shiftRead           (pin, val, auxMsg[0], auxMsg[1], auxMsg[2]);             break;
-    case 23: addShiftListener    ();  break;
-    case 24: removeShiftListener ();  break;
+    // Implemented in DinoSPIBitBang.cpp
+    #ifdef DINO_SPI_BB
+    case 21: spiBBtransfer       (auxMsg[0], pin, auxMsg[3], auxMsg[4], auxMsg[5], auxMsg[1], auxMsg[2], &auxMsg[7]);  break;
+    case 22: spiBBaddListener    ();  break;
+    case 23: spiBBremoveListener ();  break;
     #endif
 
     // Implemented in DinoSPI.cpp
@@ -216,8 +215,8 @@ void Dino::updateListeners() {
     updateCoreListeners();
 
     // Register Listeners
-    #ifdef DINO_SHIFT
-      if (tickCount % registerDivider == 0) updateShiftListeners();
+    #ifdef DINO_SPI_BB
+      if (tickCount % registerDivider == 0) spiBBupdateListeners();
     #endif
     #ifdef DINO_SPI
       if (tickCount % registerDivider == 0) updateSpiListeners();
@@ -271,8 +270,8 @@ void Dino::resetState() {
   #ifdef DINO_SPI
     clearSpiListeners();
   #endif
-  #ifdef DINO_SHIFT
-    clearShiftListeners();
+  #ifdef DINO_SPI_BB
+    spiBBclearListeners();
   #endif
   registerDivider = 8; // Update register listeners every ~8ms.
   fragmentIndex = 0;

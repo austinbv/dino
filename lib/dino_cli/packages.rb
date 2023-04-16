@@ -24,11 +24,11 @@ PACKAGES = {
       "DinoOneWire.cpp",
     ]
   },
-  shift: {
-    description: "Shift Register support",
-    directive: "DINO_SHIFT",
+  spi_bb: {
+    description: "Bit Bang SPI support",
+    directive: "DINO_SPI_BB",
     files: [
-      "DinoShift.cpp",
+      "DinoSPIBitBang.cpp",
     ]
   },
   spi: {

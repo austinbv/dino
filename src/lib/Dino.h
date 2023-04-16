@@ -107,20 +107,22 @@ class Dino {
     void noTone                ();   //cmd = 18
     void showLEDArray          ();   //cmd = 19
 
-    // Shift Registers
-    void shiftWrite            (int latchPin,  int len, byte dataPin, byte clockPin, byte settings, byte *data); //cmd = 21
-    void shiftRead             (int latchPin,  int len, byte dataPin, byte clockPin, byte settings);             //cmd = 22
-    void addShiftListener      ();                                                                               //cmd = 23
-    void removeShiftListener   ();                                                                               //cmd = 24
-    void updateShiftListeners  ();
-    void clearShiftListeners   ();
+    // Bit Bang SPI
+    void spiBBtransfer         (uint8_t settings, uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
+                                uint8_t rLength, uint8_t wLength, byte *data);                                    //cmd = 21
+    byte spiBBtransferByte     (uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
+                                uint8_t mode, uint8_t rBitOrder, uint8_t wBitOrder, byte data);
+    void spiBBaddListener      ();  //cmd = 22
+    void spiBBremoveListener    ();  //cmd = 23
+    void spiBBupdateListeners  ();
+    void spiBBclearListeners   ();
 
     // SPI
     void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
-    void spiTransfer           (int selectPin, byte settings, byte rLength, byte wLength, uint32_t clockRate, byte *data);  //cmd = 26
-    void addSpiListener        ();                                                                                          //cmd = 27
-    void removeSpiListener     ();                                                                                          //cmd = 28
+    void spiTransfer           (uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, uint32_t clockRate, byte *data); //cmd = 26
+    void addSpiListener        ();                                                                                                      //cmd = 27
+    void removeSpiListener     ();                                                                                                      //cmd = 28
     void updateSpiListeners    ();
     void clearSpiListeners     ();
 

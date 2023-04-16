@@ -14,7 +14,6 @@ require_relative 'dino/analog_io'
 require_relative 'dino/pulse_io'
 
 # Buses and interfaces.
-require_relative 'dino/register'
 require_relative 'dino/uart'
 require_relative 'dino/spi'
 require_relative 'dino/i2c'

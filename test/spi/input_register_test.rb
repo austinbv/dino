@@ -5,30 +5,50 @@ class InputRegisterTest < Minitest::Test
     @board ||= BoardMock.new
   end
 
-  def options
-    { board: board, pins: { clock: 12, data: 11, latch: 8 } }
+  def bus
+    @bus ||= Dino::SPI::Bus.new(board: board)
   end
 
-  # Shift in is probably the simplest form of an input register.
+  def options
+    { bus: bus, pin: 9, frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
+  end
+
   def part
-    @part ||= Dino::Register::ShiftInput.new(options)
+    @part ||= Dino::SPI::InputRegister.new(options)
   end
   
   def button
     @button ||= Dino::DigitalIO::Button.new(board: part, pin: 0)
   end
-  
-  def test_sets_byte_length
-    new_part = Dino::Register::ShiftInput.new(options.merge(bytes: 2))
-    assert_equal 2, new_part.bytes 
+
+  def test_state_setup
+    assert_equal part.instance_variable_get(:@reading_pins), Array.new(16) { false }
+    assert_equal part.instance_variable_get(:@listening_pins), Array.new(16) { false }
+    refute_nil   part.callbacks[:board_proxy]
+  end
+
+  def test_read
+    mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst
+    bus.stub(:transfer, mock) do
+      part.read
+    end
+    mock.verify
   end
   
-  def test_state_setup
-    new_part = Dino::Register::ShiftInput.new(options.merge(bytes: 3))
-    assert_equal new_part.state, Array.new(24) {|i| 0}
-    assert_equal new_part.instance_variable_get(:@reading_pins), Array.new(24) { false }
-    assert_equal new_part.instance_variable_get(:@listening_pins), Array.new(24) { false }
-    refute_nil   new_part.callbacks[:board_proxy]
+  def test_listen
+    mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst
+    bus.stub(:listen, mock) do
+      part.listen
+    end
+    mock.verify
+  end
+  
+  def test_stop
+    mock = MiniTest::Mock.new.expect :call, nil, [9]
+    bus.stub(:stop, mock) do
+      part.stop
+    end
+    mock.verify
   end
   
   def test_updates_child_components
@@ -43,7 +63,7 @@ class InputRegisterTest < Minitest::Test
     part.update("127")
     assert_equal [1,1,1,1,1,1,1,0], part.state
 
-    new_part = Dino::Register::ShiftInput.new(options.merge(bytes: 2))
+    new_part = Dino::SPI::InputRegister.new(options.merge(bytes: 2))
     new_part.update("127,128")
     assert_equal [1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1], new_part.state
   end
@@ -87,8 +107,12 @@ class InputRegisterTest < Minitest::Test
     end
     mock.verify
     
+    expected_array = Array.new(options[:bytes] * 8) { false }
+    expected_array[0] = true
+    expected_array[1] = true
+
     # Should be listening to the lowest 2 bits now.
-    assert_equal part.instance_variable_get(:@listening_pins), [true, true, false, false, false, false, false, false]
+    assert_equal expected_array, part.instance_variable_get(:@listening_pins)
   end
   
   def test_stop_listener_proxy
@@ -102,7 +126,15 @@ class InputRegisterTest < Minitest::Test
     mock.verify
     
     # Check listener tracking is correct.
-    assert_equal part.instance_variable_get(:@listening_pins), Array.new(8) { false }
+    assert_equal Array.new(options[:bytes] * 8) { false }, part.instance_variable_get(:@listening_pins)
     refute part.any_listening
+  end
+
+  def test_gets_reads_through_pin
+    mock = MiniTest::Mock.new.expect :call, nil, ["127,255"]
+    part.stub(:update, mock) do
+      board.update("#{part.pin}:127,255")
+    end
+    mock.verify
   end
 end

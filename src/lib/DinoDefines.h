@@ -10,7 +10,7 @@
 // Uncomment these to include features beyond core features.
 // #define DINO_ONE_WIRE
 // #define DINO_TONE
-// #define DINO_SHIFT
+// #define DINO_SPI_BB
 // #define DINO_I2C
 // #define DINO_SPI
 // #define DINO_SERVO

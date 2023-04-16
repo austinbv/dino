@@ -1,20 +1,23 @@
 module Dino
   module SPI
     class Bus
-      include Behaviors::MultiPin
+      include Behaviors::Component
       include Behaviors::BusController
       include Behaviors::Reader
 
-      def transfer(pin, **options)
-        board.spi_transfer(pin, **options)
+      # Board expects all components to have #pin.
+      attr_reader :pin
+
+      def transfer(select_pin, **options)
+        board.spi_transfer(select_pin, **options)
       end
 
-      def listen(pin, **options)
-        board.spi_listen(pin, **options)
+      def listen(select_pin, **options)
+        board.spi_listen(select_pin, **options)
       end
 
-      def stop(pin)
-        board.spi_stop(pin)
+      def stop(select_pin)
+        board.spi_stop(select_pin)
       end
 
       # Delegate necessary methods for chip enable and callbacks directly to the board.
