@@ -3,15 +3,7 @@
 // CMD = 00
 // Set up a single pin for the desired type of input or output.
 void Dino::setMode(byte p, byte m) {
-  #ifdef debug
-    Serial.print("setmode, pin:");
-    Serial.print(p);
-    Serial.print(", mode:");
-    Serial.println(m);
-  #endif
-    
-  m = m & 0b00000111;
-  
+  //
   // Use the lowest 3 bits of m to set different input/output modes, and enable 
   // or disable needed peripherals on different platforms.
   //
@@ -25,6 +17,7 @@ void Dino::setMode(byte p, byte m) {
   // 011 = Digital Input with internal pulldown if available.
   // 101 = Digital Input with internal pullup if available.
   // 111 = Digital Input/Output (ESP32 Only?)
+  m = m & 0b00000111;
 
   #ifdef ESP32
       // Free the LEDC channel if leaving PWM mode.
@@ -81,14 +74,6 @@ void Dino::setMode(byte p, byte m) {
 // CMD = 01
 // Write a digital output pin. 0 for LOW, 1 or >0 for HIGH.
 void Dino::dWrite(byte p, byte v, boolean echo) {
-  #ifdef debug
-    Serial.print("dwrite, pin:");
-    Serial.print(p);
-    Serial.print(", value:");
-    Serial.print(v);
-    Serial.print(", echo:");
-    Serial.println(echo);
-  #endif
 
   #ifdef __SAMD21G18A__
     // digitalWrite doesn't implicitly disconnect PWM on the SAMD21.
@@ -115,11 +100,6 @@ void Dino::dWrite(byte p, byte v, boolean echo) {
 // CMD = 02
 // Read a digital input pin. 0 for LOW, 1 for HIGH.
 byte Dino::dRead(byte p) {
-  #ifdef debug
-    Serial.print("dread, pin:");
-    Serial.println(p);
-  #endif
-  
   byte rval = digitalRead(p);
   coreResponse(p, rval);
   return rval;
@@ -128,15 +108,6 @@ byte Dino::dRead(byte p) {
 // CMD = 03
 // Write an analog output pin. 0 for LOW, up to 255 for HIGH @ 8-bit resolution.
 void Dino::pwmWrite(byte p, int v, boolean echo) {
-  #ifdef debug
-    Serial.print("awrite, pin:");
-    Serial.print(p);
-    Serial.print(", value:");
-    Serial.print(v);
-    Serial.print(", echo:");
-    Serial.println(echo);
-  #endif
-
   #ifdef ESP32
     // Assign new or find existing LEDC channel for this pin.
     byte channel = ledcChannel(p);
@@ -231,11 +202,6 @@ void Dino::dacWrite(byte p, int v, boolean echo) {
 // CMD = 05
 // Read an analog input pin. 0 for LOW, up to 1023 for HIGH @ 10-bit resolution.
 int Dino::aRead(byte p) {
-  #ifdef debug
-    Serial.print("aread, pin:");
-    Serial.println(p);
-  #endif
-
   int rval = analogRead(p);
   coreResponse(p, rval);
   return rval;
@@ -259,21 +225,6 @@ void Dino::setListener(byte p, boolean enabled, byte analog, byte exponent, bool
   if (analog)   settingMask = settingMask | 0b1000000;
   if (local)    settingMask = settingMask | 0b0010000;
   settingMask = settingMask | exponent;
-
-  #ifdef debug
-    Serial.print("setlistener, pin:");
-    Serial.print(p);
-    Serial.print(", enabled:");
-    Serial.print(enabled);
-    Serial.print(", analog:");
-    Serial.print(analog);
-    Serial.print(", exponent:");
-    Serial.print(exponent);
-    Serial.print(", local:");
-    Serial.print(local);
-    Serial.print(", settingMask:");
-    Serial.println(settingMask);
-  #endif
 
   // If an existing listener was already using this pin, just update settings.
   boolean found = false;

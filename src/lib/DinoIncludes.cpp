@@ -12,9 +12,6 @@
   // Pass aux message to the LCD library for processing.
   void Dino::handleLCD() {
     dinoLCD.process(val, (char *)auxMsg);
-    #ifdef debug
-      Serial.print("Called Dino::handleLCD()\n");
-    #endif
   }
 #endif
 
@@ -27,8 +24,5 @@
   // Pass aux message to the software serial library for processing.
   void Dino::handleSerial() {
     dinoSerial.process(val, auxMsg);
-    #ifdef debug
-      Serial.print("Called Dino::handleSerial()\n");
-    #endif
   }
 #endif

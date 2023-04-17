@@ -94,14 +94,6 @@ void Dino::process() {
   pin = atoi((char *)pinStr);
   val = atoi((char *)valStr);
 
-  #ifdef debug
-    if (cmd != 90) {
-      Serial.print("cmd:");   Serial.print(cmd);
-      Serial.print(", pin:"); Serial.print(pin);
-      Serial.print(", val:"); Serial.println(val);
-    }
-  #endif
-
   // Call the command.
   switch(cmd) {
     // Implemented in DinoCoreIO.cpp
@@ -284,9 +276,6 @@ void Dino::resetState() {
 // Set the register read divider. Powers of 2 up to 128 are valid.
 void Dino::setRegisterDivider() {
   registerDivider = val;
-  #ifdef debug
-    Serial.print("Called Dino::setRegisterDivider()\n");
-  #endif
 }
 
 // CMD = 96

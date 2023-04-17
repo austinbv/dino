@@ -107,12 +107,6 @@ void setup() {
   #endif
 
   // Attempt initial WiFi connection.
-  #ifdef debug
-    indicateWiFi(false);
-    serial.println();
-    serial.print("Attempting to connect to SSID: ");
-    serial.println(ssid);
-  #endif
   connect();
   
   // Start the dino TCP server.

@@ -66,10 +66,6 @@ void Dino::servoToggle() {
       }
     }
   }
-
-  #ifdef debug
-    Serial.print("Called Dino::servoToggle()\n");
-  #endif
 }
 
 // CMD = 09
@@ -82,10 +78,6 @@ void Dino::servoWrite() {
       servos[i].servo.writeMicroseconds(us);
     }
   }
-
-  #ifdef debug
-    Serial.print("Called Dino::servoWrite()\n");
-  #endif
 }
 
 #endif
