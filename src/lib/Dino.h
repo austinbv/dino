@@ -111,7 +111,7 @@ class Dino {
     void spiBBtransfer         (uint8_t settings, uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
                                 uint8_t rLength, uint8_t wLength, byte *data);                                    //cmd = 21
     byte spiBBtransferByte     (uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
-                                uint8_t mode, uint8_t rBitOrder, uint8_t wBitOrder, byte data);
+                                uint8_t mode, uint8_t bitOrder, byte data);
     void spiBBaddListener      ();  //cmd = 22
     void spiBBremoveListener   ();  //cmd = 23
     void spiBBupdateListeners  ();
@@ -120,7 +120,7 @@ class Dino {
     // SPI
     void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
-    void spiTransfer           (uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, uint32_t clockRate, byte *data); //cmd = 26
+    void spiTransfer           (uint8_t settings, uint8_t selectPin, uint32_t clockRate, uint8_t rLength, uint8_t wLength, byte *data); //cmd = 26
     void spiAddListener        ();                                                                                                      //cmd = 27
     void spiRemoveListener     ();                                                                                                      //cmd = 28
     void spiUpdateListeners    ();

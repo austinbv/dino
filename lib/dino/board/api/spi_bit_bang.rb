@@ -16,9 +16,8 @@ module Dino
             raise ArgumentError, "invalid SPI mode. Must be 0, 1, 2, or 3"
           end
 
-          # Bit 7 of settings toggles MSBFIRST (1) or LSBFIRST (0) when writing.
-          # Bit 6 of settings toggles MSBFIRST (1) or LSBFIRST (0) when reading.
-          settings = settings | 0b11000000 unless options[:bit_order] == :lsbfirst
+          # Bit 7 of settings toggles MSBFIRST (1) or LSBFIRST (0) for both read and write.
+          settings = settings | 0b10000000 unless options[:bit_order] == :lsbfirst
 
           # Validate byte lengths.
           raise ArgumentError, "can't read more than 255 SPI bytes at a time" if options[:read] > 255

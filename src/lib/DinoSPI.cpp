@@ -62,14 +62,14 @@ void Dino::spiEnd(){
 // val         = empty
 // auxMsg[0]   = SPI settings
 //   Bit 0..1  = SPI mode
-//   Bit 2..6  = unused
-//   Bit 7     = MSBFIRST(1) or LSBFIRST(0)
+//   Bit 2..6  = ** unused **
+//   Bit 7     = Read and write bit order: MSBFIRST(1) or LSBFIRST(0)
 // auxMsg[1]   = read length  (number of bytes)
 // auxMsg[2]   = write length (number of bytes)
 // auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
 // auxMsg[7+]  = data (bytes) (write only)
 //
-void Dino::spiTransfer(uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, uint32_t clockRate, byte *data) {
+void Dino::spiTransfer(uint8_t settings, uint8_t selectPin, uint32_t clockRate, uint8_t rLength, uint8_t wLength, byte *data) {
   spiBegin(settings, clockRate);
 
   // Stream read bytes as if coming from select pin.
