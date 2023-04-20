@@ -97,16 +97,13 @@ module Dino
         # Memory is arranged into pages 8 pixels high, mapping to rows.
         page_count = @rows / 8
         
+        # For each page write an array of bytes (rows), @columns long, all zeroed.
         (0..page_count-1).each do |page|
           cursor(0,page)
-          
-          # Stay under 32 bytes to avoid buffer overflow in the Wire library.
-          repeats = @columns / 16
-          blank = Array.new(16) {0x00}
-          repeats.times do
-            data(blank)
-          end
+          # This should come from a framebuffer eventually.
+          data Array.new(@columns) {0}
         end
+        
         cursor(0,0)
       end
 

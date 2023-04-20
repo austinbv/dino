@@ -25,7 +25,8 @@ void Dino::i2cSearch() {
   i2cBegin();
   stream->print(SDA);
 
-  // Only addresses from 0x08 to 0x77 are usable (8 to 127).
+  // Address ranges 0..7 and 120..127 are reserved.
+  // Try each address in 8..119 (0x08 to 0x77).
   for (addr = 0x08; addr < 0x78;  addr++) {
     Wire.beginTransmission(addr);
     error = Wire.endTransmission();
@@ -37,19 +38,19 @@ void Dino::i2cSearch() {
 }
 
 // CMD = 34
-// Write to an I2C device. All params as binary in auxMsg.
+// Write to an I2C device over a harwdare I2C interface.
 //
 // val        = Settings
 // val bit 0  = repeated start
-// val bit 1  = write register address before reading
-// val bit 2+ = unused
+// val bit 1+ = unused
 //
 // auxMsg[0]  = 7-bit device addresses
 // auxMsg[1]  = reserved
-// auxMsg[2]  = data length
-// auxMsg[3]+ = data
+// auxMsg[2]  = write length lower byte
+// auxMsg[3]  = write length upper byte
+// auxMsg[4]+ = data
 //
-// Max limited by aux message size.
+// Maximum write length limited by auxMsg size, or uint16_t.
 //
 void Dino::i2cWrite() {
   // No repeated start on ESP32.
@@ -59,14 +60,34 @@ void Dino::i2cWrite() {
     bool sendStop = bitRead(val, 0);
   #endif
   
-  i2cBegin();
-  Wire.beginTransmission(auxMsg[0]);
-  Wire.write(&auxMsg[3], auxMsg[2]);
-  Wire.endTransmission(sendStop);
+  // Write length is uint16 packed in auxMsg[2..3].
+  uint16_t totalBytes = *reinterpret_cast<uint16_t*>(auxMsg + 2);
+
+  // I2C library only writes in 32 byte chunks. Track remaining bytes after each chunk.
+  uint16_t remainingBytes = totalBytes;
+
+  while (remainingBytes > 0) {
+    // If > 32 remaining, only write 32, else write all remaining.
+    uint16_t bytesToWrite = (remainingBytes > 32) ? 32 : remainingBytes;
+
+    // Begin
+    i2cBegin();
+    Wire.beginTransmission(auxMsg[0]);
+
+    // Start or resume writing from the correct position + offset in auxMsg.
+    uint16_t writeStart = totalBytes - remainingBytes + 4;
+    Wire.write(&auxMsg[writeStart], bytesToWrite);
+
+    // End, writing bytes from I2C buffer to bus.
+    Wire.endTransmission(sendStop);
+
+    // Update remaining bytes.
+    remainingBytes = remainingBytes - bytesToWrite;
+  }
 }
 
 // CMD = 35
-// Read from an I2C device. All params as binary in auxMsg.
+// Read from an I2C device over a harwdare I2C interface.
 //
 // val        = Settings
 // val bit 0  = repeated start
@@ -75,15 +96,13 @@ void Dino::i2cWrite() {
 // 
 // auxMsg[0]  = 7-bit device address
 // auxMsg[1]  = reserved
-// auxMsg[2]  = register address
-// auxMsg[3]  = number of bytes
+// auxMsg[2]  = read length lower byte
+// auxMsg[3]  = read length upper byte
+// auxMsg[4]  = register address
 //
-// Max 32 bytes, limited by Wire library buffer. Validate remotely.
+// Maximum read length limited by uint16_t.
 //
 void Dino::i2cRead() {
-  // Limit to 32 bytes.
-  if (auxMsg[3] > 32) auxMsg[3] = 32;
-
   // No repeated start on ESP32.
   #if defined(ESP32)
     bool sendStop = true;
@@ -91,35 +110,55 @@ void Dino::i2cRead() {
     bool sendStop = bitRead(val, 0);
   #endif
 
-  i2cBegin();
-  
-  // Optionally write a register address before reading.
-  if (bitRead(val, 1)) {
+  // Read length is uint16 packed in auxMsg[2..3].
+  uint16_t totalBytes = *reinterpret_cast<uint16_t*>(auxMsg + 2);
+
+  // I2C library only reads in 32 byte chunks. Track remaining bytes after each chunk.
+  uint16_t remainingBytes = totalBytes;
+
+  while (remainingBytes > 0) {
+    // If > 32 remaining, only read 32, else read all remaining.
+    uint16_t bytesToRead = (remainingBytes > 32) ? 32 : remainingBytes;
+
+    // Ensure I2C is started.
+    i2cBegin();
+
+    // If on first pass, write register address first if needed.
+    if ((totalBytes == remainingBytes) && (bitRead(val, 1))) {
+      Wire.beginTransmission(auxMsg[0]);
+      Wire.write(auxMsg[4]);
+      Wire.endTransmission(sendStop);
+    }
+
+    // Read bytes from device.
     Wire.beginTransmission(auxMsg[0]);
-    Wire.write(auxMsg[2]);
+    #if defined(ESP32)
+      // ESP32 crashes if requestFrom gets the 3rd arg.
+      Wire.requestFrom(auxMsg[0], bytesToRead);
+    #else
+      Wire.requestFrom(auxMsg[0], bytesToRead, sendStop);
+    #endif
+
+    // End transmission. Bytes still in Wire buffer.
     Wire.endTransmission(sendStop);
+
+    // If on first pass, send the message prefix.
+    if ((totalBytes == remainingBytes) && (Wire.available())) {
+      stream->print(SDA); stream->print(':');
+      stream->print(auxMsg[0]); stream->print('-');
+    }
+
+    // Send read bytes, comma delimited.
+    while (Wire.available()) {
+      stream->print(Wire.read());
+      stream->print(',');
+    }
+
+    // Update remaining bytes.
+    remainingBytes = remainingBytes - bytesToRead;
+
+    // Terminate the message. Don't care about traling comma since Ruby ignores it.
+    if (remainingBytes == 0) stream->print('\n');
   }
-  
-  // ESP32 crashes if requestFrom gets the 3rd arg.
-  #if defined(ESP32)  
-    Wire.requestFrom(auxMsg[0], auxMsg[3]);
-  #else
-    // Wire.beginTransmission(auxMsg[0]);
-    Wire.requestFrom(auxMsg[0], auxMsg[3], sendStop);
-  #endif
-  
-  // Send data as if coming from SDA pin. Prefix with device adddress.
-  // Fail silently if no bytes read / invalid device address.
-  if(Wire.available()){
-    stream->print(SDA); stream->print(':');
-    stream->print(auxMsg[0]); stream->print('-');
-  }
-  uint8_t currentByte = 0;
-  while(Wire.available()){
-    currentByte++;
-    stream->print(Wire.read());
-    stream->print((currentByte == auxMsg[3]) ? '\n' : ',');
-  }
-  Wire.endTransmission(sendStop);
 }
 #endif
