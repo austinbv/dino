@@ -78,7 +78,7 @@ class Dino {
     // byte 0, bit 5   : digital listener state storage
     // byte 0, bit 4   : local flag (remote client cannot modify listener if set)
     // byte 0, bit 3   : unused
-    // byte 0, bits 2-0: timing divider exponent (2^0 through 2^8)
+    // byte 0, bits 2-0: timing divider exponent (2^0 through 2^7)
     //
     // byte 1          : pin number
     //
@@ -108,20 +108,21 @@ class Dino {
     void showLEDArray          ();   //cmd = 19
 
     // Bit Bang SPI
-    void spiBBtransfer         (uint8_t settings, uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
-                                uint8_t rLength, uint8_t wLength, byte *data);                                    //cmd = 21
-    byte spiBBtransferByte     (uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
+    void spiBBtransfer         (uint8_t clock, uint8_t input, uint8_t output, uint8_t select, uint8_t settings, 
+                                uint8_t rLength, uint8_t wLength, byte *data);                                                          //cmd = 21
+    byte spiBBtransferByte     (uint8_t clock, uint8_t input, uint8_t output, uint8_t select,
                                 uint8_t mode, uint8_t bitOrder, byte data);
-    void spiBBaddListener      ();  //cmd = 22
-    void spiBBremoveListener   ();  //cmd = 23
-    void spiBBupdateListeners  ();
-    void spiBBclearListeners   ();
+    void spiBBaddListener      ();                                                                                                      //cmd = 22
+    void spiBBreadListener     (uint8_t i);
 
-    // SPI
+    // Hardware SPI
     void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
-    void spiTransfer           (uint8_t settings, uint8_t selectPin, uint32_t clockRate, uint8_t rLength, uint8_t wLength, byte *data); //cmd = 26
+    void spiTransfer           (uint32_t clockRate, uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, byte *data); //cmd = 26
     void spiAddListener        ();                                                                                                      //cmd = 27
+    void spiReadListener       (uint8_t i);
+ 
+    // SPI Listeners (both hardware and bit bang)
     void spiRemoveListener     ();                                                                                                      //cmd = 28
     void spiUpdateListeners    ();
     void spiClearListeners     ();
@@ -198,5 +199,23 @@ class Dino {
     //
     void sendHalt();
     void sendReady(); // cmd = 92
+
+    //
+    // Shared SPI listeners that can be used by either hardware or bit bang SPI.
+    // 
+    #if defined(DINO_SPI) || defined(DINO_SPI_BB)
+      // How many SPI lsiteners.
+      #define SPI_LISTENER_COUNT 4
+
+      // How to store a SPI listener.
+      struct SpiListener{
+        uint32_t clock;     // Clock rate if hardware SPI. If bit bang: bits[0..7] = clock pin, bits [8..15] = input pin.
+        uint8_t  select;    // Select pin.
+        uint8_t  settings;  // Settings mask as given in request.
+        uint8_t  length;    // Read length as given in request.
+        uint8_t  enabled;   // 0 = disabled, 1 = hardware, 2 = bit bang.
+      };
+      SpiListener spiListeners[SPI_LISTENER_COUNT];
+    #endif
 };
 #endif

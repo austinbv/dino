@@ -7,8 +7,8 @@ module Dino
       include API::EEPROM
       include API::I2C
       include API::Servo
-      include API::SPIBitBang
       include API::SPI
+      include API::SPIBitBang
       include API::Infrared
       include API::OneWire
       include API::Tone

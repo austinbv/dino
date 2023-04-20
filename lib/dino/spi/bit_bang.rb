@@ -30,10 +30,6 @@ module Dino
         super(options)
       end
 
-      def pin_hash
-        {input: pins[:input], output: pins[:output], clock: pins[:clock]}
-      end
-
       def transfer(pin, **options)
         options.merge!(pin_hash)
         board.spi_bb_transfer(pin, **options)
@@ -44,8 +40,13 @@ module Dino
         board.spi_bb_listen(pin, **options)
       end
 
+      def pin_hash
+        {input: pins[:input], output: pins[:output], clock: pins[:clock]}
+      end
+
+      # Uses regular Board#spi_stop since listeners are shared.
       def stop(pin)
-        board.spi_bb_stop(pin)
+        board.spi_stop(pin)
       end
 
       # Delegate necessary methods for chip enable and callbacks directly to the board.

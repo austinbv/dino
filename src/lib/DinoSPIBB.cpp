@@ -1,21 +1,9 @@
 //
-// This file adds SPI bitbang functionality to the Dino class if DINO_SPI_BB is defined.
+// Adds SPI bitbang functionality to the Dino class if DINO_SPI_BB defined in DinoDefines.h.
 //
 #include "Dino.h"
+
 #ifdef DINO_SPI_BB
-
-// Define listeners for SPI BitBang registers.
-#define SPI_BB_LISTENER_COUNT 4
-struct spiBBlistener {
-  byte     select;
-  byte     settings;
-  byte     clock;
-  byte     input;
-  byte     length;
-  boolean  enabled;
-};
-spiBBlistener spiBBlisteners[SPI_BB_LISTENER_COUNT];
-
 // CMD = 21
 //
 // Request format for bit banged SPI 2-way transfers
@@ -33,14 +21,14 @@ spiBBlistener spiBBlisteners[SPI_BB_LISTENER_COUNT];
 // auxMsg[6]   = ** unused **
 // auxMsg[7+]  = data (bytes) (write only) - Start from 7 for parity with hardware SPI.
 //
-void Dino::spiBBtransfer( uint8_t settings, uint8_t select, uint8_t clock, uint8_t input, uint8_t output,
+void Dino::spiBBtransfer( uint8_t clock, uint8_t input, uint8_t output, uint8_t select, uint8_t settings,
                           uint8_t rLength, uint8_t wLength, byte *data) {
 
   // Mode is the lowest 2 bits of settings.
   uint8_t mode = settings & 0b00000011;
 
   // Bit order is stored in the highest bit of settings.
-  uint8_t bitOrder = (settings & 0b10000000) >> 7;
+  uint8_t bitOrder = bitRead(settings, 7);
 
   // Set modes for input and output pins.
   // Use a pin number of 255 to avoid touching either.
@@ -66,9 +54,9 @@ void Dino::spiBBtransfer( uint8_t settings, uint8_t select, uint8_t clock, uint8
     byte b;
 
     if (i < wLength) {
-      b = spiBBtransferByte(select, clock, input, output, mode, bitOrder, data[i]);
+      b = spiBBtransferByte(clock, input, output, select, mode, bitOrder, data[i]);
     } else {
-      b = spiBBtransferByte(select, clock, input, output, mode, bitOrder, 0x00);
+      b = spiBBtransferByte(clock, input, output, select, mode, bitOrder, 0x00);
     }
 
     if (i < rLength) {
@@ -85,7 +73,7 @@ void Dino::spiBBtransfer( uint8_t settings, uint8_t select, uint8_t clock, uint8
 //
 // Used by spiBBtransfer to transfer a single byte at a time.
 //
-byte Dino::spiBBtransferByte(uint8_t select, uint8_t clock, uint8_t input, uint8_t output, uint8_t mode, uint8_t bitOrder, byte data) {
+byte Dino::spiBBtransferByte(uint8_t clock, uint8_t input, uint8_t output, uint8_t select, uint8_t mode, uint8_t bitOrder, byte data) {
   // Byte to return
   byte b = 0x00;
   
@@ -135,16 +123,15 @@ byte Dino::spiBBtransferByte(uint8_t select, uint8_t clock, uint8_t input, uint8
 // CMD = 22
 // Start listening to a register with bit bang SPI.
 void Dino::spiBBaddListener() {
-  for (int i = 0;  i < SPI_BB_LISTENER_COUNT;  i++) {
+  for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
     // Overwrite the first disabled listener in the struct array.
-    if (spiBBlisteners[i].enabled == false) {
-      spiBBlisteners[i] = {
-        pin,
-        auxMsg[0],
-        auxMsg[3],
-        auxMsg[4],
-        auxMsg[1],
-        true
+    if (spiListeners[i].enabled == 0) {
+      spiListeners[i] = {
+        ((auxMsg[4] << 8) | auxMsg[3]),   // Clock: [0..7], input: [8..15]
+        pin,                              // Select pin
+        auxMsg[0],                        // Settings mask
+        auxMsg[1],                        // Read length
+        2                                 // Enabled = 2 sets bit bang SPI listener
       };
       return;
     } else {
@@ -153,35 +140,15 @@ void Dino::spiBBaddListener() {
   }
 }
 
-// CMD = 23
-// Send a select pin number to remove a bit bang SPI listener.
-void Dino::spiBBremoveListener() {
-  for (int i = 0;  i < SPI_BB_LISTENER_COUNT;  i++) {
-    if (spiBBlisteners[i].select == pin) {
-      spiBBlisteners[i].enabled = false;
-    }
-  }
-}
-
-// Gets called by Dino::updateListeners to run listeners in the main loop.
-void Dino::spiBBupdateListeners() {
-  for (int i = 0; i < SPI_BB_LISTENER_COUNT; i++) {
-    if (spiBBlisteners[i].enabled) {
-      spiBBtransfer(  spiBBlisteners[i].settings,
-                      spiBBlisteners[i].select,
-                      spiBBlisteners[i].clock,
-                      spiBBlisteners[i].input,
-                      255,       // 255 means no output pin
-                      spiBBlisteners[i].length,
-                      0,         // 0 bytes written to output
-                      &auxMsg[0] // Point at any char array since it won't be touched.
-                   );
-    }
-  }
-}
-
-// Gets called by Dino::reset to clear all listeners.
-void Dino::spiBBclearListeners() {
-  for (int i = 0; i < SPI_BB_LISTENER_COUNT; i++) spiBBlisteners[i].enabled = false;
+// Called by spiUpdateListeners to read an individual bit bang SPI listener.
+void Dino::spiBBreadListener(uint8_t i) {
+  spiBBtransfer((spiListeners[i].clock & 0xFF),          // Clock pin is bits [0..7] of the uint32
+                ((spiListeners[i].clock >> 8) & 0xFF),   // Input pin is bits [8..15] of the uint32
+                255,                                    // Disabled output pin
+                spiListeners[i].select,                 // Select pin
+                spiListeners[i].settings,
+                spiListeners[i].length,                 // Read length
+                0,                                      // 0 bytes written to output
+                &auxMsg[0]);                            // Get "write" data from anywhere since not writing
 }
 #endif

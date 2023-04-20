@@ -141,20 +141,23 @@ void Dino::process() {
     case 19: showLEDArray        ();   //cmd = 19
     #endif
 
-    // Implemented in DinoSPIBitBang.cpp
+    // Implemented in DinoSPIBB.cpp
     #ifdef DINO_SPI_BB
-    case 21: spiBBtransfer       (auxMsg[0], pin, auxMsg[3], auxMsg[4], auxMsg[5], auxMsg[1], auxMsg[2], &auxMsg[7]);  break;
+    case 21: spiBBtransfer       (auxMsg[3], auxMsg[4], auxMsg[5], pin, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[7]);  break;
     case 22: spiBBaddListener    ();  break;
-    case 23: spiBBremoveListener ();  break;
     #endif
 
     // Implemented in DinoSPI.cpp
     #ifdef DINO_SPI
-    case 26: spiTransfer      (auxMsg[0], pin, *reinterpret_cast<uint32_t*>(auxMsg + 3), auxMsg[1], auxMsg[2], &auxMsg[7]); break;
+    case 26: spiTransfer      (*reinterpret_cast<uint32_t*>(auxMsg + 3), pin, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[7]); break;
     case 27: spiAddListener   ();  break;
-    case 28: spiRemoveListener();  break;
     #endif
 
+    // Implemented in DinoSPI.cpp
+    #if defined(DINO_SPI) || defined(DINO_SPI_BB)
+    case 28: spiRemoveListener();  break;
+    #endif
+    
     // Implemented in DinoI2C.cpp
     #ifdef DINO_I2C
     case 33: i2cSearch           ();  break;
@@ -206,11 +209,8 @@ void Dino::updateListeners() {
 
     updateCoreListeners();
 
-    // Register Listeners
-    #ifdef DINO_SPI_BB
-      if (tickCount % registerDivider == 0) spiBBupdateListeners();
-    #endif
-    #ifdef DINO_SPI
+    // SPI register Listeners
+    #if defined(DINO_SPI) || defined(DINO_SPI_BB)
       if (tickCount % registerDivider == 0) spiUpdateListeners();
     #endif
   }
@@ -256,11 +256,8 @@ void Dino::handshake() {
 // CMD = 91
 void Dino::resetState() {
   clearCoreListeners();
-  #ifdef DINO_SPI
+  #if defined(DINO_SPI) || defined(DINO_SPI_BB)
     spiClearListeners();
-  #endif
-  #ifdef DINO_SPI_BB
-    spiBBclearListeners();
   #endif
   #ifdef ESP32
     clearLedcChannels();

@@ -1,24 +1,45 @@
-//
-// This file adds to the Dino class only if DINO_SPI is defined in Dino.h.
-//
 #include "Dino.h"
+
+//
+// Functions for listeners shared between hardware and bit bang SPI.
+//
+#if defined(DINO_SPI) || defined(DINO_SPI_BB)
+
+// CMD = 28
+// Send a number for a select pin to remove a SPI listener.
+void Dino::spiRemoveListener(){
+  for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
+    if (spiListeners[i].select == pin) {
+      spiListeners[i].enabled = 0;
+    }
+  }
+}
+
+// Gets called by Dino::reset to clear all listeners.
+void Dino::spiClearListeners(){
+  for (int i = 0; i < SPI_LISTENER_COUNT; i++) {
+    spiListeners[i].enabled = 0;
+  }
+}
+
+void Dino::spiUpdateListeners(){
+  for (byte i = 0;  i < SPI_LISTENER_COUNT;  i++){
+    switch(spiListeners[i].enabled) {
+      case 1: spiReadListener(i); break;
+      case 2: spiBBreadListener(i); break;
+      default: break;
+    }
+  }
+}
+#endif
+
+//
+// Adds hardware SPI support if DINO_SPI defined in DinoDefines.h.
+//
 #ifdef DINO_SPI
-
 #include <SPI.h>
-
-// Define listeners for SPI registers.
-#define SPI_LISTENER_COUNT 4
-struct SpiListener{
-  byte     selectPin;
-  byte     settings;
-  byte     len;
-  uint32_t clockRate;
-  boolean  enabled;
-};
-SpiListener spiListeners[SPI_LISTENER_COUNT];
-
 // Convenience wrapper for SPI.begin
-void Dino::spiBegin(byte settings, uint32_t clockRate){
+void Dino::spiBegin(byte settings, uint32_t clockRate) {
   SPI.begin();
 
   // SPI mode is the lowest 2 bits of settings.
@@ -44,7 +65,7 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
 }
 
 // Convenience wrapper for SPI.end
-void Dino::spiEnd(){
+void Dino::spiEnd() {
   SPI.endTransaction();
   // TXRX_SPI in defined for WiFi/Ethernet sketches on AVR chips.
   // In those cases, SPI.end() can't be called since the network hardware uses it.
@@ -69,7 +90,7 @@ void Dino::spiEnd(){
 // auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
 // auxMsg[7+]  = data (bytes) (write only)
 //
-void Dino::spiTransfer(uint8_t settings, uint8_t selectPin, uint32_t clockRate, uint8_t rLength, uint8_t wLength, byte *data) {
+void Dino::spiTransfer(uint32_t clockRate, uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, byte *data) {
   spiBegin(settings, clockRate);
 
   // Stream read bytes as if coming from select pin.
@@ -105,17 +126,16 @@ void Dino::spiTransfer(uint8_t settings, uint8_t selectPin, uint32_t clockRate, 
 }
 
 // CMD = 27
-// Start listening to an SPI register.
+// Start listening to a register with hardware SPI.
 void Dino::spiAddListener() {
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
-    // Overwrite the first disabled listener in the struct array.
-    if (spiListeners[i].enabled == false) {
+    if (spiListeners[i].enabled == 0) {
       spiListeners[i] = {
-        pin,
-        auxMsg[0],
-        auxMsg[1],
         *reinterpret_cast<uint32_t*>(auxMsg + 3),
-        true
+        pin,        // Select pin
+        auxMsg[0],  // Settings
+        auxMsg[1],  // Read length
+        1           // Enabled = 1 sets hardware SPI listener
       };
       return;
     } else {
@@ -124,32 +144,13 @@ void Dino::spiAddListener() {
   }
 }
 
-// CMD = 28
-// Send a number for a select pin to remove an SPI register listener.
-void Dino::spiRemoveListener(){
-  for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
-    if (spiListeners[i].selectPin == pin) {
-      spiListeners[i].enabled = false;
-    }
-  }
-}
-
-// Gets called by Dino::updateListeners to run listeners in the main loop.
-void Dino::spiUpdateListeners(){
-  for (int i = 0; i < SPI_LISTENER_COUNT; i++) {
-    if (spiListeners[i].enabled) {
-      spiTransfer(spiListeners[i].selectPin,
-                  spiListeners[i].settings,
-                  spiListeners[i].len,
-                  0,
-                  spiListeners[i].clockRate,
-                  {});
-    }
-  }
-}
-
-// Gets called by Dino::reset to clear all listeners.
-void Dino::spiClearListeners(){
-  for (int i = 0; i < SPI_LISTENER_COUNT; i++) spiListeners[i].enabled = false;
+// Called by spiUpdateListeners to read an individual hardware SPI listener.
+void Dino::spiReadListener(uint8_t i) {
+  spiTransfer(spiListeners[i].clock,
+              spiListeners[i].select,
+              spiListeners[i].settings,
+              spiListeners[i].length,
+              0,                          // 0 bytes written to output
+              &auxMsg[0]);                // Get "write" data from anywhere since not writing
 }
 #endif
