@@ -127,11 +127,11 @@ void Dino::spiBBaddListener() {
     // Overwrite the first disabled listener in the struct array.
     if (spiListeners[i].enabled == 0) {
       spiListeners[i] = {
-        ((auxMsg[4] << 8) | auxMsg[3]),   // Clock: [0..7], input: [8..15]
-        pin,                              // Select pin
-        auxMsg[0],                        // Settings mask
-        auxMsg[1],                        // Read length
-        2                                 // Enabled = 2 sets bit bang SPI listener
+        ((uint32_t)(auxMsg[4] << 8) | auxMsg[3]),   // Clock: [0..7], input: [8..15]
+        pin,                                        // Select pin
+        auxMsg[0],                                  // Settings mask
+        auxMsg[1],                                  // Read length
+        2                                           // Enabled = 2 sets bit bang SPI listener
       };
       return;
     } else {
