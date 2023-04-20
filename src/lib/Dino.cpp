@@ -107,38 +107,38 @@ void Dino::process() {
 
   	#ifdef EEPROM_PRESENT
     // Implemented in DinoEEPROM.cpp
-    case 7:  eepromRead          ();    break;
-    case 8:  eepromWrite         ();    break;
+    case 7:  eepromRead           (); break;
+    case 8:  eepromWrite          (); break;
 	  #endif
 
     // Implemented in DinoPulseInput.cpp
-    case 9: pulseRead           ();    break;
+    case 9: pulseRead             (); break;
 
     // Implemented in DinoServo.cpp
     #ifdef DINO_SERVO
-    case 10:  servoToggle         ();    break;
-    case 11:  servoWrite          ();    break;
+    case 10:  servoToggle         (); break;
+    case 11:  servoWrite          (); break;
     #endif
 
     // Implemented in DinoSerial.cpp
     #ifdef DINO_SERIAL
-    case 12: handleSerial        ();    break;
+    case 12: handleSerial (); break;
     #endif
 
     // Implemented in DinoIROut.cpp
     #ifdef DINO_IR_OUT
-    case 16: irSend              ();    break;
+    case 16: irSend       (); break;
     #endif
 
     // Implemented in DinoTone.cpp
     #ifdef DINO_TONE
-    case 17: tone                ();    break;
-    case 18: noTone              ();    break;
+    case 17: tone         (); break;
+    case 18: noTone       (); break;
     #endif
 
     // Implemented in DinoAddressableLED.cppp
     #ifdef DINO_LED_ARRAY
-    case 19: showLEDArray    ();   //cmd = 19
+    case 19: showLEDArray        ();   //cmd = 19
     #endif
 
     // Implemented in DinoSPIBitBang.cpp
@@ -151,8 +151,8 @@ void Dino::process() {
     // Implemented in DinoSPI.cpp
     #ifdef DINO_SPI
     case 26: spiTransfer      (pin, auxMsg[0], auxMsg[1], auxMsg[2], *reinterpret_cast<uint32_t*>(auxMsg + 3), &auxMsg[7]); break;
-    case 27: addSpiListener   ();  break;
-    case 28: removeSpiListener();  break;
+    case 27: spiAddListener   ();  break;
+    case 28: spiRemoveListener();  break;
     #endif
 
     // Implemented in DinoI2C.cpp
@@ -198,7 +198,7 @@ void Dino::updateListeners() {
   timeDiff = currentTime - lastTime;
   
   if (timeDiff > 999) {
-    // Add a tick for every 1000us passed
+    // Add a tick for every 1000us passed.
     tickCount = tickCount + (timeDiff / 1000);
       
     // lastTime for next run is currentTime offset by remainder.
@@ -211,7 +211,7 @@ void Dino::updateListeners() {
       if (tickCount % registerDivider == 0) spiBBupdateListeners();
     #endif
     #ifdef DINO_SPI
-      if (tickCount % registerDivider == 0) updateSpiListeners();
+      if (tickCount % registerDivider == 0) spiUpdateListeners();
     #endif
   }
 }
@@ -256,14 +256,14 @@ void Dino::handshake() {
 // CMD = 91
 void Dino::resetState() {
   clearCoreListeners();
-  #ifdef ESP32
-    clearLedcChannels();
-  #endif
   #ifdef DINO_SPI
-    clearSpiListeners();
+    spiClearListeners();
   #endif
   #ifdef DINO_SPI_BB
     spiBBclearListeners();
+  #endif
+  #ifdef ESP32
+    clearLedcChannels();
   #endif
   registerDivider = 8; // Update register listeners every ~8ms.
   fragmentIndex = 0;

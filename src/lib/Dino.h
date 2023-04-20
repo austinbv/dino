@@ -121,10 +121,10 @@ class Dino {
     void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
     void spiTransfer           (uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, uint32_t clockRate, byte *data); //cmd = 26
-    void addSpiListener        ();                                                                                                      //cmd = 27
-    void removeSpiListener     ();                                                                                                      //cmd = 28
-    void updateSpiListeners    ();
-    void clearSpiListeners     ();
+    void spiAddListener        ();                                                                                                      //cmd = 27
+    void spiRemoveListener     ();                                                                                                      //cmd = 28
+    void spiUpdateListeners    ();
+    void spiClearListeners     ();
 
     // I2C
     void i2cBegin              ();

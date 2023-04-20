@@ -23,11 +23,10 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
 
   // SPI mode is the lowest 2 bits of settings.
   byte mode = settings & 0B00000011;
-  // Bit 7 of settings controls bit order. 0 = LSBFIRST, 1 = MSBFIRST.
-  byte bitOrder = bitRead(settings, 7);
   
-  // Do this nonsense so I don't have to care about varying macro definitions.
-  if (bitOrder == 0) {
+  // Bit 7 of settings controls bit order. 0 = LSBFIRST, 1 = MSBFIRST.
+  if (bitRead(settings, 7) == 0) {
+    // True integer value for these macros vary by platform, so just do this.
     switch(mode){
       case 0: SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE0)); break;
       case 1: SPI.beginTransaction(SPISettings(clockRate, LSBFIRST, SPI_MODE1)); break;
@@ -47,8 +46,8 @@ void Dino::spiBegin(byte settings, uint32_t clockRate){
 // Convenience wrapper for SPI.end
 void Dino::spiEnd(){
   SPI.endTransaction();
-  // CLI generator will define TXRX_SPI in Dino.h for all WiFi sketches.
-  // Only matters if using the SPI-based WiFi Arduino shield. We don't want to end.
+  // TXRX_SPI in defined for WiFi/Ethernet sketches on AVR chips.
+  // In those cases, SPI.end() can't be called since the network hardware uses it.
   // ESP32 doesn't like when SPI.end is called either. Might be safe to never do it.
   #if !defined(TXRX_SPI) && defined(__AVR__)
     SPI.end();
@@ -107,7 +106,7 @@ void Dino::spiTransfer(uint8_t selectPin, uint8_t settings, uint8_t rLength, uin
 
 // CMD = 27
 // Start listening to an SPI register.
-void Dino::addSpiListener() {
+void Dino::spiAddListener() {
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
     // Overwrite the first disabled listener in the struct array.
     if (spiListeners[i].enabled == false) {
@@ -127,7 +126,7 @@ void Dino::addSpiListener() {
 
 // CMD = 28
 // Send a number for a select pin to remove an SPI register listener.
-void Dino::removeSpiListener(){
+void Dino::spiRemoveListener(){
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
     if (spiListeners[i].selectPin == pin) {
       spiListeners[i].enabled = false;
@@ -136,7 +135,7 @@ void Dino::removeSpiListener(){
 }
 
 // Gets called by Dino::updateListeners to run listeners in the main loop.
-void Dino::updateSpiListeners(){
+void Dino::spiUpdateListeners(){
   for (int i = 0; i < SPI_LISTENER_COUNT; i++) {
     if (spiListeners[i].enabled) {
       spiTransfer(spiListeners[i].selectPin,
@@ -150,7 +149,7 @@ void Dino::updateSpiListeners(){
 }
 
 // Gets called by Dino::reset to clear all listeners.
-void Dino::clearSpiListeners(){
+void Dino::spiClearListeners(){
   for (int i = 0; i < SPI_LISTENER_COUNT; i++) spiListeners[i].enabled = false;
 }
 #endif
