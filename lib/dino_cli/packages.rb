@@ -28,7 +28,7 @@ PACKAGES = {
     description: "Bit Bang SPI support",
     directive: "DINO_SPI_BB",
     files: [
-      "DinoSPIBitBang.cpp",
+      "DinoSPIBB.cpp",
     ]
   },
   spi: {

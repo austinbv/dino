@@ -11,7 +11,7 @@ class DinoCLI::Generator
     core: [:core],
 
     # Specific features for the old mega168 chips.
-    mega168: [:core, :one_wire, :tone, :shift, :i2c, :spi, :servo],
+    mega168: [:core, :one_wire, :tone, :spi_bb, :i2c, :spi, :servo],
 
     # SAM3X includes everytyhing except specific incompatibilities.
     sam3x: STANDARD_PACKAGES - [:tone, :serial, :ir_out],
