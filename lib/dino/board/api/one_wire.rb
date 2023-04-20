@@ -5,15 +5,15 @@ module Dino
         include Helper
 
         def one_wire_reset(pin, value=0)
-          write Message.encode command: 41,
-                              pin: convert_pin(pin),
-                              value: value
+          write Message.encode  command: 41,
+                                pin: convert_pin(pin),
+                                value: value
         end
 
         def one_wire_search(pin, branch_mask)
-          write Message.encode command: 42,
-                              pin: convert_pin(pin),
-                              aux_message: pack(:uint64, branch_mask, max: 8)
+          write Message.encode  command: 42,
+                                pin: convert_pin(pin),
+                                aux_message: pack(:uint64, branch_mask, max: 8)
         end
 
         def one_wire_write(pin, parasite_power, *data)
@@ -23,16 +23,16 @@ module Dino
           length = bytes.length
           length = length | 0b10000000 if parasite_power
 
-          write Message.encode command: 43,
-                              pin: convert_pin(pin),
-                              value: length,
-                              aux_message: bytes
+          write Message.encode  command: 43,
+                                pin: convert_pin(pin),
+                                value: length,
+                                aux_message: bytes
         end
 
         def one_wire_read(pin, num_bytes)
-          write Message.encode command: 44,
-                              pin: convert_pin(pin),
-                              value: num_bytes
+          write Message.encode  command: 44,
+                                pin: convert_pin(pin),
+                                value: num_bytes
         end
       end
     end
