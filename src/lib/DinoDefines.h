@@ -14,7 +14,7 @@
 // #define DINO_I2C
 // #define DINO_SPI
 // #define DINO_SERVO
-// #define DINO_SERIAL
+// #define DINO_SERIAL_BB
 // #define DINO_IR_OUT
 // #define DINO_LED_ARRAY
 

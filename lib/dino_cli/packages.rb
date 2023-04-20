@@ -46,12 +46,13 @@ PACKAGES = {
       "DinoI2C.cpp",
     ]
   },
-  serial: {
-    description: "Software serial output",
-    directive: "DINO_SERIAL",
+  serial_bb: {
+    description: "Bit bang serial output",
+    directive: "DINO_SERIAL_BB",
+    only: [:mega, :mega168],
     files: [
-      "DinoSerial.cpp",
-      "DinoSerial.h",
+      "DinoSerialBB.cpp",
+      "DinoSerialBB.h",
     ]
   },
   servo: {
@@ -85,7 +86,7 @@ PACKAGES = {
     ]
   },
   led_array: {
-    description: "Support for various protocosl that control (RGB) LED arrays.",
+    description: "Support for various protocols that control (RGB) LED arrays.",
     directive: "DINO_LED_ARRAY",
     files: [
       "DinoLEDArray.cpp",
