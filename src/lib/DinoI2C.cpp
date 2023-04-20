@@ -68,7 +68,7 @@ void Dino::i2cWrite() {
 
   while (remainingBytes > 0) {
     // If > 32 remaining, only write 32, else write all remaining.
-    uint16_t bytesToWrite = (remainingBytes > 32) ? 32 : remainingBytes;
+    uint8_t bytesToWrite = (remainingBytes > 32) ? 32 : remainingBytes;
 
     // Begin
     i2cBegin();
@@ -118,7 +118,7 @@ void Dino::i2cRead() {
 
   while (remainingBytes > 0) {
     // If > 32 remaining, only read 32, else read all remaining.
-    uint16_t bytesToRead = (remainingBytes > 32) ? 32 : remainingBytes;
+    uint8_t bytesToRead = (remainingBytes > 32) ? 32 : remainingBytes;
 
     // Ensure I2C is started.
     i2cBegin();
