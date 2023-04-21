@@ -33,54 +33,41 @@ module Dino
       
       def after_initialize(options={})
         super(options)
-        
+
         # Default to a 128x64 display.
         # Validate usable sizes here? 128x64, 128x32, 96x16, 64x48, 64x32.
         @columns = options[:columns] || 128
         @rows    = options[:rows]    || 64
-        
-        off
-        
+
         # Everything except 96x16 size uses clock divider 0x80.
-        command(SET_CLOCK_DIV)
         clock_divider = 0x80
         clock_divider = 0x60 if (@columns == 96 && @rows == 16)
-        command(clock_divider)
-        
-        command(SET_MULTIPLEX_RATIO)
-        command(@rows - 1)
 
-        command(SET_DISPLAY_OFFSET)
-        command(0x00)
-
-        command(SET_START_LINE | 0x00)
-
-        command(SET_CHARGE_PUMP)
-        command(0x14) # 0x14 = internal, 0x10 = external
-
-        command(SET_SEGMENT_REMAP | 0x01)
-        
-        # Scan pages from COM[N-1] to COM0
-        command(SET_COM_OUTPUT_SCAN_DIRECTION | 0x08)
-        
         # 128x32 and 96x16 sizes use com pin config 0x02
-        command(SET_COM_PIN_CONFIG)
         com_pin_config = 0x12
         com_pin_config = 0x02 if (@columns == 96 && @rows == 16) || (@columns == 128 && @rows == 32)
-        command(com_pin_config)
 
-        command(SET_CONTRAST)
-        command(0x9F)
+        startup_sequence = [
+          DISPLAY_OFF,
+          SET_CLOCK_DIV,            clock_divider,
+          SET_MULTIPLEX_RATIO,      @rows - 1,
+          SET_DISPLAY_OFFSET,       0x00,
+          SET_START_LINE |          0x00,
+          SET_CHARGE_PUMP,          0x14,           # 0x14 = internal, 0x10 = external
+          SET_SEGMENT_REMAP |       0x01,
 
-        command(SET_PRECHARGE_PERIOD)
-        command(0xF1) # 0xF1 = internal, 0x22 = external
+          # Scan pages from COM[N-1] to COM0
+          SET_COM_OUTPUT_SCAN_DIRECTION | 0x08,
 
-        command(SET_VCOM_DESELECT_LEVEL)
-        command(0x40)
-
-        command(SET_INVERT_OFF)
-      
-        command(PIXELS_FROM_RAM)
+          SET_COM_PIN_CONFIG,       com_pin_config,
+          SET_CONTRAST,             0x9F,
+          SET_PRECHARGE_PERIOD,     0xF1,            # 0xF1 = internal, 0x22 = external
+          SET_VCOM_DESELECT_LEVEL,  0x40,
+          SET_INVERT_OFF,
+          PIXELS_FROM_RAM
+        ]
+        command(startup_sequence)
+        
         clear
         on
       end
@@ -108,14 +95,15 @@ module Dino
       end
 
       def cursor(x, y)
-        command(SET_PAGE_START | y)
-        
         # Column address is sent as two nibbles.
         column_start_lower_4 = x & 0x0F
         column_start_upper_4 = (x >> 4) & 0x0F
-        
-        command(SET_COLUMN_START_LOWER | column_start_lower_4)
-        command(SET_COLUMN_START_UPPER | column_start_upper_4)
+
+        command([
+          SET_PAGE_START | y,
+          SET_COLUMN_START_LOWER | column_start_lower_4,
+          SET_COLUMN_START_UPPER | column_start_upper_4
+        ])
       end
 
       def print(str)
