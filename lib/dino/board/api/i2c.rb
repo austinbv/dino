@@ -11,22 +11,22 @@ module Dino
 
         # CMD = 34
         def i2c_write(address, bytes=[], options={})
-          raise ArgumentError, 'I2C writes must be 1..260 bytes long' if (bytes.length < 1 || bytes.length > 260)
-
+          raise ArgumentError, 'maximum write for a single I2C transaction is 32 bytes' if bytes.length > 32
+          
           # Bit 0 of settings controls stop (1), or repated start (0)
           settings  = 0b00
           settings |= 0b01 unless options[:repeated_start]
-       
-          aux = pack(:uint8, [address, 0]) + pack(:uint16, bytes.length) + pack(:uint8, bytes.flatten)
-          write Message.encode  command: 34,
-                                value: settings,
-                                aux_message: aux
+          
+          aux = pack :uint8, [address, 0, bytes.length, bytes].flatten
+          write Message.encode command: 34,
+                              value: settings,
+                              aux_message: aux
         end
 
         # CMD = 35
         def i2c_read(address, register, num_bytes, options={})
-          raise ArgumentError, 'I2C reads must be 1..260 bytes long' if (num_bytes < 1 || num_bytes > 260)
-
+          raise ArgumentError, 'maximum read for a single I2C transaction is 32 bytes' if num_bytes > 32
+          
           # Bit 0 of settings controls stop (1), or repated start (0)
           settings  = 0b00
           settings |= 0b01 unless options[:repeated_start]
@@ -35,10 +35,10 @@ module Dino
           settings |= 0b10 if register
           register = 0 unless register
 
-          aux = pack(:uint8, [address, 0]) + pack(:uint16, num_bytes) + pack(:uint8, register)
-          write Message.encode  command: 35,
-                                value: settings,
-                                aux_message: aux
+          aux = pack :uint8, [address, 0, register, num_bytes]
+          write Message.encode command: 35,
+                              value: settings,
+                              aux_message: aux
         end
       end
     end
