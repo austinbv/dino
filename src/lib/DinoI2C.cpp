@@ -52,7 +52,6 @@ void Dino::i2cSearch() {
 void Dino::i2cWrite() {
   // Get parameters from message.
   uint8_t address     =  (uint8_t)pin & 0b01111111;
-  uint8_t sendStop    =  (uint8_t)pin >> 7;
   uint8_t dataLength  =  (uint8_t)val & 0b00011111;
 
   // Limit to 32 bytes.
@@ -66,6 +65,7 @@ void Dino::i2cWrite() {
   #if defined(ESP32)
     Wire.endTransmission();
   #else
+    uint8_t sendStop = (uint8_t)pin >> 7;
     Wire.endTransmission(sendStop);
   #endif
 }
