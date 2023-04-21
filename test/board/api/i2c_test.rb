@@ -24,11 +24,13 @@ class APII2CTest < Minitest::Test
 
   def test_write
     board
-    aux = pack :uint8, [0x30, 0, 4, [1,2,3,4]]
+    aux = pack(:uint8, [1,2,3,4])
+    address = 0x30
+      
     # Normal
-    message1 = Dino::Board::API::Message.encode command: 34, value: 0b01, aux_message: aux
+    message1 = Dino::Board::API::Message.encode command: 34, pin: 0x30 | (1 << 7), value: 4, aux_message: aux
     # Repeated start
-    message2 = Dino::Board::API::Message.encode command: 34, value: 0b00, aux_message: aux
+    message2 = Dino::Board::API::Message.encode command: 34, pin: 0x30 | (0 << 7), value: 4, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message1]
@@ -39,17 +41,20 @@ class APII2CTest < Minitest::Test
       board.i2c_write(0x30, [1,2,3,4], repeated_start: true)
     end
     mock.verify
-    
-    assert_raises { board.i2c_write(0x30, Array.new(33) {0x00}) }
   end
-  
+
+  def test_write_limits
+    assert_raises { board.i2c_write(0x30, Array.new(33) {0x00}) }
+    assert_raises { board.i2c_write(0x30, Array.new(0)  {0x00}) }
+  end
+
   def test_read
     board
-    aux = pack :uint8, [0x30, 0, 0x03, 4]
+    aux = pack(:uint8, [1, 0x03])
     # Normal
-    message1 = Dino::Board::API::Message.encode command: 35, value: 0b11, aux_message: aux
+    message1 = Dino::Board::API::Message.encode command: 35, pin: 0x30 | (1 << 7), value: 4, aux_message: aux
     # Repeated start
-    message2 = Dino::Board::API::Message.encode command: 35, value: 0b10, aux_message: aux
+    message2 = Dino::Board::API::Message.encode command: 35, pin: 0x30 | (0 << 7), value: 4, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message1]
@@ -64,8 +69,8 @@ class APII2CTest < Minitest::Test
   
   def test_read_without_register
     board
-    aux = pack :uint8, [0x30, 0, 0, 4]
-    message = Dino::Board::API::Message.encode command: 35, value: 0b01, aux_message: aux
+    aux = pack(:uint8, [0])
+    message = Dino::Board::API::Message.encode command: 35, pin: 0x30 | (1 << 7), value: 4, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message]
@@ -74,5 +79,10 @@ class APII2CTest < Minitest::Test
       board.i2c_read(0x30, nil, 4)
     end
     mock.verify
+  end
+
+  def test_read_limits
+    assert_raises { board.i2c_read(0x30, nil, 33) }
+    assert_raises { board.i2c_read(0x30, nil, 0)  }
   end
 end

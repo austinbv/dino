@@ -11,34 +11,37 @@ module Dino
 
         # CMD = 34
         def i2c_write(address, bytes=[], options={})
-          raise ArgumentError, 'maximum write for a single I2C transaction is 32 bytes' if bytes.length > 32
+          raise ArgumentError, 'I2C write must be 1..32 bytes long' if (bytes.length > 32 || bytes.length < 1)
           
-          # Bit 0 of settings controls stop (1), or repated start (0)
-          settings  = 0b00
-          settings |= 0b01 unless options[:repeated_start]
-          
-          aux = pack :uint8, [address, 0, bytes.length, bytes].flatten
-          write Message.encode command: 34,
-                              value: settings,
-                              aux_message: aux
+          # Use top bit of address to select stop condition (1), or repated start (0).
+          send_stop = options[:repeated_start] ? 0 : 1
+
+          write Message.encode  command:     34,
+                                pin:         address | (send_stop << 7),
+                                value:       bytes.length,
+                                aux_message: pack(:uint8, [bytes].flatten)
         end
 
         # CMD = 35
-        def i2c_read(address, register, num_bytes, options={})
-          raise ArgumentError, 'maximum read for a single I2C transaction is 32 bytes' if num_bytes > 32
-          
-          # Bit 0 of settings controls stop (1), or repated start (0)
-          settings  = 0b00
-          settings |= 0b01 unless options[:repeated_start]
-          
-          # Bit 1 of settings controls whether to write a start register before reading.
-          settings |= 0b10 if register
-          register = 0 unless register
+        def i2c_read(address, register, read_length, options={})
+          raise ArgumentError, 'I2C read must be 1..32 bytes long' if (read_length > 32 || read_length < 1)
 
-          aux = pack :uint8, [address, 0, register, num_bytes]
-          write Message.encode command: 35,
-                              value: settings,
-                              aux_message: aux
+          # Use top bit of address to select stop condition (1), or repated start (0).
+          send_stop = options[:repeated_start] ? 0 : 1
+
+          # A starting register can be optionally given, up to 4 bytes as an array.
+          if register
+            register = [register].flatten 
+            raise ArgumentError, 'maximum 4 byte register address for I2C read' if register.length > 4
+            aux = pack(:uint8, [register.length] + register)
+          else
+            aux = pack(:uint8, [0])
+          end
+
+          write Message.encode  command:      35,
+                                pin:          address | (send_stop << 7),
+                                value:        read_length,
+                                aux_message:  aux
         end
       end
     end

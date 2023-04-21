@@ -4,7 +4,6 @@
 // Functions for listeners shared between hardware and bit bang SPI.
 //
 #if defined(DINO_SPI) || defined(DINO_SPI_BB)
-
 // CMD = 28
 // Send a number for a select pin to remove a SPI listener.
 void Dino::spiRemoveListener(){

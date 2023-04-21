@@ -24,7 +24,7 @@ module Dino
         board.i2c_write(address, [bytes].flatten, **kwargs)
       end
 
-      def _read(address, register=nil, num_bytes=1, **kwargs)
+      def _read(address, register, num_bytes, **kwargs)
         board.i2c_read(address, register, num_bytes, **kwargs)
       end
 

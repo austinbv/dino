@@ -37,89 +37,95 @@ void Dino::i2cSearch() {
 }
 
 // CMD = 34
-// Write to an I2C device. All params as binary in auxMsg.
+// Write to an I2C device over a harwdare I2C interface.
 //
-// val        = Settings
-// val bit 0  = repeated start
-// val bit 1  = write register address before reading
-// val bit 2+ = unused
+// pin
+//  bits 0..6 = Device address
+//  bit  7    = Send stop condition. 0 = no, repeated start. 1 = yes.
 //
-// auxMsg[0]  = 7-bit device addresses
-// auxMsg[1]  = reserved
-// auxMsg[2]  = data length
-// auxMsg[3]+ = data
+// val
+//  bits 0..4 = Data length. NOTE: maximum of 32. Anything after is ignored.
+//  bits 5..7 = Reserved for bus selection in future.
 //
-// Max limited by aux message size.
+// auxMsg[0]+ = data
 //
 void Dino::i2cWrite() {
+  // Get parameters from message.
+  uint8_t address     =  (uint8_t)pin & 0b01111111;
+  uint8_t sendStop    =  (uint8_t)pin >> 7;
+  uint8_t dataLength  =  (uint8_t)val & 0b00011111;
+
+  // Limit to 32 bytes.
+  if (dataLength > 32) dataLength = 32;
+
+  i2cBegin();
+  Wire.beginTransmission(address);
+  Wire.write(&auxMsg[0], dataLength);
+
   // No repeated start on ESP32.
   #if defined(ESP32)
-    bool sendStop = true;
+    Wire.endTransmission();
   #else
-    bool sendStop = bitRead(val, 0);
+    Wire.endTransmission(sendStop);
   #endif
-  
-  i2cBegin();
-  Wire.beginTransmission(auxMsg[0]);
-  Wire.write(&auxMsg[3], auxMsg[2]);
-  Wire.endTransmission(sendStop);
 }
 
 // CMD = 35
-// Read from an I2C device. All params as binary in auxMsg.
+// Read from an I2C device over a harwdare I2C interface.
 //
-// val        = Settings
-// val bit 0  = repeated start
-// val bit 1  = write register address before reading
-// val bit 2+ = unused
-// 
-// auxMsg[0]  = 7-bit device address
-// auxMsg[1]  = reserved
-// auxMsg[2]  = register address
-// auxMsg[3]  = number of bytes
+// pin
+//  bits 0..6 = Device address
+//  bit  7    = Send stop condition. 0 = no, repeated start. 1 = yes.
 //
-// Max 32 bytes, limited by Wire library buffer. Validate remotely.
+// val
+//  bits 0..4 = Data length. NOTE: maximum of 32. Anything after is ignored.
+//  bits 5..7 = Reserved for bus selection in future.
+//
+// auxMsg[0]  = If > 0, write a register address of that many bytes before reading.
+// auxMsg[1]+ = Register address bytes in order.
 //
 void Dino::i2cRead() {
-  // Limit to 32 bytes.
-  if (auxMsg[3] > 32) auxMsg[3] = 32;
+  // Get parameters from message.
+  uint8_t address         = (uint8_t)pin & 0b01111111;
+  uint8_t sendStop        = (uint8_t)pin >> 7;
+  uint8_t dataLength      = (uint8_t)val & 0b00011111;
 
-  // No repeated start on ESP32.
-  #if defined(ESP32)
-    bool sendStop = true;
-  #else
-    bool sendStop = bitRead(val, 0);
-  #endif
+  // Limit to 32 bytes.
+  if (dataLength > 32) dataLength = 32;
 
   i2cBegin();
   
-  // Optionally write a register address before reading.
-  if (bitRead(val, 1)) {
-    Wire.beginTransmission(auxMsg[0]);
-    Wire.write(auxMsg[2]);
+  // Optionally write up to a 4 byte register address before reading.
+  if ((auxMsg[0] > 0) && (auxMsg[0] < 5)) {
+    Wire.beginTransmission(address);
+    Wire.write(&auxMsg[1], auxMsg[0]);
     Wire.endTransmission(sendStop);
   }
   
   // ESP32 crashes if requestFrom gets the 3rd arg.
   #if defined(ESP32)  
-    Wire.requestFrom(auxMsg[0], auxMsg[3]);
+    Wire.requestFrom(address, dataLength);
   #else
-    // Wire.beginTransmission(auxMsg[0]);
-    Wire.requestFrom(auxMsg[0], auxMsg[3], sendStop);
+    Wire.requestFrom(address, dataLength, sendStop);
   #endif
   
   // Send data as if coming from SDA pin. Prefix with device adddress.
   // Fail silently if no bytes read / invalid device address.
   if(Wire.available()){
     stream->print(SDA); stream->print(':');
-    stream->print(auxMsg[0]); stream->print('-');
+    stream->print(address); stream->print('-');
+    while(Wire.available()){
+      stream->print(Wire.read());
+      stream->print(',');
+    }
+    stream->print('\n');
   }
-  uint8_t currentByte = 0;
-  while(Wire.available()){
-    currentByte++;
-    stream->print(Wire.read());
-    stream->print((currentByte == auxMsg[3]) ? '\n' : ',');
-  }
-  Wire.endTransmission(sendStop);
+  
+  // No repeated start on ESP32.
+  #if defined(ESP32)
+    Wire.endTransmission();
+  #else
+    Wire.endTransmission(sendStop);
+  #endif
 }
 #endif
