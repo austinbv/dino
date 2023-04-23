@@ -24,7 +24,7 @@ class APII2CTest < Minitest::Test
 
   def test_write
     board
-    aux = pack(:uint8, [1,2,3,4])
+    aux = pack(:uint8, 0x00) + pack(:uint8, [1,2,3,4])
     address = 0x30
       
     # Normal
@@ -50,7 +50,7 @@ class APII2CTest < Minitest::Test
 
   def test_read
     board
-    aux = pack(:uint8, [1, 0x03])
+    aux = pack(:uint8, 0x00) + pack(:uint8, [1, 0x03])
     # Normal
     message1 = Dino::Board::API::Message.encode command: 35, pin: 0x30 | (1 << 7), value: 4, aux_message: aux
     # Repeated start
@@ -69,7 +69,7 @@ class APII2CTest < Minitest::Test
   
   def test_read_without_register
     board
-    aux = pack(:uint8, [0])
+    aux = pack(:uint8, 0x00) + pack(:uint8, [0])
     message = Dino::Board::API::Message.encode command: 35, pin: 0x30 | (1 << 7), value: 4, aux_message: aux
 
     mock = MiniTest::Mock.new
@@ -84,5 +84,31 @@ class APII2CTest < Minitest::Test
   def test_read_limits
     assert_raises { board.i2c_read(0x30, nil, 33) }
     assert_raises { board.i2c_read(0x30, nil, 0)  }
+  end
+
+  def test_speeds
+    board
+    data = [1,2,3,4]
+    address = 0x30
+      
+    messages = []
+    # 100 kHz, 400 kHz, 1 Mhz, 3.4 MHz
+    [0x00, 0x01, 0x02, 0x03].each do |code|
+      messages << Dino::Board::API::Message.encode(command: 34, pin: 0x30 | (1 << 7), value: 4, aux_message: pack(:uint8, code) + pack(:uint8, data))
+    end
+
+    mock = MiniTest::Mock.new
+    messages.each do |message|
+      mock.expect :call, nil, [message]
+    end
+    connection.stub(:write, mock) do
+      board.i2c_write(address, data, speed: 100000)
+      board.i2c_write(address, data, speed: 400000)
+      board.i2c_write(address, data, speed: 1000000)
+      board.i2c_write(address, data, speed: 3400000)
+    end
+    mock.verify
+
+    assert_raises(ArgumentError) { board.i2c_write(0x30, [1,2,3,4], speed: 5000000) }
   end
 end

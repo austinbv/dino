@@ -20,7 +20,7 @@ class I2CPeripheralTest < MiniTest::Test
   def test_write_and_repeated_start
     part.repeated_start = true
     
-    mock = MiniTest::Mock.new.expect :call, nil, [0x30, [1,2]], repeated_start: true
+    mock = MiniTest::Mock.new.expect :call, nil, [0x30, [1,2]], repeated_start: true, speed: 100000
     bus.stub(:write, mock) do
       part.write [1,2]
     end
@@ -31,7 +31,7 @@ class I2CPeripheralTest < MiniTest::Test
     
     board.inject_read("5:48-127,127,127,127,127,127")
     
-    mock = MiniTest::Mock.new.expect :call, nil, [0x30, 0x03, 6], repeated_start: true
+    mock = MiniTest::Mock.new.expect :call, nil, [0x30, 0x03, 6], repeated_start: true, speed: 100000
     bus.stub(:read, mock) do
       part._read(0x03, 6)
     end

@@ -17,6 +17,17 @@ void Dino::i2cBegin() {
   }
 }
 
+// Configurable I2C speed each time read or write is called.
+void Dino::i2cSetSpeed(uint8_t code) {
+  switch(code) {
+    case 0:  Wire.setClock(100000);  break;
+    case 1:  Wire.setClock(400000);  break;
+    case 2:  Wire.setClock(1000000); break;
+    case 3:  Wire.setClock(3400000); break;
+    default: Wire.setClock(100000);  break;
+  }
+}
+
 // CMD = 33
 // Ask each address for a single byte to see if it exists on the bus.
 void Dino::i2cSearch() {
@@ -44,22 +55,25 @@ void Dino::i2cSearch() {
 //  bit  7    = Send stop condition. 0 = no, repeated start. 1 = yes.
 //
 // val
-//  bits 0..4 = Data length. NOTE: maximum of 32. Anything after is ignored.
-//  bits 5..7 = Reserved for bus selection in future.
+//  bits 0..4 = Data length. NOTE: maximum of 32. Anything more is ignored.
+// 
+// auxMsg[0]  = I2C settings. Just speed selection for now.
 //
-// auxMsg[0]+ = data
+// auxMsg[1]+ = data
 //
 void Dino::i2cWrite() {
   // Get parameters from message.
   uint8_t address     =  (uint8_t)pin & 0b01111111;
-  uint8_t dataLength  =  (uint8_t)val & 0b00011111;
+  uint8_t dataLength  =  (uint8_t)val;
 
   // Limit to 32 bytes.
   if (dataLength > 32) dataLength = 32;
 
   i2cBegin();
+  i2cSetSpeed(auxMsg[0]);
+
   Wire.beginTransmission(address);
-  Wire.write(&auxMsg[0], dataLength);
+  Wire.write(&auxMsg[1], dataLength);
 
   // No repeated start on ESP32.
   #if defined(ESP32)
@@ -78,27 +92,29 @@ void Dino::i2cWrite() {
 //  bit  7    = Send stop condition. 0 = no, repeated start. 1 = yes.
 //
 // val
-//  bits 0..4 = Data length. NOTE: maximum of 32. Anything after is ignored.
-//  bits 5..7 = Reserved for bus selection in future.
+//  bits 0..4 = Data length. NOTE: maximum of 32. Anything more is ignored.
 //
-// auxMsg[0]  = If > 0, write a register address of that many bytes before reading.
-// auxMsg[1]+ = Register address bytes in order.
+// auxMsg[0]  = I2C settings. Just speed selection for now.
+//
+// auxMsg[1]  = If > 0, write a register address of that many bytes before reading.
+// auxMsg[2]+ = Register address bytes in order.
 //
 void Dino::i2cRead() {
   // Get parameters from message.
   uint8_t address         = (uint8_t)pin & 0b01111111;
   uint8_t sendStop        = (uint8_t)pin >> 7;
-  uint8_t dataLength      = (uint8_t)val & 0b00011111;
+  uint8_t dataLength      = (uint8_t)val;
 
   // Limit to 32 bytes.
   if (dataLength > 32) dataLength = 32;
 
   i2cBegin();
+  i2cSetSpeed(auxMsg[0]);
   
   // Optionally write up to a 4 byte register address before reading.
-  if ((auxMsg[0] > 0) && (auxMsg[0] < 5)) {
+  if ((auxMsg[1] > 0) && (auxMsg[1] < 5)) {
     Wire.beginTransmission(address);
-    Wire.write(&auxMsg[1], auxMsg[0]);
+    Wire.write(&auxMsg[2], auxMsg[1]);
     Wire.endTransmission(sendStop);
   }
   
