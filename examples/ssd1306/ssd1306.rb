@@ -22,9 +22,20 @@ board = Dino::Board.new(Dino::Board::Connection::Serial.new)
 # connected for it to work, but we don't need to control it.
 #
 bus = Dino::I2C::Bus.new(board: board, pin: 'A4')
+oled = Dino::Display::SSD1306.new(bus: bus, address: 0x3C, rotate: true)
+canvas = oled.canvas
 
-oled = Dino::Display::SSD1306.new(bus: bus, address: 0x3C)
+# Draw some text on the OLED's canvas (a Ruby memory buffer).
+canvas.text_cursor = [27,60]
+canvas.print("Hello World!")
 
-oled.print("Hello World!")
+# Add some shapes to the canvas.
+baseline = 40
+canvas.rectangle(10, baseline, 30, -30)
+canvas.circle(66, baseline - 15, 15)
+canvas.triangle(87, baseline, 117, baseline, 102, baseline - 30)
+
+# Send the canvas to the OLED's graphics RAM so it shows.
+oled.draw
 
 board.finish_write
