@@ -130,8 +130,8 @@ module Dino
           COLUMN_ADDRESS_RANGE,   0, @columns - 1
         ]
         
-        # Draw the canvas 31 bytes at a time.
-        canvas.framebuffer.each_slice(31) do |slice|
+        # Draw the canvas in chunks based on board's I2C limit.
+        canvas.framebuffer.each_slice(self.bus.board.i2c_limit - 1) do |slice|
           data(slice)
         end
       end

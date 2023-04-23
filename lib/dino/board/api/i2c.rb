@@ -11,6 +11,11 @@ module Dino
           3400000 => 0x03,
         }
 
+        # Might make this bigger based on board maps later, but stick with the lowest limit of the AVR boards for now.
+        def i2c_limit
+          32
+        end
+
         def i2c_convert_speed(speed)
           # Default to 100 kHz.
           speed = 100000 unless speed
@@ -28,7 +33,7 @@ module Dino
 
         # CMD = 34
         def i2c_write(address, bytes=[], options={})
-          raise ArgumentError, 'I2C write must be 1..32 bytes long' if (bytes.length > 32 || bytes.length < 1)
+          raise ArgumentError, "I2C write must be 1..#{i2c_limit} bytes long" if (bytes.length > i2c_limit || bytes.length < 1)
           
           # Use top bit of address to select stop condition (1), or repated start (0).
           send_stop = options[:repeated_start] ? 0 : 1
@@ -42,7 +47,7 @@ module Dino
 
         # CMD = 35
         def i2c_read(address, register, read_length, options={})
-          raise ArgumentError, 'I2C read must be 1..32 bytes long' if (read_length > 32 || read_length < 1)
+          raise ArgumentError, "I2C read must be 1..#{i2c_limit} bytes long" if (read_length > i2c_limit || read_length < 1)
 
           # Use top bit of address to select stop condition (1), or repated start (0).
           send_stop = options[:repeated_start] ? 0 : 1
