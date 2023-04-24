@@ -1,5 +1,13 @@
 require_relative '../test_helper'
 
+class TempSpiPeripheral
+  def initialize(pin)
+    @pin = pin
+  end
+  
+  attr_reader :pin
+end
+
 class SPIBusTest < Minitest::Test
   def board
     @board ||= BoardMock.new
@@ -37,7 +45,7 @@ class SPIBusTest < Minitest::Test
   end
 
   def test_add_and_remove_component
-    obj = Object.new
+    obj = TempSpiPeripheral.new(1)
     part.add_component(obj)
     assert board.components.include?(obj)
 
@@ -51,5 +59,13 @@ class SPIBusTest < Minitest::Test
       part.set_pin_mode(9, :output)
     end
     mock.verify
+  end
+
+  def test_unique_select_pins
+    part.add_component TempSpiPeripheral.new(1)
+
+    assert_raises do
+      part.add_component TempSpiPeripheral.new(1)
+    end
   end
 end

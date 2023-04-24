@@ -63,7 +63,7 @@ class InputRegisterTest < Minitest::Test
     part.update("127")
     assert_equal [1,1,1,1,1,1,1,0], part.state
 
-    new_part = Dino::SPI::InputRegister.new(options.merge(bytes: 2))
+    new_part = Dino::SPI::InputRegister.new(options.merge(bytes: 2, pin: 10))
     new_part.update("127,128")
     assert_equal [1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1], new_part.state
   end

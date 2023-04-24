@@ -28,7 +28,7 @@ class BaseRegisterTest < Minitest::Test
     assert_equal 2,           part.spi_mode
     assert_equal :lsbfirst,   part.bit_order
     assert_equal 2,           part.bytes
-    new_part = Dino::SPI::BaseRegister.new(options.merge(bytes: 3))
+    new_part = Dino::SPI::BaseRegister.new(options.merge(bytes: 3, pin: 10))
     assert_equal new_part.state, Array.new(24) {|i| 0}
   end
 end

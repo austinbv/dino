@@ -26,10 +26,17 @@ module Dino
       end
 
       def add_component(component)
+        pins = components.map { |c| c.pin }
+        if pins.include? component.pin
+          raise ArgumentError, "duplicate select pin for #{component}"
+        end
+
+        components << component
         board.add_component(component)
       end
 
       def remove_component(component)
+        components.delete(component)
         board.remove_component(component)
       end
     end
