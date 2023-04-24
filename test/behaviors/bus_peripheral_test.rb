@@ -1,11 +1,11 @@
 require_relative '../test_helper'
 
-class BusControllerComponent
+class NoAddressController
   include Dino::Behaviors::Component
   include Dino::Behaviors::BusController
 end
 
-class BusPeripheralComponent
+class NoAddressPeripheral
   include Dino::Behaviors::Component
   include Dino::Behaviors::BusPeripheral
 end
@@ -16,22 +16,17 @@ class BusPeripheralTest < Minitest::Test
   end
 
   def bus
-    @bus ||= BusControllerComponent.new(board: board)
+    @bus ||= NoAddressController.new(board: board)
   end
   
   def part
-    @part ||= BusPeripheralComponent.new(bus: bus, address: 0x22)
+    @part ||= NoAddressPeripheral.new(bus: bus, address: 0x22)
   end
   
   def test_initialize
     assert_equal part.board, bus
-    assert_equal part.address, 0x22
   end
-  
-  def test_requires_address
-    assert_raises(ArgumentError) { BusPeripheralComponent.new(bus: bus) }
-  end
-  
+
   def test_can_use_bus_atomically   
     mock = MiniTest::Mock.new
     1.times {mock.expect(:call, nil)}

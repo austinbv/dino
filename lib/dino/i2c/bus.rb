@@ -2,7 +2,7 @@ module Dino
   module I2C
     class Bus
       include Behaviors::SinglePin
-      include Behaviors::BusController
+      include Behaviors::BusControllerAddressed
       include Behaviors::Reader
 
       attr_reader :found_devices
@@ -27,7 +27,7 @@ module Dino
       def _read(address, register, num_bytes, **kwargs)
         board.i2c_read(address, register, num_bytes, **kwargs)
       end
-
+      
       def bubble_callbacks
         add_callback(:bus_master) do |str|
           if str && str.match(/\A\d+-/)

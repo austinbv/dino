@@ -8,10 +8,11 @@ module Dino
     autoload :MultiPin,   "#{__dir__}/behaviors/multi_pin"
  
     # Subcomponent stuff
-    autoload :BusController,  "#{__dir__}/behaviors/bus_controller"
-    autoload :BusPeripheral,  "#{__dir__}/behaviors/bus_peripheral"
-    autoload :BusAddressable, "#{__dir__}/behaviors/bus_addressable"
-    autoload :BoardProxy,     "#{__dir__}/behaviors/board_proxy"
+    autoload :BusController,          "#{__dir__}/behaviors/bus_controller"
+    autoload :BusControllerAddressed, "#{__dir__}/behaviors/bus_controller_addressed"
+    autoload :BusPeripheral,          "#{__dir__}/behaviors/bus_peripheral"
+    autoload :BusPeripheralAddressed, "#{__dir__}/behaviors/bus_peripheral_addressed"
+    autoload :BoardProxy,             "#{__dir__}/behaviors/board_proxy"
 
     # Async stuff
     autoload :Threaded,   "#{__dir__}/behaviors/threaded"

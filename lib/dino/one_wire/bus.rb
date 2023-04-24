@@ -2,7 +2,7 @@ module Dino
   module OneWire
     class Bus
       include Behaviors::SinglePin
-      include Behaviors::BusController
+      include Behaviors::BusControllerAddressed
       include Behaviors::Reader
       include BusEnumeration
       include Constants

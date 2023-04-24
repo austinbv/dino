@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class BusControllerComponenet
+class NoAddressController
   include Dino::Behaviors::Component
   include Dino::Behaviors::BusController
 end
@@ -11,7 +11,7 @@ class BusControllerTest < Minitest::Test
   end
 
   def part
-    @part ||= BusControllerComponenet.new(board: board)
+    @part ||= NoAddressController.new(board: board)
   end
   
   def test_has_mutex
