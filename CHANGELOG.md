@@ -2,15 +2,22 @@
 
 ## 0.13.0
 
+### New Features
+- `Board#map`
+  - Calling `#map` on a `Board` instance will return a hash that maps its named pins (taken from the Arduino framework) to their integer GPIO values, once the board is supported. Examples: `:A0`, `:DAC0`, `:MOSI`, `:LED_BUILTIN`.
+  - Pin names can be given as symbols when instantiating components on a board, and they will automatically convert to integers.
+  - This also makes it easier to connect components like SPI or I2C, without a pinout diagram.
+  - To make this work, the board sends and identifier string (again taken from the Arduino framework) during handshake. This is cross-referenced against a directory of YAML files, loading the right map for each board.
+  - This uses [`arduino-yaml-board-maps`](https://github.com/dino-rb/arduino-yaml-board-maps). See that repo for which Arduino cores / boards are supported.
+
 ### New Boards
-- SAMD Based Boards, Arduino Zero (`--target samd`):
-  - All features work except for SoftwareSerial
+- SAMD21 Boards, Arduino Zero (`--target samd`):
+  - All working. No bit bang UART support.
 
 - RP2040 Based Boards, Raspberry Pi Pico (W) (`--target rp2040`):
-  - Only core features tested so far
-  - WiFi untested
+  - All working except WS2812 LED arrays. No bit bang UART support.
 
-- Raspberry Pi built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
+- Raspberry Pi (not Pico) built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
   - Ruby needs to be running on the Pi itself.
   - Folllow install instructions from `dino-piboard` gem's readme.
   - `require "dino/piboard"` instead of `require "dino"`
@@ -27,9 +34,9 @@
 - SSD1306 OLED driver support:
   - Class: `Dino::Display::SSD1306`
   - Connects over I2C, driver written in Ruby.
-  - Only basic text support so far, with one 6x8 font.
-  - No graphics or drawing methods yet.
-  
+  - Updates entire frame at once using horizontal addressing mode.
+  - One 6x8 font and graphic primitves, included through `Dino::Display::Canvas`.
+
 - L298 H-Bridge motor driver:
   - Class: `Dino::Motor::L298`
   - Forward, reverse, idle, and brake modes implemented.
@@ -37,11 +44,10 @@
 
 - WS2812 / WS2812B / NeoPixel Support:
   - Class: `Dino::LED::WS2812`
-  - Doesn't work on RP2040 yet.
   - No fancy functions yet. Just clear, set pixels, and show.
 
 See new examples in the [examples](examples) folder to learn more.
-  
+
 ### Changed Components
 - Virtually every component has been renamed to stop using the `Dino::Components` namespace and make naming clearer.
   - TODO: Update here with a list of renamed components.
@@ -56,16 +62,27 @@ See new examples in the [examples](examples) folder to learn more.
     ```
   - For now, this always uses the default SPI device on the board, but will allow the selection of alternate SPI devices in the future, for boards that have multiple.
   - This allows a device to mutex lock the bus and make sure operations happen atomically.
-  - The Shift In/Out features (really bitbang SPI) will be refactored into a "bus" so components can use either a hardware SPI device, or bitbang interchangeably.
+  - Shift In/Out features refactored into `SPI::Bitbang` which is class-compatible with `SPI::Bus`, except for frequency.
   - When adding a device to the SPI bus, the bus passes its chip select pin and callback hook directly through to the board.
+  - Both `SPI::Bus` and `SPI::Bitbang` validate select pin uniquness among peripherals, per bus instance.
+
+- `ShiftIn` and `ShiftOut` components removed:
+  - Refactored into `SPI::BitBang`. See SPI changes above.
+
+- `I2C::Bus` does not automatically search when initialized.
+
+- I2C frequency now configurable:
+  - `I2C::Peripheral` and it's subclasses take `:i2c_frequency` keywoard arg when instantiating. It's stored in `@i2c_frequency` with accessors, and used for all reads and writes.
+  - `Board#i2c_write` and `Board#i2c_read` accept `:i2c_frequency` as a keyword arg.
+  - Valid values are: `100000, 400000, 1000000, 3400000`. Falls back to `100000` at the `Board` level, when not given.
 
 - Hitachi HD44780 LCD driver rewritten in Ruby:
-  - Class is now: `Dino::Display::HD44789`
+  - New class: `Dino::Display::HD44789`
   - `#puts` changed to `#print` to better represent functionality.
   - No longer depends on the `LiquidCrystal` Arduino library, which has been removed.
   - Depends only on `Dino::DigitalIO::Output` and `#micro_delay`.
-  - Old implementation in `Dino::Components::LCD` class has been removed.
-  - This solves compatibility with booards that the library didn't work with.
+  - Old implementation in `Dino::Components::LCD` removed.
+  - This solves compatibility with boards that the library didn't work with.
   
 - `Dino::PulseIO::PWMOutput` (previously `Dino::Components::Basic::AnalogOutput`):
   - Changed `#analog_write` to `#pwm_write`.
@@ -73,10 +90,15 @@ See new examples in the [examples](examples) folder to learn more.
   - `#pwm_enable` is implicit when calling `#pwm_write`. Lazy initialize PWM peripherals on the chip. Never happens if only `#digital_write` gets called.
   - `#pwm_disable` sets the pin mode to `:output` (`OUTPUT` in Arduino), disconnects and deconfigures any PWM generating peripheral.
   - On the ESP32 `#pwm_disable` releases the LEDC channel that the pin was using, so it can be reused.
-  
+
 - `Dino::AnalogIO::Output` (also previously `Dino::Components::Basic::AnalogOutput`):
   - Changed `#analog_write` to `#dac_write`.
   - Does not implement `#digital_write` at all. Analog values must be used instead of `board.high` or `board.low`.
+
+- `Dino::UART::BitBang` (previously `Dino::Components::SoftwareSerial`):
+  - No longer included on anything other than AVR boards. Cross-platform support isn't good, and isn't necessary since almost everything has extra hardware UARTs.
+  - Might even try to limit to just the ATmega168 and 328, since only they need it.
+  - Will add a hardware UART passthrough eventually (for all the other chips), and add read support to this.
 
 ### Board API Changes
 - `microDelay` function exposed from the board library:
@@ -111,6 +133,13 @@ See new examples in the [examples](examples) folder to learn more.
 
 - `Board#pwm_high`, `Board#dac_high` and `Board#adc_high` been defined for convenience.
 
+- `Board#spi_transfer` now only accepts `:spi_mode` and `:spi_frequency` keywords for the respective arguments.
+
+- `Board#spi_listen` and `Board#spi_bb_listen` (hardware and bit bang SPI respectively), now share the same listener storage on the board. Default listener count is 4. "Shift listeners" have been removed.
+
+- `Board#i2c_read` and `Board#i2c_write` now only accept `:i2c_frequency` and `:i2c_repeated_start` keywords for their respective arguments.
+
+
 ### Minor Changes
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
 - Aux message size limits changed to:
@@ -118,11 +147,16 @@ See new examples in the [examples](examples) folder to learn more.
   - 256 + 16: When not using IR output or WS2812, any board
   - 32  + 16: When all the features that use lots of aux are disabled (core sketch)
 
+- All `Serial.print` style debugging removed from the Arduino sketch, in favor of the new debugger in the Arduino IDE. If this style of debugging is still needed, the sketch should emit lines beginning with "DBG:". These will be caught by the Ruby parser and printed to the terminal.
+
+- Removed `Dino::Board::ESP8266`, in favor of the new board mapping functionality. See New Features above.
+
 ### Bug Fixes
-- Fixed `Piezo` functionality. Frequency and duration values weren't being properly cast on the board. Duration is also limited to 16 bits now, instead of 32, as it should be to match the Arduino function.
-- Added validation for I2C writes not exceeding 32 bytes, since this is a limit of the native library buffer. May change functionality on the board in future, so it splits up bigger messages automatically.
-- Stricter regex validation in `I2C::Bus` for identifying a series of bytes coming from a specific I2C address.
 - Fixed `Dino::DigitalIO::Output` not setting its state through its mutex.
+- Fixed `Piezo` functionality. Frequency and duration values weren't being properly cast on the board. Duration is also limited to 16 bits now, instead of 32, as it should be to match the Arduino function.
+- Added validation for I2C writes not exceeding 32 bytes, since this is a limit of the native (AVR) library  buffer. May increase for boards with bigger buffers in the future.
+- Stricter regex validation in `I2C::Bus` for identifying a series of bytes coming from a specific I2C address.
+- `I2C::Bus` and `OneWire::Bus` now validate peripheral addresses as unique, per bus instance.
 
 ## 0.12.0
 
