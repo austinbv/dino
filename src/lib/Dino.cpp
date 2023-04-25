@@ -149,7 +149,14 @@ void Dino::process() {
 
     // Implemented in DinoSPI.cpp
     #ifdef DINO_SPI
-    case 26: spiTransfer      (*reinterpret_cast<uint32_t*>(auxMsg + 3), pin, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[7]); break;
+    case 26: {
+      // Do this since RP2040 crashes with reinterpet_cast of uint32_t.
+      uint32_t  clockRate  = (uint32_t)auxMsg[3];
+                clockRate |= (uint32_t)auxMsg[4] << 8;
+                clockRate |= (uint32_t)auxMsg[5] << 16;
+                clockRate |= (uint32_t)auxMsg[6] << 24;
+      spiTransfer(clockRate, pin, auxMsg[0], auxMsg[1], auxMsg[2], &auxMsg[7]); break;
+    }
     case 27: spiAddListener   ();  break;
     #endif
 

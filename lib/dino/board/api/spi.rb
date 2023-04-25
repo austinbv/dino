@@ -7,7 +7,7 @@ module Dino
         def spi_validate(options)
           options[:read]       ||= 0
           options[:write]        = [options[:write]].flatten.compact || []
-          options[:mode]       ||= 0
+          options[:mode]         = options[:mode] || options[:spi_mode] || 0
           options[:bit_order]  ||= :msbfrst
 
           # Lowest 2 bits of settings control the SPI mode

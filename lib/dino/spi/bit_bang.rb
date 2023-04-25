@@ -26,22 +26,22 @@ module Dino
         # Ensure clock pin is given.
         require_pin(:clock)
 
-        # Ensure pins are unique and conver them to integer.
+        # Ensure pins are unique and convert them to integer.
         super(options)
       end
 
-      def transfer(pin, **options)
+      def transfer(select_pin, **options)
         options.merge!(pin_hash)
-        board.spi_bb_transfer(pin, **options)
+        board.spi_bb_transfer(select_pin, **options)
       end
 
-      def listen(pin, **options)
+      def listen(select_pin, **options)
         options.merge!(pin_hash)
-        board.spi_bb_listen(pin, **options)
+        board.spi_bb_listen(select_pin, **options)
       end
 
       def pin_hash
-        {input: pins[:input], output: pins[:output], clock: pins[:clock]}
+        { input: pins[:input], output: pins[:output], clock: pins[:clock] }
       end
 
       # Uses regular Board#spi_stop since listeners are shared.
@@ -49,21 +49,22 @@ module Dino
         board.spi_stop(pin)
       end
 
-      # Delegate necessary methods for chip enable and callbacks directly to the board.
+      # Delegate this to board so peripherals can initialize their select pins.
       def set_pin_mode(*args)
         board.set_pin_mode(*args)
       end
 
+      # Add peripheral to self and the board. It gets callbacks directly from the board.
       def add_component(component)
-        pns = components.map { |c| c.pin }
+        pins = components.map { |c| c.pin }
         if pins.include? component.pin
           raise ArgumentError, "duplicate select pin for #{component}"
         end
-
         components << component
         board.add_component(component)
       end
 
+      # Remove peripheral from self and the board.
       def remove_component(component)
         components.delete(component)
         board.remove_component(component)
