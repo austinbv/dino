@@ -7,14 +7,14 @@
 
 |    Chip        | Status          | Version| Boards           | Notes |
 | :--------      | :------:        | :----- | :--------------- |------ |
-| ATmega168      | :green_heart:  | 0.12.0 | Duemilanove, Diecimila, Pro | IR Out, Serial left out to save memory. Configurable features. Run `dino targets` for more info.
+| ATmega168      | :green_heart:   | 0.12.0 | Duemilanove, Diecimila, Pro | (Configurable) features omitted to save memory. Run `dino targets` for more info.
 | ATmega328      | :green_heart:   | 0.11.0 | Uno, Nano, Fio, Pro  | 
 | ATmega32u4     | :green_heart:   | 0.11.0 | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB | **v0.11.1** for Leonardo ETH
 | ATmega1280     | :green_heart:   | 0.11.1 | Mega | 
 | ATmega2560     | :green_heart:   | 0.11.1 | Mega2560, Arduino Mega ADK | 
 | ATmega4809     | :man_shrugging: | 0.12.0 | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
-| ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB. Tone, and IR Out don't work yet.
-| ATSAMD21       | :green_heart:   | 0.13.0 | Zero, M0, M0 Pro |
+| ATSAM3X8E      | :yellow_heart:  | 0.12.0 | Due | Uses native USB port. Tone, and IR Out don't work.
+| ATSAMD21       | :green_heart:   | 0.13.0 | Zero, M0, M0 Pro | Uses native USB port.
 
 **Note:** Only USB boards listed. Any supported chip should work, once you can flash it and connect to serial.
 
@@ -54,74 +54,72 @@
 
 ### Basic GPIO Interface
 
-| Name                  | Status          | Version  | Component Class | Notes |
-| :---------------      | :------:        | :-----   | :------         | :---- |
-| Digital Out           | :green_heart:   | 0.11.0   | `DigitalOutput` | -     |
-| Digital In            | :green_heart:   | 0.11.0   | `DigitalInput`  | 1ms - 128ms (4ms default) listen, poll, or read
-| Analog (PWM) Out      | :green_heart:   | 0.13.0   | `PWMOut`        |
-| Analog (DAC) Out      | :green_heart:   | 0.13.0   | `DACOut`        | On SAM3X, SAMD21 and ESP32
-| Analog (ADC) In       | :green_heart:   | 0.11.0   | `AnalogInput`   | 1ms - 128ms (16ms default) listen, poll, or read
-| Tone Out (Square Wave)| :green_heart:   | 0.12.0   | -               | Not working on Due yet
+| Name                  | Status          | Version  | Component Class     | Notes |
+| :---------------      | :------:        | :-----   | :------             | :---- |
+| Digital Out           | :green_heart:   | 0.11.0   | `DigitalIO::Output` | -     |
+| Digital In            | :green_heart:   | 0.11.0   | `DigitalIO::Input`  | 1ms - 128ms (4ms default) listen, poll, or read
+| Analog (PWM) Out      | :green_heart:   | 0.13.0   | `PulseIO::PWMOut`   |
+| Analog (DAC) Out      | :green_heart:   | 0.13.0   | `AnalogIO::Output`  | On SAM3X, SAMD21 and ESP32
+| Analog (ADC) In       | :green_heart:   | 0.11.0   | `AnalogIO::Input`   | 1ms - 128ms (16ms default) listen, poll, or read
+| Tone Out (Square Wave)| :green_heart:   | 0.12.0   | `PulseIO::Buzzer`   | Not working on Due yet
 
 **Note:** When listening, the board checks the pin's value every **_2^n_** ms (**_n_** from **_0_** to **_7_**), without further prompting. Polling and reading follow a call and response pattern.
 
 ### Advanced Interfaces
 
-| Name             | Status         | SW/HW     | Version  | Component Class | Notes |
-| :--------------- | :------:       | :-------- | :-----   | :---------------  |------ |
-| I2C              | :green_heart:  | Hardware  | 0.12.0   | `I2C::Bus` | Only default clocks
-| SPI              | :green_heart:  | Hardware  | 0.12.0   | `Register::Select` | Hardware register I/O
-| Shift In/Out     | :green_heart:  | Software  | 0.12.0   | `Register::Select` | Bit bang register I/O
-| Software Serial  | :yellow_heart: | Software  | 0.12.0   | `SoftwareSerial` | Library on Board. Write only
-| Hardware Serial  | :heart:        | Hardware  | -        | - | For boards with native USB and UARTs
-| Maxim OneWire    | :green_heart:  | Software  | 0.12.0   | `OneWire::Bus` | No overdrive support
-| Infrared Emitter | :green_heart:  | Software  | 0.12.0   | `IREmitter` | Library on Board
-| Infrared Receiver| :heart:        | Software  | -        | -           | Doable with existing library
+| Name             | Status         | SW/HW     | Version  | Component Class          | Notes |
+| :--------------- | :------:       | :-------- | :-----   | :---------------         |------ |
+| I2C              | :green_heart:  | Hardware  | 0.12.0   | `I2C::Bus`               | 
+| SPI              | :green_heart:  | Hardware  | 0.12.0   | `SPI::Bus`               | Hardware SPI
+| SPI Bit Bang     | :green_heart:  | Software  | 0.12.0   | `SPI::BitBang`           | Bit Bang SPI
+| UART             | :heart:        | Hardware  | -        | -                        | For boards with native USB and UARTs
+| UART Bit Bang    | :yellow_heart: | Software  | 0.12.0   | `SoftwareSerial`         | Only on boards with 1 hardware UART. Write only
+| Maxim OneWire    | :green_heart:  | Software  | 0.12.0   | `OneWire::Bus`           | No overdrive support
+| Infrared Emitter | :green_heart:  | Software  | 0.12.0   | `PulseIO::IRTransmitter` | Library on Board
+| Infrared Receiver| :heart:        | Software  | -        | -                        | Doable with existing library
 
 ### Generic Components
 
-| Name             | Status         | Interface   | Version  | Component Class   | Notes |
-| :--------------- | :------:       | :--------   | :-----   | :---------------  |------ |
-| Board EEPROM     | :green_heart:  | Built-In    | 0.12.0   | `BoardEEPROM` | Not all boards have EEPROM
-| Led              | :green_heart:  | Digi/Ana Out| 0.11.0   | `Led` |
-| RGBLed           | :green_heart:  | Digi/Ana Out| 0.11.0   | `RGBLed` |
-| Relay            | :green_heart:  | Digital Out | 0.11.0   | `Relay` |
-| 7 Segment Display| :yellow_heart: | Digital Out | 0.12.0   | `SSD` | No decimal point
-| Button           | :green_heart:  | Digital In  | 0.11.0   | `Button` | 
-| Rotary Encoder   | :green_heart:  | Digital In  | 0.12.0   | `RotaryEncoder` | Listens every 1ms
-| PIR Sensor       | :yellow_heart: | Digital In  | 0.11.0   | `DigitalInput` | Needs class. HC-SR501 
-| Analog Sensor    | :green_heart:  | Analog In   | 0.11.0   | `Sensor` |
-| Potentiometer    | :green_heart:  | Analog In   | 0.12.0   | `Potentiometer` | Smoothing on by default
-| Piezo Buzzer     | :green_heart:  | Tone Out    | 0.12.0   | `Piezo` | Frequency > 30Hz
-| Input Register   | :green_heart:  | Shift In    | 0.12.0   | `Register::ShiftIn` | Tested on CD4021B
-| Input Register   | :green_heart:  | SPI         | 0.12.0   | `Register::SPIIn` | Tested on CD4021B
-| Output Register  | :green_heart:  | Shift Out   | 0.12.0   | `Register::ShiftOut` | Tested on 74HC595
-| Output Register  | :green_heart:  | SPI         | 0.12.0   | `Register::SPIOut` | Tested on 74HC595
+| Name             | Status         | Interface   | Version  | Component Class            | Notes |
+| :--------------- | :------:       | :--------   | :-----   | :---------------           |------ |
+| Board EEPROM     | :green_heart:  | Built-In    | 0.12.0   | `EEPROM::BuiltIn`          | Not all boards have EEPROM
+| Led              | :green_heart:  | Digi/Ana Out| 0.11.0   | `LED::Base`                |
+| RGBLed           | :green_heart:  | Digi/Ana Out| 0.11.0   | `LED::RGB`                 |
+| Relay            | :green_heart:  | Digital Out | 0.11.0   | `DigitalIO::Relay`         |
+| 7 Segment Display| :yellow_heart: | Digital Out | 0.12.0   | `LED::SevenSegment`        | No decimal point
+| Button           | :green_heart:  | Digital In  | 0.11.0   | `DigitalIO::Button`        |
+| Rotary Encoder   | :green_heart:  | Digital In  | 0.12.0   | `DigitalIO::RotaryEncoder` | Listens every 1ms
+| PIR Sensor       | :yellow_heart: | Digital In  | 0.11.0   | `DigitalIO::Input`         | Needs class. HC-SR501 
+| Analog Sensor    | :green_heart:  | Analog In   | 0.11.0   | `AnalogIO::Sensor`         |
+| Potentiometer    | :green_heart:  | Analog In   | 0.12.0   | `AnalogIO::Potentiometer`  | Smoothing on by default
+| Piezo Buzzer     | :green_heart:  | Tone Out    | 0.12.0   | `PulseIO::Buzzer`          | Frequency > 30Hz
+| Input Register   | :green_heart:  | SPI         | 0.12.0   | `SPI::InputRegister`       | Tested on CD4021B
+| Output Register  | :green_heart:  | SPI         | 0.12.0   | `SPI::OutputRegister`      | Tested on 74HC595
 
 **Note:** Most Digital In and Out components can be used seamlessley through Input and Output Registers respectively.
 
 ### Motors / Motor Drivers
 
-| Name                 | Status         | Interface           | Version  | Component Class   | Notes |
-| :---------------     | :------:       | :--------           | :-----   | :---------------  |------ |
-| Servo                | :green_heart:  | PWM + Library       | 0.11.2   | `Servo`  | Maximum of 6 on ATmega168, 16 on ESP32 and 12 otherwise
-| L298N                | :green_heart:  | Digi + PWM Out      | 0.13.0   | `L298`   | H-Bridge DC motor driver
-| A3967                | :green_heart:  | Digital Out         | 0.12.0   | `Stepper`| 1ch microstepper (EasyDriver)
-| PCA9685              | :heart:        | I2C                 | -        | -        | 16ch 12-bit PWM for servo or LED
+| Name                 | Status         | Interface           | Version  | Component Class  | Notes |
+| :---------------     | :------:       | :--------           | :-----   | :--------------- |------ |
+| Servo                | :green_heart:  | PWM + Library       | 0.11.2   | `Motor::Servo`   | Maximum of 6 on ATmega168, 16 on ESP32 and 12 otherwise
+| L298N                | :green_heart:  | Digi + PWM Out      | 0.13.0   | `Motor::L298`    | H-Bridge DC motor driver
+| A3967                | :green_heart:  | Digital Out         | 0.12.0   | `Motor::Stepper` | 1ch microstepper (EasyDriver)
+| PCA9685              | :heart:        | I2C                 | -        | -                | 16ch 12-bit PWM for servo or LED
 
 ### Displays
 
-| Name                     | Status         | Interface                    | Version  | Component Class   | Notes |
-| :---------------         | :------:       | :--------                    | :-----   | :---------------  |------ |
-| HD44780 LCD              | :green_heart:  | Digital Out, Output Register | 0.13.0   | `HD44780` | 
-| SSD1306 OLED             | :yellow_heart: | I2C                          | 0.13.0   | `I2C::SSD1306` | Only basic character support
+| Name                     | Status         | Interface                    | Version  | Component Class     | Notes |
+| :---------------         | :------:       | :--------                    | :-----   | :---------------    |------ |
+| HD44780 LCD              | :green_heart:  | Digital Out, Output Register | 0.13.0   | `Display::HD44780`  | 
+| SSD1306 OLED             | :yellow_heart: | I2C                          | 0.13.0   | `Display::SSD1306`  | 1 font, some graphics
 
 ### Addressable LEDs
 
-| Name               | Status             | Interface             | Version  | Component Class   | Notes |
-| :---------------   | :------:           | :--------             | :-----   | :---------------  |------ |
-| Neopixel / WS2812B | :yellow_heart:     | Adafruit Library      | 0.13.0   | `WS2812` | Not working on RP2040 |
-| Dotstar / APA102   | :grey_exclamation: | SPI                   | -        | - |
+| Name               | Status             | Interface             | Version  | Component Class    | Notes |
+| :---------------   | :------:           | :--------             | :-----   | :---------------   |------ |
+| Neopixel / WS2812B | :yellow_heart:     | Adafruit Library      | 0.13.0   | `LED::WS2812`      | Not working on RP2040 |
+| Dotstar / APA102   | :heart:            | SPI                   | -        | -                  |
 
 ### I/O Expansion
 
@@ -134,13 +132,13 @@
 
 ### Environmental Sensors
 
-| Name             | Status         | Interface | Version  | Component Class   | Notes |
-| :--------------- | :------:       | :-------- | :-----   | :---------------  |------ |
-| DHT 11/21/22     | :green_heart:  | Digi In/Out| 0.12.0  | `DHT`             | Temperature, Humidity
-| DS18B20          | :green_heart:  | OneWire   | 0.12.0   | `OneWire::DS18B20`| Temperature
-| MAX31850         | :grey_exclamation: | OneWire   | -        | - | Thermocouple
-| BME280           | :green_heart:  | I2C       | 0.13.0   | `I2C::BME280` | Temperature, Pressure, Humidity
-| BMP280           | :green_heart:  | I2C       | 0.13.0   | `I2C::BMP280` | Temperature, Pressure
+| Name             | Status         | Interface | Version  | Component Class    | Notes |
+| :--------------- | :------:       | :-------- | :-----   | :---------------   |------ |
+| DHT 11/21/22     | :green_heart:  | Digi In/Out| 0.12.0  | `Sensor::DHT`      | Temperature, Humidity
+| DS18B20          | :green_heart:  | OneWire   | 0.12.0   | `Sensor::DS18B20`  | Temperature
+| MAX31850         | :heart:        | OneWire   | -        | - | Thermocouple
+| BME280           | :green_heart:  | I2C       | 0.13.0   | `Sensor::BME280`   | Temperature, Pressure, Humidity
+| BMP280           | :green_heart:  | I2C       | 0.13.0   | `Sensor::BMP280`   | Temperature, Pressure
 | HTU21D           | :heart:        | I2C       | -        | - | Temperature, Humidity
 | HTU31D           | :heart:        | I2C       | -        | - | Temperature, Humidity
 | AHT10            | :heart:        | I2C       | -        | - | Temperature, Humidity
@@ -148,13 +146,11 @@
 | ENS160           | :heart:        | I2C       | -        | - | CO2e, TVOC, AQI
 | AGS02MA          | :heart:        | I2C       | -        | - | TVOC
 
-
 ### Light Sensors
 
 | Name             | Status         | Interface | Version  | Component Class   | Notes |
 | :--------------- | :------:       | :-------- | :-----   | :---------------  |------ |
 | APDS9960         | :heart:        | I2C       | -        | - | Proximity, RGB, Gesture
-
 
 ### Distance Sensors
 

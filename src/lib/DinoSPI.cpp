@@ -127,10 +127,16 @@ void Dino::spiTransfer(uint32_t clockRate, uint8_t selectPin, uint8_t settings, 
 // CMD = 27
 // Start listening to a register with hardware SPI.
 void Dino::spiAddListener() {
+  // Do this since RP2040 crashes with reinterpet_cast of uint32_t.
+  uint32_t  clockRate  = (uint32_t)auxMsg[3];
+            clockRate |= (uint32_t)auxMsg[4] << 8;
+            clockRate |= (uint32_t)auxMsg[5] << 16;
+            clockRate |= (uint32_t)auxMsg[6] << 24;
+  
   for (int i = 0;  i < SPI_LISTENER_COUNT;  i++) {
     if (spiListeners[i].enabled == 0) {
       spiListeners[i] = {
-        *reinterpret_cast<uint32_t*>(auxMsg + 3),
+        clockRate,
         pin,        // Select pin
         auxMsg[0],  // Settings
         auxMsg[1],  // Read length
