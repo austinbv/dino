@@ -10,7 +10,7 @@ class InputRegisterTest < Minitest::Test
   end
 
   def options
-    { bus: bus, pin: 9, frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
+    { bus: bus, pin: 9, spi_frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
   end
 
   def part
@@ -28,7 +28,7 @@ class InputRegisterTest < Minitest::Test
   end
 
   def test_read
-    mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst
+    mock = MiniTest::Mock.new.expect :call, nil, [9], spi_mode: 2, spi_frequency: 800000, read: 2, bit_order: :lsbfirst
     bus.stub(:transfer, mock) do
       part.read
     end
@@ -36,7 +36,7 @@ class InputRegisterTest < Minitest::Test
   end
   
   def test_listen
-    mock = MiniTest::Mock.new.expect :call, nil, [9], mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst
+    mock = MiniTest::Mock.new.expect :call, nil, [9], spi_mode: 2, spi_frequency: 800000, read: 2, bit_order: :lsbfirst
     bus.stub(:listen, mock) do
       part.listen
     end

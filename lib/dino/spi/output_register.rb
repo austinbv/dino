@@ -22,7 +22,7 @@ module Dino
       # API method delegation
       #
       def write(*bytes)
-        bus.transfer(pin, mode: spi_mode, frequency: frequency, write: bytes.flatten, bit_order: bit_order)
+        bus.transfer(pin, spi_mode: spi_mode, spi_frequency: spi_frequency, write: bytes.flatten, bit_order: bit_order)
       end
 
       #

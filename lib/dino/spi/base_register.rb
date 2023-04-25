@@ -11,7 +11,7 @@ module Dino
       #
       include Behaviors::BoardProxy
 
-      attr_reader :spi_mode, :frequency, :bit_order, :bytes
+      attr_reader :spi_mode, :spi_frequency, :bit_order, :bytes
 
       def before_initialize(options={})
         super(options)
@@ -30,9 +30,9 @@ module Dino
 
       def initialize(options={})
         super(options)
-        @spi_mode  = options[:spi_mode]
-        @frequency = options[:frequency]
-        @bit_order = options[:bit_order]
+        @spi_mode       = options[:spi_mode]
+        @spi_frequency  = options[:spi_frequency]
+        @bit_order      = options[:bit_order]
       end
 
       def after_initialize(options={})

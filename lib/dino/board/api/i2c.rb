@@ -4,7 +4,7 @@ module Dino
       module I2C
         include Helper
 
-        I2C_SPEEDS = {
+        I2C_FREQUENCIES = {
           100000  => 0x00,
           400000  => 0x01,
           1000000 => 0x02,
@@ -16,14 +16,14 @@ module Dino
           32
         end
 
-        def i2c_convert_speed(speed)
+        def i2c_convert_frequency(freq)
           # Default to 100 kHz.
-          speed = 100000 unless speed
+          freq = 100000 unless freq
 
-          unless I2C_SPEEDS.include?(speed)
-            raise ArgumentError, "I2C speed must be in: #{I2C_SPEEDS.keys.inspect}" 
+          unless I2C_FREQUENCIES.include?(freq)
+            raise ArgumentError, "I2C frequency must be in: #{I2C_FREQUENCIES.keys.inspect}" 
           end
-          I2C_SPEEDS[speed]
+          I2C_FREQUENCIES[freq]
         end
 
         # CMD = 33
@@ -36,13 +36,13 @@ module Dino
           raise ArgumentError, "I2C write must be 1..#{i2c_limit} bytes long" if (bytes.length > i2c_limit || bytes.length < 1)
           
           # Use top bit of address to select stop condition (1), or repated start (0).
-          send_stop = options[:repeated_start] ? 0 : 1
-          speed = i2c_convert_speed(options[:speed])
+          send_stop = options[:i2c_repeated_start] ? 0 : 1
+          freq = i2c_convert_frequency(options[:i2c_frequency])
 
           write Message.encode  command:     34,
                                 pin:         address | (send_stop << 7),
                                 value:       bytes.length,
-                                aux_message: pack(:uint8, speed) + pack(:uint8, [bytes].flatten)
+                                aux_message: pack(:uint8, freq) + pack(:uint8, [bytes].flatten)
         end
 
         # CMD = 35
@@ -50,11 +50,11 @@ module Dino
           raise ArgumentError, "I2C read must be 1..#{i2c_limit} bytes long" if (read_length > i2c_limit || read_length < 1)
 
           # Use top bit of address to select stop condition (1), or repated start (0).
-          send_stop = options[:repeated_start] ? 0 : 1
+          send_stop = options[:i2c_repeated_start] ? 0 : 1
 
           # Default to 100 kHz.
           options[:speed] ||= 100000
-          speed = i2c_convert_speed(options[:speed])
+          freq = i2c_convert_frequency(options[:i2c_frequency])
 
           # A starting register can be optionally given, up to 4 bytes as an array.
           if register
@@ -68,7 +68,7 @@ module Dino
           write Message.encode  command:      35,
                                 pin:          address | (send_stop << 7),
                                 value:        read_length,
-                                aux_message:  pack(:uint8, speed) + aux
+                                aux_message:  pack(:uint8, freq) + aux
         end
       end
     end

@@ -15,11 +15,11 @@ class APISPITest < Minitest::Test
   end
   
   def test_spi_modes
-    assert_equal (board.spi_header(mode: nil)[0][0]), (pack :uint8, 0b10000000)
-    assert_equal (board.spi_header(mode: 1  )[0][0]), (pack :uint8, 0b10000001)
-    assert_equal (board.spi_header(mode: 2  )[0][0]), (pack :uint8, 0b10000010)
-    assert_equal (board.spi_header(mode: 3  )[0][0]), (pack :uint8, 0b10000011)
-    assert_raises(ArgumentError) { board.spi_header(mode: 4) }
+    assert_equal (board.spi_header(spi_mode: nil)[0][0]), (pack :uint8, 0b10000000)
+    assert_equal (board.spi_header(spi_mode: 1  )[0][0]), (pack :uint8, 0b10000001)
+    assert_equal (board.spi_header(spi_mode: 2  )[0][0]), (pack :uint8, 0b10000010)
+    assert_equal (board.spi_header(spi_mode: 3  )[0][0]), (pack :uint8, 0b10000011)
+    assert_raises(ArgumentError) { board.spi_header(spi_mode: 4) }
   end
   
   def test_spi_lsbfirst
@@ -27,8 +27,8 @@ class APISPITest < Minitest::Test
   end
 
   def test_spi_frequency
-    assert_equal (board.spi_header(frequency: nil    )[0][3..6]), (pack :uint32, 1000000)
-    assert_equal (board.spi_header(frequency: 8000000)[0][3..6]), (pack :uint32, 8000000)
+    assert_equal (board.spi_header(spi_frequency: nil    )[0][3..6]), (pack :uint32, 1000000)
+    assert_equal (board.spi_header(spi_frequency: 8000000)[0][3..6]), (pack :uint32, 8000000)
   end
   
   def test_spi_too_many_bytes

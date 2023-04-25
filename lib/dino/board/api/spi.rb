@@ -7,11 +7,11 @@ module Dino
         def spi_validate(options)
           options[:read]       ||= 0
           options[:write]        = [options[:write]].flatten.compact || []
-          options[:mode]         = options[:mode] || options[:spi_mode] || 0
+          options[:spi_mode]   ||= 0
           options[:bit_order]  ||= :msbfrst
 
           # Lowest 2 bits of settings control the SPI mode
-          settings =  options[:mode] 
+          settings = options[:spi_mode] 
           unless (0..3).include? settings
             raise ArgumentError, "invalid SPI mode. Must be 0, 1, 2, or 3"
           end
@@ -30,12 +30,12 @@ module Dino
           settings, options = spi_validate(options)
           header = pack :uint8, [settings, options[:read], options[:write].length]
 
-          options[:frequency]  ||= 1000000
-          unless [Integer, Float].include? options[:frequency].class
-            raise ArgumentError, "error in SPI frequency: #{options[:frequency]}"
+          options[:spi_frequency]  ||= 1000000
+          unless [Integer, Float].include? options[:spi_frequency].class
+            raise ArgumentError, "error in SPI frequency: #{options[:spi_frequency]}"
           end
           
-          header = header + pack(:uint32, options[:frequency])
+          header = header + pack(:uint32, options[:spi_frequency])
 
           [header, options]
         end

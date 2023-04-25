@@ -10,7 +10,7 @@ class BaseRegisterTest < Minitest::Test
   end
 
   def options
-    { bus: bus, pin: 9, frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
+    { bus: bus, pin: 9, spi_frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
   end
 
   def part
@@ -24,7 +24,7 @@ class BaseRegisterTest < Minitest::Test
   end
   
   def test_options
-    assert_equal 800000,      part.frequency
+    assert_equal 800000,      part.spi_frequency
     assert_equal 2,           part.spi_mode
     assert_equal :lsbfirst,   part.bit_order
     assert_equal 2,           part.bytes

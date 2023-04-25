@@ -62,8 +62,8 @@ module Dino
       def after_initialize(options={})
         super(options)
 
-        # Set I2C speed to 400 kHz.
-        self.speed = 400000
+        # Use I2C frequency of 400 kHz.
+        self.i2c_frequency = 400000
 
         # Default to a 128x64 display.
         @columns = options[:columns] || options[:width]  || 128

@@ -21,11 +21,11 @@ module Dino
       # API method delegation
       # 
       def read
-        bus.transfer(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
+        bus.transfer(pin, spi_mode: @spi_mode, spi_frequency: spi_frequency, read: @bytes, bit_order: @bit_order)
       end
 
       def listen
-        bus.listen(pin, mode: @spi_mode, frequency: frequency, read: @bytes, bit_order: @bit_order)
+        bus.listen(pin, spi_mode: @spi_mode, spi_frequency: spi_frequency, read: @bytes, bit_order: @bit_order)
       end
 
       def stop
