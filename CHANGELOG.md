@@ -11,6 +11,11 @@
   - This uses [`arduino-yaml-board-maps`](https://github.com/dino-rb/arduino-yaml-board-maps). See that repo for which Arduino cores / boards are supported.
 
 ### New Boards
+
+- ESP32-S2 and ESP32-S3 variants (`--target esp32`):
+  - Newer versions of the ESP32 chip with native USB support.
+  - No DACs on the S3.
+
 - SAMD21 Boards, Arduino Zero (`--target samd`):
   - All working. No bit bang UART support.
 
@@ -56,15 +61,16 @@ See new examples in the [examples](examples) folder to learn more.
   - Instead of giving a board directly when creating a new SPI register, a bus must be created first:
     ```ruby
       board = Dino::Board.new(connection)
-      bus = Dino::SPI::Bus.new(board: board)
-      output_register = Dino::Register::SPIOutput.new(bus: bus, pin: 9)
-      input_register = Dino::Register::SPIInput.new(bus: bus, pin: 8)
+      bus = Dino::SPI::Bus.new(board: board)                              # board's default SPI interface
+      output_register = Dino::SPI::OutputRegister.new(bus: bus, pin: 9)   # 9  is register select pin
+      input_register = Dino::SPI::InputRegister.new(bus: bus, pin: 10)    # 10 is register select pin
     ```
-  - For now, this always uses the default SPI device on the board, but will allow the selection of alternate SPI devices in the future, for boards that have multiple.
-  - This allows a device to mutex lock the bus and make sure operations happen atomically.
+  - For now, this always uses the default SPI device set by the Arduino framework (`SPI` or `SPI0`), but this change will allow access to multiple SPI interfaces on a single board in the future.
+  - It also allows a peripheral to mutex lock the bus for atomic operations if needed.
+  - When a peripheral is added to the SPI bus, callbacks are hooked (using its select pin as identifier) directly to the board.
   - Shift In/Out features refactored into `SPI::Bitbang` which is class-compatible with `SPI::Bus`, except for frequency.
-  - When adding a device to the SPI bus, the bus passes its chip select pin and callback hook directly through to the board.
   - Both `SPI::Bus` and `SPI::Bitbang` validate select pin uniquness among peripherals, per bus instance.
+  - See the updated [SPI examples](examples/spi) to learn more.
 
 - `ShiftIn` and `ShiftOut` components removed:
   - Refactored into `SPI::BitBang`. See SPI changes above.
@@ -73,16 +79,16 @@ See new examples in the [examples](examples) folder to learn more.
 
 - I2C frequency now configurable:
   - `I2C::Peripheral` and it's subclasses take `:i2c_frequency` keywoard arg when instantiating. It's stored in `@i2c_frequency` with accessors, and used for all reads and writes.
-  - `Board#i2c_write` and `Board#i2c_read` accept `:i2c_frequency` as a keyword arg.
-  - Valid values are: `100000, 400000, 1000000, 3400000`. Falls back to `100000` at the `Board` level, when not given.
+  - `Board#i2c_write` and `Board#i2c_read` also accept `:i2c_frequency` as a keyword arg.
+  - Valid values are: `100000, 400000, 1000000, 3400000`. Defaults to `100000` at the `Board` level, when not given.
 
 - Hitachi HD44780 LCD driver rewritten in Ruby:
-  - New class: `Dino::Display::HD44789`
+  - New class: `Dino::Display::HD44780`
   - `#puts` changed to `#print` to better represent functionality.
   - No longer depends on the `LiquidCrystal` Arduino library, which has been removed.
   - Depends only on `Dino::DigitalIO::Output` and `#micro_delay`.
   - Old implementation in `Dino::Components::LCD` removed.
-  - This solves compatibility with boards that the library didn't work with.
+  - This solves compatibility with boards that the library didn't work on.
   
 - `Dino::PulseIO::PWMOutput` (previously `Dino::Components::Basic::AnalogOutput`):
   - Changed `#analog_write` to `#pwm_write`.
@@ -123,7 +129,7 @@ See new examples in the [examples](examples) folder to learn more.
 
 - `Board#analog_write` replaced by `Board#pwm_write` and `Board#dac_write`, matching the two C functions.
 
-- `Board#set_pin_mode` significantly changed to better manage pullups, pulldowns, `:input_output` mode, and freeing DAC and PWM peripherals for applicable chips.
+- `Board#set_pin_mode` significantly changed to better manage pullups, pulldowns, `:input_output` mode, and freeing DAC and PWM peripherals for relevant chips.
 
 - `Board#digital_write` implicitly disconnects a PWM or DAC peripheral from the pin, but does not free it. This is necessary on chips like the ATSAMD21 and ESP32 or the `#digital_write` will not work.
 
@@ -133,12 +139,11 @@ See new examples in the [examples](examples) folder to learn more.
 
 - `Board#pwm_high`, `Board#dac_high` and `Board#adc_high` been defined for convenience.
 
-- `Board#spi_transfer` now only accepts `:spi_mode` and `:spi_frequency` keywords for the respective arguments.
-
-- `Board#spi_listen` and `Board#spi_bb_listen` (hardware and bit bang SPI respectively), now share the same listener storage on the board. Default listener count is 4. "Shift listeners" have been removed.
-
 - `Board#i2c_read` and `Board#i2c_write` now only accept `:i2c_frequency` and `:i2c_repeated_start` keywords for their respective arguments.
 
+- `Board#spi_transfer` and `Board#spi_bb_transfer` now only accept `:spi_mode` and `:spi_frequency` keywords for the respective arguments.
+
+- `Board#spi_listen` and `Board#spi_bb_listen` now share the same listener storage on the board. Default is 4 listeners. `shiftListeners` have been removed.
 
 ### Minor Changes
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.

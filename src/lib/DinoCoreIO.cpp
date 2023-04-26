@@ -19,7 +19,7 @@ void Dino::setMode(byte p, byte m) {
   // 111 = Digital Input/Output (ESP32 Only?)
   m = m & 0b00000111;
 
-  #ifdef ESP32
+  #if defined(ESP32) && defined(SOC_DAC_SUPPORTED)
       // Free the LEDC channel if leaving PWM mode.
     if (m != 0b010) releaseLEDC(p);
     
@@ -84,7 +84,9 @@ void Dino::dWrite(byte p, byte v, boolean echo) {
     // Disconnect any DAC or LEDC peripheral the pin was using.
     // Without this, setting GPIO level has no effect.
     // NOTE: Does not release the LEDC channel or config. Can reattach in aWrite.
-    dacDisable(p);
+    #if defined(SOC_DAC_SUPPORTED)
+      dacDisable(p);
+    #endif
     ledcDetachPin(p);
   #endif
     
@@ -190,7 +192,7 @@ void Dino::clearLedcChannels(){
 // Write to a DAC (digital to analog converter) pin.
 // This outputs a true analog resolution, unlike PWM.
 void Dino::dacWrite(byte p, int v, boolean echo) {
-  #ifdef ESP32
+  #if defined(ESP32) && defined(SOC_DAC_SUPPORTED)
     ::dacWrite(p, v);
   #endif
     

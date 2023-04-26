@@ -16,7 +16,7 @@
 | ATSAM3X8E      | :yellow_heart:  | Due | Uses native USB port. Tone, and IR Out don't work.
 | ATSAMD21       | :green_heart:   | Zero, M0, M0 Pro | Uses native USB port.
 
-**Note:** Only USB boards listed. Any supported chip should work, once you can flash it and connect to serial.
+**Note:** Only USB boards listed. Any board with a supported chip should work, once you can flash it and connect to serial.
 
 ### Arduino Accessories
 
@@ -29,13 +29,14 @@
 ### Espressif Chips with Built-In WiFi
 [![ESP8266 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml) [![ESP32 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml)
 
-|    Chip        | Status          | Boards           | Notes |
-| :--------      | :------:        | :--------------- |------ |
-| ESP8266        | :yellow_heart:  | NodeMCU | No Software Serial
-| ESP8285        | :man_shrugging: | DOIT ESP-Mx DevKit | Should be identical to 8266. Not tested in hardware.
+|    Chip        | Status          | Boards               | Notes |
+| :--------      | :------:        | :---------------     |------ |
+| ESP8266        | :green_heart:   | NodeMCU |
+| ESP8285        | :man_shrugging: | DOIT ESP-Mx DevKit   | Should be identical to 8266. Not tested in hardware.
 | ESP32          | :green_heart:   | DOIT ESP32 DevKit V1 |
-| ESP32-S2       | :test_tube:     | LOLIN S2 Pico | Should work, hardware limits will be wrong
-| ESP32-S3       | :test_tube:     | LOLIN S3 V1.0.0 | Should work, hardware limits will be wrong
+| ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB port. Make sure to enable CDC on boot.
+| ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB port. Make sure to enable CDC on boot.
+| ESP32-C3       | :heart:         | LOLIN C3 Mini V2.1.0 |
 
 **Note:** There are many boards built around these ESP chips. Look up your board's pin map, and use the GPIO numbers directly. They may be labelled differently on the PCB.
 
@@ -69,7 +70,7 @@
 
 | Name             | Status         | SW/HW     | Component Class          | Notes |
 | :--------------- | :------:       | :-------- | :---------------         |------ |
-| I2C              | :green_heart:  | Hardware  | `I2C::Bus`               | 
+| I2C              | :green_heart:  | Hardware  | `I2C::Bus`               |
 | SPI              | :green_heart:  | Hardware  | `SPI::Bus`               | Hardware SPI
 | SPI Bit Bang     | :green_heart:  | Software  | `SPI::BitBang`           | Bit Bang SPI
 | UART             | :heart:        | Hardware  | -                        | Most boards have extra hardware UARTs
