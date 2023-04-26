@@ -70,8 +70,8 @@ module Dino
         @rows    = options[:rows]    || options[:height] || 64
 
         # Validate known sizes.
-        raise ArugmentError, "error in SSD1306 width: #{@columns}. Must be in: #{WIDTHS.inspect}" unless WIDTHS.include?(@columns)
-        raise ArugmentError, "error in SSD1306 height: #{@rows}. Must be in: #{HEIGHTS.inspect}" unless HEIGHTS.include?(@rows)
+        raise ArgumentError, "error in SSD1306 width: #{@columns}. Must be in: #{WIDTHS.inspect}" unless WIDTHS.include?(@columns)
+        raise ArgumentError, "error in SSD1306 height: #{@rows}. Must be in: #{HEIGHTS.inspect}" unless HEIGHTS.include?(@rows)
 
         # Everything except 96x16 size uses clock 0x80.
         clock = 0x80
