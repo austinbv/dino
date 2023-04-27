@@ -4,8 +4,8 @@
 require_relative '../../test_helper'
 
 class APIHelperTest < Minitest::Test
-  include Dino::Board::API::Helper
-  
+  include TestPacker
+
   def test_single_integers
     assert_equal pack(:uint8, 25), "\x19"
   end

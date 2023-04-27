@@ -13,7 +13,7 @@ PIXELS = 8
 
 position_array = (0..PIXELS-1).to_a.concat (1..PIXELS-2).to_a.reverse
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 strip = Dino::LED::WS2812.new(board: board, pin: 4, length: PIXELS)
 
 # Bounce a pixel back and forth on the strip, cycling through the colors.

@@ -5,7 +5,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 #
 # Default pins for the I2C0 (first) interface on most chips:

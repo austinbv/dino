@@ -15,7 +15,7 @@ class BoardTest < Minitest::Test
 
   def test_starts_observing_connection
     io = ConnectionMock.new
-    mock = MiniTest::Mock.new.expect(:call, nil, [Dino::Board::Base])
+    mock = MiniTest::Mock.new.expect(:call, nil, [Dino::Board])
     io.stub(:add_observer, mock) do
       Dino::Board.new(io)
     end
@@ -50,8 +50,8 @@ class BoardTest < Minitest::Test
     assert_equal 10,   board.analog_read_resolution
     
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [Dino::Board::API::Message.encode(command:96, value:12)])
-    mock.expect(:call, nil, [Dino::Board::API::Message.encode(command:97, value:12)])
+    mock.expect(:call, nil, [Dino::Message.encode(command:96, value:12)])
+    mock.expect(:call, nil, [Dino::Message.encode(command:97, value:12)])
     board.stub(:write, mock) do
       board.analog_write_resolution = 12
       board.analog_read_resolution = 12

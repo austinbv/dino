@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 # Initialization automatically gets all EEPROM data from the board.
 # eeprom = Dino::EEPROM::BuiltIn(board: board)

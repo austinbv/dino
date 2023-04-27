@@ -1,7 +1,15 @@
 Thread.abort_on_exception = true
 
+module Dino
+  def self.root
+    File.expand_path '../..', __FILE__
+  end
+end
+
 # Board stuff.
 require_relative 'dino/version'
+require_relative 'dino/message'
+require_relative 'dino/connection'
 require_relative 'dino/board'
 
 # Component support stuff.
@@ -26,9 +34,3 @@ require_relative 'dino/led'
 require_relative 'dino/motor'
 require_relative 'dino/rtc'
 require_relative 'dino/sensor'
-
-module Dino
-  def self.root
-    File.expand_path '../..', __FILE__
-  end
-end

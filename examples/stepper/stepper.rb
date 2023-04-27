@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 stepper = Dino::Motor::Stepper.new  board: board,
                                     pins: { slp: 6, enable: 7, direction: 8, step: 10, ms1: 11, ms2: 12 }
                                         

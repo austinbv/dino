@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 servo = Dino::Motor::Servo.new(pin: 9, board: board)
 
 # Add different angles (in degrees) to the array below to try out your servo.

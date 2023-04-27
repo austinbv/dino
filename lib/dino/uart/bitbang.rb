@@ -13,12 +13,12 @@ module Dino
 
       def after_initialize(options={})
         self.baud = options[:baud]
-        board.write Dino::Board::API::Message.encode command: COMMAND, value: 0, aux_message: encoded_pins
-        board.write Dino::Board::API::Message.encode command: COMMAND, value: 1, aux_message: self.baud
+        board.write Message.encode command: COMMAND, value: 0, aux_message: encoded_pins
+        board.write Message.encode command: COMMAND, value: 1, aux_message: self.baud
       end
       
       def puts(string)
-        board.write Dino::Board::API::Message.encode command: COMMAND, value: 3, aux_message: string
+        board.write Message.encode command: COMMAND, value: 3, aux_message: string
       end
 
       private

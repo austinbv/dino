@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 lcd = Dino::Display::HD44780.new  board: board,
                                   pins: { rs: 8, enable: 9, d4: 4, d5: 5, d6: 6, d7: 7 },
                                   cols: 16,

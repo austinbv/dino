@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 encoder = Dino::DigitalIO::RotaryEncoder.new  board: board,
                                               pins:{ clock: 4, data: 5 },
                                               divider: 1,                # (default) read approx every divider ms

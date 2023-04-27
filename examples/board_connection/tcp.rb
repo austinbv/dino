@@ -6,9 +6,9 @@ require 'dino'
 # Port number defaults to 3466 (dino), but may be given as a second argument.
 # It must correspond to the listening port set when the board was flashed.
 #
-connection = Dino::Board::Connection::TCP.new("127.0.0.1", 3466)
-# connection = Dino::Board::Connection::TCP.new("127.0.0.1")
-# connection =  Dino::Board::Connection::TCP.new("192.168.1.2", 3466)
+connection = Dino::Connection::TCP.new("192.168.0.77", 3466)
+# connection = Dino::Connection::TCP.new("127.0.0.1")
+# connection =  Dino::Connection::TCP.new("192.168.1.2", 3466)
 #
 board = Dino::Board.new(connection)
 led = Dino::Led.new(pin: 13, board: board)

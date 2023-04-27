@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 # Set up the board, connecting with serial over USB
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 #
 # To set up an RGB LED, connect its cathode leg to ground, and each of its 3 color

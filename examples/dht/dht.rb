@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 dht = Dino::Sensor::DHT.new(pin: 5, board: board)
 
 # The DHT class pre-processes raw data from the board. When it reaches callbacks

@@ -3,7 +3,7 @@
 #
 require 'bundler/setup'
 require 'dino'
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 # This is only 1 channel of the driver. Make a new object for each channel.
 motor = Dino::Motor::L298.new board: board, pins: {direction1: 8, direction2: 9, enable: 10}

@@ -29,8 +29,8 @@ require 'dino'
 # device  for the board that has the IR emitter connected and dino sketch loaded.
 # Open the receiver board in the Arduino IDE's or another serial monitor.
 #
-connection = Dino::Board::Connection::Serial.new
-# connection = Dino::Board::Connection::Serial.new(device: "/dev/ttyACM0")
+connection = Dino::Connection::Serial.new
+# connection = Dino::Connection::Serial.new(device: "/dev/ttyACM0")
 board = Dino::Board.new(connection)
 
 #

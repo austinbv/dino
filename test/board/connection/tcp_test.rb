@@ -12,10 +12,10 @@ end
 
 class TCPConnectionTest < Minitest::Test
   # Force autoload.
-  Dino::Board::Connection::TCP
+  Dino::Connection::TCP
 
   def connection
-    @connection ||= Dino::Board::Connection::TCP.new("127.0.0.1", 3467)
+    @connection ||= Dino::Connection::TCP.new("127.0.0.1", 3467)
   end
 
   def io
@@ -25,7 +25,7 @@ class TCPConnectionTest < Minitest::Test
   end
 
   def test_connect_raises_if_server_unavailable
-    assert_raises(Dino::Board::Connection::TCPConnectError) { io }
+    assert_raises(Dino::Connection::TCPConnectError) { io }
   end
 
   def test_connect

@@ -12,7 +12,7 @@ REGISTER_SELECT_PIN = 10
 # SevenSegment pins (on register parallel outputs)
 SEVEN_SEGMENT_PINS = { cathode: 0, a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 # 1-way bit bang SPI bus (slower, but use any pins).
 bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)

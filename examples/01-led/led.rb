@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 # If the board is plugged into a USB port, we can connect with serial over USB.
-connection = Dino::Board::Connection::Serial.new
+connection = Dino::Connection::Serial.new
 
 # Create a new board instance, giving it the connection.
 board = Dino::Board.new(connection)

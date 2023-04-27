@@ -12,7 +12,7 @@ REGISTER_SELECT_PIN = 10
 # LED pin (on register parallel outputs)
 LED_PIN = 0
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 # 1-way (output) bit bang SPI interface on any pins (slower, but flexible).
 bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)

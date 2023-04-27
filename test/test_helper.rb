@@ -51,7 +51,7 @@ class ConnectionMock
   end
 end
 
-class BoardMock < Dino::Board::Base
+class BoardMock < Dino::Board
   def initialize
     super(ConnectionMock.new)
     @read_injection_mutex = Mutex.new
@@ -79,5 +79,11 @@ class BoardMock < Dino::Board::Base
         self.update(line)
       end
     end
+  end
+end
+
+module TestPacker
+  def pack(*args, **kwargs)
+    Dino::Message.pack(*args, **kwargs)
   end
 end

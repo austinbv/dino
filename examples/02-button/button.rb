@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'dino'
 
 # Set up the board, connecting with serial over USB.
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 #
 # Create an object for a momentary button, giving the board, and the pin that

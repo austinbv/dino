@@ -4,7 +4,7 @@
 require_relative '../../test_helper'
 
 class APISPITest < Minitest::Test
-  include Dino::Board::API::Helper
+  include TestPacker
   
   def connection
     @connection ||= ConnectionMock.new
@@ -52,7 +52,7 @@ class APISPITest < Minitest::Test
     aux = header + pack(:uint8, options[:write])
     
     mock = MiniTest::Mock.new
-    mock.expect :call, nil, [Dino::Board::API::Message.encode(command: 26, pin: 3, aux_message: aux)]
+    mock.expect :call, nil, [Dino::Message.encode(command: 26, pin: 3, aux_message: aux)]
     
     board.stub(:write, mock) do
       board.spi_transfer(3, options)
@@ -66,7 +66,7 @@ class APISPITest < Minitest::Test
     header = board.spi_header(options)[0]
     
     mock = MiniTest::Mock.new
-    mock.expect :call, nil, [Dino::Board::API::Message.encode(command: 27, pin: 3, aux_message: header)]
+    mock.expect :call, nil, [Dino::Message.encode(command: 27, pin: 3, aux_message: header)]
     
     board.stub(:write, mock) do
       board.spi_listen(3, options)
@@ -76,7 +76,7 @@ class APISPITest < Minitest::Test
   
   def test_spi_stop
     board
-    mock = MiniTest::Mock.new.expect :call, nil, [Dino::Board::API::Message.encode(command: 28, pin: 3)]
+    mock = MiniTest::Mock.new.expect :call, nil, [Dino::Message.encode(command: 28, pin: 3)]
     board.stub(:write, mock) do
       board.spi_stop(3)
     end

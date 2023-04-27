@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 bus = Dino::OneWire::Bus.new(pin:4, board: board)
 
 # The bus detects parasite power automatically when initialized.

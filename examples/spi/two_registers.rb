@@ -14,7 +14,7 @@ IN_REGISTER_SELECT  = 9
 LED_PIN     = 0
 BUTTON_PIN  = 0
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 
 # 2-way bit bang SPI bus (slower, but use any pins).
 bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)

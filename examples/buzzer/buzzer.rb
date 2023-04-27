@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'dino'
 
-board = Dino::Board.new(Dino::Board::Connection::Serial.new)
+board = Dino::Board.new(Dino::Connection::Serial.new)
 buzzer = Dino::PulseIO::Buzzer.new(board: board, pin: 9)
 
 C4 = 262
