@@ -12,6 +12,83 @@ end
 require 'bundler/setup'
 require 'dino'
 
+# Touch each class to trigger auto load for simplecov.
+
+# Analog IO
+Dino::AnalogIO::Input
+Dino::AnalogIO::Output
+Dino::AnalogIO::Potentiometer
+Dino::AnalogIO::Sensor
+
+# Behaviors
+# Not needed, since every behavior will be included by at least one class.
+
+# Board
+# BoardMock inherits from Dino::Board
+
+# Connection
+Dino::Connection::Serial
+Dino::Connection::TCP
+
+# Digital IO
+Dino::DigitalIO::Button
+Dino::DigitalIO::Input
+Dino::DigitalIO::Output
+Dino::DigitalIO::Relay
+Dino::DigitalIO::RotaryEncoder
+
+# Display
+Dino::Display::Canvas
+Dino::Display::HD44780
+Dino::Display::SSD1306
+
+# EEPROM
+Dino::EEPROM::BuiltIn
+
+# I2C
+Dino::I2C::Bus
+Dino::I2C::Peripheral
+
+# LED
+Dino::LED::Base
+Dino::LED::RGB
+Dino::LED::SevenSegment
+Dino::LED::WS2812
+
+# Motor
+Dino::Motor::L298
+Dino::Motor::Servo
+Dino::Motor::Stepper
+
+# OneWire
+Dino::OneWire::Bus
+Dino::OneWire::Peripheral
+Dino::OneWire::Helper
+
+# Pulse IO
+Dino::PulseIO::Buzzer
+Dino::PulseIO::IRTransmitter
+Dino::PulseIO::PWMOutput
+
+# RTC
+Dino::RTC::DS3231
+
+# Sensor
+Dino::Sensor::BME280
+Dino::Sensor::BMP280
+Dino::Sensor::DHT
+Dino::Sensor::DS18B20
+
+# SPI
+Dino::SPI::BaseRegister
+Dino::SPI::BitBang
+Dino::SPI::Bus
+Dino::SPI::InputRegister
+Dino::SPI::OutputRegister
+
+# UART
+Dino::UART::Bitbang
+
 # Nice little helper module to redefine constants quietly.
 module Constants
   def self.redefine(const, value, opts={})
