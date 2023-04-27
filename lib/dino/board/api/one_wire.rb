@@ -6,13 +6,13 @@ module Dino
 
         def one_wire_reset(pin, value=0)
           write Message.encode  command: 41,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 value: value
         end
 
         def one_wire_search(pin, branch_mask)
           write Message.encode  command: 42,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 aux_message: pack(:uint64, branch_mask, max: 8)
         end
 
@@ -24,14 +24,14 @@ module Dino
           length = length | 0b10000000 if parasite_power
 
           write Message.encode  command: 43,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 value: length,
                                 aux_message: bytes
         end
 
         def one_wire_read(pin, num_bytes)
           write Message.encode  command: 44,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 value: num_bytes
         end
       end

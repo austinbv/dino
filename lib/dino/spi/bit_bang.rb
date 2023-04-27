@@ -23,11 +23,7 @@ module Dino
         pins[:input]  = 255 if pins[:output] && !pins[:input]
         pins[:output] = 255 if pins[:input]  && !pins[:output]
 
-        # Ensure clock pin is given.
-        require_pin(:clock)
-
-        # Ensure pins are unique and convert them to integer.
-        super(options)
+        require_pins(:clock, :input, :output)
       end
 
       def transfer(select_pin, **options)
@@ -52,6 +48,10 @@ module Dino
       # Delegate this to board so peripherals can initialize their select pins.
       def set_pin_mode(*args)
         board.set_pin_mode(*args)
+      end
+
+      def convert_pin(pin)
+        board.convert_pin(pin)
       end
 
       # Add peripheral to self and the board. It gets callbacks directly from the board.

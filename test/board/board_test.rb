@@ -101,7 +101,7 @@ class BoardTest < Minitest::Test
     # Make sure lines are split only on the first colon.
     # Tests for string based pine names too.
     mock2 = MiniTest::Mock.new.expect(:update, nil, ["with:colon"])
-    4.times { mock2.expect(:pin, 'A0') }
+    4.times { mock2.expect(:pin, 14) }
     
     # Special EEPROM mock.
     mock3 = MiniTest::Mock.new.expect(:update, nil, ["bytes"])

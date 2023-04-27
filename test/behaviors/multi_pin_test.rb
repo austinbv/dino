@@ -58,4 +58,9 @@ class MultiPinSetupTest < Minitest::Test
     part.two.high
     assert_equal({two: board.high, maybe: nil}, part.proxy_states)
   end
+
+  def test_required_but_not_proxied_pin_conversion
+    part = MultiPinComponent.new board: board, pins: { one: 'A0', two:10 }
+    assert_equal 14, part.pins[:one]
+  end
 end

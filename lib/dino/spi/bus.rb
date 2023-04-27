@@ -25,6 +25,10 @@ module Dino
         board.set_pin_mode(*args)
       end
 
+      def convert_pin(pin)
+        board.convert_pin(pin)
+      end
+
       # Add peripheral to self and the board. It gets callbacks directly from the board.
       def add_component(component)
         pins = components.map { |c| c.pin }

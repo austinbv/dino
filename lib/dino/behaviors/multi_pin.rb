@@ -24,9 +24,9 @@ module Dino
         super(options)
       end
 
-      def initialize_pins(options={})
+      def convert_pins(options={})
         super(options)
-        pins.each { |key,pin| pins[key] = board.convert_pin(pin) }
+        self.pins.each { |key,pin| self.pins[key] = board.convert_pin(pin) }
         pin_array = pins.values
         raise ArgumentError, "duplicate pins in: #{pins.inspect}" unless pin_array == pin_array.uniq
       end
@@ -57,7 +57,7 @@ module Dino
       # the pin, but not do anything with it.
       #
       def require_pin(name)
-        raise ArgumentError, "missing :#{name} pin" unless self.pins[name]
+        raise ArgumentError, "missing #{name.inspect} pin" unless self.pins[name]
       end
 
       def require_pins(*array)

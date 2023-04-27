@@ -8,6 +8,7 @@ module Dino
         @state_mutex = Mutex.new
         before_initialize(options)
         initialize_board(options)
+        convert_pins(options)
         initialize_pins(options)
         register
         after_initialize(options)
@@ -44,6 +45,7 @@ module Dino
       # Include modules from Setup or override this to use pins.
       #
       def before_initialize(options={}); end
+      def convert_pins(options={});      end
       def initialize_pins(options={});   end
       alias :initialize_pin :initialize_pins
 

@@ -119,7 +119,7 @@ module Dino
         pin, message = line.split(":", 2)
         pin = pin.to_i unless pin == "EE"
         @components.each do |part|
-          part.update(message) if pin == convert_pin(part.pin)
+          part.update(message) if pin == part.pin
         end
       end
     end

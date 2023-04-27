@@ -42,7 +42,7 @@ module Dino
           aux = pack :uint16, [options[:reset_time], options[:timeout]]
           aux << pack(:uint8, options[:pulse_limit])
           write Message.encode  command: 9,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 value: settings,
                                 aux_message: aux
         end

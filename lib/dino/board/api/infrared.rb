@@ -14,7 +14,7 @@ module Dino
           bytes  = pack :uint16, pulses, min: 1, max: 510
 
           write Message.encode command: 16,
-                              pin: convert_pin(pin),
+                              pin: pin,
                               value: frequency,
                               aux_message: length + bytes
         end

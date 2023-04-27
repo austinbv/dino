@@ -28,4 +28,14 @@ class SinglePinSetupTest < Minitest::Test
     
     assert_equal :some_mode, part.mode
   end
+
+  def test_converts_pin_before_saving
+    c1 = SinglePinComponent.new(board: board, pin: :A0)
+    c2 = SinglePinComponent.new(board: board, pin: :DAC0)
+    c3 = SinglePinComponent.new(board: board, pin: :SDA)
+
+    assert_equal 14, c1.pin
+    assert_equal 14, c2.pin
+    assert_equal 20, c3.pin
+  end
 end

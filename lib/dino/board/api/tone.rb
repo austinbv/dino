@@ -14,14 +14,14 @@ module Dino
           aux << pack(:uint16, duration) if duration
 
           write Message.encode command: 17,
-                                    pin: convert_pin(pin),
+                                    pin: pin,
                                     value: duration ? 1 : 0,
                                     aux_message: aux
         end
 
         # CMD = 18
         def no_tone(pin)
-          write Message.encode command: 18, pin: convert_pin(pin)
+          write Message.encode command: 18, pin: pin
         end
       end
     end

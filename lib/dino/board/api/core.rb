@@ -22,7 +22,7 @@ module Dino
             raise ArgumentError, "cannot set mode: #{mode}. Should be one of: #{PIN_MODES.keys.inspect}"
           end
           write Message.encode  command: 0,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 value: PIN_MODES[mode]
         end
 
@@ -31,12 +31,12 @@ module Dino
           unless (value == 1) || (value == 0)
             raise ArgumentError, "cannot write digital value: #{value}. Should be one of: [0, 1]" 
           end
-          write Message.encode command: 1, pin: convert_pin(pin), value: value
+          write Message.encode command: 1, pin: pin, value: value
         end
 
         # CMD = 2
         def digital_read(pin)
-          write Message.encode command: 2, pin: convert_pin(pin)
+          write Message.encode command: 2, pin: pin
         end
 
         # CMD = 3
@@ -46,7 +46,7 @@ module Dino
           rescue => exception
             raise ArgumentError, "cannot write PWM value: #{value}. Should be Integer in range 0..#{pwm_high} "
           end
-          write Message.encode command: 3, pin: convert_pin(pin), value: value.round
+          write Message.encode command: 3, pin: pin, value: value.round
         end
         
         # CMD = 4
@@ -56,12 +56,12 @@ module Dino
           rescue => exception
             raise ArgumentError, "cannot write DAC value: #{value}. Should be Integer in range 0..#{dac_high} "
           end
-          write Message.encode command: 4, pin: convert_pin(pin), value: value.round
+          write Message.encode command: 4, pin: pin, value: value.round
         end
 
         # CMD = 5
         def analog_read(pin)
-          write Message.encode command: 5, pin: convert_pin(pin)
+          write Message.encode command: 5, pin: pin
         end
 
         # CMD = 6
@@ -96,7 +96,7 @@ module Dino
 
           # Send it.
           write Message.encode  command: 6,
-                                pin: convert_pin(pin),
+                                pin: pin,
                                 value: state_byte,
                                 aux_message: pack(:uint8, [mode_byte, exponent])
         end
