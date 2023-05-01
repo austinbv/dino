@@ -8,6 +8,9 @@ module Dino
       def initialize(options={})
         @device = options[:device]
         @baud = options[:baud] || BAUD
+        @rx_buffer = ""
+        @rx_line = ""
+        @rx_escaped = false
       end
 
       def to_s
@@ -19,24 +22,32 @@ module Dino
       end
 
       def _read
-        buff, escaped = "", false
-        loop do
-          char = io.read(1)
-          if ["\n", "\\"].include? char
-            if escaped
-              buff << char
-              escaped = false
-            elsif (char == "\n")
-              return buff
-            elsif (char == "\\")
-              escaped = true
-            end
+        # A native USB serial packet can be up to 64 bytes.
+        @rx_buffer << io.read(64)
+
+        while @rx_buffer.length > 0
+          # Take a single character off the RX buffer.
+          char = @rx_buffer[0]
+          @rx_buffer = @rx_buffer[1..-1]
+
+          # Parse it, returning and resetting @rx_line if needed.
+          if @rx_escaped && ((char == "\n") || (char == "\\"))
+            @rx_line << char
+            @rx_escaped = false
+          elsif (char == "\n")
+            line = @rx_line
+            @rx_line = ""
+            return line
+          elsif (char == "\\")
+            @rx_escaped = true
           else
-            escaped = false
-            buff << char
+            @rx_escaped = false
+            @rx_line << char
           end
-          return nil if (buff.empty? && !escaped)
         end
+
+        # Return nil if line wasn't returned and entire buffer parsed.
+        return nil
       end
 
     private

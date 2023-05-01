@@ -150,9 +150,7 @@ class SerialConnectionTest < Minitest::Test
 
   def test_io_read_single_chars_until_newline_and_strips_it
     mock = MiniTest::Mock.new
-    "line\n".split("").each do |char|
-      mock.expect :read, char, [1]
-    end
+    mock.expect :read, "line\n", [64]
     connection.stub(:io, mock) do
       assert_equal "line", connection.send(:read)
     end
@@ -161,9 +159,7 @@ class SerialConnectionTest < Minitest::Test
 
   def test_io_read_handles_escaped_newlines_and_backslashes
     mock = MiniTest::Mock.new
-    "l1\\\nl2\\\\\n".split("").each do |char|
-      mock.expect :read, char, [1]
-    end
+    mock.expect :read, "l1\\\nl2\\\\\n", [64]
     connection.stub(:io, mock) do
       assert_equal "l1\nl2\\", connection.send(:read)
     end
@@ -172,7 +168,7 @@ class SerialConnectionTest < Minitest::Test
 
   def test_io_read_returns_empty_string_if_just_newline
     mock = MiniTest::Mock.new
-    mock.expect :read, "\n", [1]
+    mock.expect :read, "\n", [64]
     connection.stub(:io, mock) do
       assert_equal "", connection.send(:read)
     end
