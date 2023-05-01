@@ -2,9 +2,7 @@ module Dino
   module Connection
     module FlowControl
       BOARD_BUFFER = 64
-      SLEEP_UPDATE_INTERVAL = 0.1
-      SLEEP_MIN = 0.00015625
-      SLEEP_MAX = 0.01
+      SLEEP_TIME = 0.001
 
       def initialize(*args)
         super(*args)
@@ -13,7 +11,6 @@ module Dino
       end
 
       def write(message, tx_halt_after=nil)
-        add_write_call
         @write_buffer_mutex.synchronize do
           @write_buffer << message
 
@@ -30,31 +27,15 @@ module Dino
     private
 
       def reset_flow_control
-        @io_mutex       ||= Mutex.new
+        @tx_ready_mutex ||= Mutex.new
         @transit_mutex  ||= Mutex.new
-        @tx_sleep_mutex ||= Mutex.new
-        @rx_sleep_mutex ||= Mutex.new
         @transit_mutex.synchronize { @transit_bytes = 0 }
 
-        @tx_sleep_mutex.synchronize do
-          @tx_sleep        = SLEEP_MAX
-          @write_calls     = 0
-          @tx_sleep_calls  = 0
-        end
-
-        @rx_sleep_mutex.synchronize do
-          @rx_sleep        = SLEEP_MAX
-          @read_lines      = 0
-          @rx_sleep_calls  = 0
-        end
-        
         @write_buffer_mutex ||= Mutex.new
         @write_buffer_mutex.synchronize do
           @write_buffer = ""
           @tx_halt_points = []
         end
-
-        @last_interval_update = Time.now
       end
       
       def write_from_buffer
@@ -68,7 +49,7 @@ module Dino
           # Try to send the entire buffer unless a halt point is coming up.
           if @tx_halt_points.empty?
             limit = @write_buffer.length
-          # Don't send beyond the first halt point if one is.
+          # Don't send beyond the first halt point if one exists.
           else
             limit = @tx_halt_points[0]
           end
@@ -92,20 +73,20 @@ module Dino
         end
 
         # If no fragment, wait.
-        return tx_wait unless fragment
+        return wait unless fragment
 
         # If fragment, write it.
         loop do
           # Write and end loop if the board is ready.
-          @io_mutex.synchronize do
-            if @board_ready
+          @tx_ready_mutex.synchronize do
+            if @tx_ready
               _write fragment
-              @board_ready = false if halt_after_fragment
+              @tx_ready = false if halt_after_fragment
               return
             end
           end
-          # Else wait outside the @io_mutex. Allow read thread to update @board_ready.
-          tx_wait
+          # Else wait outside the @tx_ready_mutex. Allows read thread to update @tx_ready.
+          wait
         end
       end
 
@@ -120,11 +101,9 @@ module Dino
       end
 
       def read
-        line = @io_mutex.synchronize { _read }
+        line = _read
         
         if line
-          add_read_line
-
           # Board says to resume transmission.
           if line.match(/\ARdy/)
             tx_resume
@@ -137,74 +116,24 @@ module Dino
           elsif line.match(/\ARx/)
             remove_transit_bytes(line.split(/x/)[1].to_i)
             line = nil
-          elsif line.match(/\ADBG:/)
-            puts line.inspect
-            line = nil
           end
         else
-          rx_wait
+          wait
         end
-        update_sleep_intervals
-        
+
         return line
       end
 
-      def update_sleep_intervals
-        if (Time.now - @last_interval_update > SLEEP_UPDATE_INTERVAL)
-          @last_interval_update = Time.now
-          update_rx_sleep_interval
-          update_tx_sleep_interval
-        end
-      end
-
-      def update_tx_sleep_interval
-        @tx_sleep_mutex.synchronize do
-          if (@write_calls > 0) && (@tx_sleep_calls.to_f/@write_calls.to_f > 0.1)
-            @tx_sleep /= 2 if (@tx_sleep > SLEEP_MIN)
-          else
-            @tx_sleep *= 2 if (@tx_sleep < SLEEP_MAX)
-          end
-          @write_calls = 0
-          @tx_sleep_calls = 0
-        end
-      end
-
-      def update_rx_sleep_interval
-        @rx_sleep_mutex.synchronize do
-          if (@read_lines > 0) && (@read_lines.to_f/@rx_sleep_calls.to_f > 0.01)
-            @rx_sleep /= 2 if (@rx_sleep > SLEEP_MIN)
-          else
-            @rx_sleep *= 2 if (@rx_sleep < SLEEP_MAX)
-          end
-          @read_lines = 0
-          @rx_sleep_calls = 0
-        end
-      end
-
-      def add_write_call
-        @tx_sleep_mutex.synchronize { @write_calls += 1 }
-      end
-
-      def add_read_line
-        @rx_sleep_mutex.synchronize { @read_lines += 1 }
-      end
-
-      def rx_wait
-        @rx_sleep_mutex.synchronize { @rx_sleep_calls += 1 }
-        sleep @rx_sleep
-      end
-
-      def tx_wait
-        @tx_sleep_mutex.synchronize { @tx_sleep_calls += 1 }
-        sleep @tx_sleep
+      def wait
+        sleep SLEEP_TIME
       end
 
       def tx_halt
-        @io_mutex.synchronize { @board_ready = false } 
+        @tx_ready_mutex.synchronize { @tx_ready = false } 
       end
 
       def tx_resume
-        @io_mutex.synchronize { @board_ready = true }
+        @tx_ready_mutex.synchronize { @tx_ready = true }
       end
 
       def add_transit_bytes(value)
