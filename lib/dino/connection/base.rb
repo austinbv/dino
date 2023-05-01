@@ -22,13 +22,7 @@ module Dino
     private
     
       def parse(line)
-        return unless line
-
-        if line.match(/\ADBG:/)
-          puts line.inspect
-        else
-          changed && notify_observers(line)
-        end
+        changed && notify_observers(line) if line
       end
 
       def io

@@ -13,7 +13,7 @@ Dino::Dino(){
 }
 
 void Dino::rxNotify() {
-  stream->print("Rx");
+  stream->print("Rx:");
   stream->print(rxBytes);
   stream->print("\n");
   rxBytes = 0;

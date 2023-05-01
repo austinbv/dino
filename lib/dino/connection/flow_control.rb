@@ -104,17 +104,22 @@ module Dino
         line = _read
         
         if line
+          case line[0..2]
+          # Board read (freed) this many bytes from its input buffer.
+          when "Rx:"
+            remove_transit_bytes(line.split(/:/)[1].to_i)
+            line = nil
           # Board says to resume transmission.
-          if line.match(/\ARdy/)
+          when "Rdy"
             tx_resume
             line = nil
           # Board says to halt transmission.
-          elsif line.match(/\AHlt/)
+          when "Hlt"
             tx_halt
             line = nil
-          # Board read (freed) this many bytes from its input buffer.
-          elsif line.match(/\ARx/)
-            remove_transit_bytes(line.split(/x/)[1].to_i)
+          # Print debug lines.
+          when "DBG"
+            puts line.inspect
             line = nil
           end
         else
