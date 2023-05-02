@@ -23,26 +23,27 @@ module Dino
 
       def _read
         # A native USB serial packet can be up to 64 bytes.
-        @rx_buffer << io.read(64)
+        @rx_buffer << io.read(64) if @rx_buffer.empty?
 
         while @rx_buffer.length > 0
           # Take a single character off the RX buffer.
           char = @rx_buffer[0]
           @rx_buffer = @rx_buffer[1..-1]
 
-          # Parse it, returning and resetting @rx_line if needed.
-          if @rx_escaped && ((char == "\n") || (char == "\\"))
+          if @rx_escaped
             @rx_line << char
             @rx_escaped = false
-          elsif (char == "\n")
-            line = @rx_line
-            @rx_line = ""
-            return line
-          elsif (char == "\\")
-            @rx_escaped = true
           else
-            @rx_escaped = false
-            @rx_line << char
+            if (char == "\n")
+              line = @rx_line
+              @rx_line = ""
+              return line
+            elsif (char == "\\")
+              @rx_escaped = false
+            else
+              @rx_line << char
+              @rx_escaped = false
+            end
           end
         end
 
