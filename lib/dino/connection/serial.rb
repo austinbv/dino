@@ -39,7 +39,7 @@ module Dino
               @rx_line = ""
               return line
             elsif (char == "\\")
-              @rx_escaped = false
+              @rx_escaped = true
             else
               @rx_line << char
               @rx_escaped = false
