@@ -123,27 +123,51 @@ module Dino
         command [CONTRAST, value]
       end
 
-      def draw
-        # Set the auto-incrementing address range to the entire display.
-        command [
-          PAGE_ADDRESS_RANGE,     0, (@rows / 8) - 1,
-          COLUMN_ADDRESS_RANGE,   0, @columns - 1
-        ]
+      def draw(x_min=0, x_max=(@columns-1), y_min=0, y_max=(@rows-1))
+        # Convert y-coords to page coords.
+        p_min = y_min / 8
+        p_max = y_max / 8
         
-        # Draw the canvas in chunks based on board's I2C limit.
-        canvas.framebuffer.each_slice(self.bus.board.i2c_limit - 1) do |slice|
-          data(slice)
+        # If drawing the whole frame (default), bypass temp buffer to save time.
+        if (x_min == 0) && (x_max == @columns-1) && (p_min == 0) && (p_max == @rows/8)
+          draw_partial(canvas.framebuffer, x_min, x_max, p_min, p_max)
+          
+        # Copy bytes for the given rectangle into a temp buffer. 
+        else
+          temp_buffer = []
+          (p_min..p_max).each_with_index do |page|
+            src_start = (@columns * page) + x_min
+            src_end = src_start + x_max - x_min
+            temp_buffer += canvas.framebuffer[src_start..src_end]
+          end
+    
+          # And draw them.
+          draw_partial(temp_buffer, x_min, x_max, p_min, p_max)
+        end
+      end
+
+      def draw_partial(buffer, x_min, x_max, p_min, p_max)
+        # Limit auto-incrementing GRAM address to the rectangle being drawn.
+        command [ COLUMN_ADDRESS_RANGE, x_min, x_max, PAGE_ADDRESS_RANGE, p_min, p_max ]
+        
+        # Send all the bytes at once if within board I2C limit.
+        if buffer.length < (bus.board.i2c_limit - 1)
+          data(buffer)
+        
+        # Or split into chunks.
+        else  
+          buffer.each_slice(bus.board.i2c_limit - 1) { |slice| data(slice) }
         end
       end
 
       # Commands are I2C messages prefixed with 0x00.
-      def command(command=[])
-        write [command].flatten.unshift(0x00)
+      def command(bytes)
+        write([0x00] + bytes)
       end
 
       # Data are I2C messages prefixed with 0x40.
-      def data(byte)
-        write [byte].flatten.unshift(0x40)
+      def data(bytes)
+        write([0x40] + bytes)
       end
     end
   end
