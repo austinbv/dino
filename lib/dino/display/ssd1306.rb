@@ -135,9 +135,9 @@ module Dino
         # Copy bytes for the given rectangle into a temp buffer. 
         else
           temp_buffer = []
-          (p_min..p_max).each_with_index do |page|
+          (p_min..p_max).each do |page|
             src_start = (@columns * page) + x_min
-            src_end = src_start + x_max - x_min
+            src_end   = (@columns * page) + x_max
             temp_buffer += canvas.framebuffer[src_start..src_end]
           end
     
