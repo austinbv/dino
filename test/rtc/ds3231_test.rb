@@ -41,7 +41,7 @@ class DS3231Test < MiniTest::Test
     bus
     board.inject_read("5:104-0,0,0,6,1,1,48")
     
-    mock = MiniTest::Mock.new.expect :call, nil, [part.address, 0x00, 7], i2c_repeated_start: nil, i2c_frequency: nil
+    mock = MiniTest::Mock.new.expect :call, nil, [part.address, 0x00, 7, 100000, false]
     bus.stub(:_read, mock) do
       part.time
     end

@@ -38,9 +38,9 @@ class I2CBusTest < MiniTest::Test
     board.inject_read("5:48:50")
     part
 
-    mock = MiniTest::Mock.new.expect :call, nil, [0x30, [0x01, 0x02]], some_option: true
+    mock = MiniTest::Mock.new.expect :call, nil, [0x30, [0x01, 0x02], 100000, false]
     board.stub(:i2c_write, mock) do
-      part.write 0x30, [0x01, 0x02], some_option: true
+      part.write 0x30, [0x01, 0x02]
     end
     mock.verify
   end
@@ -52,9 +52,9 @@ class I2CBusTest < MiniTest::Test
 
     board.inject_read("5:48-255,0,255,0,255,0")
     
-    mock = MiniTest::Mock.new.expect :call, nil, [0x32, 0x03, 6], some_option: true
+    mock = MiniTest::Mock.new.expect :call, nil, [0x32, 0x03, 6, 100000, false]
     board.stub(:i2c_read, mock) do
-      part._read 0x32, 0x03, 6, some_option: true
+      part._read 0x32, 0x03, 6
     end
     mock.verify
   end

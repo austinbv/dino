@@ -38,7 +38,7 @@ class APII2CTest < Minitest::Test
     
     connection.stub(:write, mock) do
       board.i2c_write(0x30, [1,2,3,4])
-      board.i2c_write(0x30, [1,2,3,4], i2c_repeated_start: true)
+      board.i2c_write(0x30, [1,2,3,4], 100000, true)
     end
     mock.verify
   end
@@ -62,7 +62,7 @@ class APII2CTest < Minitest::Test
     
     connection.stub(:write, mock) do
       board.i2c_read(0x30, 0x03, 4)
-      board.i2c_read(0x30, 0x03, 4, i2c_repeated_start: true)
+      board.i2c_read(0x30, 0x03, 4, 100000, true)
     end
     mock.verify
   end
@@ -102,13 +102,13 @@ class APII2CTest < Minitest::Test
       mock.expect :call, nil, [message]
     end
     connection.stub(:write, mock) do
-      board.i2c_write(address, data, i2c_frequency: 100000)
-      board.i2c_write(address, data, i2c_frequency: 400000)
-      board.i2c_write(address, data, i2c_frequency: 1000000)
-      board.i2c_write(address, data, i2c_frequency: 3400000)
+      board.i2c_write(address, data, 100000)
+      board.i2c_write(address, data, 400000)
+      board.i2c_write(address, data, 1000000)
+      board.i2c_write(address, data, 3400000)
     end
     mock.verify
 
-    assert_raises(ArgumentError) { board.i2c_write(0x30, [1,2,3,4], i2c_frequency: 5000000) }
+    assert_raises(ArgumentError) { board.i2c_write(0x30, [1,2,3,4], 5000000, false) }
   end
 end

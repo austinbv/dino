@@ -5,8 +5,8 @@ module Dino
       include Behaviors::Reader
 
       def before_initialize(options)
-        @repeated_start = options[:i2c_repeated_start] || false
-        @speed          = options[:i2c_frequency]      || 100000
+        @i2c_frequency      = options[:i2c_frequency]      || 100000
+        @i2c_repeated_start = options[:i2c_repeated_start] || false
 
         # Allow generic :address option to be given as :i2c_address before validation.
         options[:address] ||= options[:i2c_address]
@@ -21,11 +21,11 @@ module Dino
       end
       
       def write(bytes=[])
-        bus.write(address, bytes, i2c_repeated_start: i2c_repeated_start, i2c_frequency: i2c_frequency)
+        bus.write(address, bytes, i2c_frequency, i2c_repeated_start)
       end
 
       def _read(register, num_bytes)
-        bus.read(address, register, num_bytes, i2c_repeated_start: i2c_repeated_start, i2c_frequency: i2c_frequency)
+        bus.read(address, register, num_bytes, i2c_frequency, i2c_repeated_start)
       end
     end
   end

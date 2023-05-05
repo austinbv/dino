@@ -28,43 +28,41 @@ module Dino
     end
 
     # CMD = 34
-    def i2c_write(address, bytes=[], options={})
+    def i2c_write(address, bytes, frequency=100000, repeated_start=false)
+      bytes = [bytes] unless bytes.class == Array
       raise ArgumentError, "I2C write must be 1..#{i2c_limit} bytes long" if (bytes.length > i2c_limit || bytes.length < 1)
       
       # Use top bit of address to select stop condition (1), or repated start (0).
-      send_stop = options[:i2c_repeated_start] ? 0 : 1
-      freq = i2c_convert_frequency(options[:i2c_frequency])
-
+      send_stop = repeated_start ? 0 : 1
+      frequency = i2c_convert_frequency(frequency)
+      
       write Message.encode  command:     34,
                             pin:         address | (send_stop << 7),
                             value:       bytes.length,
-                            aux_message: pack(:uint8, freq) + pack(:uint8, [bytes].flatten)
+                            aux_message: pack(:uint8, frequency) + pack(:uint8, bytes)
     end
 
     # CMD = 35
-    def i2c_read(address, register, read_length, options={})
+    def i2c_read(address, register, read_length, frequency=100000, repeated_start=false)
       raise ArgumentError, "I2C read must be 1..#{i2c_limit} bytes long" if (read_length > i2c_limit || read_length < 1)
 
       # Use top bit of address to select stop condition (1), or repated start (0).
-      send_stop = options[:i2c_repeated_start] ? 0 : 1
+      send_stop = repeated_start ? 0 : 1
+      frequency = i2c_convert_frequency(frequency)
 
-      # Default to 100 kHz.
-      options[:speed] ||= 100000
-      freq = i2c_convert_frequency(options[:i2c_frequency])
-
-      # A starting register can be optionally given, up to 4 bytes as an array.
+      # A register address starting register address can be given (up to 4 bytes)
       if register
-        register = [register].flatten 
+        register = [register].flatten
         raise ArgumentError, 'maximum 4 byte register address for I2C read' if register.length > 4
-        aux = pack(:uint8, [register.length] + register)
+        register_packed = pack(:uint8, [register.length] + register)
       else
-        aux = pack(:uint8, [0])
+        register_packed = pack(:uint8, [0])
       end
 
       write Message.encode  command:      35,
                             pin:          address | (send_stop << 7),
                             value:        read_length,
-                            aux_message:  pack(:uint8, freq) + aux
+                            aux_message:  pack(:uint8, frequency) + register_packed
     end
   end
 end
