@@ -8,8 +8,8 @@ module Dino
         # Keep track of whether anything is listening or reading a specific pin.
         # This might be separate from whether a component is attached or not.
         #
-        @reading_pins   = Array.new(@bytes*8) { false}
-        @listening_pins = Array.new(@bytes*8) { false}
+        @reading_pins   = Array.new(@bytes*8) { false }
+        @listening_pins = Array.new(@bytes*8) { false }
       end
 
       def after_initialize(options={})
@@ -21,11 +21,11 @@ module Dino
       # API method delegation
       # 
       def read
-        bus.transfer(pin, spi_mode: @spi_mode, spi_frequency: spi_frequency, read: @bytes, bit_order: @bit_order)
+        bus.transfer(pin, read: bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
       def listen
-        bus.listen(pin, spi_mode: @spi_mode, spi_frequency: spi_frequency, read: @bytes, bit_order: @bit_order)
+        bus.listen(pin, read: bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
       def stop

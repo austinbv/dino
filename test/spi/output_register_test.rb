@@ -10,7 +10,7 @@ class OutputRegisterTest < Minitest::Test
   end
 
   def options
-    { bus: bus, pin: 9, spi_frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
+    { bus: bus, pin: 9, bytes: 2, spi_frequency: 800000, spi_mode: 2, spi_bit_order: :lsbfirst }
   end
 
   def part
@@ -23,7 +23,7 @@ class OutputRegisterTest < Minitest::Test
 
   def test_write
     part
-    mock = MiniTest::Mock.new.expect :call, nil, [9], spi_mode: 2, spi_frequency: 800000, write: [255,127], bit_order: :lsbfirst
+    mock = MiniTest::Mock.new.expect :call, nil, [9], write: [255,127], frequency: 800000, mode: 2, bit_order: :lsbfirst
     bus.stub(:transfer, mock) do
       part.write(255,127)
     end

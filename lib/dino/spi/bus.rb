@@ -8,26 +8,17 @@ module Dino
       # Board expects all components to have #pin.
       attr_reader :pin
 
-      def transfer(select_pin, **options)
-        board.spi_transfer(select_pin, **options)
-      end
+      # Forward some methods directly to the board.
+      extend Forwardable
 
-      def listen(select_pin, **options)
-        board.spi_listen(select_pin, **options)
-      end
+      # Forward SPI methods with prefixed names.
+      def_delegator :board, :spi_transfer,  :transfer
+      def_delegator :board, :spi_listen,    :listen
+      def_delegator :board, :spi_stop,      :stop
 
-      def stop(select_pin)
-        board.spi_stop(select_pin)
-      end
-
-      # Delegate this to board so peripherals can initialize their select pins.
-      def set_pin_mode(*args)
-        board.set_pin_mode(*args)
-      end
-
-      def convert_pin(pin)
-        board.convert_pin(pin)
-      end
+      # Forward pin control methods with same names for board proxying.
+      def_delegator :board, :convert_pin
+      def_delegator :board, :set_pin_mode
 
       # Add peripheral to self and the board. It gets callbacks directly from the board.
       def add_component(component)

@@ -18,7 +18,7 @@ class SPIBusTest < Minitest::Test
   end
 
   PIN = 9
-  OPTIONS = { mode: 2, frequency: 800000, read: 2, bit_order: :lsbfirst }
+  OPTIONS = { read: 2, frequency: 800000, mode: 2, bit_order: :lsbfirst }
 
   def test_transfer
     mock = MiniTest::Mock.new.expect :call, nil, [PIN], **OPTIONS

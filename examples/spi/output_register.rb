@@ -26,10 +26,10 @@ bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)
 
 # OutputRegister needs a bus and its select pin.
 # Other options and their defaults:
-#     bit_order:      :msbfirst
+#     bytes:          1          - For daisy-chaining registers
 #     spi_frequency:  1000000    - Only affects hardware SPI interfaces
 #     spi_mode:       0
-#     bytes:          1          - For daisy-chaining registers
+#     spi_bit_order:  :msbfirst
 #     write_delay:    0.001      - How long to buffer writes, in seconds
 #     buffer_writes:  true       - Wait for write_delay before writing whole register state.
 #                                  Makes proxied components write pseudo-parallelly.

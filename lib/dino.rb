@@ -6,6 +6,9 @@ module Dino
   end
 end
 
+# For method delegation.
+require 'forwardable'
+
 # Board stuff.
 require_relative 'dino/version'
 require_relative 'dino/message'

@@ -10,7 +10,7 @@ class BaseRegisterTest < Minitest::Test
   end
 
   def options
-    { bus: bus, pin: 9, spi_frequency: 800000, spi_mode: 2, bit_order: :lsbfirst, bytes: 2 }
+    { bus: bus, pin: 9, bytes: 2, spi_frequency: 800000, spi_mode: 2, spi_bit_order: :lsbfirst }
   end
 
   def part
@@ -26,7 +26,7 @@ class BaseRegisterTest < Minitest::Test
   def test_options
     assert_equal 800000,      part.spi_frequency
     assert_equal 2,           part.spi_mode
-    assert_equal :lsbfirst,   part.bit_order
+    assert_equal :lsbfirst,   part.spi_bit_order
     assert_equal 2,           part.bytes
     new_part = Dino::SPI::BaseRegister.new(options.merge(bytes: 3, pin: 10))
     assert_equal new_part.state, Array.new(24) {|i| 0}

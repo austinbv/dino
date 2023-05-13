@@ -15,20 +15,34 @@ class APISPITest < Minitest::Test
   end
   
   def test_spi_modes
-    assert_equal (board.spi_header(spi_mode: nil)[0][0]), (pack :uint8, 0b10000000)
-    assert_equal (board.spi_header(spi_mode: 1  )[0][0]), (pack :uint8, 0b10000001)
-    assert_equal (board.spi_header(spi_mode: 2  )[0][0]), (pack :uint8, 0b10000010)
-    assert_equal (board.spi_header(spi_mode: 3  )[0][0]), (pack :uint8, 0b10000011)
-    assert_raises(ArgumentError) { board.spi_header(spi_mode: 4) }
+    # Start with mode = 0.
+    args = [[], 0, 1000000, 0, :msbfirst]
+    assert_equal (pack :uint8, 0b10000000), board.spi_header(*args)[0]
+
+    args[3] = 1
+    assert_equal (pack :uint8, 0b10000001), board.spi_header(*args)[0]
+
+    args[3] = 2
+    assert_equal (pack :uint8, 0b10000010), board.spi_header(*args)[0]
+
+    args[3] = 3
+    assert_equal (pack :uint8, 0b10000011), board.spi_header(*args)[0]
+
+    # Invalid mode = 4.
+    assert_raises(ArgumentError) { board.spi_header(*args[3] = 4) }
   end
   
   def test_spi_lsbfirst
-    assert_equal (board.spi_header(bit_order: :lsbfirst)[0][0]), (pack :uint8, 0b00000000)
+    args = [[], 0, 1000000, 0, :lsbfirst]
+    assert_equal (pack :uint8, 0b00000000), board.spi_header(*args)[0]
   end
 
   def test_spi_frequency
-    assert_equal (board.spi_header(spi_frequency: nil    )[0][3..6]), (pack :uint32, 1000000)
-    assert_equal (board.spi_header(spi_frequency: 8000000)[0][3..6]), (pack :uint32, 8000000)
+    args = [[], 0, 1000000, 0, :msbfirst]
+    assert_equal (pack :uint32, 1000000), board.spi_header(*args)[3..6]
+
+    args[2] = 8000000
+    assert_equal (pack :uint32, 8000000), board.spi_header(*args)[3..6]
   end
   
   def test_spi_too_many_bytes
@@ -47,29 +61,27 @@ class APISPITest < Minitest::Test
   
   def test_spi_transfer
     board
-    options = { write: [1,2,3,4], read: 4, bit_order: :lsbfirst, frequency: 8000000, mode: 2 }
-    header = board.spi_header(options)[0]
-    aux = header + pack(:uint8, options[:write])
-    
-    mock = MiniTest::Mock.new
-    mock.expect :call, nil, [Dino::Message.encode(command: 26, pin: 3, aux_message: aux)]
+    bytes = [1,2,3,4]
+    header = board.spi_header(bytes, 4, 8000000, 2, :lsbfirst)
+    aux = header + pack(:uint8, bytes)
+    mock = MiniTest::Mock.new.expect  :call, nil,
+                                      [Dino::Message.encode(command: 26, pin: 3, aux_message: aux)]
     
     board.stub(:write, mock) do
-      board.spi_transfer(3, options)
+      args = { write: [1,2,3,4], read: 4, bit_order: :lsbfirst, frequency: 8000000, mode: 2 }
+      board.spi_transfer(3, **args)
     end
     mock.verify
   end
   
   def test_spi_listen
     board
-    options = { read: 8, bit_order: :lsbfirst }
-    header = board.spi_header(options)[0]
-    
-    mock = MiniTest::Mock.new
-    mock.expect :call, nil, [Dino::Message.encode(command: 27, pin: 3, aux_message: header)]
+    header = board.spi_header([], 8, 1000000, 0, :lsbfirst)
+    mock = MiniTest::Mock.new.expect  :call, nil,
+                                      [Dino::Message.encode(command: 27, pin: 3, aux_message: header)]
     
     board.stub(:write, mock) do
-      board.spi_listen(3, options)
+      board.spi_listen(3, read: 8, bit_order: :lsbfirst)
     end
     mock.verify
   end

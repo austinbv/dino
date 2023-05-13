@@ -26,10 +26,10 @@ bus = Dino::SPI::BitBang.new(board: board, pins: SPI_BIT_BANG_PINS)
 
 # InputRegister needs a bus and its select pin. The CD4021 likes SPI mode 2.
 # Other options and their defaults:
-#     bit_order:      :msbfirst
+#     bytes:          1          - For daisy-chaining registers
 #     spi_frequency:  1000000    - Only affects hardware SPI interfaces
 #     spi_mode:       0
-#     bytes:          1          - For daisy-chaining registers
+#     spi_bit_order:  :msbfirst
 #
 register = Dino::SPI::InputRegister.new(bus: bus, pin: REGISTER_SELECT_PIN, spi_mode: 2)
 

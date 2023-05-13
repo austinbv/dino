@@ -26,18 +26,14 @@ module Dino
         require_pins(:clock, :input, :output)
       end
 
-      def transfer(select_pin, **options)
-        options.merge!(pin_hash)
-        board.spi_bb_transfer(select_pin, **options)
+      def transfer(select_pin, write: [], read: 0, frequency: nil, mode: 0, bit_order: :msbfirst)
+        board.spi_bb_transfer select_pin, clock: pins[:clock], output: pins[:output], input: pins[:input],
+                                          write: write, read: read, mode: mode, bit_order: bit_order
       end
 
-      def listen(select_pin, **options)
-        options.merge!(pin_hash)
-        board.spi_bb_listen(select_pin, **options)
-      end
-
-      def pin_hash
-        { input: pins[:input], output: pins[:output], clock: pins[:clock] }
+      def listen(select_pin, read: 0, frequency: nil, mode: 0, bit_order: :msbfirst)
+        board.spi_bb_listen select_pin, clock: pins[:clock], input: pins[:input],
+                                        read: read, mode: mode, bit_order: bit_order
       end
 
       # Uses regular Board#spi_stop since listeners are shared.
