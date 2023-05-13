@@ -38,16 +38,12 @@
 | ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB port. Make sure to enable CDC on boot.
 | ESP32-C3       | :heart:         | LOLIN C3 Mini V2.1.0 |
 
-**Note:** There are many boards built around these ESP chips. Look up your board's pin map, and use the GPIO numbers directly. They may be labelled differently on the PCB.
-
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
 
 |    Chip        | Status          | Boards           | Notes |
 | :--------      | :------:        | :--------------- |------ |
 | RP2040         | :green_heart:   | Raspberry Pi Pico (W) | WiFi only on W version. No WS1812 LED support.
-
-**Note:** There are many boards built around the RP2040. Look up your board's pin map, and use the GPIO numbers directly. They may be labelled differently on the PCB.
 
 # Supported Components
 
@@ -59,10 +55,10 @@
 | :---------------      | :------:        | :------             | :---- |
 | Digital Out           | :green_heart:   | `DigitalIO::Output` | -     |
 | Digital In            | :green_heart:   | `DigitalIO::Input`  | 1ms - 128ms (4ms default) listen, poll, or read
-| Analog (PWM) Out      | :green_heart:   | `PulseIO::PWMOut`   |
-| Analog (DAC) Out      | :green_heart:   | `AnalogIO::Output`  | On SAM3X, SAMD21 and ESP32
-| Analog (ADC) In       | :green_heart:   | `AnalogIO::Input`   | 1ms - 128ms (16ms default) listen, poll, or read
-| Tone Out (Square Wave)| :green_heart:   | `PulseIO::Buzzer`   | Not working on Due yet
+| PWM Out               | :green_heart:   | `PulseIO::PWMOut`   |
+| Analog Out (DAC)      | :green_heart:   | `AnalogIO::Output`  | On SAM3X, SAMD21 and ESP32
+| Analog In (ADC)       | :green_heart:   | `AnalogIO::Input`   | 1ms - 128ms (16ms default) listen, poll, or read
+| Tone Out (Square Wave)| :green_heart:   | `PulseIO::Buzzer`   | Doesn't work on Due (SAM3X)
 
 **Note:** When listening, the board checks the pin's value every **_2^n_** ms (**_n_** from **_0_** to **_7_**), without further prompting. Polling and reading follow a call and response pattern.
 
@@ -74,7 +70,7 @@
 | SPI              | :green_heart:  | Hardware  | `SPI::Bus`               | Hardware SPI
 | SPI Bit Bang     | :green_heart:  | Software  | `SPI::BitBang`           | Bit Bang SPI
 | UART             | :heart:        | Hardware  | -                        | Most boards have extra hardware UARTs
-| UART Bit Bang    | :yellow_heart: | Software  | `SoftwareSerial`         | Only on boards with 1 hardware UART. Write only
+| UART Bit Bang    | :yellow_heart: | Software  | `UART::BitBang`          | Only on boards with 1 hardware UART. Write only
 | Maxim OneWire    | :green_heart:  | Software  | `OneWire::Bus`           | No overdrive support
 | Infrared Emitter | :green_heart:  | Software  | `PulseIO::IRTransmitter` | Library on Board
 | Infrared Receiver| :heart:        | Software  | -                        | Doable with existing library
@@ -120,12 +116,12 @@
 | Name               | Status             | Interface         | Component Class    | Notes |
 | :---------------   | :------:           | :--------         | :---------------   |------ |
 | Neopixel / WS2812B | :yellow_heart:     | Adafruit Library  | `LED::WS2812`      | Not working on RP2040 |
-| Dotstar / APA102   | :yellow_heart:     | SPI/SPI Bit Bang  | `LED::APA102`      | No current control yet. End frame won't support > 64 pixels.
+| Dotstar / APA102   | :yellow_heart:     | SPI               | `LED::APA102`      | No current control yet and max 64 pixels.
 
 ### I/O Expansion
 
 | Name             | Status         | Interface  | Component Class      | Notes |
-| :--------------- | :------:       | :--------  | :---------------     |------ 
+| :--------------- | :------:       | :--------  | :---------------     |------ |
 | PCF8574 Expander | :heart:        | I2C        | -  | 8ch bi-directional digital I/O
 | ADS1115 ADC      | :heart:        | I2C        | -  | 16-bit, 4ch analog to digital converter
 | ADS1118 ADC      | :heart:        | SPI        | -  | 16-bit, 4ch analog to digital converter

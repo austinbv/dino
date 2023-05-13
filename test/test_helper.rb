@@ -87,7 +87,7 @@ Dino::SPI::InputRegister
 Dino::SPI::OutputRegister
 
 # UART
-Dino::UART::Bitbang
+Dino::UART::BitBang
 
 # Nice little helper module to redefine constants quietly.
 module Constants

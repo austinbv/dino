@@ -1,6 +1,6 @@
 module Dino
   module UART
-    class Bitbang
+    class BitBang
       include Behaviors::MultiPin
       attr_accessor :baud
 
