@@ -17,19 +17,14 @@ module Dino
         enable_proxy
       end
 
-      #
-      # API method delegation
-      # 
+      # Overrides Peripheral#read to always read @bytes.
       def read
-        bus.transfer(pin, read: bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
+        super(@bytes)
       end
 
+      # Overrides Peripheral#listen to always read @bytes.
       def listen
-        bus.listen(pin, read: bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
-      end
-
-      def stop
-        bus.stop(pin)
+        super(@bytes)
       end
 
       #

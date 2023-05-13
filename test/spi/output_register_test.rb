@@ -25,7 +25,9 @@ class OutputRegisterTest < Minitest::Test
     part
     mock = MiniTest::Mock.new.expect :call, nil, [9], write: [255,127], frequency: 800000, mode: 2, bit_order: :lsbfirst
     bus.stub(:transfer, mock) do
-      part.write(255,127)
+      arr = Array.new(16) { 1 }; arr[7] = 0
+      part.instance_variable_set(:@state, arr) 
+      part.write
     end
     mock.verify
   end
@@ -44,8 +46,8 @@ class OutputRegisterTest < Minitest::Test
   def test_updates_and_writes_state_for_children
     led
     
-    mock = MiniTest::Mock.new.expect :call, nil, [[0, 1]]
-    part.stub(:write, mock) do
+    mock = MiniTest::Mock.new.expect :call, nil, [9], write: [0, 1], frequency: 800000, mode: 2, bit_order: :lsbfirst
+    bus.stub(:transfer, mock) do
       led.on
       sleep 0.050
     end
@@ -71,11 +73,10 @@ class OutputRegisterTest < Minitest::Test
     part.instance_variable_set(:@bytes, 2)
     bit_array = "0101010100001111".split("")
     
-    mock = MiniTest::Mock.new
-    mock.expect :call, nil, [[0b11110000, 0b10101010]]
-    part.stub(:write, mock) do
+    mock = MiniTest::Mock.new.expect :call, nil, [9], write: [0b11110000, 0b10101010], frequency: 800000, mode: 2, bit_order: :lsbfirst
+    bus.stub(:transfer, mock) do
       part.instance_variable_set(:@state, bit_array)
-      part.write_state
+      part.write
       sleep 0.002
     end
     mock.verify

@@ -1,9 +1,7 @@
 module Dino
   module SPI
     class BaseRegister
-      include Behaviors::OutputPin
-      include Behaviors::Callbacks
-      include Behaviors::BusPeripheral
+      include Peripheral
       #
       # Registers act as a Board for components that need only digital pins in
       # in their I/O direction. Give the register as a 'board' when initializing a
@@ -11,7 +9,7 @@ module Dino
       #
       include Behaviors::BoardProxy
 
-      attr_reader :bytes, :spi_frequency, :spi_mode, :spi_bit_order
+      attr_reader :bytes
 
       def before_initialize(options={})
         super(options)
@@ -26,12 +24,6 @@ module Dino
         # pin as a 0 or 1 in an array that is (@bytes * 8) long. Zero out to start.
         #
         @state = Array.new(@bytes*8) { 0 }
-        #
-        # Setup SPI options.
-        # 
-        @spi_frequency  = options[:spi_frequency]
-        @spi_mode       = options[:spi_mode]
-        @spi_bit_order  = options[:spi_bit_order]
       end
 
       def after_initialize(options={})

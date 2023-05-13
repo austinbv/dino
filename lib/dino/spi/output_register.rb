@@ -15,14 +15,27 @@ module Dino
       end
       
       def after_initialize(options={})
-        write_state
+        write
       end
 
       #
-      # API method delegation
+      # Overrides Peripheral#write to always write @state.
+      # Convert bit state to array of 0-255 integers (bytes) first.
       #
-      def write(bytes)
-        bus.transfer(pin, write: bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
+      def write
+        bytes = []
+        @state.each_slice(8) do |slice|
+          # Convert nils in the slice to zero.
+          zeroed = slice.map { |bit| bit.to_i }
+          
+          # Each slice is 8 bits of a byte, with the lowest on the left.
+          # Reverse to reading order (lowest right) then join into string, and convert to integer.
+          byte = zeroed.reverse.join.to_i(2)
+          
+          # Pack bytes in reverse order.
+          bytes.unshift byte
+        end
+        super(bytes)
       end
 
       #
@@ -30,7 +43,7 @@ module Dino
       #
       def digital_write(pin, value)
         state[pin] = value  # Might not be atomic?
-        @buffer_writes ? write_buffered(state) : write_state
+        @buffer_writes ? write_buffered(state) : write
       end
       
       def digital_read(pin)
@@ -46,27 +59,8 @@ module Dino
         threaded do
           sleep @write_delay
           # Keep delaying if state has changed.
-          write_state if (old_state == state)
+          write if (old_state == state)
         end
-      end
-
-      #
-      # Convert bit state to array of 0-255 integers (bytes) then write normally.
-      #
-      def write_state
-        bytes = []
-        state.each_slice(8) do |slice|
-          # Convert nils in the slice to zero.
-          zeroed = slice.map { |bit| bit.to_i }
-          
-          # Each slice is 8 bits of a byte, with the lowest on the left.
-          # Reverse to reading order (lowest right) then join into string, and convert to integer.
-          byte = zeroed.reverse.join.to_i(2)
-          
-          # Pack bytes in reverse order.
-          bytes.unshift byte
-        end
-        write(bytes)
       end
     end
   end
