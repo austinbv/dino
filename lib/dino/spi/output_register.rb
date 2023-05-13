@@ -21,7 +21,7 @@ module Dino
       #
       # API method delegation
       #
-      def write(*bytes)
+      def write(bytes)
         bus.transfer(pin, write: bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
