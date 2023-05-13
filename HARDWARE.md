@@ -36,7 +36,7 @@
 | ESP32          | :green_heart:   | DOIT ESP32 DevKit V1 |
 | ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB port. Make sure to enable CDC on boot.
 | ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB port. Make sure to enable CDC on boot.
-| ESP32-C3       | :heart:         | LOLIN C3 Mini V2.1.0 |
+| ESP32-C3       | :green_heart:   | LOLIN C3 Mini V2.1.0 | Hold button (GPIO9) while connecting USB to flash.
 
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)

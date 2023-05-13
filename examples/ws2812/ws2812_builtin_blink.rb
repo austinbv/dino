@@ -1,5 +1,5 @@
 #
-# Blink example for the LOLIN S3 (ESP32) or any board where
+# Blink example for the LOLIN ESP32 S3 or C3, or any board where
 # :LED_BUILTIN is the data pin for a single on-board WS2812.
 #
 require 'bundler/setup'
@@ -14,8 +14,8 @@ strip = Dino::LED::WS2812.new(board: board, pin: :LED_BUILTIN, length: 1)
 loop do
   strip[0] = WHITE
   strip.show
-  sleep 0.1
+  sleep 0.5
   strip[0] = OFF
   strip.show
-  sleep 0.1
+  sleep 0.5
 end
