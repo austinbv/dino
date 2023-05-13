@@ -120,7 +120,7 @@
 | Name               | Status             | Interface         | Component Class    | Notes |
 | :---------------   | :------:           | :--------         | :---------------   |------ |
 | Neopixel / WS2812B | :yellow_heart:     | Adafruit Library  | `LED::WS2812`      | Not working on RP2040 |
-| Dotstar / APA102   | :heart:            | SPI               | -                  |
+| Dotstar / APA102   | :yellow_heart:     | SPI/SPI Bit Bang  | `LED::APA102`      | No current control yet. End frame won't support > 64 pixels.
 
 ### I/O Expansion
 
