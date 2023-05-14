@@ -118,7 +118,7 @@ class Dino {
     // Hardware SPI
     void spiBegin              (byte settings, uint32_t clockRate);
     void spiEnd                ();
-    void spiTransfer           (uint32_t clockRate, uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, byte *data); //cmd = 26
+    void spiTransfer           (uint32_t clockRate, uint8_t select, uint8_t settings, uint8_t rLength, uint8_t wLength, byte *data);    //cmd = 26
     void spiAddListener        ();                                                                                                      //cmd = 27
     void spiReadListener       (uint8_t i);
  

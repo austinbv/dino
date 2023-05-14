@@ -11,8 +11,8 @@ BLUE   = [0, 0, 255]
 WHITE  = [255, 255, 255]
 COLORS = [RED, GREEN, BLUE, WHITE]
 
-# Need an unused pin since SPI interface expects a chip select pin.
-APA102_PIN = 128
+# A SPI select pin of 255 is treated as no select pin.
+SELECT_PIN = 255
 PIXELS = 8
 
 # Move along the strip and back, one pixel at a time.
@@ -22,7 +22,7 @@ board = Dino::Board.new(Dino::Connection::Serial.new)
 
 # Use the default hardware SPI bus.
 bus = Dino::SPI::Bus.new(board: board)
-strip = Dino::LED::APA102.new(bus: bus, pin: APA102_PIN, length: PIXELS)
+strip = Dino::LED::APA102.new(bus: bus, pin: SELECT_PIN, length: PIXELS)
 
 loop do
   COLORS.each do |color|

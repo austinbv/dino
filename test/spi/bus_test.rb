@@ -68,4 +68,9 @@ class SPIBusTest < Minitest::Test
       part.add_component TempSpiPeripheral.new(1)
     end
   end
+
+  def test_no_select_pin
+    part.add_component TempSpiPeripheral.new(255)
+    assert_empty part.components
+  end
 end

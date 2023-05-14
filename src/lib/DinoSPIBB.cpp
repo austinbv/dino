@@ -46,9 +46,11 @@ void Dino::spiBBtransfer( uint8_t clock, uint8_t input, uint8_t output, uint8_t 
     stream->print(':');
   }
 
-  // Pull select pin low.
-  pinMode(select, OUTPUT);
-  digitalWrite(select, LOW);
+  // Pull select pin low, treating 255 as no select pin.
+  if (select != 255) {
+    pinMode(select, OUTPUT);
+    digitalWrite(select, LOW);
+  }
 
   for (byte i = 0;  (i < rLength || i < wLength);  i++) {
     byte b;
@@ -66,8 +68,8 @@ void Dino::spiBBtransfer( uint8_t clock, uint8_t input, uint8_t output, uint8_t 
     }
   }
   
-  // Leave select high.
-  digitalWrite(select, HIGH);
+  // Leave select high, treating 255 as no select pin.
+  if (select != 255) digitalWrite(select, HIGH);
 }
 
 //
@@ -142,8 +144,8 @@ void Dino::spiBBaddListener() {
 
 // Called by spiUpdateListeners to read an individual bit bang SPI listener.
 void Dino::spiBBreadListener(uint8_t i) {
-  spiBBtransfer((spiListeners[i].clock & 0xFF),          // Clock pin is bits [0..7] of the uint32
-                ((spiListeners[i].clock >> 8) & 0xFF),   // Input pin is bits [8..15] of the uint32
+  spiBBtransfer((spiListeners[i].clock & 0xFF),         // Clock pin is bits [0..7] of the uint32
+                ((spiListeners[i].clock >> 8) & 0xFF),  // Input pin is bits [8..15] of the uint32
                 255,                                    // Disabled output pin
                 spiListeners[i].select,                 // Select pin
                 spiListeners[i].settings,

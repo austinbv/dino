@@ -22,10 +22,14 @@ module Dino
 
       # Add peripheral to self and the board. It gets callbacks directly from the board.
       def add_component(component)
+        # Treat pin 255 as the component having no select pin. Mostly for APA102.
+        return if component.pin == 255
+
         pins = components.map { |c| c.pin }
         if pins.include? component.pin
           raise ArgumentError, "duplicate select pin for #{component}"
         end
+
         components << component
         board.add_component(component)
       end

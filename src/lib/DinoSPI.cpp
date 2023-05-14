@@ -89,18 +89,20 @@ void Dino::spiEnd() {
 // auxMsg[3-6] = clock frequency (uint32_t as 4 bytes)
 // auxMsg[7+]  = data (bytes) (write only)
 //
-void Dino::spiTransfer(uint32_t clockRate, uint8_t selectPin, uint8_t settings, uint8_t rLength, uint8_t wLength, byte *data) {
+void Dino::spiTransfer(uint32_t clockRate, uint8_t select, uint8_t settings, uint8_t rLength, uint8_t wLength, byte *data) {
   spiBegin(settings, clockRate);
 
   // Stream read bytes as if coming from select pin.
   if (rLength > 0) {
-    stream->print(selectPin);
+    stream->print(select);
     stream->print(':');
   }
 
-  // Pull select pin low.
-  pinMode(selectPin, OUTPUT);
-  digitalWrite(selectPin, LOW);
+  // Pull select pin low, treating 255 as no select pin.
+  if (select != 255) {
+    pinMode(select, OUTPUT);
+    digitalWrite(select, LOW);
+  }
   
   for (byte i = 0;  (i < rLength || i < wLength);  i++) {
     byte b;
@@ -118,8 +120,8 @@ void Dino::spiTransfer(uint32_t clockRate, uint8_t selectPin, uint8_t settings, 
     }
   }
 
-  // Leave select high.
-  digitalWrite(selectPin, HIGH);
+  // Leave select high, treating 255 as no select pin.
+  if (select != 255) digitalWrite(select, HIGH);
 
   spiEnd();
 }
