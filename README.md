@@ -68,7 +68,7 @@ dino sketch serial --target esp8266
 dino sketch wifi --target esp8266 --ssid YOUR_SSID --password YOUR_PASSWORD
 dino sketch wifi --target esp32 --ssid YOUR_SSID --password YOUR_PASSWORD
 ````
-**Note:** [This example](examples/tcp.rb) shows how to connect to a board with a TCP socket, but the WiFi & Ethernet sketches fall back to the serial interface when no TCP client is connected.
+**Note:** [This example](examples/connection/tcp.rb) shows how to connect to a board with a TCP socket, but the WiFi & Ethernet sketches fall back to the serial interface when no TCP client is connected.
 
 #### 5a) IDE Flashing
 
@@ -121,7 +121,7 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
   * Breadboard
   * Jumper wires
   
-  **Tip:** Arduino kits are a cost-effective way to get started. They will almost certainly include these parts, plus more, getting you well beyond the starter examples.
+  **Tip:** Kits are a cost-effective way to get started. They will almost certainly include these parts, plus more, getting you well beyond the starter examples.
   
 * The remaining examples will usually demonstrate the interface for a specific component class, or how to use multiple components together.
 * Each example folder should incldue a wiring diagram alongside its code.

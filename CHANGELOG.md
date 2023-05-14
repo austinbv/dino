@@ -3,18 +3,20 @@
 ## 0.13.0
 
 ### New Features
+
 - `Board#map`
   - Calling `#map` on a `Board` instance will return a hash that maps its named pins (taken from the Arduino framework) to their integer GPIO values, once the board is supported. Examples: `:A0`, `:DAC0`, `:MOSI`, `:LED_BUILTIN`.
-  - Pin names can be given as symbols when instantiating components on a board, and they will automatically convert to integers.
+  - Pin names can be given as symbols when instantiating components on a board, and they will be converted to integers by `Board#convert_pin`.
   - This also makes it easier to connect components like SPI or I2C, without a pinout diagram.
   - To make this work, the board sends and identifier string (again taken from the Arduino framework) during handshake. This is cross-referenced against a directory of YAML files, loading the right map for each board.
   - This uses [`arduino-yaml-board-maps`](https://github.com/dino-rb/arduino-yaml-board-maps). See that repo for which Arduino cores / boards are supported.
 
 ### New Boards
 
-- ESP32-S2 and ESP32-S3 variants (`--target esp32`):
+- ESP32-S2, ESP32-S3 and ESP32-C3 variants (`--target esp32`):
   - Newer versions of the ESP32 chip with native USB support.
   - No DACs on the S3.
+  - No DACs or capacitive touch on the C3.
 
 - SAMD21 Boards, Arduino Zero (`--target samd`):
   - All working. No bit bang UART support.
@@ -22,7 +24,7 @@
 - RP2040 Based Boards, Raspberry Pi Pico (W) (`--target rp2040`):
   - All working except WS2812 LED arrays. No bit bang UART support.
 
-- Raspberry Pi (not Pico) built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
+- Raspberry Pi SBC (not Pico) built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
   - Ruby needs to be running on the Pi itself.
   - Folllow install instructions from `dino-piboard` gem's readme.
   - `require "dino/piboard"` instead of `require "dino"`
@@ -30,16 +32,18 @@
   - Not all interfaces and components from `dino` are supported yet.
 
 ### New Components
+
 - Bosch BME/BMP 280 environmental sensor:
   - Classes: `Dino::Sensor::BME280` and `Dino::Sensor::BMP280`
   - All features in the datasheet are implemented, except status checking.
   - Connects over I2C, driver written in Ruby.
   - Both are mostly identical, except for BMP280 lacking humidity.
   
-- SSD1306 OLED driver support:
+- SSD1306 OLED driver:
   - Class: `Dino::Display::SSD1306`
   - Connects over I2C, driver written in Ruby.
-  - Updates entire frame at once using horizontal addressing mode.
+  - By default, it updates entire frame at once using horizontal addressing mode, `SSD1306#draw`.
+  - Can do partial updates by calling `SSD1306#draw(x_min, x_max, y_min, y_max)` defining a bounding box to redraw.
   - One 6x8 font and graphic primitves, included through `Dino::Display::Canvas`.
 
 - L298 H-Bridge motor driver:
@@ -47,18 +51,24 @@
   - Forward, reverse, idle, and brake modes implemented.
   - Speed controlled by PWM output on enable pin.
 
-- WS2812 / WS2812B / NeoPixel Support:
+- WS2812 / WS2812B / NeoPixel RGB LED array:
   - Class: `Dino::LED::WS2812`
   - No fancy functions yet. Just clear, set pixels, and show.
+
+- APA102 / Dotstar RGB LED array:
+  - Class: `Dino::LED::APA102`
+  - No fancy functions yet. Just clear, set pixels, show, global and per-pixel brightness control.
+  - Sends data over SPI interface with no select pin, but select pin needs to be given as 255.
 
 See new examples in the [examples](examples) folder to learn more.
 
 ### Changed Components
+
 - Virtually every component has been renamed to stop using the `Dino::Components` namespace and make naming clearer.
   - TODO: Update here with a list of renamed components.
 
 - SPI components now go through a `Dino::SPI::Bus` object:
-  - Instead of giving a board directly when creating a new SPI register, a bus must be created first:
+  - Instead of giving a board directly when creating a new SPI peripheral, a bus must be created first:
     ```ruby
       board = Dino::Board.new(connection)
       bus = Dino::SPI::Bus.new(board: board)                              # board's default SPI interface
@@ -70,10 +80,14 @@ See new examples in the [examples](examples) folder to learn more.
   - When a peripheral is added to the SPI bus, callbacks are hooked (using its select pin as identifier) directly to the board.
   - Shift In/Out features refactored into `SPI::Bitbang` which is class-compatible with `SPI::Bus`, except for frequency.
   - Both `SPI::Bus` and `SPI::Bitbang` validate select pin uniquness among peripherals, per bus instance.
+  - Both types of SPI buses treat a select (enable) pin of 255 as no select pin at all (won't toggle before and after transferring).
   - See the updated [SPI examples](examples/spi) to learn more.
 
 - `ShiftIn` and `ShiftOut` components removed:
   - Refactored into `SPI::BitBang`. See SPI changes above.
+
+- `SPI::Peripheral` has been extracted from the various SPI Register classes.
+  - This should be used for most peripherals, and the register classes used only simple I/O expansion registers.
 
 - `I2C::Bus` does not automatically search when initialized.
 
@@ -81,6 +95,7 @@ See new examples in the [examples](examples) folder to learn more.
   - `I2C::Peripheral` and it's subclasses take `:i2c_frequency` keywoard arg when instantiating. It's stored in `@i2c_frequency` with accessors, and used for all reads and writes.
   - `Board#i2c_write` and `Board#i2c_read` also accept `:i2c_frequency` as a keyword arg.
   - Valid values are: `100000, 400000, 1000000, 3400000`. Defaults to `100000` at the `Board` level, when not given.
+  - **Note:** This DOES NOT work if using `dino-piboard`. See the README on that gem for more info.
 
 - Hitachi HD44780 LCD driver rewritten in Ruby:
   - New class: `Dino::Display::HD44780`
@@ -106,8 +121,15 @@ See new examples in the [examples](examples) folder to learn more.
   - Might even try to limit to just the ATmega168 and 328, since only they need it.
   - Will add a hardware UART passthrough eventually (for all the other chips), and add read support to this.
 
+- `Dino::TxRx` moved to `Dino::Connection`.
+
+- `Dino::Connection::Serial` tries to read up to 64 bytes each time now instead of 1, reducing the number of FFI calls, and CPU usage.
+
+- `Dino::Connection::FlowControl` simplified to always wait 1ms if no bytes to read or write. This also reduces CPU usage. This might affect the time precision of values received from listeners, but they weren't guaranteed to be evenly spaced anyway. Will add a timestamped listener feature in the future if needed.
+
 ### Board API Changes
-- `microDelay` function exposed from the board library:
+
+- `microDelay` function exposed from the board:
   - Implements a platform independent microsecond delay.
   - All calls to `delayMicroseconds()` should be replaced with this.
   - Exposed in Ruby via `CMD=99`. It takes one argument, uint_16 for delay length in microsceonds.
@@ -145,8 +167,14 @@ See new examples in the [examples](examples) folder to learn more.
 
 - `Board#spi_listen` and `Board#spi_bb_listen` now share the same listener storage on the board. Default is 4 listeners. `shiftListeners` have been removed.
 
+- I2C and SPI data transfer methods on `Board` changed to avoid using the options Hash pattern. I2C uses only positional arguments, and SPI uses positional and keyword arguments. This gives a significant performance boost on lower end processors like the Raspberry Pi Zero, and reduces CPU usage in general.
+
 ### Minor Changes
+
+- When instantiating a component, `Board#convert_pin` is run immediately, then the converted integer for the pin (based on the board map), is saved in `@pin`, instead of whatever form was given to `#initialize`. After this, the integer is always used as-is for sending / receiving messages. This reduces CPU usage, since `Board#convert_pin` doesn't need to be called for every message.
+
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
+
 - Aux message size limits changed to:
   - 512 + 16: When using IR output or WS2812 and not using ATmega168
   - 256 + 16: When not using IR output or WS2812, any board
@@ -156,11 +184,20 @@ See new examples in the [examples](examples) folder to learn more.
 
 - Removed `Dino::Board::ESP8266`, in favor of the new board mapping functionality. See New Features above.
 
+- Started using `simplecov` gem to track test coverage.
+
+- Added [this example](examples/ws2812/ws2812_builtin_blink.rb) as a blink example for boards where :LED_BUILTIN maps to a single on-board WS2812 LED, instead of a regular LED.
+
 ### Bug Fixes
+
 - Fixed `Dino::DigitalIO::Output` not setting its state through its mutex.
+
 - Fixed `Piezo` functionality. Frequency and duration values weren't being properly cast on the board. Duration is also limited to 16 bits now, instead of 32, as it should be to match the Arduino function.
+
 - Added validation for I2C writes not exceeding 32 bytes, since this is a limit of the native (AVR) library  buffer. May increase for boards with bigger buffers in the future.
+
 - Stricter regex validation in `I2C::Bus` for identifying a series of bytes coming from a specific I2C address.
+
 - `I2C::Bus` and `OneWire::Bus` now validate peripheral addresses as unique, per bus instance.
 
 ## 0.12.0
