@@ -116,7 +116,7 @@
 | Name               | Status             | Interface         | Component Class    | Notes |
 | :---------------   | :------:           | :--------         | :---------------   |------ |
 | Neopixel / WS2812B | :yellow_heart:     | Adafruit Library  | `LED::WS2812`      | Not working on RP2040 |
-| Dotstar / APA102   | :yellow_heart:     | SPI               | `LED::APA102`      | No current control yet and max 64 pixels.
+| Dotstar / APA102   | :green_heart:      | SPI               | `LED::APA102`      |
 
 ### I/O Expansion
 
