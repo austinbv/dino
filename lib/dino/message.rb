@@ -4,38 +4,57 @@ module Dino
     VAL_MIN = 0
     VAL_MAX = 9999
 
-    def self.encode(options={})
-      cmd = options[:command]
-      pin = options[:pin]
-      val = options[:value]
-      aux = options[:aux_message]
-      aux = aux.to_s.gsub("\\","\\\\\\\\").gsub("\n", "\\\n") if aux
+    def self.encode(command: nil, pin: nil, value: nil, aux_message: nil)
+      # Start building message backwards with aux_message first.
+      if aux_message
+        # Convert it to String.
+        aux_message = aux_message.to_s
 
-      raise ArgumentError, 'command missing from message' unless cmd
+        # Validate aux_message before escaping characters.
+        raise ArgumentError, 'aux_message is limited to 528 characters' if aux_message.length > 528
 
-      if cmd.class != Integer || cmd < 0 || cmd > BYTE_MAX
-        raise ArgumentError, 'command missing or not integer in range 0 to 255'
-      end
-      if pin && (pin.class != Integer || pin < 0 || pin > BYTE_MAX)
-        raise ArgumentError, 'pin must be integer in range 0 to 255'
-      end
-      if val && (val.class != Integer || val < VAL_MIN || val > VAL_MAX)
-        raise ArgumentError, "value must be integer in range 0 to 9999"
-      end
-      if aux.to_s.length > 527
-        raise ArgumentError, 'auxillary messages are limited to 528 characters'
+        # Escape \ and \n.
+        aux_message = aux_message.gsub("\\","\\\\\\\\").gsub("\n", "\\\n")
+
+        # Start message with aux_message.
+        message = ".#{aux_message}"
+      else
+        # Or start with empty message.
+        message = ""
       end
 
-      message = ""
-      [aux, val, pin].each do |fragment|
-        if fragment
-          message = ".#{fragment}" << message
-        elsif !message.empty?
-          message = "." << message
+      # Prepend value
+      if value
+        # Validate value
+        if (value.class != Integer || value < VAL_MIN || value > VAL_MAX)
+          raise ArgumentError, "value must be integer in range #{VAL_MIN} to #{VAL_MAX}"
         end
+
+        message = ".#{value}#{message}"
+      elsif !message.empty?
+        message = ".#{message}"
       end
-      message = "#{cmd}" << message
-      message << "\n"
+
+      # Prepend pin
+      if pin
+        # Validate pin
+        if (pin.class != Integer || pin < 0 || pin > BYTE_MAX)
+          raise ArgumentError, 'pin must be integer in range 0 to 255'
+        end
+
+        message = ".#{pin}#{message}"
+      elsif !message.empty?
+        message = ".#{message}"
+      end
+
+      # Validate command
+      raise ArgumentError, 'command missing from message' unless command
+      if command.class != Integer || command < 0 || command > BYTE_MAX
+        raise ArgumentError, 'command must be Integer in range 0 to 255'
+      end
+
+      # Prepend command and append newline.
+      message = "#{command}#{message}\n"
     end
 
     def self.pack(type, data, options={})

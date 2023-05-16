@@ -24,7 +24,10 @@ class MessageTest < Minitest::Test
     assert_raises(ArgumentError) { Dino::Message.encode command: 0, value: 42.2 }
   end
 
-  # Test that aux message is limited by board aux_limit
+  def test_validates_aux_message_length
+    too_big_message = Array.new(529) { "a" }.join 
+    assert_raises(ArgumentError) { Dino::Message.encode command: 0, value: 0, aux_message: too_big_message }
+  end
 
   def test_build_messages_correctly
     assert_equal "1.1.1\n",    Dino::Message.encode(command: 1, pin: 1, value: 1)
@@ -35,12 +38,17 @@ class MessageTest < Minitest::Test
   end
 
   def test_escape_newline_in_aux
-    assert_equal Dino::Message.encode(command: 1, aux_message: "line1\nline2"),
-                 "1...line1\\\nline2\n"
+    assert_equal  "1...line1\\\nline2\\\n\n",
+                  Dino::Message.encode(command: 1, aux_message: "line1\nline2\n")
   end
 
   def test_escape_backslash_in_aux
-    assert_equal Dino::Message.encode(command: 1, aux_message: "line1\\line2"),
-                "1...line1\\\\line2\n"
+    assert_equal  "1...line1\\\\line2\\\\\n",
+                  Dino::Message.encode(command: 1, aux_message: "line1\\line2\\")
+  end
+
+  def test_escape_newline_and_backslashes_together
+    assert_equal  "1...line1\\\\\\\nline2\\\\\\\n\n",
+                  Dino::Message.encode(command: 1, aux_message: "line1\\\nline2\\\n")
   end
 end
