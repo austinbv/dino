@@ -1,7 +1,7 @@
 module Dino
   module Behaviors
     module BoardProxy
-      include BusController
+      include Subcomponents
 
       def high
         1

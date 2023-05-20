@@ -8,6 +8,7 @@ module Dino
     autoload :MultiPin,   "#{__dir__}/behaviors/multi_pin"
  
     # Subcomponent stuff
+    autoload :Subcomponents,          "#{__dir__}/behaviors/subcomponents"
     autoload :BusController,          "#{__dir__}/behaviors/bus_controller"
     autoload :BusControllerAddressed, "#{__dir__}/behaviors/bus_controller_addressed"
     autoload :BusPeripheral,          "#{__dir__}/behaviors/bus_peripheral"

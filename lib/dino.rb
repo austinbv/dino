@@ -9,15 +9,15 @@ end
 # For method delegation.
 require 'forwardable'
 
-# Board stuff.
+# Component support stuff.
 require_relative 'dino/version'
+require_relative 'dino/behaviors'
+require_relative 'dino/fonts'
+
+# Board stuff.
 require_relative 'dino/message'
 require_relative 'dino/connection'
 require_relative 'dino/board'
-
-# Component support stuff.
-require_relative 'dino/behaviors'
-require_relative 'dino/fonts'
 
 # Basic IO components.
 require_relative 'dino/digital_io'

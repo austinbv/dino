@@ -4,7 +4,6 @@ Dir["#{Dino.root}/lib/dino/board/*.rb"].each {|file| require file }
 module Dino
   class Board
     attr_reader :board_name, :version, :aux_limit, :eeprom_length
-    attr_reader :components
     attr_reader :low, :high, :analog_write_high, :analog_read_high
 
     def initialize(io, options={})
@@ -32,9 +31,6 @@ module Dino
       @high = 1
       self.analog_write_resolution = options[:write_bits] || 8
       self.analog_read_resolution = options[:read_bits] || 10
-
-      # Component holder.
-      @components = []
     end
     
     def finish_write
@@ -86,30 +82,23 @@ module Dino
     end
 
     #
-    # Component generating convenience methods. TODO: add more!
+    # Use standard Subcomponents behavior.
     #
-    def eeprom
-      @eeprom ||= EEPROM::BuiltIn.new(board: self)
-    end
-
-    #
-    # Component management stuff.
-    #
-    def add_component(component)
-      @components << component
-    end
-
-    def remove_component(component)
-      component.stop if component.methods.include? :stop
-      @components.delete(component)
-    end
+    include Behaviors::Subcomponents
 
     def update(line)
       pin, message = line.split(":", 2)
       pin = pin.to_i unless pin == "EE"
-      @components.each do |part|
+      components.each do |part|
         part.update(message) if pin == part.pin
       end
+    end
+
+    #
+    # Component generating convenience methods. TODO: add more!
+    #
+    def eeprom
+      @eeprom ||= EEPROM::BuiltIn.new(board: self)
     end
   end
 end
