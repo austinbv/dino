@@ -35,7 +35,7 @@ module Dino
           # Pack bytes in reverse order.
           bytes.unshift byte
         end
-        super(bytes)
+        spi_write(bytes)
       end
 
       #

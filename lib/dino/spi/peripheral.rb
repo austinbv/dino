@@ -19,23 +19,23 @@ module Dino
       #
       # Delegate methods to the bus.
       #
-      def transfer(write: [], read: 0)
+      def spi_transfer(write: [], read: 0)
         bus.transfer(pin, write: write, read: read, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
-      def write(byte_array)
+      def spi_write(byte_array)
         bus.transfer(pin, write: byte_array, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
-      def read(num_bytes)
+      def spi_read(num_bytes)
         bus.transfer(pin, read: num_bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
-      def listen(num_bytes)
+      def spi_listen(num_bytes)
         bus.listen(pin, read: num_bytes, frequency: spi_frequency, mode: spi_mode, bit_order: spi_bit_order)
       end
 
-      def stop
+      def spi_stop
         bus.stop(pin)
       end
     end

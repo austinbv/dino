@@ -31,7 +31,7 @@ end
 # This always uses the 128 SPS mode, and there is no polling method for it.
 # 
 temperature = ads1118.temperature_read
-puts "ADS 1118 Temperature: #{temperature} \xC2\xB0C"
+puts "ADS1118 Temperature: #{temperature} \xC2\xB0C"
 puts
 
 #

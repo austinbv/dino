@@ -17,14 +17,16 @@ module Dino
         enable_proxy
       end
 
-      # Overrides Peripheral#read to always read @bytes.
       def read
-        super(@bytes)
+        spi_read(@bytes)
       end
 
-      # Overrides Peripheral#listen to always read @bytes.
       def listen
-        super(@bytes)
+        spi_listen(@bytes)
+      end
+
+      def stop
+        spi_stop
       end
 
       #

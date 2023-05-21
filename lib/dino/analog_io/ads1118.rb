@@ -65,7 +65,7 @@ module Dino
 
         # Set register bytes to default and write to device.
         @config_register = CONFIG_DEFAULT.dup
-        transfer(write: @config_register)
+        spi_write(@config_register)
 
         # Enable BoardProxy callbacks.
         enable_proxy
@@ -73,13 +73,13 @@ module Dino
 
       def _read(config)
         # Write config register to start reading.
-        transfer(write: config)
+        spi_write(config)
         
         # Sleep the right amount of time for conversion, based on sample rate bits.
         sleep WAIT_TIMES[config[1] >> 5]
 
         # Read the result, triggering callbacks.
-        transfer(read: 2)
+        spi_read(2)
       end
 
       # Pack the 2 bytes back into a string, then unpack as big-endian int16.
