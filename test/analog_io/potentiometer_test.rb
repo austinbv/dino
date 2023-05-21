@@ -14,9 +14,10 @@ class AnalogIOPotentiometerTest < MiniTest::Test
     board.stub(:analog_listen, mock) do
       part
     end
-    assert_equal part.divider, 8
-    assert_equal part.smoothing, true
-    assert_equal part.instance_variable_get(:@moving_set), []
+
+    assert part.smoothing
+    assert_equal 8,   part.divider
+    assert_equal [],  part.instance_variable_get(:@smoothing_set)
   end
   
   def test_smoothing_on
@@ -30,7 +31,7 @@ class AnalogIOPotentiometerTest < MiniTest::Test
   end
   
   def test_smoothing_off
-    part.smoothing_off
+    part.smoothing = false
     7.times do
       part.update(10)
     end
@@ -44,7 +45,7 @@ class AnalogIOPotentiometerTest < MiniTest::Test
     mock = Minitest::Mock.new.expect(:call, nil)
     
     # Turn off smoothing and set an initial value
-    part.smoothing_off
+    part.smoothing = false
     part.update(100)
     
     # Add the callback

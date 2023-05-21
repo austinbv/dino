@@ -26,6 +26,10 @@ module Dino
 
         # If using a non-default sampling rate, store it.
         @sample_rate = options[:sample_rate]
+
+        # Default to smoothing disabled.
+        @smoothing        = false
+        @smoothing_set  ||= []
       end
 
       attr_reader :negative_pin, :gain, :sample_rate
@@ -42,8 +46,33 @@ module Dino
         board.analog_listen(pin, @divider)
       end
       
+      # Attach a callback that only fires when state changes.
+      def on_change(&block)
+        add_callback(:on_change) do |new_state|
+          block.call(new_state) if new_state != self.state
+        end
+      end
+
+      #
+      # Smoothing features.
+      # Does a moving average of the last 8 readings.
+      #
+      attr_accessor :smoothing
+
+      def smooth_input(value)
+        # Add new value, but limit to the 8 latest values.
+        @smoothing_set << value
+        @smoothing_set.shift if @smoothing_set.length > 8
+        
+        average = @smoothing_set.reduce(:+) / @smoothing_set.length.to_f
+        
+        # Round up or down based on previous state to reduce fluctuations.
+        state && (state > average) ? average.ceil : average.floor
+      end
+
+      # Convert data to integer, or pass it through smoothing if enabled.
       def pre_callback_filter(value)
-        value.to_i
+        smoothing ? smooth_input(value.to_i) : value.to_i
       end
     end
   end
