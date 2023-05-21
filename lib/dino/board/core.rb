@@ -56,7 +56,7 @@ module Dino
     end
 
     # CMD = 5
-    def analog_read(pin, negative_pin=nil, gain=nil)
+    def analog_read(pin, negative_pin=nil, gain=nil, sample_rate=nil)
       write Message.encode command: 5, pin: pin
     end
 

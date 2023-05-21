@@ -27,9 +27,19 @@ def print_reading(name, raw, voltage)
 end
 
 #
+# Read the ADS1118 internal temperature sensor.
+# This always uses the 128 SPS mode, and there is no polling method for it.
+# 
+temperature = ads1118.temperature_read
+puts "ADS 1118 Temperature: #{temperature} \xC2\xB0C"
+puts
+
+#
 # Use the ADS1118 directly by writing values to its config registers.
-# ADS1118#read automatically waits for conversion and gets the 16-bit reading.
+# ADS1118#read automatically waits for conversion time and gets the 16-bit reading.
 # See datasheet for register bitmaps.
+#
+# Note: This is the only way to use continuous mode. Subcomponents always use one-shot.
 #
 ads1118.read([0b10000001, 0b10001011]) do |reading|
   voltage = reading * 0.0001875
@@ -37,15 +47,17 @@ ads1118.read([0b10000001, 0b10001011]) do |reading|
 end
 
 #
-# Or use its BoardProxy interface, adding components as if it were a Board.
+# Or use its BoardProxy interface, adding subcomponents as if it were a Board.
 # The key adc: can substitute for board: when intializing AnalogIO::Input.
-# Gain bitmasks can be found in the datasheet.
+#
+# Gain and sample rate bitmasks can be found in the datasheet.
 #
 # Input on pin 0, with pin 1 as differential negative input, and 6.144 V full range.
 diff_input = Dino::AnalogIO::Input.new(adc: ads1118, pin: 0, negative_pin: 1, gain: 0b000)
 
 # Input on pin 2 with no negative input (single ended), and 1.024V full range.
-single_input = Dino::AnalogIO::Input.new(adc: ads1118, pin: 2, gain: 0b011)
+# Ths one uses a 8 SPS rate, essentially 16x oversampling compared to the default 128.
+single_input = Dino::AnalogIO::Input.new(adc: ads1118, pin: 2, gain: 0b011, sample_rate: 0b000)
 
 # Poll the differential input every second.
 diff_input.poll(1) do |reading|

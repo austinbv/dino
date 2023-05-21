@@ -122,10 +122,10 @@
 
 | Name             | Status         | Interface  | Component Class      | Notes |
 | :--------------- | :------:       | :--------  | :---------------     |------ |
-| PCF8574 Expander | :heart:        | I2C        | -  | 8ch bi-directional digital I/O
-| ADS1115 ADC      | :heart:        | I2C        | -  | 16-bit, 4ch analog to digital converter
-| ADS1118 ADC      | :yellow_heart: | SPI        | -  | 16-bit 4ch ADC. No sample rate control, internal temp sensor read, or continuous mode yet.
-| PCF8591 ADC/DAC  | :heart:        | I2C        | -  | 4ch ADC + 1ch DAC, 8-bit resolution
+| PCF8574 Expander | :heart:        | I2C        | -                    | 8ch bi-directional digital I/O
+| ADS1115 ADC      | :heart:        | I2C        | -                    | 15-bit +/- 4ch ADC
+| ADS1118 ADC      | :green_heart:  | SPI        | `AnalogIO::ADS1118`  | 15-bit +/- 4ch ADC
+| PCF8591 ADC/DAC  | :heart:        | I2C        | -                    | 4ch ADC + 1ch DAC, 8-bit resolution
 
 ### Environmental Sensors
 
