@@ -34,9 +34,11 @@
 | ESP8266        | :green_heart:   | NodeMCU |
 | ESP8285        | :man_shrugging: | DOIT ESP-Mx DevKit   | Should be identical to 8266. Not tested in hardware.
 | ESP32          | :green_heart:   | DOIT ESP32 DevKit V1 |
-| ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB port. Make sure to enable CDC on boot.
-| ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB port. Make sure to enable CDC on boot.
-| ESP32-C3       | :green_heart:   | LOLIN C3 Mini V2.1.0 | Hold button (GPIO9) while connecting USB to flash.
+| ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB.
+| ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB. Press button (GPIO0) to start upload.
+| ESP32-C3       | :green_heart:   | LOLIN C3 Mini V2.1.0 | Native USB. Connect USB while button (GPIO9) is held to upload.
+
+**Note:** For ESP32 chips using native USB, make `USB CDC On Boot` is set to `Enabled` in the IDE's `Tools` menu
 
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
