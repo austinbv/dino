@@ -183,10 +183,13 @@ class Dino {
     void rxNotify();
     uint8_t rxBytes  = 0;
     //
-    // ESP32 uses a 128 byte FIFO buffer for UART Rx. Notify every 64 bytes instead of 32
+    // ESP32 uses a 128 byte FIFO buffer for UART Rx. Notify every 63 bytes instead of 32
     // so serial over native USB performs better.
+    //
+    // Using 63 instead of 64 since the ATmega32u4 (Leonardo) is limited to 63.
+    //
     #ifdef ESP32
-      uint8_t rxNotifyLimit = 64;
+      uint8_t rxNotifyLimit = 63;
     #else
       uint8_t rxNotifyLimit = 32;
     #endif

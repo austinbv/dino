@@ -1,7 +1,7 @@
 module Dino
   module Connection
     module FlowControl
-      BOARD_BUFFER = 64
+      BOARD_BUFFER = 63
       SLEEP_TIME = 0.001
 
       def initialize(*args)
