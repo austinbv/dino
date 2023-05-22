@@ -20,7 +20,7 @@ compile_successful = system "arduino-cli compile -b #{target["fqbn"]} #{sketch_f
 
 # Upload it.
 if compile_successful
-  system "arduino-cli upload -p #{target["port"]} -b #{target["fqbn"]} #{sketch_folder}"
+  system "arduino-cli upload -v -p #{target["port"]} -b #{target["fqbn"]} #{sketch_folder}"
 end
 
 # Delete it.
