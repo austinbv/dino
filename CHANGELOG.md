@@ -33,29 +33,44 @@
 
 ### New Components
 
-- Bosch BME/BMP 280 environmental sensor:
+- ADS1118 Analog-to-Digital Converter:
+  - Class: `Dino::AnalogIO::ADS1118`.
+  - Connects over SPI bus. Driver written in Ruby.
+  - Can be used directly by calling `ADS1118#read` with the 2 config register bytes.
+  - `#read` automatically waits for conversion before reading result.
+  - Implements `BoardProxy` interface, so `AnalogIO::Input` can use it in place of `Board`.
+  - For each `AnalogIO::Input` subcomponent:
+    - Negative pin (1 or 3) of differential pair can be set with the keyword argument `negative_pin:`
+    - Gain can be set with the keyword argumentg `gain:`
+    - Sample rate can be set with the keyword argument `sample_rate:`
+    - Sample rate doesn't affect update rate. It oversamples for a single reading, reducing noise.
+    - `ADS1118` sets `@volts_per_bit` in the subcomponent, so exact voltages can be calculated.
+    - There is no listening interface for subcomponents.
+  - Built in temperature sensor can be read with `ADS1118#temperature_read`. Only 128 SPS. No polling.
+
+- Bosch BME/BMP 280 Temperature / Pressure / Humidity Sensor:
   - Classes: `Dino::Sensor::BME280` and `Dino::Sensor::BMP280`
   - All features in the datasheet are implemented, except status checking.
-  - Connects over I2C, driver written in Ruby.
+  - Connects over I2C. Driver written in Ruby.
   - Both are mostly identical, except for BMP280 lacking humidity.
   
-- SSD1306 OLED driver:
+- SSD1306 OLED Display:
   - Class: `Dino::Display::SSD1306`
-  - Connects over I2C, driver written in Ruby.
+  - Connects over I2C. Driver written in Ruby.
   - By default, it updates entire frame at once using horizontal addressing mode, `SSD1306#draw`.
   - Can do partial updates by calling `SSD1306#draw(x_min, x_max, y_min, y_max)` defining a bounding box to redraw.
   - One 6x8 font and graphic primitves, included through `Dino::Display::Canvas`.
 
-- L298 H-Bridge motor driver:
+- L298 H-Bridge Motor Driver:
   - Class: `Dino::Motor::L298`
   - Forward, reverse, idle, and brake modes implemented.
   - Speed controlled by PWM output on enable pin.
 
-- WS2812 / WS2812B / NeoPixel RGB LED array:
+- WS2812 / WS2812B / NeoPixel RGB LED Array:
   - Class: `Dino::LED::WS2812`
   - No fancy functions yet. Just clear, set pixels, and show.
 
-- APA102 / Dotstar RGB LED array:
+- APA102 / Dotstar RGB LED Array:
   - Class: `Dino::LED::APA102`
   - No fancy functions yet. Just clear, set pixels, show, global and per-pixel brightness control.
   - Sends data over SPI interface with no select pin, but select pin needs to be given as 255.
@@ -78,21 +93,20 @@ See new examples in the [examples](examples) folder to learn more.
   - For now, this always uses the default SPI device set by the Arduino framework (`SPI` or `SPI0`), but this change will allow access to multiple SPI interfaces on a single board in the future.
   - It also allows a peripheral to mutex lock the bus for atomic operations if needed.
   - When a peripheral is added to the SPI bus, callbacks are hooked (using its select pin as identifier) directly to the board.
-  - Shift In/Out features refactored into `SPI::Bitbang` which is class-compatible with `SPI::Bus`, except for frequency.
-  - Both `SPI::Bus` and `SPI::Bitbang` validate select pin uniquness among peripherals, per bus instance.
-  - Both types of SPI buses treat a select (enable) pin of 255 as no select pin at all (won't toggle before and after transferring).
+  - `SPI::Bus` validates select pin uniquness among peripherals, per bus instance.
+  - `SPI::Bus` treats a select (enable) pin of 255 as no select pin at all (won't toggle before and after transferring).
   - See the updated [SPI examples](examples/spi) to learn more.
 
-- `ShiftIn` and `ShiftOut` components removed:
-  - Refactored into `SPI::BitBang`. See SPI changes above.
+- Shift In/Out features refactored into `SPI::BitBang` which is class-compatible with `SPI::Bus`, except for frequency.
+  - See SPI changes above.
 
 - `SPI::Peripheral` has been extracted from the various SPI Register classes.
-  - This should be used for most peripherals, and the register classes used only simple I/O expansion registers.
+  - This should be used for most peripherals, and the register classes used only for simple I/O expansion registers.
 
 - `I2C::Bus` does not automatically search when initialized.
 
 - I2C frequency now configurable:
-  - `I2C::Peripheral` and it's subclasses take `:i2c_frequency` keywoard arg when instantiating. It's stored in `@i2c_frequency` with accessors, and used for all reads and writes.
+  - `I2C::Peripheral` and it's subclasses take `:i2c_frequency` keywoard arg when instantiating. It's stored in `@i2c_frequency` and used for all reads and writes.
   - `Board#i2c_write` and `Board#i2c_read` also accept `:i2c_frequency` as a keyword arg.
   - Valid values are: `100000, 400000, 1000000, 3400000`. Defaults to `100000` at the `Board` level, when not given.
   - **Note:** This DOES NOT work if using `dino-piboard`. See the README on that gem for more info.
