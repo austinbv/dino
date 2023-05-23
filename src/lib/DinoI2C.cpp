@@ -8,13 +8,20 @@
 
 bool i2cStarted = false;
 
-// Only start the Wire class if not already started.
+// Only start the I2C interface if not already started.
 // Lazy initialization in case user wants to use I2C pins for something else.
 void Dino::i2cBegin() {
   if (!i2cStarted) {
     Wire.begin();
     i2cStarted = true;
   }
+}
+
+// End the I2C interface.
+// This is mostly used as a Reset in Dino::handshake.
+void Dino::i2cEnd(){
+  Wire.end();
+  i2cStarted = false;
 }
 
 // Configurable I2C speed each time read or write is called.

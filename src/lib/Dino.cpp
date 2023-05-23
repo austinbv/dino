@@ -225,12 +225,19 @@ void Dino::updateListeners() {
 
 // CMD = 90
 void Dino::handshake() {
+  // Reset the I2C interface.
+  // Some boards (like the ESP32-S2) behave badly without this.
+  #ifdef DINO_I2C
+    i2cEnd();
+  #endif
+
+  // Reset all the state variables.
   resetState();
 
   // Reset this so we never send Rx along with ACK:
   rxBytes = 0;
   
-  // First value is BOARD_MAP if it is set.
+  // First handshake value is BOARD_MAP if set.
   stream->print("ACK:");
   #ifdef BOARD_MAP
     stream->print(BOARD_MAP);

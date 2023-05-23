@@ -37,5 +37,4 @@ canvas.triangle(87, baseline, 117, baseline, 102, baseline - 30)
 
 # Send the canvas to the OLED's graphics RAM so it shows.
 oled.draw
-
 board.finish_write

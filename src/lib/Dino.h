@@ -129,6 +129,7 @@ class Dino {
 
     // I2C
     void i2cBegin              ();
+    void i2cEnd                ();
     void i2cSetSpeed           (uint8_t code);
     void i2cSearch             (); //cmd = 33
     void i2cWrite              (); //cmd = 34
