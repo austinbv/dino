@@ -75,7 +75,7 @@ module Dino
       end
 
       def show
-        write(@start_frame + @buffer + @end_frame)
+        spi_write(@start_frame + @buffer + @end_frame)
       end
     end
   end
