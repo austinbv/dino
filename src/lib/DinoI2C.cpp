@@ -20,7 +20,10 @@ void Dino::i2cBegin() {
 // End the I2C interface.
 // This is mostly used as a Reset in Dino::handshake.
 void Dino::i2cEnd(){
-  Wire.end();
+  // ESP8266 core does not define Wire.end()
+  #ifndef ESP8266
+    Wire.end();
+  #endif
   i2cStarted = false;
 }
 
