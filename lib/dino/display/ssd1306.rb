@@ -59,11 +59,18 @@ module Dino
       WIDTHS  = [64,96,128]
       HEIGHTS = [16,32,48,64]
 
+      def before_initialize(options={})
+        # Default to 400 kHz unless frequency given.
+        options[:i2c_frequency] ||= 400000
+
+        # Default address unless one given.
+        options[:address] ||= 0x3C
+
+        super(options)
+      end
+
       def after_initialize(options={})
         super(options)
-
-        # Use I2C frequency of 400 kHz.
-        self.i2c_frequency = 400000
 
         # Default to a 128x64 display.
         @columns = options[:columns] || options[:width]  || 128

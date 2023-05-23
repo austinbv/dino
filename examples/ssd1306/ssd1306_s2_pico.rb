@@ -11,7 +11,7 @@ reset = Dino::DigitalIO::Output.new(board: board, pin: 18)
 reset.high
 
 bus = Dino::I2C::Bus.new(board: board, pin: :SDA)
-oled = Dino::Display::SSD1306.new(bus: bus, address: 0x3C, rotate: false, width: 128, height: 32)
+oled = Dino::Display::SSD1306.new(bus: bus, width: 128, height: 32)
 canvas = oled.canvas
 
 # Draw some text on the OLED's canvas (a Ruby memory buffer).
