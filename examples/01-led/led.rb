@@ -7,20 +7,24 @@ require 'dino'
 # If the board is plugged into a USB port, we can connect with serial over USB.
 connection = Dino::Connection::Serial.new
 
-# Create a new board instance, giving it the connection.
+# Create a new board object, giving the connection.
 board = Dino::Board.new(connection)
 
 #
-# Create an object for the LED, giving the board, and the pin that the positive
+# Create an LED object, giving the board, and the pin that the positive
 # leg of the LED is connected to. The longer leg is usually positive.
 #
 # See led.pdf in this folder for a hook-up diagram.
 # Use a current limiting resistor with external LEDs to protect them.
 #
-# The on-board LED (marked "L") is internally connected to pin 13 on most Arduinos,
-# and can be used without connecting anything.
+# The on-board LED can also be used. It is connected to pin 13 on most Arduinos,
+# but can vary for other boards. The symbol :LED_BUILTIN should map to the right pin.
+# If it doesn't, change it to the pin number from your board's documentation.
 #
-led = Dino::LED.new(board: board, pin: 13)
+# Note: Some boards use an addressable LED on-board. In those cases, connect an external
+# LED and use its pin for this example instead.
+#
+led = Dino::LED.new(board: board, pin: :LED_BUILTIN)
 
 # Now we can make it blink.
 puts "Blinking every half second..."
