@@ -2,8 +2,12 @@ module Dino
   module RTC
     class DS3231
       include I2C::Peripheral
-      
       require 'bcd'
+
+      def before_initialize(options={})
+        @i2c_address = 0x68
+        super(options)
+      end
       
       # Write start register 0x00, then bytes to set time.
       def time=(time)

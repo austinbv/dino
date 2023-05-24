@@ -62,12 +62,8 @@ module Dino
       HEIGHTS = [16,32,48,64]
 
       def before_initialize(options={})
-        # Default to 400 kHz unless frequency given.
-        options[:i2c_frequency] ||= 400000
-
-        # Default address unless one given.
-        options[:address] ||= 0x3C
-
+        @i2c_address   = 0x3C
+        @i2c_frequency = 400000
         super(options)
       end
 

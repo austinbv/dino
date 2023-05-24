@@ -4,10 +4,10 @@ module Dino
       include Dino::Behaviors::BusPeripheral
 
       def before_initialize(options={})
-        unless options[:address]
-          raise ArgumentError, "missing address for #{self}. Try Bus#search first"
-        end
-        @address = options[:address]
+        # Aallow @address override in options, even if peripheral sets default.
+        @address = options[:address] if options[:address]
+
+        raise ArgumentError, "missing address for #{self}. Try Bus#search first" unless @address
         super(options)
       end
     end
