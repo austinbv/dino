@@ -50,11 +50,6 @@ module Dino
       def pre_callback_filter(data)
         data
       end
-
-      # Override for behavior other than @state = filtered data.
-      def update_state(filtered_data)
-        self.state = filtered_data
-      end
     end
   end
 end

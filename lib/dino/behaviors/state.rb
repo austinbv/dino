@@ -15,6 +15,10 @@ module Dino
       def state=(value)
         @state_mutex.synchronize { @state = value }
       end
+      
+      def update_state(value)
+        self.state = value if value
+      end
     end
   end
 end
