@@ -5,7 +5,7 @@ module Dino
       
       # Write start register 0x00, then bytes to set time.
       def time=(time)
-        write [0, time_to_bcd(time)]
+        i2c_write [0, time_to_bcd(time)]
         time
       end
       
@@ -14,7 +14,7 @@ module Dino
       
       # Time data starts at register 0 and is 7 bytes long.
       def _read
-        super(0, 7)
+        i2c_read(0, 7)
       end
       
       def pre_callback_filter(bytes)

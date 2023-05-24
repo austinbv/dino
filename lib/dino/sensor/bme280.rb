@@ -127,10 +127,10 @@ module Dino
     
       def write_settings
         # Write humidity setting for BME280 only.
-        write [0xF2, @registers[:f2]] if humidity_available?
+        i2c_write [0xF2, @registers[:f2]] if humidity_available?
         
         # Write temperature and pressure settings.
-        write [0xF5, @registers[:f5], 0xF4, @registers[:f4]]
+        i2c_write [0xF5, @registers[:f5], 0xF4, @registers[:f4]]
       end
       
       def config_register_bits
@@ -152,12 +152,12 @@ module Dino
       def read(&block)
         # Write register 0xF4 to trigger a oneshot reading and wait, unless continuous mode is enabled.
         unless (@registers[:f4] & 0b00000011 == 0b11)
-          write [0xF4, @registers[:f4]]
+          i2c_write [0xF4, @registers[:f4]]
           sleep 0.005
         end
         
         # Always read 8 bytes starting at 0xF7, regardless of settings. Keeps data in correct order.
-        read_using -> { _read 0xF7, 8 }, &block
+        read_using -> { i2c_read 0xF7, 8 }, &block
       end
       
       def pre_callback_filter(data)
@@ -255,7 +255,7 @@ module Dino
       #
       def get_calibration_data
         # First group of calibration bytes.
-        a = read_using -> { _read 0x88, 26 }
+        a = read_using -> { i2c_read 0x88, 26 }
         
         @calibration = {
           t1: a[0..1].pack('C*').unpack('S<')[0],
@@ -275,7 +275,7 @@ module Dino
         
         # Second group of calibration bytes, mostly for humidity. Not available on BMP280.
         if humidity_available?
-          b = read_using -> { _read 0xE1, 7 }
+          b = read_using -> { i2c_read 0xE1, 7 }
           @calibration.merge!(
             h1: a[25],
             h2: b[0..1].pack('C*').unpack('s<')[0],

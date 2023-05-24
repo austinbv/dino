@@ -22,7 +22,7 @@ class I2CPeripheralTest < MiniTest::Test
     
     mock = MiniTest::Mock.new.expect :call, nil, [0x30, [1,2], 100000, true]
     bus.stub(:write, mock) do
-      part.write [1,2]
+      part.i2c_write [1,2]
     end
   end
 
@@ -31,7 +31,7 @@ class I2CPeripheralTest < MiniTest::Test
     
     mock = MiniTest::Mock.new.expect :call, nil, [0x30, [1,2], 400000, false]
     bus.stub(:write, mock) do
-      part.write [1,2]
+      part.i2c_write [1,2]
     end
   end
   
@@ -42,7 +42,7 @@ class I2CPeripheralTest < MiniTest::Test
     
     mock = MiniTest::Mock.new.expect :call, nil, [0x30, 0x03, 6, 100000, true]
     bus.stub(:read, mock) do
-      part._read(0x03, 6)
+      part.i2c_read(0x03, 6)
     end
   end
 end

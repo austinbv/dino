@@ -15,16 +15,13 @@ module Dino
       end
       
       attr_accessor :i2c_repeated_start, :i2c_frequency
+      alias :i2c_address :address 
 
-      def i2c_address
-        self.address
-      end
-      
-      def write(bytes=[])
+      def i2c_write(bytes=[])
         bus.write(address, bytes, i2c_frequency, i2c_repeated_start)
       end
 
-      def _read(register, num_bytes)
+      def i2c_read(register, num_bytes)
         bus.read(address, register, num_bytes, i2c_frequency, i2c_repeated_start)
       end
     end

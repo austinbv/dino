@@ -169,12 +169,12 @@ module Dino
 
       # Commands are I2C messages prefixed with 0x00.
       def command(bytes)
-        write([0x00] + bytes)
+        i2c_write([0x00] + bytes)
       end
 
       # Data are I2C messages prefixed with 0x40.
       def data(bytes)
-        write([0x40] + bytes)
+        i2c_write([0x40] + bytes)
       end
     end
   end
