@@ -1,6 +1,7 @@
 module Dino
   module Behaviors
     # Pin and component setup stuff
+    autoload :State,      "#{__dir__}/behaviors/state"
     autoload :Component,  "#{__dir__}/behaviors/component"
     autoload :SinglePin,  "#{__dir__}/behaviors/single_pin"
     autoload :InputPin,   "#{__dir__}/behaviors/input_pin"

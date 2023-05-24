@@ -1,14 +1,15 @@
 module Dino
   module Behaviors
     module Callbacks
+      include State
       attr_reader :callback_mutex
 
-      def after_initialize(options={})
-        super(options)
+      def initialize(options={})
         @callback_mutex = Mutex.new
         remove_callbacks
+        super(options)
       end
-      
+
       def callbacks
         callback_mutex.synchronize { @callbacks }
       end

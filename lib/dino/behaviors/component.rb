@@ -1,11 +1,11 @@
 module Dino
   module Behaviors
     module Component
+      include State
       attr_reader :board
 
       def initialize(options={})
-        @state = nil
-        @state_mutex = Mutex.new
+        super(options)
         before_initialize(options)
         initialize_board(options)
         convert_pins(options)
@@ -13,20 +13,12 @@ module Dino
         register
         after_initialize(options)
       end
-      
-      def state
-        @state_mutex.synchronize { @state }
-      end
-      
+
       def micro_delay(duration)
         board.micro_delay(duration)
       end
 
       protected
-
-      def state=(value)
-        @state_mutex.synchronize { @state = value }
-      end
 
       def initialize_board(options={})
         raise ArgumentError, 'a board is required for a component' unless options[:board]
