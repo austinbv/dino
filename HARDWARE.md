@@ -34,11 +34,11 @@
 | ESP8266        | :green_heart:   | NodeMCU |
 | ESP8285        | :man_shrugging: | DOIT ESP-Mx DevKit   | Should be identical to 8266. Not tested in hardware.
 | ESP32          | :green_heart:   | DOIT ESP32 DevKit V1 |
-| ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB.
-| ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB. Press button (GPIO0) to start upload.
-| ESP32-C3       | :green_heart:   | LOLIN C3 Mini V2.1.0 | Native USB. Connect USB while button (GPIO9) is held to upload.
+| ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB
+| ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB
+| ESP32-C3       | :green_heart:   | LOLIN C3 Mini V2.1.0 | Native USB
 
-**Note:** For ESP32 chips using native USB, make `USB CDC On Boot` is set to `Enabled` in the IDE's `Tools` menu
+**Note:** For ESP32 chips using native USB, make sure `USB CDC On Boot` is `Enabled` in the IDE's `Tools` menu. Flashing from the CLI doesn't automatically enable this, so the IDE is recommended for now.
 
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
@@ -71,11 +71,11 @@
 | I2C              | :green_heart:  | Hardware  | `I2C::Bus`               |
 | SPI              | :green_heart:  | Hardware  | `SPI::Bus`               | Hardware SPI
 | SPI Bit Bang     | :green_heart:  | Software  | `SPI::BitBang`           | Bit Bang SPI
-| UART             | :heart:        | Hardware  | -                        | Most boards have extra hardware UARTs
+| UART             | :heart:        | Hardware  | `UART::Native`           | Most boards have extra hardware UARTs
 | UART Bit Bang    | :yellow_heart: | Software  | `UART::BitBang`          | Only on boards with 1 hardware UART. Write only
 | Maxim OneWire    | :green_heart:  | Software  | `OneWire::Bus`           | No overdrive support
 | Infrared Emitter | :green_heart:  | Software  | `PulseIO::IRTransmitter` | Library on Board
-| Infrared Receiver| :heart:        | Software  | -                        | Doable with existing library
+| Infrared Receiver| :heart:        | Software  | `PulseIO::IRReceiver`    | Doable with existing library
 
 ### Generic Components
 
@@ -99,12 +99,12 @@
 
 ### Motors / Motor Drivers
 
-| Name                 | Status         | Interface      | Component Class  | Notes |
-| :---------------     | :------:       | :--------      | :--------------- |------ |
-| Servo                | :green_heart:  | PWM + Library  | `Motor::Servo`   | Maximum of 6 on ATmega168, 16 on ESP32 and 12 otherwise
-| L298N                | :green_heart:  | Digi + PWM Out | `Motor::L298`    | H-Bridge DC motor driver
-| A3967                | :green_heart:  | Digital Out    | `Motor::Stepper` | 1ch microstepper (EasyDriver)
-| PCA9685              | :heart:        | I2C            | -                | 16ch 12-bit PWM for servo or LED
+| Name                 | Status         | Interface      | Component Class    | Notes |
+| :---------------     | :------:       | :--------      | :---------------   |------ |
+| Servo                | :green_heart:  | PWM + Library  | `Motor::Servo`     | Maximum of 6 on ATmega168, 16 on ESP32 and 12 otherwise
+| L298N                | :green_heart:  | Digi + PWM Out | `Motor::L298`      | H-Bridge DC motor driver
+| A3967                | :green_heart:  | Digital Out    | `Motor::Stepper`   | 1ch microstepper (EasyDriver)
+| PCA9685              | :heart:        | I2C            | `PulseIO::PCA9685` | 16ch 12-bit PWM for servo or LED
 
 ### Displays
 
@@ -124,57 +124,58 @@
 
 | Name             | Status         | Interface  | Component Class      | Notes |
 | :--------------- | :------:       | :--------  | :---------------     |------ |
-| PCF8574 Expander | :heart:        | I2C        | -                    | 8ch bi-directional digital I/O
-| ADS1115 ADC      | :heart:        | I2C        | -                    | 15-bit +/- 4ch ADC
-| ADS1118 ADC      | :green_heart:  | SPI        | `AnalogIO::ADS1118`  | 15-bit +/- 4ch ADC
-| PCF8591 ADC/DAC  | :heart:        | I2C        | -                    | 4ch ADC + 1ch DAC, 8-bit resolution
+| PCF8574 Expander | :heart:        | I2C        | `DigitalIO::PCF8574` | 8ch bi-directional digital I/O
+| ADS1115 ADC      | :heart:        | I2C        | `AnalogIO::ADS1115`  | 15-bit +/- 4ch ADC
+| ADS1118 ADC      | :green_heart:  | SPI        | `AnalogIO::ADS1118`  | 15-bit +/- 4ch ADC, and temperature
+| PCF8591 ADC/DAC  | :heart:        | I2C        | `AnalogIO::PCF8591`  | 4ch ADC + 1ch DAC, 8-bit resolution
 
 ### Environmental Sensors
 
 | Name             | Status         | Interface   | Component Class    | Notes |
 | :--------------- | :------:       | :--------   | :---------------   |------ |
-| DHT 11/21/22     | :green_heart:  | Digi In/Out | `Sensor::DHT`      | Temperature, Humidity
-| DS18B20          | :green_heart:  | OneWire     | `Sensor::DS18B20`  | Temperature
-| MAX31850         | :heart:        | OneWire     | - | Thermocouple
-| BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp, Pressure, Humidity
+| DHT 11/21/22     | :green_heart:  | Digi In/Out | `Sensor::DHT`      | Temp/RH
+| DS18B20          | :green_heart:  | OneWire     | `Sensor::DS18B20`  | Temp
+| MAX31850         | :heart:        | OneWire     | `Sensor::MAX31850` | Thermocouple Amplifier
+| BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp/RH/Pressure
 | BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temperature, Pressure
-| HTU21D           | :green_heart:  | I2C         | - | Temp + RH. Always holds I2C bus during measurement. User register read not implemented.
-| HTU31D           | :heart:        | I2C         | - | Temperature, Humidity
-| AHT10            | :heart:        | I2C         | - | Temperature, Humidity
-| AHT21            | :heart:        | I2C         | - | Temperature, Humidity
-| ENS160           | :heart:        | I2C         | - | CO2e, TVOC, AQI
-| AGS02MA          | :heart:        | I2C         | - | TVOC
+| HTU21D           | :green_heart:  | I2C         | `Sensor::HTU21D`   | Temp/RH. Locks I2C bus during read. No user register read.
+| HTU31D           | :heart:        | I2C         | `Sensor::HTU31D`   | Temp/RH
+| AHT10            | :heart:        | I2C         | `Sensor::AHT10`    | Temp/RH
+| AHT21            | :heart:        | I2C         | `Sensor::AHT20`    | Temp/RH
+| ENS160           | :heart:        | I2C         | `Sensor::ENS160`   | CO2e/TVOC/AQI
+| AGS02MA          | :heart:        | I2C         | `Sensor::AGS02MA`  | TVOC
 
 ### Light Sensors
 
 | Name             | Status         | Interface | Component Class   | Notes |
 | :--------------- | :------:       | :-------- | :---------------  |------ |
-| APDS9960         | :heart:        | I2C       | - | Proximity, RGB, Gesture
+| APDS9960         | :heart:        | I2C       | `Sensor::APDS9960`| Proximity, RGB, Gesture
 
 ### Distance Sensors
 
-| Name             | Status         | Interface | Component Class   | Notes |
-| :--------------- | :------:       | :-------- | :---------------  |------ |
-| HC-SR04          | :heart:        | Direct    | - | Ultrasonic, 20-4000mm
-| VL53L0X          | :heart:        | I2C       | - | Laser, 30 - 1000mm
-| GP2Y0E03         | :heart:        | I2C       | - | Infrared, 40 - 500mm
+| Name             | Status         | Interface | Component Class    | Notes |
+| :--------------- | :------:       | :-------- | :---------------   |------ |
+| HC-SR04          | :heart:        | Direct    | `Sensor::HCSR04`   | Ultrasonic, 20-4000mm
+| VL53L0X          | :heart:        | I2C       | `Sensor::VL53L0X`  | Laser, 30 - 1000mm
+| GP2Y0E03         | :heart:        | I2C       | `Sensor::GP2Y0E03` | Infrared, 40 - 500mm
 
 ### Motion Sensors
 
-| Name             | Status         | Interface | Component Class   | Notes |
-| :--------------- | :------:       | :-------- | :---------------  |------ |
-| ADXL345          | :heart:        | I2C       | - | 3-axis Accelerometer
-| IT3205           | :heart:        | I2C       | - | 3-axis Gyroscope
-| HMC5883L         | :heart:        | I2C       | - | 3-axis Compass
+| Name             | Status         | Interface | Component Class    | Notes |
+| :--------------- | :------:       | :-------- | :---------------   |------ |
+| ADXL345          | :heart:        | I2C       | `Sensor::ADXL345`  | 3-axis Accelerometer
+| IT3205           | :heart:        | I2C       | `Sensor::IT3205`   | 3-axis Gyroscope
+| HMC5883L         | :heart:        | I2C       | `Sensor::HMC5883L` | 3-axis Compass
 
 ### Real Time Clock
 
 | Name             | Status         | Interface | Component Class   | Notes |
 | :--------------- | :------:       | :-------- | :---------------  |------ |
+| DS1302           | :heart:        | I2C       | `RTC::DS1302`     |
 | DS3221           | :yellow_heart: | I2C       | `RTC::DS3231`     | Only set and get time implemented
 
 ### Miscellaneous
 
-| Name             | Status         | Interface  | Component Class   | Notes |
-| :--------------- | :------:       | :--------  | :---------------  |------ |
-| MFRC522          | :heart:        | SPI / I2C  | -                 | RFID tag reader / writer
+| Name             | Status         | Interface  | Component Class     | Notes |
+| :--------------- | :------:       | :--------  | :---------------    |------ |
+| MFRC522          | :heart:        | SPI/I2C    | `DigitalIO::MFRC522 | RFID tag reader / writer
