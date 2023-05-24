@@ -1,18 +1,18 @@
 # Supported Microcontrollers
 
-:green_heart: Full support :yellow_heart: Partial support :heart: Planned. No support yet
+:green_heart: Full support :yellow_heart: Partial support :heart: Planned. No support yet :question: Works in theory. Untested in real hardware.
 
 ### Microchip/Atmel Chips in Arduino Products (and Compatibles)
-[![AVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_avr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_avr.yml) [![MegaAVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml) [![SAM3X Build Satus](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml) [![SAMD Build Satus](https://github.com/austinbv/dino/actions/workflows/build_samd.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_samd.yml) 
+[![AVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_avr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_avr.yml) [![MegaAVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml) [![SAM3X Build Satus](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml) [![SAMD Build Satus](https://github.com/austinbv/dino/actions/workflows/build_samd.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_samd.yml)
 
 |    Chip        | Status          | Products         | Notes |
 | :--------      | :------:        | :--------------- |------ |
-| ATmega168      | :green_heart:   | Duemilanove, Diecimila, Pro | (Configurable) features omitted to save memory. Run `dino targets` for more info.
-| ATmega328      | :green_heart:   | Uno, Nano, Fio, Pro  | 
-| ATmega32u4     | :green_heart:   | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB | **v0.11.1** for Leonardo ETH
-| ATmega1280     | :green_heart:   | Mega | 
-| ATmega2560     | :green_heart:   | Mega2560, Arduino Mega ADK | 
-| ATmega4809     | :man_shrugging: | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
+| ATmega168      | :green_heart:   | Duemilanove, Diecimila, Pro | Features omitted to save memory. `dino targets` for more info.
+| ATmega328      | :green_heart:   | Uno, Nano, Fio, Pro  |
+| ATmega32u4     | :green_heart:   | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB |
+| ATmega1280     | :green_heart:   | Mega |
+| ATmega2560     | :green_heart:   | Mega2560, Arduino Mega ADK |
+| ATmega4809     | question:       | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
 | ATSAM3X8E      | :yellow_heart:  | Due | Native USB port. Tone, and IR Out don't work.
 | ATSAMD21       | :green_heart:   | Zero, M0, M0 Pro | Native USB port. I2C seems stuck on 100 kHz.
 
@@ -23,16 +23,16 @@
 |    Chip               | Status          | Product          | Notes |
 | :--------             | :------:        | :--------------- |------ |
 | Wiznet W5100/5500     | :green_heart:   | Ethernet Shield  | Wired Ethernet for Uno/Mega pin-compatibles
-| HDG204 + AT32UC3      | :man_shrugging: | WiFi Shield      | WiFi for Uno. No hardware to test, but compiles
-| ATWINC1500            | :man_shrugging: | WiFi Shield 101  | Same as above, high memory use, Mega only
+| HDG204 + AT32UC3      | :question:      | WiFi Shield      | WiFi for Uno. No hardware to test, but compiles
+| ATWINC1500            | :question:      | WiFi Shield 101  | Same as above, high memory use, Mega only
 
 ### Espressif Chips with Built-In WiFi
 [![ESP8266 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml) [![ESP32 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml)
 
-|    Chip        | Status          | Test Board           | Notes |
+|    Chip        | Status          | Board Tested         | Notes |
 | :--------      | :------:        | :---------------     |------ |
 | ESP8266        | :green_heart:   | NodeMCU              |
-| ESP8285        | :man_shrugging: | DOIT ESP-Mx DevKit   | Should be identical to 8266. Not tested in hardware.
+| ESP8285        | :question:      | DOIT ESP-Mx DevKit   | Should be identical to 8266. Not tested in hardware.
 | ESP32          | :green_heart:   | DOIT ESP32 DevKit V1 |
 | ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB
 | ESP32-S3       | :green_heart:   | LOLIN S3 V1.0.0      | Native USB
@@ -43,9 +43,21 @@
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
 
-|    Chip        | Status          | Test Board       | Notes |
-| :--------      | :------:        | :--------------- |------ |
-| RP2040         | :green_heart:   | Raspberry Pi Pico (W) | WiFi only on W version. No WS1812 LED support.
+|    Chip        | Status          | Board Tested          | Notes |
+| :--------      | :------:        | :---------------      |------ |
+| RO2040         | :green_heart:   | Raspberry Pi Pico (W) | WiFi only on W version. No WS1812 LED support.
+
+
+### Raspberry Pi Single Board Computers
+**Note:** See the [dino-piboard](https://github.com/dino-rb/dino-piboard) extension to this gem. It uses the Component classes from this gem, but swaps out the low-level microcontroller interface with the Raspberry Pi's built-in GPIPO interface. This is still a very early work-in-progress.
+
+|    Chip        | Status          | Products              | Notes |
+| :--------      | :------:        | :---------------      |------ |
+| BCM2835        | :yellow_heart:  | Pi 1, Pi Zero (W)     |
+| BCM2836/7      | :question:      | Pi 2                  |
+| BCM2837A0/B0   | :question:      | Pi 3                  |
+| BCM2711        | :question:      | Pi 4                  |
+| BCM2710A1      | :question:      | Pi Zero 2W            |
 
 # Supported Components
 
