@@ -31,6 +31,12 @@ module Dino
       alias :remove_callbacks :remove_callback
 
       def update(data)
+        # nil will unblock #read without running callbacks.
+        unless data
+          remove_callback(:read)
+          return nil
+        end
+
         filtered_data = pre_callback_filter(data)
 
         callback_mutex.synchronize do
@@ -39,7 +45,7 @@ module Dino
               callback.call(filtered_data)
             end
           end
-          # Remove special :read callback before unlocking.
+          # Remove one-time callbacks added by #read.
           @callbacks.delete(:read)
         end
 

@@ -202,6 +202,8 @@ See new examples in the [examples](examples) folder to learn more.
 
 - Added [this example](examples/ws2812/ws2812_builtin_blink.rb) as a blink example for boards where :LED_BUILTIN maps to a single on-board WS2812 LED, instead of a regular LED.
 
+- Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being called, but still remove any one-time callbacks present in the `:read` key.
+
 ### Bug Fixes
 
 - Fixed `Dino::DigitalIO::Output` not setting its state through its mutex.
