@@ -204,6 +204,8 @@ See new examples in the [examples](examples) folder to learn more.
 
 - Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being called, but still remove any one-time callbacks present in the `:read` key.
 
+- `Poller#poll` no longer defaults to a 3 second interval and will rais an error if a numeric interval is not given.
+
 ### Bug Fixes
 
 - Fixed `Dino::DigitalIO::Output` not setting its state through its mutex.

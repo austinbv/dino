@@ -38,19 +38,19 @@ class PollerTest < Minitest::Test
 
   def test_call_stop_before_polling
     mock = MiniTest::Mock.new.expect :call, nil
-    part.stub(:stop, mock) { part.poll }
+    part.stub(:stop, mock) { part.poll(1) }
     mock.verify
   end
 
   def test_uses_threaded_loop
     mock = MiniTest::Mock.new.expect :call, nil
-    part.stub(:threaded_loop, mock) { part.poll }
+    part.stub(:threaded_loop, mock) { part.poll(1) }
     mock.verify
   end
 
   def test_add_and_remove_callback
     callback = Proc.new{}
-    part.poll(&callback)
+    part.poll(1, &callback)
     assert_equal part.callbacks[:poll], [callback]
     part.stop
     assert_nil part.callbacks[:poll]

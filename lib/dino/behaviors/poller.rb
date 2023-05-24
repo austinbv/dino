@@ -4,7 +4,11 @@ module Dino
       include Reader
       include Threaded
       
-      def poll_using(method, interval=3, *args, &block)
+      def poll_using(method, interval, *args, &block)
+        unless [Integer, Float].include? interval.class
+          raise ArgumentError, "wrong interval given to #poll : #{interval.inspect}"
+        end
+
         stop
         add_callback(:poll, &block) if block_given?
 
@@ -14,7 +18,7 @@ module Dino
         end
       end
 
-      def poll(interval=3, *args, &block)
+      def poll(interval, *args, &block)
         poll_using(self.method(:_read), interval, *args, &block)
       end
 
