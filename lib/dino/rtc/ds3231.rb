@@ -1,6 +1,8 @@
 module Dino
   module RTC
-    class DS3231 < I2C::Peripheral
+    class DS3231
+      include I2C::Peripheral
+      
       require 'bcd'
       
       # Write start register 0x00, then bytes to set time.

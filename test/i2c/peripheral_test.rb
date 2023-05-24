@@ -1,5 +1,9 @@
 require_relative '../test_helper'
 
+class I2CPeripheralBase
+  include Dino::I2C::Peripheral
+end
+
 class I2CPeripheralTest < MiniTest::Test
   def board
     @board ||= BoardMock.new
@@ -14,7 +18,7 @@ class I2CPeripheralTest < MiniTest::Test
   end
   
   def part
-    @part ||= Dino::I2C::Peripheral.new(bus: bus, i2c_address: 0x30)
+    @part ||= I2CPeripheralBase.new(bus: bus, i2c_address: 0x30)
   end
     
   def test_write_and_repeated_start

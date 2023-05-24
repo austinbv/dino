@@ -2,7 +2,9 @@ require_relative 'canvas'
 
 module Dino
   module Display
-    class SSD1306 < I2C::Peripheral
+    class SSD1306
+      include I2C::Peripheral
+
       # Fundamental Commands
         # Single byte (no need to OR with anything)
         PIXELS_FROM_RAM = 0xA4

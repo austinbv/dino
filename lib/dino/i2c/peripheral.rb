@@ -1,6 +1,6 @@
 module Dino
   module I2C
-    class Peripheral
+    module Peripheral
       include Behaviors::BusPeripheralAddressed
       include Behaviors::Reader
 

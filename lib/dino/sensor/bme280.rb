@@ -1,6 +1,7 @@
 module Dino
   module Sensor
-    class BME280 < I2C::Peripheral
+    class BME280
+      include I2C::Peripheral
       include Behaviors::Poller
       
       # Reading Mode Settings
