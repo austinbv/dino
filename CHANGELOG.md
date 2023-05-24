@@ -54,6 +54,13 @@
   - Connects over I2C. Driver written in Ruby.
   - Both are mostly identical, except for BMP280 lacking humidity.
   
+- HTU21D Temperature / Humidity Sensor:
+  - Class: `Dino::Sensor::HTU21D`
+  - Connects over I2C. Driver written in Ruby.
+  - Most features implemented, except reading back the configuration register, and releasing the I2C bus during measurement. Since conversion times can vary, it's simpler to let the sensor hold the line until its data is ready to be read.
+  - Can be read ith direct methods `HTU21D#read_temperature` and `HTU21D#read_humidity`, but these do not accept block callbacks, and there is no polling.
+  - For callbacks and polling use the sub-objects accessible through `HTU21D#temperature` and `HTU21D#humidity`. See examples for more info.
+  
 - SSD1306 OLED Display:
   - Class: `Dino::Display::SSD1306`
   - Connects over I2C. Driver written in Ruby.

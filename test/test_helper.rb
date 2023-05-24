@@ -76,10 +76,13 @@ Dino::PulseIO::PWMOutput
 Dino::RTC::DS3231
 
 # Sensor
+Dino::Sensor::Temperature
+Dino::Sensor::Humidity
 Dino::Sensor::BME280
 Dino::Sensor::BMP280
 Dino::Sensor::DHT
 Dino::Sensor::DS18B20
+Dino::Sensor::HTU21D
 
 # SPI
 Dino::SPI::BaseRegister

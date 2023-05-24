@@ -136,9 +136,9 @@
 | DHT 11/21/22     | :green_heart:  | Digi In/Out | `Sensor::DHT`      | Temperature, Humidity
 | DS18B20          | :green_heart:  | OneWire     | `Sensor::DS18B20`  | Temperature
 | MAX31850         | :heart:        | OneWire     | - | Thermocouple
-| BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temperature, Pressure, Humidity
+| BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp, Pressure, Humidity
 | BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temperature, Pressure
-| HTU21D           | :heart:        | I2C         | - | Temperature, Humidity
+| HTU21D           | :green_heart:  | I2C         | - | Temp + RH. Always holds I2C bus during measurement. User register read not implemented.
 | HTU31D           | :heart:        | I2C         | - | Temperature, Humidity
 | AHT10            | :heart:        | I2C         | - | Temperature, Humidity
 | AHT21            | :heart:        | I2C         | - | Temperature, Humidity
