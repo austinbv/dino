@@ -15,6 +15,7 @@ require 'dino'
 # Touch each class to trigger auto load for simplecov.
 
 # Analog IO
+Dino::AnalogIO::ADS1118
 Dino::AnalogIO::Input
 Dino::AnalogIO::Output
 Dino::AnalogIO::Potentiometer
@@ -50,6 +51,7 @@ Dino::I2C::Bus
 Dino::I2C::Peripheral
 
 # LED
+Dino::LED::APA102
 Dino::LED::Base
 Dino::LED::RGB
 Dino::LED::SevenSegment
