@@ -5,7 +5,7 @@
 ### Microchip/Atmel Chips in Arduino Products (and Compatibles)
 [![AVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_avr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_avr.yml) [![MegaAVR Build Status](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_megaavr.yml) [![SAM3X Build Satus](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_sam3x.yml) [![SAMD Build Satus](https://github.com/austinbv/dino/actions/workflows/build_samd.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_samd.yml) 
 
-|    Chip        | Status          | Boards           | Notes |
+|    Chip        | Status          | Products         | Notes |
 | :--------      | :------:        | :--------------- |------ |
 | ATmega168      | :green_heart:   | Duemilanove, Diecimila, Pro | (Configurable) features omitted to save memory. Run `dino targets` for more info.
 | ATmega328      | :green_heart:   | Uno, Nano, Fio, Pro  | 
@@ -13,8 +13,8 @@
 | ATmega1280     | :green_heart:   | Mega | 
 | ATmega2560     | :green_heart:   | Mega2560, Arduino Mega ADK | 
 | ATmega4809     | :man_shrugging: | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
-| ATSAM3X8E      | :yellow_heart:  | Due | Uses native USB port. Tone, and IR Out don't work.
-| ATSAMD21       | :green_heart:   | Zero, M0, M0 Pro | Uses native USB port.
+| ATSAM3X8E      | :yellow_heart:  | Due | Native USB port. Tone, and IR Out don't work.
+| ATSAMD21       | :green_heart:   | Zero, M0, M0 Pro | Native USB port. I2C seems stuck on 100 kHz.
 
 **Note:** Only USB boards listed. Any board with a supported chip should work, once you can flash it and connect to serial.
 
@@ -29,9 +29,9 @@
 ### Espressif Chips with Built-In WiFi
 [![ESP8266 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp8266.yml) [![ESP32 Build Status](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_esp32.yml)
 
-|    Chip        | Status          | Boards               | Notes |
+|    Chip        | Status          | Test Board           | Notes |
 | :--------      | :------:        | :---------------     |------ |
-| ESP8266        | :green_heart:   | NodeMCU |
+| ESP8266        | :green_heart:   | NodeMCU              |
 | ESP8285        | :man_shrugging: | DOIT ESP-Mx DevKit   | Should be identical to 8266. Not tested in hardware.
 | ESP32          | :green_heart:   | DOIT ESP32 DevKit V1 |
 | ESP32-S2       | :green_heart:   | LOLIN S2 Pico        | Native USB
@@ -43,7 +43,7 @@
 ### Raspberry Pi Microcontrollers
 [![RP2040 Build Status](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml/badge.svg)](https://github.com/austinbv/dino/actions/workflows/build_rp2040.yml)
 
-|    Chip        | Status          | Boards           | Notes |
+|    Chip        | Status          | Test Board       | Notes |
 | :--------      | :------:        | :--------------- |------ |
 | RP2040         | :green_heart:   | Raspberry Pi Pico (W) | WiFi only on W version. No WS1812 LED support.
 
@@ -136,8 +136,8 @@
 | DHT 11/21/22     | :green_heart:  | Digi In/Out | `Sensor::DHT`      | Temp/RH
 | DS18B20          | :green_heart:  | OneWire     | `Sensor::DS18B20`  | Temp
 | MAX31850         | :heart:        | OneWire     | `Sensor::MAX31850` | Thermocouple Amplifier
-| BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp/RH/Pressure
-| BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temperature, Pressure
+| BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp/RH/Press
+| BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temp/Pres
 | HTU21D           | :green_heart:  | I2C         | `Sensor::HTU21D`   | Temp/RH. Locks I2C bus during read. No user register read.
 | HTU31D           | :heart:        | I2C         | `Sensor::HTU31D`   | Temp/RH
 | AHT10            | :heart:        | I2C         | `Sensor::AHT10`    | Temp/RH
@@ -176,6 +176,6 @@
 
 ### Miscellaneous
 
-| Name             | Status         | Interface  | Component Class     | Notes |
-| :--------------- | :------:       | :--------  | :---------------    |------ |
-| MFRC522          | :heart:        | SPI/I2C    | `DigitalIO::MFRC522 | RFID tag reader / writer
+| Name             | Status         | Interface  | Component Class      | Notes |
+| :--------------- | :------:       | :--------  | :---------------     |------ |
+| MFRC522          | :heart:        | SPI/I2C    | `DigitalIO::MFRC522` | RFID tag reader / writer
