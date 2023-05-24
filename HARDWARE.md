@@ -12,7 +12,7 @@
 | ATmega32u4     | :green_heart:   | Leonardo, Micro, Leonardo ETH, Esplora, LilyPad USB |
 | ATmega1280     | :green_heart:   | Mega |
 | ATmega2560     | :green_heart:   | Mega2560, Arduino Mega ADK |
-| ATmega4809     | question:       | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
+| ATmega4809     | :question:      | Nano Every, Uno WiFi Rev2 | No hardware to test, but should work
 | ATSAM3X8E      | :yellow_heart:  | Due | Native USB port. Tone, and IR Out don't work.
 | ATSAMD21       | :green_heart:   | Zero, M0, M0 Pro | Native USB port. I2C seems stuck on 100 kHz.
 
@@ -47,6 +47,7 @@
 | :--------      | :------:        | :---------------      |------ |
 | RO2040         | :green_heart:   | Raspberry Pi Pico (W) | WiFi only on W version. No WS1812 LED support.
 
+# Supported Single Board Computers
 
 ### Raspberry Pi Single Board Computers
 **Note:** See the [dino-piboard](https://github.com/dino-rb/dino-piboard) extension to this gem. It uses the Component classes from this gem, but swaps out the low-level microcontroller interface with the Raspberry Pi's built-in GPIPO interface. This is still a very early work-in-progress.
