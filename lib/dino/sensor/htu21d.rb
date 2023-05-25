@@ -28,6 +28,7 @@ module Dino
         # Avoid repeated memory allocation for callback data and state.
         @reading   = [:temperatue, 0.0]
         self.state = { temperature: nil, humidity: nil }
+        @mutex     = Mutex.new
 
         # Temperature and humidity objects, to treat this like 2 sensors.
         @temperature = Temperature.new(self)
@@ -46,7 +47,9 @@ module Dino
       end
 
       def write_config
-        i2c_write [WRITE_CONFIG, @config]
+        @mutex.synchronize do
+          i2c_write [WRITE_CONFIG, @config]
+        end
       end
 
       def heater_on?
@@ -103,13 +106,17 @@ module Dino
       end
       
       def read_temperature
-        result = read_using -> { i2c_read(READ_TEMPERATURE_BLOCKING, 3)}
-        (result[0] == :temperature) ? result[1] : nil
+        @mutex.synchronize do
+          result = read_using -> { i2c_read(READ_TEMPERATURE_BLOCKING, 3) }
+          result[1] if result
+        end
       end
 
       def read_humidity
-        result = read_using -> { i2c_read(READ_HUMIDITY_BLOCKING, 3)}
-        (result[0] == :humidity) ? result[1] : nil
+        @mutex.synchronize do
+          result = read_using -> { i2c_read(READ_HUMIDITY_BLOCKING, 3) }
+          result[1] if result
+        end
       end
 
       def pre_callback_filter(bytes)
@@ -159,6 +166,7 @@ module Dino
       end
 
       def update_state(reading)
+        return unless reading
         @state_mutex.synchronize do
           @state[reading[0]] = reading[1]
         end

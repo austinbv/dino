@@ -109,9 +109,9 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
 
 ## Examples and Tutorials
 
-#### Included Examples
+#### Tutorial
 
-* A beginner-friendly tutorial that goes through the basics, using examples and diagrams can be found [here](tutorial). Read the comments and try modifying the code. You will need the following:
+* [Here](tutorial) you will find a beginner-friendly tutorial, that goes through the basics, using commented examples and diagrams. Read the comments and try modifying the code. You will need the following:
   * 1 compatible microcontroller (see [supported hardware](HARDWARE.md))
   * 1 button or momentary switch
   * 1 potentiometer (any value)
@@ -121,9 +121,11 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
   * Breadboard
   * Jumper wires
   
-  **Tip:** Kits are a cost-effective way to get started. They will almost certainly include these parts, plus more, getting you well beyond the starter examples.
-  
-* There are many more [examples](examples) demonstrating the interface for every supported peripheral, and some showing how to use them together.
+  **Tip:** Kits are a cost-effective way to get started. They will almost certainly include these parts, plus more, getting you well beyond the tutorial.
+
+#### Included Examples
+
+* The [examples](examples) folder contains at least one example per supported peripheral, demonstrating its interface, and a few that use multiple peripherals together.
 * Each example should incldue a wiring diagram alongside its code (still incomplete).
 
 ####  More Examples

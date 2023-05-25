@@ -29,11 +29,15 @@ loop do
     canvas.text_cursor = [0,0]
     canvas.print "Time:  #{Time.now.strftime("%H:%M:%S.%L")}"
 
-    canvas.text_cursor = [0,8]
-    canvas.print "Temp:     " + ('%.3f' % htu21d[:temperature]).rjust(7, " ") + " C"
+    if htu21d[:temperature]
+      canvas.text_cursor = [0,8]
+      canvas.print "Temp:     " + ('%.3f' % htu21d[:temperature]).rjust(7, " ") + " C"
+    end
 
-    canvas.text_cursor = [0,16]
-    canvas.print "Humidity: " + ('%.3f' % htu21d[:humidity]).rjust(7, " ") + " %"
+    if htu21d[:humidity]
+      canvas.text_cursor = [0,16]
+      canvas.print "Humidity: " + ('%.3f' % htu21d[:humidity]).rjust(7, " ") + " %"
+    end
 
     # Only refresh the area in use.
     oled.draw(0, 127, 0, 24)

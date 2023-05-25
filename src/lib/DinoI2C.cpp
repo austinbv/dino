@@ -137,16 +137,14 @@ void Dino::i2cRead() {
   
   // Send data as if coming from SDA pin. Prefix with device adddress.
   // Fail silently if no bytes read / invalid device address.
-  if(Wire.available()){
-    stream->print(SDA); stream->print(':');
-    stream->print(address); stream->print('-');
-    while(Wire.available()){
-      stream->print(Wire.read());
-      stream->print(',');
-    }
-    stream->print('\n');
+  stream->print(SDA); stream->print(':');
+  stream->print(address); stream->print('-');  
+  while(Wire.available()){
+    stream->print(Wire.read());
+    stream->print(',');
   }
-  
+  stream->print('\n');
+
   // No repeated start on ESP32.
   #if defined(ESP32)
     Wire.endTransmission();

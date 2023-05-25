@@ -33,7 +33,10 @@ module Dino
           if str && str.match(/\A\d+-/)
             address, data = str.split("-", 2)
             address = address.to_i
+
             data = data.split(",").map(&:to_i)
+            data = nil if data.empty?
+
             update_component(address, data)
           end
         end
