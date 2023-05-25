@@ -102,7 +102,9 @@ module Dino
       end
 
       def [](key)
-        @state[key]
+        @state_mutex.synchronize do
+          return @state[key]
+        end
       end
       
       def read_temperature

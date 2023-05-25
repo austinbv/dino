@@ -55,8 +55,11 @@ module Dino
 
       def after_initialize(options={})
         super(options)
-        get_calibration_data
         
+        # Avoid repeated memory allocation for callback data and state.
+        @reading   = { temperature: nil, humidity: nil, pressure: nil }
+        self.state = { temperature: nil, humidity: nil, pressure: nil }
+
         #
         # Setup defaults for the config registers:
         #   Oneshot reading mode
@@ -80,6 +83,13 @@ module Dino
         @registers.merge!(f2: 0b00000001) if humidity_available?
         
         write_settings
+        get_calibration_data
+      end
+
+      def [](key)
+        @state_mutex.synchronize do
+          return @state[key]
+        end
       end
       
       #
@@ -88,6 +98,24 @@ module Dino
       def oneshot_mode
         @registers[:f4] = (@registers[:f4] & 0b11111100) | ONESHOT_MODE
         write_settings
+      end
+
+      attr_reader :measurement_time
+      
+      def update_measurement_time
+        t_oversampling = 2 ** (((@registers[:f4] & 0b11100000) >> 5) - 1)
+        p_oversampling = 2 ** (((@registers[:f4] & 0b00011100) >> 2) - 1)
+
+        # Use the maximum measurement time from the datasheet.
+        @measurement_time = 1.25 + (2.3 * t_oversampling) + (2.3 * p_oversampling) + 0.575
+
+        if humidity_available?
+          h_oversampling = 2 ** ((@registers[:f2] & 0b00000111) - 1) if humidity_available?
+          @measurement_time = @measurement_time + (2.3 * h_oversampling) + 0.575
+        end
+
+        # Milliseconds to seconds
+        @measurement_time = @measurement_time / 1000
       end
       
       def continuous_mode
@@ -137,6 +165,8 @@ module Dino
         
         # Write temperature and pressure settings.
         i2c_write [0xF5, @registers[:f5], 0xF4, @registers[:f4]]
+
+        update_measurement_time
       end
       
       def config_register_bits
@@ -147,53 +177,48 @@ module Dino
         str
       end
 
-      #
-      # Override default Callback, Reader and Poller behavior.
-      #
-      def poll(interval=3, *args, &block)
-        # Need to call #read instead of #read to poll.
-        poll_using(self.method(:read), interval, *args, &block)
-      end
-      
-      def read(&block)
-        # Write register 0xF4 to trigger a oneshot reading and wait, unless continuous mode is enabled.
+      def _read
         unless (@registers[:f4] & 0b00000011 == 0b11)
           i2c_write [0xF4, @registers[:f4]]
-          sleep 0.005
+          sleep measurement_time
         end
-        
-        # Always read 8 bytes starting at 0xF7, regardless of settings. Keeps data in correct order.
-        read_using -> { i2c_read 0xF7, 8 }, &block
+        i2c_read 0xF7, 8
       end
       
       def pre_callback_filter(data)
         # Readings are always 8 bytes. Let calibration data pass through unmodified.
-        data.length == 8 ? decode(data) : data
+        data.length == 8 ? decode_reading(data) : data
       end
       
-      def update_state(readings)
-        # Prevent calibration data arrays from modifying state.
-        self.state = readings if readings.class == Hash
+      def update_state(reading)
+        # Checking for Hash ignores calibration data and nil.
+        if reading.class == Hash
+          @state_mutex.synchronize do
+            @state[:temperature] = reading[:temperature]
+            @state[:pressure]    = reading[:pressure]
+            @state[:humidity]    = reading[:humidity]
+          end
+        end
       end
       
       #
       # Decode Data
       #
-      def decode(bytes)
+      def decode_reading(bytes)
         # Always read temperature since t_fine is needed to calibrate other values.
         temperature, t_fine = decode_temperature(bytes)
-        results = {temperature: temperature}
+        @reading[:temperature] = temperature
       
         # Pressure and humidity are optional. Humidity is not available on the BMP280.
-        results[:pressure] = decode_pressure(bytes, t_fine) if reading_pressure?
-        results[:humidity] = decode_humidity(bytes, t_fine) if reading_humidity?
+        @reading[:pressure] = decode_pressure(bytes, t_fine) if reading_pressure?
+        @reading[:humidity] = decode_humidity(bytes, t_fine) if reading_humidity?
           
-        results
+        @reading
       end
       
       def decode_temperature(bytes)
-        # Reformat raw ADC bytes (20-bits in 24) to a 32-bit integer.
-        adc_t = [0, bytes[3], bytes[4], bytes[5]].pack('C*').unpack('L>')[0] >> 4
+        # Reformat raw temeprature bytes (20-bits in 24) to uint32.
+        adc_t = ((bytes[3] << 16) | (bytes[4] << 8) | (bytes[5])) >> 4
                   
         # Floating point temperature calculation from datasheet. Result in degrees Celsius.
         var1 = (adc_t /  16384.0 - @calibration[:t1] / 1024.0) * @calibration[:t2]
@@ -204,8 +229,8 @@ module Dino
       end
       
       def decode_pressure(bytes, t_fine)
-        # Reformat raw ADC bytes (20-bits in 24) to a 32-bit integer.
-        adc_p = [0, bytes[0], bytes[1], bytes[2]].pack('C*').unpack('L>')[0] >> 4
+        # Reformat raw pressure bytes (20-bits in 24) to uint32.
+        adc_p = ((bytes[0] << 16) | (bytes[1] << 8) | (bytes[2])) >> 4
         
         # Floating point pressure calculation from datasheet. Result in Pascals.
         var1 = (t_fine / 2.0) - 64000.0
@@ -227,7 +252,7 @@ module Dino
       end
       
       def decode_humidity(bytes, t_fine)
-        # Raw ADC data for humidity is a big-endian unsigned 16-bit integer.
+        # Raw data for humidity is big-endian uint16.
         adc_h = (bytes[6] << 8) | bytes[7]
         
         # Floating point humidity calculation from datasheet. Result in % RH.
@@ -261,7 +286,7 @@ module Dino
       #
       def get_calibration_data
         # First group of calibration bytes.
-        a = read_using -> { i2c_read 0x88, 26 }
+        a = read_using -> { i2c_read(0x88, 26) }
         
         @calibration = {
           t1: a[0..1].pack('C*').unpack('S<')[0],
