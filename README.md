@@ -18,11 +18,11 @@ Dino doesn't run Ruby on the microcontroller (see the [mruby-dino](#mruby) proje
 
 High-level abstraction in Ruby makes hardware classes easy to implement, with intuitive interfaces. They multitask a single core microcontroller, with thread-safe state, and callbacks for inputs, but no "task" priority. If you need more I/O, integration is seamless. Connect another board and instantiate it in Ruby.
 
-Each physical component connected to your board(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not everything in between.
+Each peripheral connected to your microcontroller(s) maps to a Ruby object you can use directly. You get to think about your hardware and appplication logic, not everything in between.
 
 ### Supported Hardware
 
-See a full list of supported mircocontroller platforms, interfaces, and components [here](HARDWARE.md).
+See a full list of supported mircocontroller platforms, interfaces, and peripherals [here](HARDWARE.md).
 
 ## Getting Started
 
@@ -111,7 +111,7 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
 
 #### Included Examples
 
-* The first 5 [examples](examples) are sort of a mini-tutorial, to familiarize you with the basics. Read the comments and try modifying the code. You will need the following:
+* A beginner-friendly tutorial that goes through the basics, using examples and diagrams can be found [here](tutorial). Read the comments and try modifying the code. You will need the following:
   * 1 compatible microcontroller (see [supported hardware](HARDWARE.md))
   * 1 button or momentary switch
   * 1 potentiometer (any value)
@@ -123,8 +123,8 @@ Most boards have an on-board LED. It's internally connected to pin 13 on Arduino
   
   **Tip:** Kits are a cost-effective way to get started. They will almost certainly include these parts, plus more, getting you well beyond the starter examples.
   
-* The remaining examples will usually demonstrate the interface for a specific component class, or how to use multiple components together.
-* Each example folder should incldue a wiring diagram alongside its code.
+* There are many more [examples](examples) demonstrating the interface for every supported peripheral, and some showing how to use them together.
+* Each example should incldue a wiring diagram alongside its code (still incomplete).
 
 ####  More Examples
 
@@ -146,4 +146,4 @@ But what if you want to be _really_ small? Building on the [mruby-esp32](https:/
 
 ## dino-piboard
 
-There's an add-on for this gem, [dino-piboard](https://github.com/dino-rb/dino-piboard), in early development, which adds support for the Raspberry Pi's built in GPIO interface as a class-compatible "board". This allows you to connect components directly to the Pi, without a microcontroller, and use the dino component classes as-is.
+There's an add-on for this gem, [dino-piboard](https://github.com/dino-rb/dino-piboard), in early development, which adds support for the Raspberry Pi's built in GPIO interface as a class-compatible "board". This allows you to connect peripherals directly to the Pi, without a microcontroller, and use the dino peripherals classes as-is.

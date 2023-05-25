@@ -6,8 +6,8 @@
 
 - `Board#map`
   - Calling `#map` on a `Board` instance will return a hash that maps its named pins (taken from the Arduino framework) to their integer GPIO values, once the board is supported. Examples: `:A0`, `:DAC0`, `:MOSI`, `:LED_BUILTIN`.
-  - Pin names can be given as symbols when instantiating components on a board, and they will be converted to integers by `Board#convert_pin`.
-  - This also makes it easier to connect components like SPI or I2C, without a pinout diagram.
+  - Pin names can be given as symbols when instantiating peripherals with a board. The board converts them to integer using `Board#convert_pin`.
+  - This also makes it easier to connect peripherals to SPI or I2C pins, without a pinout diagram. Call `Board#map` to see the pins.
   - To make this work, the board sends and identifier string (again taken from the Arduino framework) during handshake. This is cross-referenced against a directory of YAML files, loading the right map for each board.
   - This uses [`arduino-yaml-board-maps`](https://github.com/dino-rb/arduino-yaml-board-maps). See that repo for which Arduino cores / boards are supported.
 
@@ -35,37 +35,37 @@
 
 - ADS1118 Analog-to-Digital Converter:
   - Class: `Dino::AnalogIO::ADS1118`.
-  - Connects over SPI bus. Driver written in Ruby.
+  - Connects via SPI bus. Driver written in Ruby.
   - Can be used directly by calling `ADS1118#read` with the 2 config register bytes.
   - `#read` automatically waits for conversion before reading result.
   - Implements `BoardProxy` interface, so `AnalogIO::Input` can use it in place of `Board`.
   - For each `AnalogIO::Input` subcomponent:
     - Negative pin (1 or 3) of differential pair can be set with the keyword argument `negative_pin:`
-    - Gain can be set with the keyword argumentg `gain:`
+    - Gain can be set with the keyword argument `gain:`
     - Sample rate can be set with the keyword argument `sample_rate:`
-    - Sample rate doesn't affect update rate. It oversamples for a single reading, reducing noise.
+    - Sample rate doesn't affect update rate. Higher sample rates oversample for a single reaidng, reducing noise.
     - `ADS1118` sets `@volts_per_bit` in the subcomponent, so exact voltages can be calculated.
     - There is no listening interface for subcomponents.
   - Built in temperature sensor can be read with `ADS1118#temperature_read`. Only 128 SPS. No polling.
 
 - Bosch BME/BMP 280 Temperature / Pressure / Humidity Sensor:
   - Classes: `Dino::Sensor::BME280` and `Dino::Sensor::BMP280`
+  - Connects via I2C bus. Driver written in Ruby.
   - All features in the datasheet are implemented, except status checking.
-  - Connects over I2C. Driver written in Ruby.
   - Both are mostly identical, except for BMP280 lacking humidity.
   
 - HTU21D Temperature / Humidity Sensor:
   - Class: `Dino::Sensor::HTU21D`
-  - Connects over I2C. Driver written in Ruby.
+  - Connects via I2C bus. Driver written in Ruby.
   - Most features implemented, except reading back the configuration register, and releasing the I2C bus during measurement. Since conversion times can vary, it's simpler to let the sensor hold the line until its data is ready to be read.
-  - Can be read ith direct methods `HTU21D#read_temperature` and `HTU21D#read_humidity`, but these do not accept block callbacks, and there is no polling.
+  - Can be read with direct methods `HTU21D#read_temperature` and `HTU21D#read_humidity`, but these do not accept block callbacks, and there is no polling.
   - For callbacks and polling use the sub-objects accessible through `HTU21D#temperature` and `HTU21D#humidity`. See examples for more info.
   
 - SSD1306 OLED Display:
   - Class: `Dino::Display::SSD1306`
-  - Connects over I2C. Driver written in Ruby.
-  - By default, it updates entire frame at once using horizontal addressing mode, `SSD1306#draw`.
-  - Can do partial updates by calling `SSD1306#draw(x_min, x_max, y_min, y_max)` defining a bounding box to redraw.
+  - Connects via I2C bus. Driver written in Ruby.
+  - By default, `SSD1306#draw` refreshes the entire frame, using horizontal addressing mode.
+  - Can do partial refreshes with `SSD1306#draw(x_min, x_max, y_min, y_max)`, defining a bounding box to redraw.
   - One 6x8 font and graphic primitves, included through `Dino::Display::Canvas`.
 
 - L298 H-Bridge Motor Driver:
@@ -86,10 +86,11 @@ See new examples in the [examples](examples) folder to learn more.
 
 ### Changed Components
 
-- Virtually every component has been renamed to stop using the `Dino::Components` namespace and make naming clearer.
+- Virtually every component has been renamed to bring them out of the `Dino::Components` namespace,  make naming clearer.
+
   - TODO: Update here with a list of renamed components.
 
-- SPI components now go through a `Dino::SPI::Bus` object:
+- SPI peripherals now go through a `Dino::SPI::Bus` object:
   - Instead of giving a board directly when creating a new SPI peripheral, a bus must be created first:
     ```ruby
       board = Dino::Board.new(connection)
@@ -180,15 +181,15 @@ See new examples in the [examples](examples) folder to learn more.
 
 - `Board#analog_resolution` has been split into `Board#analog_write_resolution` and `Board#analog_read_resoluton`, defaulting to 8 and 10-bits respectively. Write resolution applies to both PWM and DACs.
 
-- `Board#pwm_high`, `Board#dac_high` and `Board#adc_high` been defined for convenience.
+- `Board#pwm_high`, `Board#dac_high` and `Board#adc_high` defined for convenience.
 
-- `Board#i2c_read` and `Board#i2c_write` now only accept `:i2c_frequency` and `:i2c_repeated_start` keywords for their respective arguments.
+- I2C and SPI transfer methods on `Board` changed to avoid using the options Hash pattern. I2C uses only positional arguments, and SPI uses positional and keyword arguments. This gives a significant performance boost on lower end processors like the Raspberry Pi Zero, and reduces CPU usage in general.
+
+- `Board#i2c_read` and `Board#i2c_write` now only accept positional arguments, with frequency and repeated_start always being last, in that order, and optional.
 
 - `Board#spi_transfer` and `Board#spi_bb_transfer` now only accept `:spi_mode` and `:spi_frequency` keywords for the respective arguments.
 
 - `Board#spi_listen` and `Board#spi_bb_listen` now share the same listener storage on the board. Default is 4 listeners. `shiftListeners` have been removed.
-
-- I2C and SPI data transfer methods on `Board` changed to avoid using the options Hash pattern. I2C uses only positional arguments, and SPI uses positional and keyword arguments. This gives a significant performance boost on lower end processors like the Raspberry Pi Zero, and reduces CPU usage in general.
 
 ### Minor Changes
 
@@ -211,7 +212,7 @@ See new examples in the [examples](examples) folder to learn more.
 
 - Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being called, but still remove any one-time callbacks present in the `:read` key.
 
-- `Poller#poll` no longer defaults to a 3 second interval and will rais an error if a numeric interval is not given.
+- `Poller#poll` no longer defaults to a 3 second interval and will raise an error if a numeric interval is not given.
 
 ### Bug Fixes
 

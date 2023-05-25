@@ -1,4 +1,4 @@
-# Supported Microcontrollers
+# Microcontrollers
 
 :green_heart: Full support :yellow_heart: Partial support :heart: Planned. No support yet :question: Works in theory. Untested in real hardware.
 
@@ -47,7 +47,7 @@
 | :--------      | :------:        | :---------------      |------ |
 | RO2040         | :green_heart:   | Raspberry Pi Pico (W) | WiFi only on W version. No WS1812 LED support.
 
-# Supported Single Board Computers
+# Single Board Computers
 
 ### Raspberry Pi Single Board Computers
 **Note:** See the [dino-piboard](https://github.com/dino-rb/dino-piboard) extension to this gem. It uses the Component classes from this gem, but swaps out the low-level microcontroller interface with the Raspberry Pi's built-in GPIPO interface. This is still a very early work-in-progress.
@@ -57,10 +57,10 @@
 | BCM2835        | :yellow_heart:  | Pi 1, Pi Zero (W)     |
 | BCM2836/7      | :question:      | Pi 2                  |
 | BCM2837A0/B0   | :question:      | Pi 3                  |
-| BCM2711        | :question:      | Pi 4                  |
+| BCM2711        | :question:      | Pi 4, Pi 400          |
 | BCM2710A1      | :question:      | Pi Zero 2W            |
 
-# Supported Components
+# Peripherals
 
 :green_heart: Full support :yellow_heart: Partial support :heart: Planned. No support yet
 
@@ -90,7 +90,7 @@
 | Infrared Emitter | :green_heart:  | Software  | `PulseIO::IRTransmitter` | Library on Board
 | Infrared Receiver| :heart:        | Software  | `PulseIO::IRReceiver`    | Doable with existing library
 
-### Generic Components
+### Generic Peripherals
 
 | Name             | Status         | Interface    | Component Class            | Notes |
 | :--------------- | :------:       | :--------    | :---------------           |------ |
@@ -108,7 +108,7 @@
 | Input Register   | :green_heart:  | SPI          | `SPI::InputRegister`       | Tested on CD4021B
 | Output Register  | :green_heart:  | SPI          | `SPI::OutputRegister`      | Tested on 74HC595
 
-**Note:** Most Digital In and Out components can be used seamlessley through Input and Output Registers respectively.
+**Note:** Most Digital In and Out peripherals can be used seamlessley through Input and Output Registers respectively.
 
 ### Motors / Motor Drivers
 

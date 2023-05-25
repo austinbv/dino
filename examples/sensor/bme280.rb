@@ -21,7 +21,7 @@ board = Dino::Board.new(Dino::Connection::Serial.new)
 # Only give the SDA pin of the I2C bus. SCL (clock) pin must be 
 # connected for it to work, but we don't need to control it.
 #
-bus = Dino::I2C::Bus.new(board: board, pin: 'A4')
+bus = Dino::I2C::Bus.new(board: board, pin: :SDA)
 
 sensor = Dino::Sensor::BME280.new(bus: bus, address: 0x76)
 
