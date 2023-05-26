@@ -52,26 +52,43 @@ class RotaryEncoderTest < MiniTest::Test
   def test_goes_the_right_direction
     part.data.send(:update, 1)
     part.clock.send(:update, 1)
-    assert_equal part.state, { steps: 1, angle: 12.0}
+    assert_equal({ steps: -1, angle: 348.0 }, part.state)
     
     part.reset
     
     part.data.send(:update, 1)
     part.clock.send(:update, 0)
-    assert_equal part.state, { steps: -1, angle: 348.0}
+    assert_equal({ steps: 1, angle: 12.0 }, part.state)
+  end
+
+  def test_reverse
+    part.reverse
+    assert part.reversed
+
+    part.data.send(:update, 1)
+    part.clock.send(:update, 1)
+    assert_equal({ steps: 1, angle: 12.0 }, part.state)
+  end
+
+  def test_swapped_pins
+    part2 = Dino::DigitalIO::RotaryEncoder.new board: board, pins: {data:4, clock: 3}
+
+    part2.clock.send(:update, 1)
+    part2.data.send(:update, 1)
+    assert_equal({ steps: 1, angle: 12.0 }, part2.state)
   end
   
   def test_callback_prefilter
     part.data.send(:update, 1)
-    part.clock.send(:update, 1)
+    part.clock.send(:update, 0)
     callback_value = nil
     part.add_callback do |value|
       callback_value = value.dup
     end
     part.data.send(:update, 1)
-    part.clock.send(:update, 1)
+    part.clock.send(:update, 0)
     
-    assert_equal callback_value, {change: 1, steps: 2, angle: 24.0}
+    assert_equal({change: 1, steps: 2, angle: 24.0}, callback_value)
   end
   
   def test_update_state_removes_change

@@ -12,16 +12,23 @@ module Dino
       def after_initialize(options={})
         super(options)
         self.steps_per_revolution = options[:steps_per_revolution] || 30
+        @reverse = false
         
         # DigitalInputs listen with default divider automatically. Override here.
-        divider = options[:divider] || 1
-        clock.listen(divider)
-        data.listen(divider)
+        @divider = options[:divider] || 1
+        clock.listen(@divider)
+        data.listen(@divider)
         
-        reset
         observe_pins
+        reset
       end
       
+      attr_reader :reversed
+
+      def reverse
+        @reversed = !@reversed
+      end
+
       def steps_per_revolution
         (360 / @degrees_per_step).to_i
       end
@@ -46,11 +53,11 @@ module Dino
 
       def observe_pins
         #
-        # This is a quirk of how listeners work.
-        # When observing the pins, attach a callback to the higher numbered pin,
-        # then read state from the lower. If not, direction will be reversed.
+        # This is a quirk of listeners reading in numerical order.
+        # When observing the pins, attach a callback to the higher numbered pin (trailing),
+        # then read state of the lower numbered (leading). If not, direction will be reversed.
         #
-        if board.convert_pin(clock.pin) > board.convert_pin(data.pin)
+        if clock.pin > data.pin
           trailing = clock
           leading = data
         else
@@ -59,7 +66,10 @@ module Dino
         end
         
         trailing.add_callback do |trailing_state|
-          (leading.state == trailing_state) ? self.update(1) : self.update(-1)
+          change = (trailing_state == leading.state) ? 1 : -1
+          change = -change if trailing == clock
+          change = -change if reversed
+          self.update(change)
         end
       end
       
