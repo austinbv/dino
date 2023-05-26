@@ -82,16 +82,9 @@ module Dino
         # Bits 3+ are unused.
         @registers.merge!(f2: 0b00000001) if humidity_available?
         
-        write_settings
-        get_calibration_data
+        @calibration_data_loaded = false
       end
 
-      def [](key)
-        @state_mutex.synchronize do
-          return @state[key]
-        end
-      end
-      
       #
       # Configuration Methods
       #
@@ -160,12 +153,11 @@ module Dino
       end
     
       def write_settings
-        # Write humidity setting for BME280 only.
-        i2c_write [0xF2, @registers[:f2]] if humidity_available?
-        
-        # Write temperature and pressure settings.
-        i2c_write [0xF5, @registers[:f5], 0xF4, @registers[:f4]]
-
+        if humidity_available?
+          i2c_write [0xF2, @registers[:f2], 0xF4, @registers[:f4], 0xF5, @registers[:f5]] 
+        else
+          i2c_write [0xF4, @registers[:f4], 0xF5, @registers[:f5]]
+        end
         update_measurement_time
       end
       
@@ -177,11 +169,12 @@ module Dino
         str
       end
 
+      #
+      # Reading Methods
+      # 
       def _read
-        unless (@registers[:f4] & 0b00000011 == 0b11)
-          i2c_write [0xF4, @registers[:f4]]
-          sleep measurement_time
-        end
+        get_calibration_data unless calibration_data_loaded
+        write_settings
         i2c_read 0xF7, 8
       end
       
@@ -200,9 +193,15 @@ module Dino
           end
         end
       end
+
+      def [](key)
+        @state_mutex.synchronize do
+          return @state[key]
+        end
+      end
       
       #
-      # Decode Data
+      # Decoding Methods
       #
       def decode_reading(bytes)
         # Always read temperature since t_fine is needed to calibrate other values.
@@ -282,11 +281,14 @@ module Dino
       end
       
       #
-      # Calibration
+      # Calibration Methods
       #
+      attr_reader :calibration_data_loaded
+
       def get_calibration_data
         # First group of calibration bytes.
         a = read_using -> { i2c_read(0x88, 26) }
+        return nil unless a
         
         @calibration = {
           t1: a[0..1].pack('C*').unpack('S<')[0],
@@ -307,6 +309,8 @@ module Dino
         # Second group of calibration bytes, mostly for humidity. Not available on BMP280.
         if humidity_available?
           b = read_using -> { i2c_read 0xE1, 7 }
+          return nil unless b
+
           @calibration.merge!(
             h1: a[25],
             h2: b[0..1].pack('C*').unpack('s<')[0],
@@ -316,6 +320,7 @@ module Dino
             h6: [b[6]].pack('C').unpack('c')[0]
           )
         end
+        @calibration_data_loaded = true
       end
     end
     
