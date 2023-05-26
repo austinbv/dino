@@ -139,6 +139,15 @@ class BoardMock < Dino::Board
     @read_injection_mutex = Mutex.new
   end
 
+  WAITING_ON_READ_KEYS = [:read, :bus_controller, :board_proxy, :force_udpate]
+
+  def waiting_on_read(component)
+    WAITING_ON_READ_KEYS.each do |key|
+      return true if component.callbacks[key]
+    end
+    return false
+  end
+
   #
   # Inject a message into the Board instance as if it were coming from the phsyical board.
   # Use this to mock input data for the blocking #read pattern in the Reader behavior.
@@ -147,13 +156,13 @@ class BoardMock < Dino::Board
     Thread.new do
       if wait_for_callbacks
         # Wait for a component to be added.
-        sleep(0.005) while self.components.empty?
+        sleep(0.001) while self.components.empty?
         component = self.components.first
 
-        # Wait for the callback mutex to exist, then callbacks, then the read callback.
-        sleep(0.05) while !component.callback_mutex
-        sleep(0.05) while !component.callbacks
-        sleep(0.05) while !component.callbacks[:read]
+        # Wait for the callback mutex to exist, then callbacks, then a read or board proxy callback.
+        sleep(0.001) while !component.callback_mutex
+        sleep(0.001) while !component.callbacks
+        sleep(0.001) while !waiting_on_read(component)
       end
 
       # Finally inject the message.

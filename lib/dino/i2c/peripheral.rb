@@ -31,7 +31,7 @@ module Dino
       end
 
       def i2c_read(register, num_bytes)
-        bus.read(address, register, num_bytes, i2c_frequency, i2c_repeated_start)
+        bus._read(address, register, num_bytes, i2c_frequency, i2c_repeated_start)
       end
     end
   end

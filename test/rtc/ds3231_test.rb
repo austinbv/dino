@@ -34,6 +34,7 @@ class DS3231Test < MiniTest::Test
     part.stub(:i2c_write, mock) do
       part.time = Time.new(2000, 1, 1, 0, 0, 0.0)
     end
+    mock.verify
   end
   
   def test_read
@@ -45,6 +46,7 @@ class DS3231Test < MiniTest::Test
     bus.stub(:_read, mock) do
       part.time
     end
+    mock.verify
   end
   
   def test_pre_callback_filter
@@ -52,5 +54,6 @@ class DS3231Test < MiniTest::Test
     part.stub(:update_state, mock) do
       bus.send(:update, "104-0,0,0,6,1,1,48")
     end
+    mock.verify
   end
 end

@@ -15,9 +15,7 @@ module Dino
 
       def search
         addresses = read_using -> { board.i2c_search }
-        if addresses
-          @found_devices = addresses.split(":").map(&:to_i)
-        end
+        @found_devices = addresses.split(":").map(&:to_i) if addresses
       end
 
       def write(address, bytes, frequency=100000, repeated_start=false)
@@ -29,7 +27,7 @@ module Dino
       end
       
       def bubble_callbacks
-        add_callback(:bus_master) do |str|
+        add_callback(:bus_controller) do |str|
           if str && str.match(/\A\d+-/)
             address, data = str.split("-", 2)
             address = address.to_i

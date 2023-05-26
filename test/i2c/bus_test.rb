@@ -23,7 +23,7 @@ class I2CBusTest < MiniTest::Test
   def test_initialize
     board.inject_read("5:")
     assert_equal part.found_devices, []
-    refute_nil part.callbacks[:bus_master]
+    refute_nil part.callbacks[:bus_controller]
   end
 
   def test_search
