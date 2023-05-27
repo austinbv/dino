@@ -115,7 +115,7 @@ module Dino
         @divider_seconds = @divider / 1000.0
         threaded_loop do
           read_pins_pi
-          sleep @divider_second
+          sleep @divider_seconds
         end
       end
       
