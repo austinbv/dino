@@ -66,24 +66,25 @@
 
 ### Basic GPIO Interface
 
-| Name                  | Status          | Component Class     | Notes |
-| :---------------      | :------:        | :------             | :---- |
-| Digital Out           | :green_heart:   | `DigitalIO::Output` | -     |
-| Digital In            | :green_heart:   | `DigitalIO::Input`  | 1ms - 128ms (4ms default) listen, poll, or read
-| PWM Out               | :green_heart:   | `PulseIO::PWMOut`   |
-| Analog Out (DAC)      | :green_heart:   | `AnalogIO::Output`  | On SAM3X, SAMD21 and ESP32
-| Analog In (ADC)       | :green_heart:   | `AnalogIO::Input`   | 1ms - 128ms (16ms default) listen, poll, or read
-| Tone Out (Square Wave)| :green_heart:   | `PulseIO::Buzzer`   | Doesn't work on Due (SAM3X)
+| Name                  | Status          | Component Class      | Notes |
+| :---------------      | :------:        | :------              | :---- |
+| Digital Out           | :green_heart:   | `DigitalIO::Output`  | -     |
+| Digital In            | :green_heart:   | `DigitalIO::Input`   | 1ms - 128ms (4ms default) listen, poll, or read
+| PWM Out               | :green_heart:   | `PulseIO::PWMOutput` |
+| Analog Out (DAC)      | :green_heart:   | `AnalogIO::Output`   | On SAM3X, SAMD21 and some ESP32
+| Analog In (ADC)       | :green_heart:   | `AnalogIO::Input`    | 1ms - 128ms (16ms default) listen, poll, or read
+| Tone Out (Square Wave)| :green_heart:   | `PulseIO::Buzzer`    | Doesn't work on Due (SAM3X)
 
-**Note:** When listening, the board checks the pin's value every **_2^n_** ms (**_n_** from **_0_** to **_7_**), without further prompting. Polling and reading follow a call and response pattern.
+**Note:** When listening, the board checks the pin's value every **_2^n_** milliseconds (**_n_** from **_0_** to **_7_**), without further commands.
+Polling and reading follow a call and response pattern.
 
 ### Advanced Interfaces
 
 | Name             | Status         | SW/HW     | Component Class          | Notes |
 | :--------------- | :------:       | :-------- | :---------------         |------ |
-| I2C              | :green_heart:  | Hardware  | `I2C::Bus`               |
-| SPI              | :green_heart:  | Hardware  | `SPI::Bus`               | Hardware SPI
-| SPI Bit Bang     | :green_heart:  | Software  | `SPI::BitBang`           | Bit Bang SPI
+| I2C              | :green_heart:  | Hardware  | `I2C::Bus`               | Hardware I2C on predefined pins
+| SPI              | :green_heart:  | Hardware  | `SPI::Bus`               | Hardware SPI on prefedined pins
+| SPI Bit Bang     | :green_heart:  | Software  | `SPI::BitBang`           | Bit Bang SPI on any pins
 | UART             | :heart:        | Hardware  | `UART::Native`           | Most boards have extra hardware UARTs
 | UART Bit Bang    | :yellow_heart: | Software  | `UART::BitBang`          | Only on boards with 1 hardware UART. Write only
 | Maxim OneWire    | :green_heart:  | Software  | `OneWire::Bus`           | No overdrive support
