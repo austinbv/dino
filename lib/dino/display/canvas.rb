@@ -249,7 +249,7 @@ module Dino
       end
 
       def print(str)
-        str.split("").each do |char|
+        str.to_s.split("").each do |char|
           print_char(char)
         end
       end
