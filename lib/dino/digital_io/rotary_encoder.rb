@@ -67,10 +67,7 @@ module Dino
           change =  1 if @encoder_state_last == 0b10
         end
 
-        if (change != 0)
-          change = -change if reversed
-          self.update(change)
-        end
+        self.update(change) if (change != 0)
 
         @encoder_state_last = @encoder_state
       end
@@ -99,7 +96,6 @@ module Dino
         trailing.add_callback do |trailing_state|
           change = (trailing_state == leading.state) ? 1 : -1
           change = -change if trailing == clock
-          change = -change if reversed
           self.update(change)
         end
       end
@@ -125,6 +121,7 @@ module Dino
       # value in :change, so callbacks can use any of these.
       #
       def pre_callback_filter(step)
+        step = -step if reversed
         # Copy old state through the mutex wrapped reader.
         temp_state = state.dup
         temp_state[:change] = step
