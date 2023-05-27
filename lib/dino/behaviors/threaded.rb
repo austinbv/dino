@@ -31,6 +31,11 @@ module Dino
         @thread.kill if @thread
       end
 
+      def stop
+        stop_thread
+        super if defined?(super)
+      end
+
       def enable_interrupts
         interrupts = self.class.class_eval('@@interrupts') rescue []
         interrupts.each do |method_name|

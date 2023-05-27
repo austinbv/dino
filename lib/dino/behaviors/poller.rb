@@ -24,7 +24,6 @@ module Dino
 
       def stop
         super if defined?(super)
-        stop_thread
         remove_callbacks :poll
       end
     end
