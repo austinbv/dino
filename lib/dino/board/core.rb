@@ -25,7 +25,7 @@ module Dino
     # CMD = 1
     def digital_write(pin,value)
       unless (value == 1) || (value == 0)
-        raise ArgumentError, "cannot write digital value: #{value}. Should be one of: [0, 1]" 
+        raise ArgumentError, "cannot write digital value: #{value}. Should be Integer either 0 or 1" 
       end
       write Message.encode command: 1, pin: pin, value: value
     end

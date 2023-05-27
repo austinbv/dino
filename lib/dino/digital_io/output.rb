@@ -16,8 +16,6 @@ module Dino
       end
 
       def digital_write(value)
-        value = value.to_i
-        value = board.high unless (value == board.low)
         board.digital_write(pin, value)
         self.state = value
       end

@@ -26,9 +26,9 @@ class DigitalIOOutputTest < Minitest::Test
     mock.expect :call, nil, [14, board.high]
     board.stub(:digital_write, mock) do
       part.digital_write(board.high)
-      part.digital_write(nil)
-      part.digital_write("0")
-      part.digital_write("1")
+      part.digital_write(board.low)
+      part.digital_write(0)
+      part.digital_write(1)
     end
     mock.verify
     assert_equal board.high, part.state
