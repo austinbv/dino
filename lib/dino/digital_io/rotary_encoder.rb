@@ -48,10 +48,41 @@ module Dino
       def reset
         self.state = {steps: 0, angle: 0}
       end
+
+      #
+      # Listeners don't work for rotary encoder on Raspberry Pi.
+      # So read the pins directly and update state.
+      #
+      def read_pins_pi
+        @encoder_state = (clock.read << 1) | data.read
+        change = 0
+
+        if (@encoder_state == 0b00)
+          change =  1 if @encoder_state_last == 0b10
+          change = -1 if @encoder_state_last == 0b01
+        end
+        
+        if (@encoder_state == 0b11)
+          change =  1 if @encoder_state_last == 0b01
+          change = -1 if @encoder_state_last == 0b10
+        end
+
+        if (change != 0)
+          change = -change if reversed
+          self.update(change)
+        end
+
+        @encoder_state_last = @encoder_state
+      end
       
       private
 
       def observe_pins
+        # If encoder is connected to a Raspberry Pi GPIO header.
+        if defined?(Dino::PiBoard) && (self.board.class == Dino::PiBoard)
+          return observe_pins_pi
+        end
+
         #
         # This is a quirk of listeners reading in numerical order.
         # When observing the pins, attach a callback to the higher numbered pin (trailing),
@@ -73,6 +104,23 @@ module Dino
         end
       end
       
+      # Use direct polling on Raspberry Pi since Pi listeners don't really poll.
+      def observe_pins_pi
+        self.singleton_class.include(Behaviors::Threaded)
+
+        self.stop
+        clock.stop
+        data.stop
+        
+        @encoder_state_last = (clock.read << 1) | data.read
+        @divider_millis = @divider / 1000.0
+        
+        threaded_loop do
+          sleep @divider_millis
+          read_pins_pi
+        end
+      end
+            
       #
       # Take data (+/- 1 step change) and calculate new state.
       # Return a hash with the new :steps and :angle. Pass through raw
