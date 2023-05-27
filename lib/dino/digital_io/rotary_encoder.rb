@@ -58,13 +58,13 @@ module Dino
         change = 0
 
         if (@encoder_state == 0b00)
-          change =  1 if @encoder_state_last == 0b10
-          change = -1 if @encoder_state_last == 0b01
+          change = -1 if @encoder_state_last == 0b10
+          change =  1 if @encoder_state_last == 0b01
         end
         
         if (@encoder_state == 0b11)
-          change =  1 if @encoder_state_last == 0b01
-          change = -1 if @encoder_state_last == 0b10
+          change = -1 if @encoder_state_last == 0b01
+          change =  1 if @encoder_state_last == 0b10
         end
 
         if (change != 0)
@@ -112,15 +112,13 @@ module Dino
         clock.stop
         data.stop
         
-        @encoder_state_last = (clock.read << 1) | data.read
-        @divider_millis = @divider / 1000.0
-        
+        @divider_seconds = @divider / 1000.0
         threaded_loop do
-          sleep @divider_millis
           read_pins_pi
+          sleep @divider_second
         end
       end
-            
+      
       #
       # Take data (+/- 1 step change) and calculate new state.
       # Return a hash with the new :steps and :angle. Pass through raw
