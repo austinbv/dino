@@ -13,6 +13,10 @@ module Dino
         super(options)
         self.steps_per_revolution = options[:steps_per_revolution] || 30
         @reverse = false
+
+        # Avoid repeated memory allocation.
+        self.state = { steps: 0, angle: 0 }
+        @reading   = { steps: 0, angle: 0, change: 0}
         
         # DigitalInputs listen with default divider automatically. Override here.
         @divider = options[:divider] || 1
@@ -122,20 +126,24 @@ module Dino
       #
       def pre_callback_filter(step)
         step = -step if reversed
-        # Copy old state through the mutex wrapped reader.
-        temp_state = state.dup
-        temp_state[:change] = step
-        temp_state[:steps]  = temp_state[:steps] + step
-        temp_state[:angle]  = temp_state[:steps] * @degrees_per_step % 360
-        temp_state
+
+        @reading[:change] = step
+        @state_mutex.synchronize do
+          @reading[:steps] = @state[:steps] + step
+        end      
+        @reading[:angle] = @reading[:steps] * @degrees_per_step % 360
+        
+        @reading
       end
 
       #
       # After callbacks, set state to the hash from before, except change.
       #
-      def update_state(new_state)
-        new_state.delete(:change)
-        self.state = new_state
+      def update_state(reading)
+        @state_mutex.synchronize do
+          @state[:steps]  = reading[:steps]
+          @state[:angle]  = reading[:angle]
+        end
       end
     end
   end
