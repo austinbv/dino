@@ -5,9 +5,5 @@ module Dino
     autoload :Base,         "#{__dir__}/connection/base"
     autoload :Serial,       "#{__dir__}/connection/serial"
     autoload :TCP,          "#{__dir__}/connection/tcp"
-    
-    def self.new(options={})
-      self::Serial.new(options)
-    end
   end
 end

@@ -1,4 +1,4 @@
-require_relative '../../test_helper'
+require_relative '../test_helper'
 
 class MessageTest < Minitest::Test
   def test_require_a_command

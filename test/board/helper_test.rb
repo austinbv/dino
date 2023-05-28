@@ -1,7 +1,7 @@
 # encoding: ascii-8bit
 # For convenience when validating longer data types.
 
-require_relative '../../test_helper'
+require_relative '../test_helper'
 
 class APIHelperTest < Minitest::Test
   include TestPacker

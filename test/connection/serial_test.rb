@@ -1,4 +1,4 @@
-require_relative '../../test_helper'
+require_relative '../test_helper'
 
 require "rubyserial"
 
@@ -26,7 +26,7 @@ class SerialConnectionTest < Minitest::Test
       connection.send(:io)
     end
   end
-
+  
   def test_connect_with_device_specified
     mock = MiniTest::Mock.new.expect(:call, "SerialMock", ["/dev/ttyACM0", 9600])
     ::Serial.stub(:new, mock) do

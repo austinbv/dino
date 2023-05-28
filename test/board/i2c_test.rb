@@ -1,4 +1,4 @@
-require_relative '../../test_helper'
+require_relative '../test_helper'
 
 class APII2CTest < Minitest::Test
   include TestPacker

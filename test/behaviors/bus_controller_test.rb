@@ -15,7 +15,7 @@ class BusControllerTest < Minitest::Test
   end
   
   def test_has_mutex
-    assert_equal part.mutex.class, Mutex
+    assert_equal Mutex, part.mutex.class
   end
   
   def test_components
