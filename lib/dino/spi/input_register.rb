@@ -123,7 +123,7 @@ module Dino
         end.join
         
         # Split the digits out of the string into individual integers.
-        bits = binary_string.split("").map { |bit| bit.to_i }
+        binary_string.split("").map { |bit| bit.to_i }
       end
     end
   end

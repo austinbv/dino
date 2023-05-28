@@ -11,9 +11,7 @@ class I2CPeripheralTest < MiniTest::Test
 
   def bus
     return @bus if @bus
-    board.inject_read("5:48")
     @bus = Dino::I2C::Bus.new(board: board, pin:5)
-    @bus.search
     @bus
   end
   
@@ -42,7 +40,7 @@ class I2CPeripheralTest < MiniTest::Test
   def test__read_and_repeated_start
     part.i2c_repeated_start = true
     
-    board.inject_read("5:48-127,127,127,127,127,127")
+    board.inject_read_for_component(part, 5, "48-127,127,127,127,127,127")
     
     mock = MiniTest::Mock.new.expect :call, nil, [0x30, 0x03, 6, 100000, true]
     bus.stub(:read, mock) do

@@ -6,25 +6,39 @@ class OneWireBusTest < MiniTest::Test
   end
   
   def part
+    return @part if @part
+    # Respond with disabled parasite power.
+    board.inject_read_for_pin(1, "1")
     @part ||= Dino::OneWire::Bus.new(board: board, pin: 1)
   end
 
-  def test_read_power_supply_locks_mutex
-    # Inject a response for no parasite power.
-    board.inject_read("1:0")
+  def test_initialize
+    board.inject_read_for_pin(2, "0")
+    bus2 = Dino::OneWire::Bus.new(board: board, pin: 2)
+    assert bus2.parasite_power
+  end
 
+  def test_read_power_supply_locks_mutex
     mock = MiniTest::Mock.new.expect(:call, nil)
-    
     part.mutex.stub(:synchronize, mock) do
       part.read_power_supply
     end
     mock.verify
   end
 
+  def test_read_power_supply
+    part
+
+    board.inject_read_for_component(part, 1, "1")
+    part.read_power_supply
+    refute part.parasite_power
+
+    board.inject_read_for_component(part, 1, "0")
+    part.read_power_supply
+    assert part.parasite_power
+  end
+
   def test_read_power_supply_sends_board_commands
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
-    
     board_mock = MiniTest::Mock.new
     board_mock.expect(:set_pin_mode, nil, [part.pin, :output])
     board_mock.expect(:low, 0)
@@ -41,16 +55,17 @@ class OneWireBusTest < MiniTest::Test
         part.read_power_supply
       end
     end
+
     board_mock.verify
     read_mock.verify
+    assert part.parasite_power
   end
 
   def test_device_present_in_mutex
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
+    # part.device_present calls #reset which expects a response. 
+    board.inject_read_for_component(part, 1, "1")
 
     mock = MiniTest::Mock.new.expect(:call, nil)
-    
     part.mutex.stub(:synchronize, mock) do
       part.device_present
     end
@@ -58,68 +73,56 @@ class OneWireBusTest < MiniTest::Test
   end
 
   def test_set_device_present
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
-
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [1])
     mock.expect(:call, nil, [1])
     
     part.stub(:reset, mock) do
       # Give 0 for first reading, device present
-      board.inject_read("1:0")
+      board.inject_read_for_component(part, 1, "0")
       assert part.device_present
       
       # Give 1 for second reading, no device
-      board.inject_read("1:1")
+      board.inject_read_for_component(part, 1,  "1")
       refute part.device_present
     end
     mock.verify
   end
 
   def test_pre_callback_filter
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
-
-    assert_equal part.pre_callback_filter("255,180,120"), [255, 180, 120]
-    assert_equal part.pre_callback_filter("127"), 127
+    assert_equal [255, 180, 120], part.pre_callback_filter("255,180,120")
+    assert_equal 127,             part.pre_callback_filter("127")
   end
 
-  def reset_test
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
-
+  def test_reset
+    part
     mock = MiniTest::Mock.new
-    mock.expect(:call, [1, true])
-    mock.expect(:call, [1])
+    mock.expect :call, nil, [1, 1]
+    mock.expect :call, nil, [1, 0]
+
     board.stub(:one_wire_reset, mock) do
-      part.reset(true)
+      part.reset(1)
       part.reset
     end
     mock.verify
   end
   
-  def _read_test
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
-
-    mock = MiniTest::Mock.new.expect(:call, [1, 4])
+  def test__read
+    part
+    mock = MiniTest::Mock.new.expect :call, nil, [1, 4]
     board.stub(:one_wire_read, mock) do
       part._read(4)
     end
     mock.verify
   end
 
-  def write
-    # Pre-initialize the bus. 
-    board.inject_read("1:0"); part
-
+  def test_write
+    part
     mock = MiniTest::Mock.new
-    expect(:call, [1, true, [255, 177, 0x44]])
-    mock = MiniTest::Mock.new.expect(:call, [1, true, [255, 177, 0x44]])
-    mock = MiniTest::Mock.new.expect(:call, [1, true, [255, 177, 0x48]])
-    mock = MiniTest::Mock.new.expect(:call, [1, false, [255, 177, 0x55]])
-    mock = MiniTest::Mock.new.expect(:call, [1, false, [255, 177, 0x44]])
+    mock.expect :call, nil, [1, true,  [255, 177, 0x44]]
+    mock.expect :call, nil, [1, true,  [255, 177, 0x48]]
+    mock.expect :call, nil, [1, false, [255, 177, 0x55]]
+    mock.expect :call, nil, [1, false, [255, 177, 0x44]]
     
     board.stub(:one_wire_write, mock) do
       # Parasite power on and parasite power functions.

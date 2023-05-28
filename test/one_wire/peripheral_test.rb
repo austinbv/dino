@@ -7,8 +7,8 @@ class OneWirePeripheralTest < MiniTest::Test
 
   def bus
     return @bus if @bus
-    # Parasite power response.
-    board.inject_read("1:0")
+    # Respond with disabled parasite power.
+    board.inject_read_for_pin(1, "1")
     @bus ||= Dino::OneWire::Bus.new(board: board, pin: 1)
   end
 
@@ -93,7 +93,7 @@ class OneWirePeripheralTest < MiniTest::Test
     # Pre-initialize the bus. 
     bus
     # Will read 9 bytes.
-    board.inject_read("1:255,255,255,255,255,255,255,255")
+    board.inject_read_for_component(bus, 1, "255,255,255,255,255,255,255,255")
 
     mock = MiniTest::Mock.new.expect(:call, nil)
     part.stub(:atomically, mock) { part.read_scratch(9) }
@@ -104,7 +104,7 @@ class OneWirePeripheralTest < MiniTest::Test
     # Pre-initialize the bus. 
     bus
     # Will read 9 bytes.
-    board.inject_read("1:255,255,255,255,255,255,255,255")
+    board.inject_read_for_component(bus, 1, "255,255,255,255,255,255,255,255")
 
     mock = MiniTest::Mock.new.expect(:call, nil)
     part.stub(:match, mock) { part.read_scratch(9) }
@@ -115,7 +115,7 @@ class OneWirePeripheralTest < MiniTest::Test
     # Pre-initialize the bus. 
     bus
     # Will read 9 bytes.
-    board.inject_read("1:255,255,255,255,255,255,255,255")
+    board.inject_read_for_component(bus, 1, "255,255,255,255,255,255,255,255")
 
     mock = MiniTest::Mock.new
     mock.expect(:call, nil, [0xCC])
@@ -128,7 +128,7 @@ class OneWirePeripheralTest < MiniTest::Test
     # Pre-initialize the bus. 
     bus
     # Will read 9 bytes.
-    board.inject_read("1:255,255,255,255,255,255,255,255")
+    board.inject_read_for_component(bus, 1, "255,255,255,255,255,255,255,255")
 
     mock = MiniTest::Mock.new.expect(:call, nil, [9])
     bus.stub(:read, mock) { part.read_scratch(9) }

@@ -7,9 +7,7 @@ class DS3231Test < MiniTest::Test
 
   def bus
     return @bus if @bus
-    board.inject_read("5:104")
     @bus = Dino::I2C::Bus.new(board: board, pin:5)
-    @bus.search
     @bus
   end
   
@@ -38,9 +36,7 @@ class DS3231Test < MiniTest::Test
   end
   
   def test_read
-    # Pre-initialize the bus.
-    bus
-    board.inject_read("5:104-0,0,0,6,1,1,48")
+    board.inject_read_for_component(part, 5, "104-0,0,0,6,1,1,48")
     
     mock = MiniTest::Mock.new.expect :call, nil, [part.address, 0x00, 7, 100000, false]
     bus.stub(:_read, mock) do

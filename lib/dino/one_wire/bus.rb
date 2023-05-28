@@ -47,6 +47,7 @@ module Dino
       end
 
       def write(*bytes)
+        bytes.flatten!
         pp = parasite_power && [CONVERT_T, COPY_SCRATCH].include?(bytes.last)
         board.one_wire_write(pin, pp, bytes)
       end

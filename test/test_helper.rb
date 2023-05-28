@@ -141,33 +141,59 @@ class BoardMock < Dino::Board
 
   WAITING_ON_READ_KEYS = [:read, :bus_controller, :board_proxy, :force_udpate]
 
+  def component_exists_for_pin(pin)
+    self.components.each do |component|
+      return component if component.pin == pin
+    end
+    false
+  end
+
   def waiting_on_read(component)
     WAITING_ON_READ_KEYS.each do |key|
       return true if component.callbacks[key]
     end
-    return false
+    false
   end
 
   #
   # Inject a message into the Board instance as if it were coming from the phsyical board.
   # Use this to mock input data for the blocking #read pattern in the Reader behavior.
   #
-  def inject_read(line, wait_for_callbacks = true)
+  def inject_read_for_pin(pin, message)
     Thread.new do
-      if wait_for_callbacks
-        # Wait for a component to be added.
-        sleep(0.001) while self.components.empty?
-        component = self.components.first
-
-        # Wait for the callback mutex to exist, then callbacks, then a read or board proxy callback.
-        sleep(0.001) while !component.callback_mutex
-        sleep(0.001) while !component.callbacks
-        sleep(0.001) while !waiting_on_read(component)
+      # Wait for a component to be added.
+      component = false
+      while !component
+        sleep(0.001)
+        component = component_exists_for_pin(pin)
       end
 
-      # Finally inject the message.
+      # Wait for the component to have a "WAITING_ON_READ" callback.
+      sleep(0.001) while !component.callback_mutex
+      sleep(0.001) while !component.callbacks
+      sleep(0.001) while !waiting_on_read(component)
+
+      # Then inject the message.
       @read_injection_mutex.synchronize do
-        self.update(line)
+        self.update("#{pin}:#{message}")
+      end
+    end
+  end
+
+  #
+  # Inject a message into the Board instance as if it were coming from the phsyical board.
+  # Use this to mock input data for the blocking #read pattern in the Reader behavior.
+  #
+  def inject_read_for_component(component, pin, message)
+    Thread.new do
+      # Wait for the component to have a "WAITING_ON_READ" callback.
+      sleep(0.001) while !component.callback_mutex
+      sleep(0.001) while !component.callbacks
+      sleep(0.001) while !waiting_on_read(component)
+
+      # Then inject the message.
+      @read_injection_mutex.synchronize do
+        self.update("#{pin}:#{message}")
       end
     end
   end
@@ -176,5 +202,15 @@ end
 module TestPacker
   def pack(*args, **kwargs)
     Dino::Message.pack(*args, **kwargs)
+  end
+end
+
+# Speed up one wire tests.
+module Dino
+  module OneWire
+    class Bus
+      def sleep(time)
+      end
+    end
   end
 end

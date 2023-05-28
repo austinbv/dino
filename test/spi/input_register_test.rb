@@ -103,7 +103,7 @@ class InputRegisterTest < Minitest::Test
       button
       
       # Should not make a second listen call to the board.
-      button1 = Dino::DigitalIO::Button.new(board: part, pin: 1)
+      Dino::DigitalIO::Button.new(board: part, pin: 1)
     end
     mock.verify
     

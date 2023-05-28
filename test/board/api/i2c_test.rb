@@ -28,9 +28,9 @@ class APII2CTest < Minitest::Test
     address = 0x30
       
     # Normal
-    message1 = Dino::Message.encode command: 34, pin: 0x30 | (1 << 7), value: 4, aux_message: aux
+    message1 = Dino::Message.encode command: 34, pin: address | (1 << 7), value: 4, aux_message: aux
     # Repeated start
-    message2 = Dino::Message.encode command: 34, pin: 0x30 | (0 << 7), value: 4, aux_message: aux
+    message2 = Dino::Message.encode command: 34, pin: address | (0 << 7), value: 4, aux_message: aux
 
     mock = MiniTest::Mock.new
     mock.expect :call, nil, [message1]

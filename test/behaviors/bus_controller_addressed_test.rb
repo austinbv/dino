@@ -32,7 +32,7 @@ class BusControllerAddressedTest < Minitest::Test
   end
 
   def test_prevents_duplicate_addresses
-    peripheral1 = AddressedPeripheral.new(bus: part, address: 1)
+    AddressedPeripheral.new(bus: part, address: 1)
     assert_raises do
       AddressedPeripheral.new(bus: part, address: 1)
     end

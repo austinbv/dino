@@ -10,7 +10,7 @@ module Dino
       options[:reset_time] ||= 0
       begin
         raise ArgumentError if (options[:reset_time] < 0) || (options[:reset_time] > 0xFFFF)
-      rescue => exception
+      rescue 
         raise ArgumentError, "error in reset time: #{options[:reset_time]}. Should be Integer in range 0..65535 ms"
       end
 
@@ -18,7 +18,7 @@ module Dino
       options[:pulse_limit] ||= 100
       begin
         raise ArgumentError if (options[:pulse_limit] < 0) || (options[:pulse_limit] > 0xFF)
-      rescue => exception
+      rescue
         raise ArgumentError, "error in pulse limit: #{options[:pulse_limit]}. Should be Integer in range 0..255 pulses"
       end
 
@@ -26,7 +26,7 @@ module Dino
       options[:timeout] ||= 200
       begin
         raise ArgumentError if (options[:timeout] < 0) || (options[:timeout] > 0xFFFF)
-      rescue => exception
+      rescue
         raise ArgumentError, "error in timeout: #{options[:timeout]}. Should be Integer in range 0..65535 ms"
       end
       

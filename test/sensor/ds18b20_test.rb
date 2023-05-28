@@ -7,8 +7,8 @@ class DS18B20Test < MiniTest::Test
 
   def bus
     return @bus if @bus
-    # Parasite power response.
-    board.inject_read("1:0")
+    # Respond with disabled parasite power.
+    board.inject_read_for_pin(1, "1")
     @bus ||= Dino::OneWire::Bus.new(board: board, pin: 1)
   end
 
@@ -47,23 +47,44 @@ class DS18B20Test < MiniTest::Test
 
   def test_convert_is_atomic
     mock = MiniTest::Mock.new.expect(:call, nil)
-    part.stub(:atomically, mock) { part.convert }
+    part.stub(:atomically, mock) do
+      part.convert
+    end
+    mock.verify
   end
 
   def test_convert_matches_first
-    mock = MiniTest::Mock.new.expect(:call, nil)
-    part.stub(:match, mock) { part.convert}
+    match_mock = MiniTest::Mock.new.expect(:call, nil)
+    sleep_mock = MiniTest::Mock.new.expect(:call, nil, [0.75])
+    
+    part.stub(:match, match_mock) do
+      part.stub(:sleep, sleep_mock) do
+        part.convert
+      end
+    end
+    match_mock.verify
   end
 
   def test_convert_sends_the_command
-    mock = MiniTest::Mock.new
-    mock.expect(:call, nil, [0xCC])
-    mock.expect(:call, nil, [0x44])
-    bus.stub(:write, mock) { part.convert }
+    write_mock = MiniTest::Mock.new
+    write_mock.expect(:call, nil, [0xCC])
+    write_mock.expect(:call, nil, [0x44])
+    sleep_mock = MiniTest::Mock.new.expect(:call, nil, [0.75])
+
+    bus.stub(:write, write_mock) do
+      part.stub(:sleep, sleep_mock) do
+        part.convert
+      end  
+    end
+    write_mock.verify
   end
 
   def test_convert_sets_max_convert_time_first
-    part.convert
+    sleep_mock = MiniTest::Mock.new.expect(:call, nil, [0.75])
+    part.stub(:sleep, sleep_mock) do 
+      part.convert
+    end
+
     assert_equal 0.75, part.instance_variable_get(:@convert_time)
   end
 
@@ -72,6 +93,7 @@ class DS18B20Test < MiniTest::Test
     part.stub(:sleep, mock) do
       part.convert
     end
+    mock.verify
   end
 
   def test_convert_sleeps_inside_lock_if_parasite_power

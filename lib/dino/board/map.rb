@@ -22,7 +22,7 @@ module Dino
       return "EE" if pin == "EE"
 
       # Convert non numerical strings to symbols.
-      pin = pin.to_sym if (pin.class == String) && !(pin.match /\A\d+\.*\d*/)
+      pin = pin.to_sym if (pin.class == String) && !(pin.match (/\A\d+\.*\d*/))
 
       # Handle symbols.
       if (pin.class == Symbol)
@@ -41,7 +41,7 @@ module Dino
       # Try #to_i on anyting else. Will catch numerical strings.
       begin
         return pin.to_i
-      rescue => exception
+      rescue
         raise ArgumentError, "error in pin: #{pin.inspect}"
       end
     end
