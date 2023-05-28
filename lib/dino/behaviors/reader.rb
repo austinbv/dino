@@ -35,7 +35,7 @@ module Dino
       
       def block_until_read
         loop do
-          break if !@callbacks[:read]
+          break if !callbacks[:read]
           sleep 0.001
         end
       end
