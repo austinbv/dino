@@ -210,6 +210,7 @@ module Dino
   module OneWire
     class Bus
       def sleep(time)
+        super(0.001)
       end
     end
   end
