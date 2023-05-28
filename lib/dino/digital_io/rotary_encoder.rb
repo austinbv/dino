@@ -58,21 +58,21 @@ module Dino
       # So read the pins directly and update state.
       #
       def read_pins_pi
-        @encoder_state = (clock.read << 1) | data.read
-        change = 0
+        @encoder_state = (board.digital_read_raw(clock.pin) << 1) | board.digital_read_raw(data.pin)
+        @step_change = 0
 
         if (@encoder_state == 0b00)
-          change = -1 if @encoder_state_last == 0b10
-          change =  1 if @encoder_state_last == 0b01
+          @step_change = -1 if @encoder_state_last == 0b10
+          @step_change =  1 if @encoder_state_last == 0b01
         end
         
         if (@encoder_state == 0b11)
-          change = -1 if @encoder_state_last == 0b01
-          change =  1 if @encoder_state_last == 0b10
+          @step_change = -1 if @encoder_state_last == 0b01
+          @step_change =  1 if @encoder_state_last == 0b10
         end
 
-        self.update(change) if (change != 0)
-
+        self.update(@step_change) if (@step_change != 0)
+                
         @encoder_state_last = @encoder_state
       end
       
