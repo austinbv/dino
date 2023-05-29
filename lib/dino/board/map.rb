@@ -18,9 +18,6 @@ module Dino
     end
     
     def convert_pin(pin)
-      # Handle special case of built-in EEPROM "pin".
-      return "EE" if pin == "EE"
-
       # Convert non numerical strings to symbols.
       pin = pin.to_sym if (pin.class == String) && !(pin.match (/\A\d+\.*\d*/))
 

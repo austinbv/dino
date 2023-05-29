@@ -105,7 +105,7 @@ class BoardTest < Minitest::Test
     
     # Special EEPROM mock.
     mock3 = MiniTest::Mock.new.expect(:update, nil, ["bytes"])
-    4.times { mock3.expect(:pin, 'EE') }
+    4.times { mock3.expect(:pin, 254) }
      
     board.add_component(mock1)
     board.add_component(mock2)
@@ -113,7 +113,7 @@ class BoardTest < Minitest::Test
     board.update("1:data")
     board.update("14:with:colon")
     board.update("3:ignore")
-    board.update("EE:bytes")
+    board.update("254:bytes")
     mock1.verify
     mock2.verify
     mock3.verify
@@ -128,7 +128,6 @@ class BoardTest < Minitest::Test
     assert_equal 15,    board.convert_pin('A1')
     assert_equal 15,    board.convert_pin(:A1)
     assert_equal 14,    board.convert_pin('DAC0')
-    assert_equal "EE",  board.convert_pin('EE')
   end
 
   def test_convert_pin_incorrect

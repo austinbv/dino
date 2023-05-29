@@ -11,7 +11,7 @@ class BoardMock < Dino::Board
     string = @eeprom_stub[start_address, length].map{ |x| x.to_s }.join(",")
     
     # Update ourselves with it.
-    self.update("EE:#{start_address}-#{string}\n")
+    self.update("254:#{start_address}-#{string}\n")
   end
 
   def eeprom_write(start_address, bytes)
@@ -29,7 +29,7 @@ class BuiltInEEPROMTest < Minitest::Test
   end
   
   def test_pin_ee
-    assert_equal part.pin, "EE"
+    assert_equal part.pin, 254
   end
 
   def test_loads_on_initialize_and_updates_correctly

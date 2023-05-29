@@ -19,8 +19,8 @@ void Dino::eepromRead(){
 	  
     uint16_t startAddress = ((uint16_t)auxMsg[1] << 8) | auxMsg[0];
 
-    // Stream read bytes as if coming from a pin named 'EE'.
-    stream->print("EE");
+    // Use pin 254 as a "virtual pin" for the built-in EEPROM.
+    stream->print("254");
     stream->print(':');
     stream->print(startAddress);
     stream->print('-');

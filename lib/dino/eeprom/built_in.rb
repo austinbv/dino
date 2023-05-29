@@ -6,7 +6,11 @@ module Dino
 
       public :state=
 
-      def after_initialize(options)
+      def pin
+        254
+      end
+
+      def after_initialize(options={})
         super(options)
         self.state = Array.new(board.eeprom_length, nil)
         load
@@ -59,10 +63,6 @@ module Dino
         @state_mutex.synchronize do
           @state[hash[:address], hash[:data].length] = hash[:data]
         end
-      end
-
-      def pin
-        "EE"
       end
     end
   end
