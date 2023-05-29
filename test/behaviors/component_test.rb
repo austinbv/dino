@@ -4,7 +4,7 @@ class BaseComponent
   include Dino::Behaviors::Component
 end
 
-class BaseSetupTest < Minitest::Test
+class ComponentTest < Minitest::Test
   def board
     @board ||= BoardMock.new
   end

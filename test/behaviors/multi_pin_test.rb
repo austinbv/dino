@@ -10,7 +10,7 @@ class MultiPinComponent
   end
 end
 
-class MultiPinSetupTest < Minitest::Test
+class MultiPinTest < Minitest::Test
   def board
     @board ||= BoardMock.new
   end

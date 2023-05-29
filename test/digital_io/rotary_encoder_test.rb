@@ -43,7 +43,7 @@ class RotaryEncoderTest < MiniTest::Test
     refute_empty part.clock.callbacks
     assert_empty part.data.callbacks
         
-    part2 = Dino::DigitalIO::RotaryEncoder.new board: board, pins: {data:4, clock: 3}
+    part2 = Dino::DigitalIO::RotaryEncoder.new board: board, pins: {data:6, clock: 5}
     
     refute_empty part2.data.callbacks
     assert_empty part2.clock.callbacks

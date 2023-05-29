@@ -4,7 +4,7 @@ class SinglePinComponent
   include Dino::Behaviors::SinglePin
 end
 
-class SinglePinSetupTest < Minitest::Test
+class SinglePinTest < Minitest::Test
   def board
     @board ||= BoardMock.new
   end
@@ -30,12 +30,12 @@ class SinglePinSetupTest < Minitest::Test
   end
 
   def test_converts_pin_before_saving
-    c1 = SinglePinComponent.new(board: board, pin: :A0)
-    c2 = SinglePinComponent.new(board: board, pin: :DAC0)
+    c1 = SinglePinComponent.new(board: board, pin: :DAC0)
+    c2 = SinglePinComponent.new(board: board, pin: :A1)
     c3 = SinglePinComponent.new(board: board, pin: :SDA)
 
     assert_equal 14, c1.pin
-    assert_equal 14, c2.pin
+    assert_equal 15, c2.pin
     assert_equal 20, c3.pin
   end
 end

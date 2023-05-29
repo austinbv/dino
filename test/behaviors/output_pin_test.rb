@@ -4,7 +4,7 @@ class OutputComponent
   include Dino::Behaviors::OutputPin
 end
 
-class OutputSetupTest < Minitest::Test
+class OutputPinTest < Minitest::Test
   def board
     @board ||= BoardMock.new
   end

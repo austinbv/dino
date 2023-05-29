@@ -89,8 +89,8 @@ module Dino
     def update(line)
       pin, message = line.split(":", 2)
       pin = pin.to_i
-      components.each do |part|
-        part.update(message) if pin == part.pin
+      if single_pin_components[pin]
+        single_pin_components[pin].update(message)
       end
     end
 

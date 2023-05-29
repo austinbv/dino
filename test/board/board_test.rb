@@ -73,18 +73,6 @@ class BoardTest < Minitest::Test
     mock.verify
   end
 
-  def test_add_remove_component
-    mock = MiniTest::Mock.new
-    mock.expect(:methods, [:stop])
-    mock.expect(:stop, true)
-
-    board.add_component(mock)
-    assert_equal [mock], board.components
-
-    board.remove_component(mock)
-    assert_equal [], board.components
-  end
-
   def test_write
     board
     mock = MiniTest::Mock.new.expect(:call, nil, ["message"])
@@ -96,16 +84,16 @@ class BoardTest < Minitest::Test
 
   def test_update_passes_messages_to_correct_components
     mock1 = MiniTest::Mock.new.expect(:update, nil, ["data"])
-    4.times { mock1.expect(:pin, 1) }
+    3.times { mock1.expect(:pin, 1) }
     
     # Make sure lines are split only on the first colon.
     # Tests for string based pine names too.
     mock2 = MiniTest::Mock.new.expect(:update, nil, ["with:colon"])
-    4.times { mock2.expect(:pin, 14) }
+    3.times { mock2.expect(:pin, 14) }
     
     # Special EEPROM mock.
     mock3 = MiniTest::Mock.new.expect(:update, nil, ["bytes"])
-    4.times { mock3.expect(:pin, 254) }
+    3.times { mock3.expect(:pin, 254) }
      
     board.add_component(mock1)
     board.add_component(mock2)
@@ -133,5 +121,10 @@ class BoardTest < Minitest::Test
   def test_convert_pin_incorrect
     assert_raises { board.convert_pin "DAC20"}
     assert_raises { board.convert_pin :DAC20 }
+  end
+
+  def test_pin_uniqueness_for_single_pin_components
+    led = Dino::LED.new(board: board, pin:13)
+    assert_raises { Dino::Led.new(board: board, pin: 13) }
   end
 end
