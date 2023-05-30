@@ -37,9 +37,7 @@ module Dino
 
     # CMD = 3
     def pwm_write(pin,value)
-      begin
-        raise ArgumentError if (value < 0) || (value > pwm_high)
-      rescue
+      if  (value < 0) || (value > pwm_high)
         raise ArgumentError, "cannot write PWM value: #{value}. Should be Integer in range 0..#{pwm_high} "
       end
       write Message.encode command: 3, pin: pin, value: value.round
@@ -47,9 +45,7 @@ module Dino
     
     # CMD = 4
     def dac_write(pin,value)
-      begin
-        raise ArgumentError if (value < 0) || (value > dac_high)
-      rescue
+      if (value < 0) || (value > dac_high)
         raise ArgumentError, "cannot write DAC value: #{value}. Should be Integer in range 0..#{dac_high} "
       end
       write Message.encode command: 4, pin: pin, value: value.round
@@ -77,10 +73,8 @@ module Dino
       end
       
       # Convert divider to exponent and validate.
-      begin
-        exponent = Math.log2(options[:divider]).round
-        raise ArgumentError if (exponent < 0) || (exponent > 7)
-      rescue
+      exponent = Math.log2(options[:divider]).round
+      if (exponent < 0) || (exponent > 7)
         raise ArgumentError, "error in divider: #{options[:divider]}. Should be one of: #{DIVIDERS.inspect}"
       end
 
@@ -132,9 +126,7 @@ module Dino
 
     # CMD = 96
     def set_analog_write_resolution(value)
-      begin
-        raise ArgumentError if (value < 0) || (value > 16)
-      rescue
+      if (value < 0) || (value > 16)
         raise ArgumentError, "cannot set resolution: #{value}. Should be Integer in range 0..16"
       end
       write Message.encode(command: 96, value: value)
@@ -142,9 +134,7 @@ module Dino
     
     # CMD = 97
     def set_analog_read_resolution(value)
-      begin
-        raise ArgumentError if (value < 0) || (value > 16)
-      rescue
+      if (value < 0) || (value > 16)
         raise ArgumentError, "cannot set resolution: #{value}. Should be Integer in range 0..16"
       end
       write Message.encode(command: 97, value: value)
@@ -152,9 +142,7 @@ module Dino
 
     # CMD = 99
     def micro_delay(duration)
-      begin
-        raise ArgumentError if (duration < 0) || (duration > 0xFFFF)
-      rescue
+      if (duration < 0) || (duration > 0xFFFF)
         raise ArgumentError, "error in duration: #{duration}. Should be Integer in range 0..65535"
       end
       write Message.encode command: 99, aux_message: pack(:uint16, [duration])

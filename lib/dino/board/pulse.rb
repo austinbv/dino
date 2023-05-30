@@ -8,25 +8,19 @@ module Dino
       
       # How long to hold the rest for, in milliseconds.
       options[:reset_time] ||= 0
-      begin
-        raise ArgumentError if (options[:reset_time] < 0) || (options[:reset_time] > 0xFFFF)
-      rescue 
+      if (options[:reset_time] < 0) || (options[:reset_time] > 0xFFFF)
         raise ArgumentError, "error in reset time: #{options[:reset_time]}. Should be Integer in range 0..65535 ms"
       end
 
       # Maximum number of pulses to capture.
       options[:pulse_limit] ||= 100
-      begin
-        raise ArgumentError if (options[:pulse_limit] < 0) || (options[:pulse_limit] > 0xFF)
-      rescue
+      if (options[:pulse_limit] < 0) || (options[:pulse_limit] > 0xFF)
         raise ArgumentError, "error in pulse limit: #{options[:pulse_limit]}. Should be Integer in range 0..255 pulses"
       end
 
       # A pulse of this length will end the read.
       options[:timeout] ||= 200
-      begin
-        raise ArgumentError if (options[:timeout] < 0) || (options[:timeout] > 0xFFFF)
-      rescue
+      if (options[:timeout] < 0) || (options[:timeout] > 0xFFFF)
         raise ArgumentError, "error in timeout: #{options[:timeout]}. Should be Integer in range 0..65535 ms"
       end
       
