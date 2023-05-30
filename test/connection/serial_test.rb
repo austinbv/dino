@@ -2,16 +2,6 @@ require_relative '../test_helper'
 
 require "rubyserial"
 
-class DummySerial
-  def read
-    ""
-  end
-
-  def write(message)
-    nil
-  end
-end
-
 class SerialConnectionTest < Minitest::Test
   def mock_tty_device
     "/dev/mock_serial"
@@ -132,19 +122,25 @@ class SerialConnectionTest < Minitest::Test
     assert_nil connection.instance_variable_get(:@write_thread)
   end
 
-  def test_write
-    # Message is appended to the buffer.
+  def test_write_adds_to_buffer
     connection.send(:stop_write)
     connection.write('message')
     assert_equal connection.instance_variable_get("@write_buffer"), "message"
-    
+  end
+
+  def test_write_thread_removes_from_buffer
+    connection.send(:stop_write)
+    connection.write('message')
+
     # Message is written from buffer when we start the write thread.
     mock = MiniTest::Mock.new.expect :call, nil, ['message']
     connection.stub(:_write, mock) do
-      connection.send(:start_write)
-      sleep 0.005
+      # Start the write thread and wait for the buffer to empty.
+      connection.send(:start_write)  
+      sleep 0.001 while connection.instance_variable_get("@write_buffer") != ""
     end
     mock.verify
+
     assert_equal connection.instance_variable_get("@write_buffer"), ""
   end
 
