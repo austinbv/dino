@@ -137,7 +137,7 @@ class SerialConnectionTest < Minitest::Test
     connection.stub(:_write, mock) do
       # Start the write thread and wait for the buffer to empty.
       connection.send(:start_write)  
-      sleep 0.001 while connection.instance_variable_get("@write_buffer") != ""
+      sleep 0.100 while connection.instance_variable_get("@write_buffer") != ""
     end
     mock.verify
 
