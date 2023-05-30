@@ -258,21 +258,24 @@ module Dino
         # 0th character in font is SPACE. Offset and limit to printable chars.
         index = char.ord - 32
         index = 0 if (index < 0 || index > 94)
-        
         char_map = FONT_6x8[index]
 
-        # Get the starting byte index
+        raw_char(char_map)
+      end
+
+      def raw_char(byte_array)
+        # Get the starting byte index.
         page = text_cursor[1] / 8
         byte_index = (@columns * page) + text_cursor[0]
 
         # Replace those bytes in the framebuffer with the character.
-        char_map.each do |byte| 
+        byte_array.each do |byte| 
           @framebuffer[byte_index] = byte
           byte_index += 1
         end
 
         # Increment the text cursor.
-        self.text_cursor[0] += 6
+        self.text_cursor[0] += byte_array.length
       end
     end
   end
