@@ -12,7 +12,7 @@ module Dino
       def proxy_states
         hash = {}
         proxies.each_key do |key|
-          hash[key] = self.proxies[key].state rescue nil
+          hash[key] = proxies[key].state if self.proxies[key]
         end
         hash
       end
