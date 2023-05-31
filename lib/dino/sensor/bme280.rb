@@ -179,8 +179,18 @@ module Dino
       end
       
       def pre_callback_filter(data)
-        # Readings are always 8 bytes. Let calibration data pass through unmodified.
-        data.length == 8 ? decode_reading(data) : data
+        if data.length == 8
+          return decode_reading(data)
+        elsif data.length == 26
+          process_calibration_a(data)
+          return nil
+        elsif data.length == 7
+          process_calibration_b(data)
+          return nil
+        else
+          # Ignores readings that aren't 8 bytes.
+          return nil
+        end
       end
       
       def update_state(reading)
@@ -286,15 +296,21 @@ module Dino
       attr_reader :calibration_data_loaded
       
       def get_calibration_data        
-        # Temporarily disable callbacks.
-        @callback_mutex.synchronize do
-          @temp_callbacks = @callbacks.dup
-          @callbacks = {}
+        # First group of calibration bytes, sent to #process_calibration_a.
+        read_using -> { i2c_read(0x88, 26) }
+
+        # Second group of calibration bytes, only on BME280, sent to #process_calibration_b.
+        if humidity_available?
+          read_using -> { i2c_read 0xE1, 7 }
         end
 
-        # First group of calibration bytes.
-        cal_a = read_using -> { i2c_read(0x88, 26) }
+        if (@calibration[:cal_a] && @calibration[:cal_b]) || (@calibration[:cal_a] && !humidity_available?)
+          @calibration.delete(:cal_a).delete(:cal_b)
+          @calibration_data_loaded = true
+        end
+      end
 
+      def process_calibration_a(cal_a)
         if cal_a
           @calibration = {
             t1: cal_a[0..1].pack('C*').unpack('S<')[0],
@@ -311,32 +327,21 @@ module Dino
             p8: cal_a[20..21].pack('C*').unpack('s<')[0],
             p9: cal_a[22..23].pack('C*').unpack('s<')[0],
           }
+          @calibration[:cal_a] = cal_a
         end
+      end
 
-        # Second group of calibration bytes, mostly for humidity. Not available on BMP280.
-        if cal_a && humidity_available?
-          cal_b = read_using -> { i2c_read 0xE1, 7 }
-          
-          if cal_b
-            @calibration.merge!(
-              h1: cal_a[25],
-              h2: cal_b[0..1].pack('C*').unpack('s<')[0],
-              h3: cal_b[2],
-              h4: [(cal_b[3] << 4) | (cal_b[4] & 0b00001111)].pack('S').unpack('s')[0],
-              h5: [(cal_b[5] << 4) | (cal_b[4] >> 4)        ].pack('S').unpack('s')[0],
-              h6: [cal_b[6]].pack('C').unpack('c')[0]
-            )
-          end
-        end
-
-        if (cal_a && cal_b && humidity_available?) || (cal_a && !humidity_available?)
-          @calibration_data_loaded = true
-        end
-
-        # Reenable callbacks.
-        @callback_mutex.synchronize do
-          @callbacks = @temp_callbacks.dup
-          @temp_callbacks = {}
+      def process_calibration_b(cal_b)
+        if cal_b && @calibration[:cal_a]
+          @calibration.merge!(
+            h1: @calibration[:cal_a][25],
+            h2: cal_b[0..1].pack('C*').unpack('s<')[0],
+            h3: cal_b[2],
+            h4: [(cal_b[3] << 4) | (cal_b[4] & 0b00001111)].pack('S').unpack('s')[0],
+            h5: [(cal_b[5] << 4) | (cal_b[4] >> 4)        ].pack('S').unpack('s')[0],
+            h6: [cal_b[6]].pack('C').unpack('c')[0]
+          )
+          @calibration[:cal_b] = cal_b
         end
       end
     end
