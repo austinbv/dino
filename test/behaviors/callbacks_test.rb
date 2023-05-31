@@ -9,6 +9,15 @@ class CallbackComponent
   end
 end
 
+class CallbackComponentNilFilter
+  include Dino::Behaviors::Component
+  include Dino::Behaviors::Callbacks
+
+  def pre_callback_filter(data)
+    nil
+  end
+end
+
 class CallbacksTest < Minitest::Test
   def board
     @board ||= BoardMock.new
@@ -84,5 +93,26 @@ class CallbacksTest < Minitest::Test
   def test_update_state
     part.update("test")
     assert_equal "dino: test", part.state
+  end
+
+  def test_no_state_update_when_data_nil
+    part.update("test")
+    part.update(nil)
+    assert_equal "dino: test", part.state
+  end
+
+  def test_no_callback_with_data_input_nil
+    value = 0
+    part.add_callback { value = 1 }
+    part.update(nil)
+    assert_equal 0, value 
+  end
+
+  def test_no_callbacks_with_filter_returning_nil
+    part2 = CallbackComponentNilFilter.new(board: board, pin: 2)
+    value = 0
+    part2.add_callback { value = 1 }
+    part2.update("anything")
+    assert_equal 0, value 
   end
 end

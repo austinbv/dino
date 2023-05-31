@@ -39,6 +39,12 @@ module Dino
 
         filtered_data = pre_callback_filter(data)
 
+        # nil will unblock #read without running callbacks.
+        unless filtered_data
+          remove_callback(:read)
+          return nil
+        end
+
         callback_mutex.synchronize do
           @callbacks.each_value do |array|
             array.each do |callback|
