@@ -284,43 +284,60 @@ module Dino
       # Calibration Methods
       #
       attr_reader :calibration_data_loaded
-
-      def get_calibration_data
-        # First group of calibration bytes.
-        a = read_using -> { i2c_read(0x88, 26) }
-        return nil unless a
-        
-        @calibration = {
-          t1: a[0..1].pack('C*').unpack('S<')[0],
-          t2: a[2..3].pack('C*').unpack('s<')[0],
-          t3: a[4..5].pack('C*').unpack('s<')[0],
-
-          p1: a[6..7].pack('C*').unpack('S<')[0],
-          p2: a[8..9].pack('C*').unpack('s<')[0],
-          p3: a[10..11].pack('C*').unpack('s<')[0],
-          p4: a[12..13].pack('C*').unpack('s<')[0],
-          p5: a[14..15].pack('C*').unpack('s<')[0],
-          p6: a[16..17].pack('C*').unpack('s<')[0],
-          p7: a[18..19].pack('C*').unpack('s<')[0],
-          p8: a[20..21].pack('C*').unpack('s<')[0],
-          p9: a[22..23].pack('C*').unpack('s<')[0],
-        }
-        
-        # Second group of calibration bytes, mostly for humidity. Not available on BMP280.
-        if humidity_available?
-          b = read_using -> { i2c_read 0xE1, 7 }
-          return nil unless b
-
-          @calibration.merge!(
-            h1: a[25],
-            h2: b[0..1].pack('C*').unpack('s<')[0],
-            h3: b[2],
-            h4: [(b[3] << 4) | (b[4] & 0b00001111)].pack('S').unpack('s')[0],
-            h5: [(b[5] << 4) | (b[4] >> 4)        ].pack('S').unpack('s')[0],
-            h6: [b[6]].pack('C').unpack('c')[0]
-          )
+      
+      def get_calibration_data        
+        # Temporarily disable callbacks.
+        @callback_mutex.synchronize do
+          @temp_callbacks = @callbacks.dup
+          @callbacks = {}
         end
-        @calibration_data_loaded = true
+
+        # First group of calibration bytes.
+        cal_a = read_using -> { i2c_read(0x88, 26) }
+
+        if cal_a
+          @calibration = {
+            t1: cal_a[0..1].pack('C*').unpack('S<')[0],
+            t2: cal_a[2..3].pack('C*').unpack('s<')[0],
+            t3: cal_a[4..5].pack('C*').unpack('s<')[0],
+
+            p1: cal_a[6..7].pack('C*').unpack('S<')[0],
+            p2: cal_a[8..9].pack('C*').unpack('s<')[0],
+            p3: cal_a[10..11].pack('C*').unpack('s<')[0],
+            p4: cal_a[12..13].pack('C*').unpack('s<')[0],
+            p5: cal_a[14..15].pack('C*').unpack('s<')[0],
+            p6: cal_a[16..17].pack('C*').unpack('s<')[0],
+            p7: cal_a[18..19].pack('C*').unpack('s<')[0],
+            p8: cal_a[20..21].pack('C*').unpack('s<')[0],
+            p9: cal_a[22..23].pack('C*').unpack('s<')[0],
+          }
+        end
+
+        # Second group of calibration bytes, mostly for humidity. Not available on BMP280.
+        if cal_a && humidity_available?
+          cal_b = read_using -> { i2c_read 0xE1, 7 }
+          
+          if cal_b
+            @calibration.merge!(
+              h1: cal_a[25],
+              h2: cal_b[0..1].pack('C*').unpack('s<')[0],
+              h3: cal_b[2],
+              h4: [(cal_b[3] << 4) | (cal_b[4] & 0b00001111)].pack('S').unpack('s')[0],
+              h5: [(cal_b[5] << 4) | (cal_b[4] >> 4)        ].pack('S').unpack('s')[0],
+              h6: [cal_b[6]].pack('C').unpack('c')[0]
+            )
+          end
+        end
+
+        if (cal_a && cal_b && humidity_available?) || (cal_a && !humidity_available?)
+          @calibration_data_loaded = true
+        end
+
+        # Reenable callbacks.
+        @callback_mutex.synchronize do
+          @callbacks = @temp_callbacks.dup
+          @temp_callbacks = {}
+        end
       end
     end
     
