@@ -121,14 +121,15 @@ void Dino::process() {
     #endif
 
     // Implemented in DinoSerialBB.cpp
-    #ifdef DINO_SERIAL
-    case 12: handleSerial (); break;
+    #ifdef DINO_UART_BB
+    case 12: uartBBSetup (); break;
+    case 13: uartBBWrite (); break;
     #endif
 
     // Implemented in DinoUART.cpp
     #ifdef DINO_UARTS
-    case 13: uartSetup  (); break;
-    case 14: uartWrite  (); break;
+    case 14: uartSetup  (); break;
+    case 15: uartWrite  (); break;
     #endif
 
     // Implemented in DinoIROut.cpp
@@ -229,6 +230,10 @@ void Dino::updateListeners() {
 
     #ifdef DINO_UARTS
       uartUpdateListeners();
+    #endif
+
+    #ifdef DINO_UART_BB
+      uartBBUpdateListener();
     #endif
   }
 }

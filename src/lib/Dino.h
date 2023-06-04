@@ -101,11 +101,32 @@ class Dino {
     void servoWrite         (); //cmd = 11
     void handleSerial       (); //cmd = 12
 
-    void uartSetup          (); //cmd = 13
-    void uartBegin          (uint8_t index, uint32_t baud);
-    void uartEnd            (uint8_t index);
-    void uartWrite          (); //cmd = 14
-    void uartUpdateListeners();
+    // Single Bit Bang UART
+    #ifdef DINO_UART_BB
+      SoftwareSerial uartBB = SoftwareSerial(10,11);
+      uint8_t uartBBTx;
+      uint8_t uartBBRx;
+      bool uartBBListen = false;
+
+      void uartBBBegin          (uint32_t baud);
+      void uartBBEnd            ();
+      void uartBBSetup          (); //cmd = 12
+      void uartBBWrite          (); //cmd = 13
+      void uartBBUpdateListener ();
+    #endif
+
+    // Up to 3 extra hardware UARTs
+    #ifdef DINO_UARTS
+      HardwareSerial* uarts[DINO_UARTS+1];
+      bool uartListenStates[DINO_UARTS+1];
+      byte uartRxPins[DINO_UARTS+1];
+
+      void uartBegin            (uint8_t index, uint32_t baud);
+      void uartEnd              (uint8_t index);
+      void uartSetup            (); //cmd = 14
+      void uartWrite            (); //cmd = 15
+      void uartUpdateListeners  ();
+    #endif
 
     void irSend             (); //cmd = 16
     void tone               (); //cmd = 17
@@ -234,11 +255,5 @@ class Dino {
         uint8_t  enabled;   // 0 = disabled, 1 = hardware, 2 = bit bang.
       };
       SpiListener spiListeners[SPI_LISTENER_COUNT];
-    #endif
-
-    #ifdef DINO_UARTS
-      HardwareSerial* uarts[DINO_UARTS+1];
-      bool uartListenStates[DINO_UARTS+1];
-      byte uartRxPins[DINO_UARTS+1];
     #endif
 };

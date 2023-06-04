@@ -12,7 +12,7 @@ class DinoCLI::Generator
 
     # Other ATmega chips do everything.
     # Add bit bang serial for 328p / UNO since ith as no extra hardware UART.
-    mega: STANDARD_PACKAGES + [:serial_bb],
+    mega: STANDARD_PACKAGES + [:uart_bb],
 
     # No tone or IR support on SAM3X / Due.
     sam3x: STANDARD_PACKAGES - [:tone, :ir_out],

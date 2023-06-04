@@ -62,10 +62,10 @@ void Dino::uartSetup() {
 
   if (enable > 0) {
     // RP2040 crashes with 32-bit reinterpret_cast.
-    uint32_t  baudRate  = (uint32_t)auxMsg[0];
-              baudRate |= (uint32_t)auxMsg[1] << 8;
-              baudRate |= (uint32_t)auxMsg[2] << 16;
-              baudRate |= (uint32_t)auxMsg[3] << 24;
+    uint32_t  baud  = (uint32_t)auxMsg[0];
+              baud |= (uint32_t)auxMsg[1] << 8;
+              baud |= (uint32_t)auxMsg[2] << 16;
+              baud |= (uint32_t)auxMsg[3] << 24;
 
     // Serial1 on ESP8266 can't read.
     #ifndef ESP8266
@@ -77,7 +77,7 @@ void Dino::uartSetup() {
       }
     #endif
 
-    uartBegin(index, baudRate);
+    uartBegin(index, baud);
   } else {
     uartEnd(index);
   }

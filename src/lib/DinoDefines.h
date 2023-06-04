@@ -15,39 +15,28 @@
 // #define DINO_SPI
 // #define DINO_SERVO
 // #define DINO_UART
-// #define DINO_SERIAL_BB
+// #define DINO_UART_BB
 // #define DINO_IR_OUT
 // #define DINO_LED_ARRAY
 
 // Include libraries for specific LED array protocols.
 #ifdef DINO_LED_ARRAY
-# define DINO_LED_WS2812
+  #define DINO_LED_WS2812
 #endif
 
 // Define number of pins to set up listener storage.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#  define PIN_COUNT 70
+  #define PIN_COUNT 70
 #elif defined(__SAM3X8E__)
-#  define PIN_COUNT 72
+  #define PIN_COUNT 72
 #elif defined(ESP8266)
-#  define PIN_COUNT 18
+  #define PIN_COUNT 18
 #elif defined(ESP32)
-#  define PIN_COUNT 40
+  #define PIN_COUNT 40
 #elif defined(ARDUINO_ARCH_RP2040)
-#  define PIN_COUNT 26
+  #define PIN_COUNT 26
 #else
-#  define PIN_COUNT 22
-#endif
-
-// If no high usage features (core sketch), 32 + 16.
-#if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_SERIAL) && !defined(DINO_IR_OUT) && !defined(DINO_LED_ARRAY)
-#  define AUX_SIZE 48
-// If using IR_OUT or LED_ARRAY, and not on the ATmega168, 512 + 16.
-#elif (defined(DINO_IR_OUT) || defined(DINO_LED_ARRAY)) && !defined(__AVR_ATmega168__)
-# define AUX_SIZE 528
-// Default aux message size to 256 + 16 bytes.
-#else
-# define AUX_SIZE 272
+  #define PIN_COUNT 22
 #endif
 
 // No EEPROM on the Due or Zero.
@@ -109,4 +98,19 @@
       #define DINO_UARTS 1
     #endif
   #endif
+#endif
+
+#ifdef DINO_UART_BB
+  #include <SoftwareSerial.h>
+#endif
+
+// If no high usage features (core sketch), 32 + 16.
+#if !defined(DINO_SHIFT) && !defined (DINO_I2C) && !defined(DINO_SPI) && !defined(DINO_UARTS) && !defined(DINO_UART_BB) && !defined(DINO_IR_OUT) && !defined(DINO_LED_ARRAY)
+  #define AUX_SIZE 48
+// If using IR_OUT or LED_ARRAY, and not on the ATmega168, 512 + 16.
+#elif (defined(DINO_IR_OUT) || defined(DINO_LED_ARRAY)) && !defined(__AVR_ATmega168__)
+  #define AUX_SIZE 528
+// Default aux message size to 256 + 16 bytes.
+#else
+  #define AUX_SIZE 272
 #endif

@@ -46,13 +46,12 @@ PACKAGES = {
       "DinoI2C.cpp",
     ]
   },
-  serial_bb: {
+  uart_bb: {
     description: "Bit bang serial output",
-    directive: "DINO_SERIAL_BB",
+    directive: "DINO_UART_BB",
     only: [:mega, :mega168],
     files: [
-      "DinoSerialBB.cpp",
-      "DinoSerialBB.h",
+      "DinoUARTBB.cpp",
     ]
   },
   uart: {

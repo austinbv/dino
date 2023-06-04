@@ -1,5 +1,5 @@
 #
-# Example that writes to TX pin of a hardware UART and reads back on RX pin of same UART.
+# Example that writes to TX pin of hardware UART1 and reads back on RX pin of same UART.
 #
 require 'bundler/setup'
 require 'dino'

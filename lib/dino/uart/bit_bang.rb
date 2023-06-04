@@ -1,30 +1,62 @@
 module Dino
   module UART
+    class UARTRxPin
+      include Behaviors::InputPin
+      include Behaviors::Callbacks
+    end
+
     class BitBang
       include Behaviors::MultiPin
-      attr_accessor :baud
-
-      COMMAND = 12
+      include Behaviors::Callbacks
+      
+      attr_reader :baud
 
       def initialize_pins(options={})
-        require_pin(:rx)
         require_pin(:tx)
+        proxy_pin(:rx, UARTRxPin)
       end
 
       def after_initialize(options={})
-        self.baud = options[:baud]
-        board.write Message.encode command: COMMAND, value: 0, aux_message: encoded_pins
-        board.write Message.encode command: COMMAND, value: 1, aux_message: self.baud
-      end
-      
-      def puts(string)
-        board.write Message.encode command: COMMAND, value: 3, aux_message: string
+        hook_rx_callback
+        initialize_buffer
+        start(options[:baud] || 9600)
       end
 
-      private
+      def initialize_buffer
+        @buffer       = ""
+        @buffer_mutex = Mutex.new
+        self.add_callback(:buffer) do |data|
+          @buffer_mutex.synchronize do
+            @buffer = "#{@buffer}#{data}"
+          end
+        end
+      end
 
-      def encoded_pins
-        [pins[:rx], pins[:tx]].compact.join(',')
+      def gets
+        @buffer_mutex.synchronize do
+          newline = @buffer.index("\n")
+          return nil unless newline
+          line = @buffer[0..newline-1]
+          @buffer = @buffer[newline+1..-1]
+          return line
+        end
+      end
+
+      def start(baud)
+        @baud = baud
+        board.uart_bb_start(pins[:tx], pins[:rx], @baud)
+      end
+
+      def stop()
+        board.uart_bb_stop
+      end
+
+      def write(data)
+        board.uart_bb_write(data)
+      end
+
+      def hook_rx_callback
+        rx.add_callback {|data| self.update(data)}
       end
     end
   end

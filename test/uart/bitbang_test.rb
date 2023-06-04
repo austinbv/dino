@@ -1,6 +1,8 @@
 require_relative '../test_helper'
 
-class SoftwareSerialTest < MiniTest::Test
+class UARTBitBangTest < MiniTest::Test
+  include TestPacker
+
   def board
     @board ||= BoardMock.new
   end
@@ -11,20 +13,24 @@ class SoftwareSerialTest < MiniTest::Test
 
   def test_initialize
     mock = MiniTest::Mock.new
-    mock.expect :call, nil, ["12..0.10,11\n"]
-    mock.expect :call, nil, ["12..1.4800\n"]
+    # Set RX to input
+    mock.expect :call, nil, ["0.10.1\n"]
+    # Start BB UART
+    aux = pack(:uint32, 4800) + pack(:uint8, 0b11000000)
+    mock.expect :call, nil, ["12.11.10.#{aux}\n"]
+
     board.stub(:write, mock) do
       part
     end
     mock.verify
   end
 
-  def test_puts
+  def test_write
     part
     mock = MiniTest::Mock.new
-    mock.expect :call, nil, ["12..3.Testing\n"]
+    mock.expect :call, nil, ["13..8.Testing\\\n\n"]
     board.stub(:write, mock) do
-      part.puts("Testing")
+      part.write("Testing\n")
     end
     mock.verify
   end
