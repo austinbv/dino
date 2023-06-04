@@ -85,7 +85,7 @@ Polling and reading follow a call and response pattern.
 | I2C              | :green_heart:  | Hardware  | `I2C::Bus`               | Hardware I2C on predefined pins
 | SPI              | :green_heart:  | Hardware  | `SPI::Bus`               | Hardware SPI on prefedined pins
 | SPI Bit Bang     | :green_heart:  | Software  | `SPI::BitBang`           | Bit Bang SPI on any pins
-| UART             | :heart:        | Hardware  | `UART::Native`           | Most boards have extra hardware UARTs
+| UART             | :yellow_heart: | Hardware  | `UART::Hardware`         | R/W support for UART1..3 when available. Not fully tested.
 | UART Bit Bang    | :yellow_heart: | Software  | `UART::BitBang`          | Only on boards with 1 hardware UART. Write only
 | Maxim OneWire    | :green_heart:  | Software  | `OneWire::Bus`           | No overdrive support
 | Infrared Emitter | :green_heart:  | Software  | `PulseIO::IRTransmitter` | Library on Board

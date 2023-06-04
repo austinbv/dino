@@ -1,8 +1,6 @@
 /*
   Library for dino ruby gem.
 */
-#ifndef Dino_h
-#define Dino_h
 #include <Arduino.h>
 #include "DinoDefines.h"
 
@@ -94,18 +92,25 @@ class Dino {
 
     // Functions with a cmd value can be called through the remote API.
     // EEPROM Access
-    void eepromRead            ();   //cmd = 7
-    void eepromWrite           ();   //cmd = 8
+    void eepromRead         (); //cmd = 7
+    void eepromWrite        (); //cmd = 8
 
     // Included Libraries
-    void pulseRead             ();   //cmd = 9
-    void servoToggle           ();   //cmd = 10
-    void servoWrite            ();   //cmd = 11
-    void handleSerial          ();   //cmd = 12
-    void irSend                ();   //cmd = 16
-    void tone                  ();   //cmd = 17
-    void noTone                ();   //cmd = 18
-    void showLEDArray          ();   //cmd = 19
+    void pulseRead          (); //cmd = 9
+    void servoToggle        (); //cmd = 10
+    void servoWrite         (); //cmd = 11
+    void handleSerial       (); //cmd = 12
+
+    void uartSetup          (); //cmd = 13
+    void uartBegin          (uint8_t index, uint32_t baud);
+    void uartEnd            (uint8_t index);
+    void uartWrite          (); //cmd = 14
+    void uartUpdateListeners();
+
+    void irSend             (); //cmd = 16
+    void tone               (); //cmd = 17
+    void noTone             (); //cmd = 18
+    void showLEDArray       (); //cmd = 19
 
     // Bit Bang SPI
     void spiBBtransfer         (uint8_t clock, uint8_t input, uint8_t output, uint8_t select, uint8_t settings, 
@@ -230,5 +235,10 @@ class Dino {
       };
       SpiListener spiListeners[SPI_LISTENER_COUNT];
     #endif
+
+    #ifdef DINO_UARTS
+      HardwareSerial* uarts[DINO_UARTS+1];
+      bool uartListenStates[DINO_UARTS+1];
+      byte uartRxPins[DINO_UARTS+1];
+    #endif
 };
-#endif

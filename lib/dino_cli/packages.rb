@@ -55,6 +55,13 @@ PACKAGES = {
       "DinoSerialBB.h",
     ]
   },
+  uart: {
+    description: "Hardware UART I/O",
+    directive: "DINO_UART",
+    files: [
+      "DinoUART.cpp",
+    ]
+  },
   servo: {
     description: "Servo support",
     directive: "DINO_SERVO",

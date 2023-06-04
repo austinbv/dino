@@ -105,11 +105,11 @@ void Dino::process() {
     case 5:  aRead               (pin);             break;
     case 6:  setListener         (pin, val, auxMsg[0], auxMsg[1], false); break;
 
-  	#ifdef EEPROM_PRESENT
     // Implemented in DinoEEPROM.cpp
+    #ifdef EEPROM_PRESENT
     case 7:  eepromRead           (); break;
     case 8:  eepromWrite          (); break;
-	  #endif
+    #endif
 
     // Implemented in DinoPulseInput.cpp
     case 9: pulseRead             (); break;
@@ -120,9 +120,15 @@ void Dino::process() {
     case 11:  servoWrite          (); break;
     #endif
 
-    // Implemented in DinoSerial.cpp
+    // Implemented in DinoSerialBB.cpp
     #ifdef DINO_SERIAL
     case 12: handleSerial (); break;
+    #endif
+
+    // Implemented in DinoUART.cpp
+    #ifdef DINO_UARTS
+    case 13: uartSetup  (); break;
+    case 14: uartWrite  (); break;
     #endif
 
     // Implemented in DinoIROut.cpp
@@ -219,6 +225,10 @@ void Dino::updateListeners() {
     // SPI register Listeners
     #if defined(DINO_SPI) || defined(DINO_SPI_BB)
       if (tickCount % registerDivider == 0) spiUpdateListeners();
+    #endif
+
+    #ifdef DINO_UARTS
+      uartUpdateListeners();
     #endif
   }
 }

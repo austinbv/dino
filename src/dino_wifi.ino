@@ -18,12 +18,13 @@
 #endif
 
 
-// Define 'serial' as the serial interface we want to use.
-// Defaults to Native USB port (left) on Due and Zero, or Serial otherwise.
+// Define 'serial' as the serial interface to use.
+// Uses SerialUSB (left port), which is native USB, on Arduino Due and Zero, or Serial otherwise.
+// On many boards, eg. Arduino Due, RP2040, Serial may be native USB anyway.
 #if defined(__SAM3X8E__) || defined(__SAMD21G18A__)
   #define serial SerialUSB
   // Use this for Programming USB port (right) on Due and Zero.
-  //#define serial Serial
+  // #define serial Serial
 #else
   #define serial Serial
 #endif

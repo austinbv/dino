@@ -14,6 +14,7 @@
 // #define DINO_I2C
 // #define DINO_SPI
 // #define DINO_SERVO
+// #define DINO_UART
 // #define DINO_SERIAL_BB
 // #define DINO_IR_OUT
 // #define DINO_LED_ARRAY
@@ -74,4 +75,38 @@
 // Filter for boards that can set their analog read resolution.
 #if defined(__SAM3X8E__) || defined(__SAMD21G18A__) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
   #define READ_RESOLUTION_SETTER
+#endif
+
+// Figure out how many open (not connected to a USB port) hardware UARTS there are on the board.
+#ifdef DINO_UART
+  // Look for TX pin definitions on RP2040.
+  #if defined(RP2040)
+    #if   defined(PIN_SERIAL2_TX)
+      #define DINO_UARTS 2
+    #elif defined(PIN_SERIAL_1_TX)
+      #define DINO_UARTS 1
+    #endif
+  
+  // ESP32 has either 1 or 2 extra UARTS enabled, depending on chip and board.
+  #elif defined(ESP32)
+    #if SOC_UART_NUM == 3
+      #define DINO_UARTS 2
+    #elif SOC_UART_NUM == 2
+      #define DINO_UARTS 1
+    #endif  
+
+  // ESP8266 has a single open transmit-only UART.
+  #elif defined(ESP8266) && defined(SERIAL_PORT_HARDWARE_OPEN)
+    #define DINO_UARTS 1
+
+  // This works for all the Atmel cores.
+  #else
+    #if defined(SERIAL_PORT_HARDWARE3)
+      #define DINO_UARTS 3
+    #elif defined(SERIAL_PORT_HARDWARE2)
+      #define DINO_UARTS 2
+    #elif defined(SERIAL_PORT_HARDWARE1)
+      #define DINO_UARTS 1
+    #endif
+  #endif
 #endif
