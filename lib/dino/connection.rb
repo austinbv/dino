@@ -5,5 +5,6 @@ module Dino
     autoload :Base,         "#{__dir__}/connection/base"
     autoload :Serial,       "#{__dir__}/connection/serial"
     autoload :TCP,          "#{__dir__}/connection/tcp"
+    autoload :BoardUART,    "#{__dir__}/connection/board_uart"
   end
 end

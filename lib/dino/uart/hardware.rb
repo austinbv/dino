@@ -43,6 +43,12 @@ module Dino
         end
       end
 
+      def flush
+        @buffer_mutex.synchronize do
+          @buffer = ""
+        end
+      end
+
       def start(baud)
         @baud = baud
         board.uart_start(index, baud, true)
