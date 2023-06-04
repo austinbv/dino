@@ -12,7 +12,7 @@ uart = Dino::UART::Hardware.new(board: board, index: 1, baud: 31250)
 #   puts data.inspect
 # end
 
-uart.write("Hello World! \nBye World! \n")
+uart.write("Hello World!\nBye World!\n")
 
 sleep 1
 

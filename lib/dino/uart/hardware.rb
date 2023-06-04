@@ -37,7 +37,7 @@ module Dino
         @buffer_mutex.synchronize do
           newline = @buffer.index("\n")
           return nil unless newline
-          line = @buffer[0..newline-1].chop
+          line = @buffer[0..newline-1]
           @buffer = @buffer[newline+1..-1]
           return line
         end
