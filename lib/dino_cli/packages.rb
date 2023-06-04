@@ -13,7 +13,6 @@ PACKAGES = {
       "DinoCoreIO.cpp",
       "DinoPulseInput.cpp",
       "DinoEEPROM.cpp",
-      "DinoIncludes.cpp",
       "../../vendor/board-maps/BoardMap.h",
     ]
   },

@@ -106,7 +106,7 @@ class DinoCLI::Generator
   end
 
   def define(directive)
-    gsub_defines "// #define #{directive}", "#define #{directive}"
+    gsub_defines /\/\/.*#{directive}\s*$/, "#define #{directive}"
   end
 
   # Run gsub! on contents of src/lib/Dino.h specifically.

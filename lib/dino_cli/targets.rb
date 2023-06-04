@@ -8,7 +8,7 @@ class DinoCLI::Generator
     core: [:core],
 
     # Specific features for the old mega168 chips.
-    mega168: [:core, :one_wire, :tone, :spi_bb, :i2c, :spi, :servo],
+    mega168: [:core, :one_wire, :tone, :i2c, :spi, :servo],
 
     # Other ATmega chips do everything.
     # Add bit bang serial for 328p / UNO since ith as no extra hardware UART.

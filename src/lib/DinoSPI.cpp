@@ -25,7 +25,9 @@ void Dino::spiUpdateListeners(){
   for (byte i = 0;  i < SPI_LISTENER_COUNT;  i++){
     switch(spiListeners[i].enabled) {
       case 1: spiReadListener(i); break;
-      case 2: spiBBreadListener(i); break;
+      #ifdef DINO_SPI_BB
+        case 2: spiBBreadListener(i); break;
+      #endif
       default: break;
     }
   }
