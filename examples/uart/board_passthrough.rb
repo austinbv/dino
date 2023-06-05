@@ -4,9 +4,9 @@
 # For this example, board1 (direct) is an Arduino Mega. board2 (passthrough) is an Uno,
 # running Dino, with its UART pins (0, 1) connected to the Mega's UART1 pins (18, 19)
 #
-# This won't 100% reliable. The Rx buffer on the direct board is periodically read, so
+# This isn't 100% reliable. The Rx buffer on the direct board is periodically read, so
 # it can potentially overflow, causing data sent from the passthrough board to be lost.
-# Eventually flow control data 
+# Eventually flow control data will be lost and the host will stop sending altogether.
 #
 # Use at your own risk, but for the best possible performance:
 #  1) Avoid long running commands on the direct board (eg. IR transmission, HTU21D).
