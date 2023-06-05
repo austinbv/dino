@@ -32,13 +32,20 @@ void Dino::sendReady() {
 }
 
 void Dino::run(){
-  while(stream->available() > 0) {
-    rxBytes ++;
+  while(stream->available()) {
     parse(stream->read());
-
+    rxBytes ++;
     // Acknowledge when we've received half as many bytes as the serial buffer.
     if (rxBytes >= rxNotifyLimit) rxNotify();
   }
+
+  #ifdef DINO_UARTS
+    uartUpdateListeners();
+  #endif
+
+  #ifdef DINO_UART_BB
+    uartBBUpdateListener();
+  #endif
 
   // Run dino's listeners.
   updateListeners();
@@ -226,14 +233,6 @@ void Dino::updateListeners() {
     // SPI register Listeners
     #if defined(DINO_SPI) || defined(DINO_SPI_BB)
       if (tickCount % registerDivider == 0) spiUpdateListeners();
-    #endif
-
-    #ifdef DINO_UARTS
-      uartUpdateListeners();
-    #endif
-
-    #ifdef DINO_UART_BB
-      uartBBUpdateListener();
     #endif
   }
 }
