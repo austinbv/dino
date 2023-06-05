@@ -13,6 +13,7 @@ void Dino::uartBBEnd() {
   uartBB.end();
   pinMode(uartBBTx, INPUT);
   pinMode(uartBBRx, INPUT);
+  uartBBListen = false;
 }
 
 void Dino::uartBBSetup() {

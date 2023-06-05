@@ -38,6 +38,8 @@ void Dino::uartEnd(uint8_t index) {
       Serial3.end();
     }
   #endif
+  uartListenStates[index] = false;
+  uartRxPins[index] = NULL;
 }
 
 // CMD = 13
