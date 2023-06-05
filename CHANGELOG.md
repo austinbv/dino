@@ -42,9 +42,10 @@
   - UARTs 1 to 3 are supported, and map to "virtual pins" 251..253 for purposes of identifying read bytes at the `Board` level.
   - The 0th UART (`Serial`) is never used, even on boards where `SerialUSB` is the Dino connection and `Serial` is not in use (eg. Zero and Due).
   - `UART::Hardware#write` accepts either String or Array of bytes to send binary data.
-  - The `UART::Hardware` instance itslef buffers read bytes. Complete lines can be read with `UART::Hardware#gets`.
+  - The `UART::Hardware` instance itself buffers read bytes. Complete lines can be read with `UART::Hardware#gets`.
   - Callbacks can be attached, like other input classes, to handle each raw fragment of data as it arrives.
   - Call `UART::Hardware#stop` to disable the UART and return the pins to regular GPIO.
+  - Added `Dino::Connection::BoardUART`, which allows a Board to use one of its UARTs as the transport for another Board. See [this example](examples/uart/board_passthrough.rb) for more. 
 
 - ADS1118 Analog-to-Digital Converter:
   - Class: `Dino::AnalogIO::ADS1118`.
@@ -152,15 +153,11 @@ See new examples in the [examples](examples) folder to learn more.
   - Does not implement `#digital_write` at all. Analog values must be used instead of `board.high` or `board.low`.
 
 - `Dino::UART::BitBang` (previously `Dino::Components::SoftwareSerial`):
-  - No longer included on anything other than AVR boards. Cross-platform support isn't good, and isn't necessary since almost everything has extra hardware UARTs.
-  - Might even try to limit to just the ATmega168 and 328, since only they need it.
-  - Will add a hardware UART passthrough eventually (for all the other chips), and add read support to this.
+  - Only inclduedo on AVR boards. Cross-platform support isn't good, and isn't necessary since almost everything has extra hardware UARTs.
+  - Read functionality added. The board listens for incoming bytes and forwards them.
+  - Interface matches `Dino::UART::Hardware` except for :tx and :rx pins given when initializing. See that entry in New Components above for more info.
 
 - `Dino::TxRx` moved to `Dino::Connection`.
-
-- `Dino::Connection::Serial` tries to read up to 64 bytes each time now instead of 1, reducing the number of FFI calls, and CPU usage.
-
-- `Dino::Connection::FlowControl` simplified to always wait 1ms if no bytes to read or write. This also reduces CPU usage. This might affect the time precision of values received from listeners, but they weren't guaranteed to be evenly spaced anyway. Will add a timestamped listener feature in the future if needed.
 
 ### Board API Changes
 
@@ -168,7 +165,7 @@ See new examples in the [examples](examples) folder to learn more.
   - Implements a platform independent microsecond delay.
   - All calls to `delayMicroseconds()` should be replaced with this.
   - Exposed in Ruby via `CMD=99`. It takes one argument, uint_16 for delay length in microsceonds.
-  - `Board#micro_delay` and `Components::Base#micro_delay` are defined.
+  - `Board#micro_delay` and `Component::#micro_delay` are defined.
   
 - `dacWrite` function added to board library. `aWrite` function renamed to `pwmWrite`. Need this to avoid conflict between DAC, PWM and regular output on some chips.
 
@@ -208,24 +205,30 @@ See new examples in the [examples](examples) folder to learn more.
 
 - When instantiating a component, `Board#convert_pin` is run immediately, then the converted integer for the pin (based on the board map), is saved in `@pin`, instead of whatever form was given to `#initialize`. After this, the integer is always used as-is for sending / receiving messages. This reduces CPU usage, since `Board#convert_pin` doesn't need to be called for every message.
 
+- As a consequence of the above change, when `Board` methods are called directly, pins must always be given as integers.
+
+- `Poller#poll` no longer defaults to a 3 second interval and will raise an error if a numeric interval is not given.
+
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
+
+- Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being called, but still remove any one-time callbacks present in the `:read` key. This also happens if `#pre_callback_filter` returns nil.
+
+- Added [this example](examples/ws2812/ws2812_builtin_blink.rb) as a blink example for boards where :LED_BUILTIN maps to a single on-board WS2812 LED, instead of a regular LED.
+
+- Removed `Dino::Board::ESP8266`, in favor of the new board mapping functionality. See New Features above.
 
 - Aux message size limits changed to:
   - 512 + 16: When using IR output or WS2812 and not using ATmega168
   - 256 + 16: When not using IR output or WS2812, any board
   - 32  + 16: When all the features that use lots of aux are disabled (core sketch)
 
+- `Dino::Connection::Serial` tries to read up to 64 bytes each time now instead of 1, reducing the number of FFI calls, and CPU usage.
+
+- `Dino::Connection::FlowControl` simplified to always wait 1ms if no bytes to read or write. This also reduces CPU usage. This might affect the time precision of values received from listeners, but they weren't guaranteed to be evenly spaced anyway. Will add a timestamped listener feature in the future if needed.
+
 - All `Serial.print` style debugging removed from the Arduino sketch, in favor of the new debugger in the Arduino IDE. If this style of debugging is still needed, the sketch should emit lines beginning with "DBG:". These will be caught by the Ruby parser and printed to the terminal.
 
-- Removed `Dino::Board::ESP8266`, in favor of the new board mapping functionality. See New Features above.
-
 - Started using `simplecov` gem to track test coverage.
-
-- Added [this example](examples/ws2812/ws2812_builtin_blink.rb) as a blink example for boards where :LED_BUILTIN maps to a single on-board WS2812 LED, instead of a regular LED.
-
-- Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being called, but still remove any one-time callbacks present in the `:read` key.
-
-- `Poller#poll` no longer defaults to a 3 second interval and will raise an error if a numeric interval is not given.
 
 ### Bug Fixes
 

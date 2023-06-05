@@ -16,7 +16,6 @@ module Dino
         # Set pin to a "virtual pin" in 251 - 253 that will match the board.
         options[:pin] = 250 + options[:index]
       end
-      alias :rx_pin :pin
 
       def after_initialize(options={})
         initialize_buffer
