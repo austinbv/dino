@@ -48,7 +48,6 @@ class SerialConnectionTest < Minitest::Test
 
   def test_connect_on_windows
     # Simulate being on Windows
-    original_platform = RUBY_PLATFORM
     Constants.redefine(:RUBY_PLATFORM, "mswin", :on => Object)
 
     mock =  MiniTest::Mock.new
@@ -62,7 +61,7 @@ class SerialConnectionTest < Minitest::Test
     mock.verify
 
     # Set platform back to original value
-    Constants.redefine(:RUBY_PLATFORM, original_platform, :on => Object)
+    Constants.redefine(:RUBY_PLATFORM, Constants::ORIGINAL_RUBY_PLATFORM, :on => Object)
   end
 
   def test_io_reset

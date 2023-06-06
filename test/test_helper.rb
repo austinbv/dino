@@ -13,7 +13,6 @@ require 'bundler/setup'
 require 'dino'
 
 # Touch each class to trigger auto load for simplecov.
-
 # Analog IO
 Dino::AnalogIO::ADS1118
 Dino::AnalogIO::Input
@@ -94,15 +93,17 @@ Dino::SPI::OutputRegister
 # UART
 Dino::UART::BitBang
 
-# Nice little helper module to redefine constants quietly.
+# Helper module to redefine constants quietly.
 module Constants
   def self.redefine(const, value, opts={})
     opts = {:on => self.class}.merge(opts)
     opts[:on].send(:remove_const, const) if self.class.const_defined?(const)
     opts[:on].const_set(const, value)
   end
-
   ACK = "SAMD_ZERO,0.13.0,528,1024"
+
+  # Some test redefine RUBY_PLATFORM. Save the original to reset it.
+  ORIGINAL_RUBY_PLATFORM = RUBY_PLATFORM
 end
 
 # Taken from: https://gist.github.com/moertel/11091573
@@ -110,8 +111,13 @@ def suppress_output
   begin
     original_stderr = $stderr.clone
     original_stdout = $stdout.clone
-    $stderr.reopen(File.new('/dev/null', 'w'))
-    $stdout.reopen(File.new('/dev/null', 'w'))
+    if Constants::ORIGINAL_RUBY_PLATFORM.match(/mswin|mingw/i)
+      $stderr.reopen('NUL:')
+      $stdout.reopen('NUL:')
+    else
+      $stderr.reopen(File.new('/dev/null', 'w'))
+      $stdout.reopen(File.new('/dev/null', 'w'))
+    end
     retval = yield
   rescue Exception => e
     $stdout.reopen(original_stdout)

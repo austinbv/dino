@@ -18,6 +18,11 @@ Gem::Specification.new do |gem|
   # get an array of submodule dirs by executing 'pwd' inside each submodule
   gem_dir = File.expand_path(File.dirname(__FILE__)) + "/"
   `git submodule --quiet foreach pwd`.split($\).each do |submodule_path|
+    # Fix submodule paths on Windows.    
+    if RUBY_PLATFORM.match(/mswin|mingw/i)
+      submodule_path = `cygpath -m #{submodule_path}`.strip
+    end
+
     Dir.chdir(submodule_path) do
       submodule_relative_path = submodule_path.sub gem_dir, ""
       # issue git ls-files in submodule's directory and
