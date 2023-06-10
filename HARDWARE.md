@@ -50,13 +50,13 @@
 # Single Board Computers
 
 ### Raspberry Pi Single Board Computers
-**Note:** See the [dino-piboard](https://github.com/dino-rb/dino-piboard) extension to this gem. It uses the Component classes from this gem, but swaps out the low-level microcontroller interface with the Raspberry Pi's built-in GPIPO interface. This is still a very early work-in-progress.
+**Note:** See the [dino-piboard](https://github.com/dino-rb/dino-piboard) extension to this gem. It uses the peripheral classes from this gem, but swaps out `Board` for `PiBoard`, which uses the Raspberry Pi's built-in GPIPO interface. This is still a work-in-progress.
 
 |    Chip        | Status          | Products              | Notes |
 | :--------      | :------:        | :---------------      |------ |
 | BCM2835        | :yellow_heart:  | Pi 1, Pi Zero (W)     |
 | BCM2836/7      | :question:      | Pi 2                  |
-| BCM2837A0/B0   | :question:      | Pi 3                  |
+| BCM2837A0/B0   | :yellow_heart:  | Pi 3                  |
 | BCM2711        | :question:      | Pi 4, Pi 400          |
 | BCM2710A1      | :question:      | Pi Zero 2W            |
 
