@@ -93,7 +93,7 @@
 - APA102 / Dotstar RGB LED Array:
   - Class: `Dino::LED::APA102`
   - No fancy functions yet. Just clear, set pixels, show, global and per-pixel brightness control.
-  - Sends data over SPI interface with no select pin, but select pin needs to be given as 255.
+  - Needs its own dedicated SPI bus. Select pin is automatically set to 255 (no pin).
 
 See new examples in the [examples](examples) folder to learn more.
 

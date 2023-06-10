@@ -5,6 +5,11 @@ module Dino
 
       attr_reader :length, :bpp, :brightness
 
+      def before_initialize(options={})
+        options[:pin] = 255
+        super(options)
+      end
+
       def after_initialize(options={})
         super(options)
 
