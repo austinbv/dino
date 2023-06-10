@@ -103,9 +103,9 @@ arduino-cli upload -v -p YOUR_PORT -b YOUR_FQBN YOUR_SKETCH_FOLDER
 arduino-cli board listall
 ````
 
-#### 6)  Test It!
+#### 6)  Test It
 
-Most boards have an on-board LED. It's internally connected to pin 13 on Arduinos, but might be different for you. Change the pin number if needed, then run the [LED example](examples/01-led/led.rb). If the LED starts blinking, you're ready for Ruby!
+Most boards have a regular LED on-board. Test it with the [blink](examples/led/builtin_blink.rb) example. If you have an on-board WS2812 LED, use the [WS2812 blink](examples/led/ws2812_builtin_blink.rb) example instead. If it starts blinking, you're ready for Ruby!
 
 ## Examples and Tutorials
 

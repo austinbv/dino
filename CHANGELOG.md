@@ -5,10 +5,9 @@
 ### New Features
 
 - `Board#map`
-  - Calling `#map` on a `Board` instance will return a hash that maps its named pins (taken from the Arduino framework) to their integer GPIO values, once the board is supported. Examples: `:A0`, `:DAC0`, `:MOSI`, `:LED_BUILTIN`.
-  - Pin names can be given as symbols when instantiating peripherals with a board. The board converts them to integer using `Board#convert_pin`.
-  - This also makes it easier to connect peripherals to SPI or I2C pins, without a pinout diagram. Call `Board#map` to see the pins.
-  - To make this work, the board sends and identifier string (again taken from the Arduino framework) during handshake. This is cross-referenced against a directory of YAML files, loading the right map for each board.
+  - Returns a hash mapping named pins (taken from the Arduino framework) to their integer GPIO values, once the board is supported. Examples: `:A0`, `:DAC0`, `:MOSI`, `:LED_BUILTIN`.
+  - Pins can be given as symbols when creating peripherals. The `Board` instance converts them to integer using `Board#convert_pin`.
+  - This works by having the board send an identifier string (again taken from the Arduino framework) during handshake. The identifier is cross-referenced against a directory of YAML files, loading the right map for each board.
   - This uses [`arduino-yaml-board-maps`](https://github.com/dino-rb/arduino-yaml-board-maps). See that repo for which Arduino cores / boards are supported.
 
 ### New Boards
@@ -19,13 +18,13 @@
   - No DACs or capacitive touch on the C3.
 
 - SAMD21 Boards, Arduino Zero (`--target samd`):
-  - All working. No bit bang UART support.
 
 - RP2040 Based Boards, Raspberry Pi Pico (W) (`--target rp2040`):
-  - All working except WS2812 LED arrays. No bit bang UART support.
+  - WS2812 LED arrays don't work.
 
 - Raspberry Pi SBC (not Pico) built-in GPIO support, using [`dino-piboard`](https://github.com/dino-rb/dino-piboard) extension gem:
   - Ruby needs to be running on the Pi itself.
+  - Only works with CRuby. No JRuby or TruffleRuby.
   - Folllow install instructions from `dino-piboard` gem's readme.
   - `require "dino/piboard"` instead of `require "dino"`
   - Substitute `Dino::PiBoard` for `Dino::Board` as board class.
@@ -35,17 +34,17 @@
 
 - Hardware UART support:
   - Class: `Dino::UART::Hardware`.
-  - Makes a board's open (not tied to a USB port) hardware UARTs available for reading/writing, allowing you to interface with serial peripherals.
-  - Initialize giving :index as the UART's number, according to the Arduino IDE, and usually pinout diagrams. `Serial1` has index `1`. `Serial2` has index `2`, and so on.
-  - A :baud argument can be given when initializing, or call `UART::Hardware#start(YOUR_BAUD_RATE)` to restart at a desired baud rate. Default is 9600.
+  - Read/write support for a board's open (not tied to a USB port) hardware UARTs. Allows interfacing with serial peripherals.
+  - Initialize giving `:index` as the UART's number, according to the Arduino IDE/pinout. `Serial1` has index `1`. `Serial2` has index `2`, and so on.
+  - `:baud` argument can be given when initializing, or call `UART::Hardware#start(YOUR_BAUD_RATE)`. Default is 9600.
   - No pin arguments are needed to start the UART, but peripherals must be connected properly. Refer to your board's pinout.
-  - UARTs 1 to 3 are supported, and map to "virtual pins" 251..253 for purposes of identifying read bytes at the `Board` level.
-  - The 0th UART (`Serial`) is never used, even on boards where `SerialUSB` is the Dino connection and `Serial` is not in use (eg. Zero and Due).
-  - `UART::Hardware#write` accepts either String or Array of bytes to send binary data.
+  - UARTs 1..3 are supported, and map to "virtual pins" 251..253, for purposes of identifying bytes read from the board.
+  - The 0th UART (`Serial`) is never used, even on boards where it is not in use, and `SerialUSB` is the Dino transport.
+  - `UART::Hardware#write` accepts either a String or Array of bytes to send binary data.
   - The `UART::Hardware` instance itself buffers read bytes. Complete lines can be read with `UART::Hardware#gets`.
-  - Callbacks can be attached, like other input classes, to handle each raw fragment of data as it arrives.
+  - Callbacks can be attached, like other input classes, to handle each batch of raw bytes as they arrive.
   - Call `UART::Hardware#stop` to disable the UART and return the pins to regular GPIO.
-  - Added `Dino::Connection::BoardUART`, which allows a Board to use one of its UARTs as the transport for another Board. See [this example](examples/uart/board_passthrough.rb) for more. 
+  - Added `Dino::Connection::BoardUART`, allowing a board's UART to be the transport for another `Board` instance. See [this example](examples/uart/board_passthrough.rb).
 
 - ADS1118 Analog-to-Digital Converter:
   - Class: `Dino::AnalogIO::ADS1118`.
@@ -101,7 +100,6 @@ See new examples in the [examples](examples) folder to learn more.
 ### Changed Components
 
 - Virtually every component has been renamed to bring them out of the `Dino::Components` namespace,  make naming clearer.
-
   - TODO: Update here with a list of renamed components.
 
 - SPI peripherals now go through a `Dino::SPI::Bus` object:
@@ -140,6 +138,8 @@ See new examples in the [examples](examples) folder to learn more.
   - Depends only on `Dino::DigitalIO::Output` and `#micro_delay`.
   - Old implementation in `Dino::Components::LCD` removed.
   - This solves compatibility with boards that the library didn't work on.
+  - `HD44780#create_char` allows 8 custom characters to be defined in memory addresses 0-7.
+  - `HD44780#write` draws the custom  (or standard) character from a given memory address.
   
 - `Dino::PulseIO::PWMOutput` (previously `Dino::Components::Basic::AnalogOutput`):
   - Changed `#analog_write` to `#pwm_write`.
@@ -211,7 +211,9 @@ See new examples in the [examples](examples) folder to learn more.
 
 - `MultiPin` validation and proxying has changed to not use class methods. Everything is done inside `#initialize_pins` per-instance instead. This reduces the amount of `eval` and `rescue` going on, so it's easier to understand, and changes are more portable to mruby.
 
-- Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being called, but still remove any one-time callbacks present in the `:read` key. This also happens if `#pre_callback_filter` returns nil.
+- Calling `#update` with `nil`, on any object using the `Callback` pattern, will prevent callbacks from being run, but still remove any one-time callbacks present in the `:read` key.
+
+- If `#pre_callback_filter` returns nil, callbacks will also not be run, behaving just as above.
 
 - Added [this example](examples/ws2812/ws2812_builtin_blink.rb) as a blink example for boards where :LED_BUILTIN maps to a single on-board WS2812 LED, instead of a regular LED.
 
