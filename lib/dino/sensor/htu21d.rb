@@ -15,7 +15,7 @@ module Dino
       HEATER_MASK               = 0b00000100
       RESOLUTION_MASK           = 0b10000001
 
-      RESOLUTION_SETTINGS       = [0x00, 0x01, 0x80, 0x81]
+      attr_reader :temperature, :humidity
 
       def before_initialize(options={})
         @i2c_address = 0x40
@@ -38,8 +38,6 @@ module Dino
         reset
         heater_off
       end
-
-      attr_reader :temperature, :humidity
 
       def reset
         i2c_write [SOFT_RESET]
@@ -71,34 +69,27 @@ module Dino
       end
 
       #
-      # Only 4 resolution combinations are available, and need to be
-      # set by giving a bitmask from the datasheet:
-      #   0x00 = 14-bit temperature, 12-bit humidity
-      #   0x01 = 12-bit temperature,  8-bit humidity (default)
-      #   0x80 = 13-bit temperature, 10-bit humidity
-      #   0x81 = 11-bit temperature, 11-bit humidity
+      # Only 4 resolution combinations are available.
+      # Set by giving a bitmask from the datasheet:
       #
-      def resolution=(mask)
-        raise ArgumentError, "wrong resolution bitmask given: #{mask}" unless RESOLUTION_SETTINGS.include? mask
+      RESOLUTIONS = {
+        0x00 => {temperature: 14, humidity: 12},
+        0x01 => {temperature: 12, humidity: 8},
+        0x80 => {temperature: 13, humidity: 10},
+        0x81 => {temperature: 11, humidity: 11},
+      }
+
+      def resolution=(setting)
+        raise ArgumentError, "wrong resolution setting given: #{mask}" unless RESOLUTIONS.keys.include? setting
         @config &= ~RESOLUTION_MASK
-        @config |= mask
+        @config |= setting
         write_config
       end
 
       def resolution
-        resolution_mask = @config & RESOLUTION_MASK
-        case resolution_mask
-        when 0x00
-          {temperature: 14, humidity: 12}
-        when 0x01
-          {temperature: 12, humidity: 8}
-        when 0x80
-          {temperature: 13, humidity: 10}
-        when 0x81
-          {temperature: 11, humidity: 11}
-        else
-          raise StandardError, "cannot get resolution from config register: #{@config}"
-        end
+        resolution_bits = @config & RESOLUTION_MASK
+        raise StandardError, "cannot get resolution from config register: #{@config}" unless RESOLUTIONS[resolution_bits]
+        RESOLUTIONS[resolution_bits]
       end
 
       def [](key)
@@ -147,6 +138,13 @@ module Dino
         end
         @reading
       end
+      
+      def update_state(reading)
+        return unless reading
+        @state_mutex.synchronize do
+          @state[reading[0]] = reading[1]
+        end
+      end
 
       #
       # CRC calculation adapted from offical driver, found here:
@@ -165,13 +163,6 @@ module Dino
           polynomial >>= 1
         end
         result
-      end
-
-      def update_state(reading)
-        return unless reading
-        @state_mutex.synchronize do
-          @state[reading[0]] = reading[1]
-        end
       end
     end
   end
