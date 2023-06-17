@@ -151,9 +151,9 @@ Polling and reading follow a call and response pattern.
 | DS18B20          | :green_heart:  | OneWire     | `Sensor::DS18B20`  | Temp
 | MAX31850         | :heart:        | OneWire     | `Sensor::MAX31850` | Thermocouple Amplifier
 | BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp/RH/Press
-| BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temp/Pres
+| BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temp/Press
 | HTU21D           | :green_heart:  | I2C         | `Sensor::HTU21D`   | Temp/RH. Locks I2C bus during read. No user register read.
-| HTU31D           | :heart:        | I2C         | `Sensor::HTU31D`   | Temp/RH
+| HTU31D           | :yellow_heart: | I2C         | `Sensor::HTU31D`   | Temp/RH. No diagnostic read, separate T/RH reading yet.
 | AHT10            | :heart:        | I2C         | `Sensor::AHT10`    | Temp/RH
 | AHT21            | :heart:        | I2C         | `Sensor::AHT20`    | Temp/RH
 | ENS160           | :heart:        | I2C         | `Sensor::ENS160`   | CO2e/TVOC/AQI

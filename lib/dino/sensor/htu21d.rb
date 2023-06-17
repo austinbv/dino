@@ -140,7 +140,6 @@ module Dino
       end
       
       def update_state(reading)
-        return unless reading
         @state_mutex.synchronize do
           @state[reading[0]] = reading[1]
         end
