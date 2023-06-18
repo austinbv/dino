@@ -117,9 +117,9 @@ module Dino
       end
       
       def standby_time=(ms)
-        raise ArgumentError, "invalid standby time: #{ms}" unless STANDBY_TIMES.keys.include? ms
-        
-        @registers[:f5] = (@registers[:f5] & 0b00011111) | (STANDBY_TIMES[ms] << 5)
+        raise ArgumentError, "invalid standby time: #{ms}" unless self.class::STANDBY_TIMES.keys.include? ms
+
+        @registers[:f5] = (@registers[:f5] & 0b00011111) | (self.class::STANDBY_TIMES[ms] << 5)
         write_settings
       end
       
@@ -361,13 +361,6 @@ module Dino
                         2000 => 0b110,
                         4000 => 0b111,
                       }
-                      
-      def standby_time=(ms)
-        raise ArgumentError, "invalid standby time: #{ms}" unless STANDBY_TIMES.keys.include? ms
-
-        @registers[:f5] = (@registers[:f5] & 0b00011111) | (STANDBY_TIMES[ms] << 5)
-        write_settings
-      end
     end
   end
 end
