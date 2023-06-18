@@ -19,7 +19,7 @@ htu31d.reset
 puts "Resetting HTU31D... Heater off: #{htu31d.heater_off?}"
 puts
 
-# Resolution goes from 0..3 for separately for temperature and humidity. See datasheet.
+# Resolution goes from 0..3 separately for temperature and humidity. See datasheet.
 htu31d.temperature_resolution = 3
 htu31d.humidity_resolution = 3
 

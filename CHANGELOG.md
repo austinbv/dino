@@ -61,19 +61,35 @@
     - There is no listening interface for subcomponents.
   - Built in temperature sensor can be read with `ADS1118#temperature_read`. Only 128 SPS. No polling.
 
-- Bosch BME/BMP 280 Temperature / Pressure / Humidity Sensor:
+- Bosch BME/BMP 280 Temperature + Pressure + Humidity Sensor:
   - Classes: `Dino::Sensor::BME280` and `Dino::Sensor::BMP280`
   - Connects via I2C bus. Driver written in Ruby.
   - All features in the datasheet are implemented, except status checking.
   - Both are mostly identical, except for BMP280 lacking humidity.
   
-- HTU21D Temperature / Humidity Sensor:
+- HTU21D Temperature + Humidity Sensor:
   - Class: `Dino::Sensor::HTU21D`
   - Connects via I2C bus. Driver written in Ruby.
   - Most features implemented, except reading back the configuration register, and releasing the I2C bus during measurement. Since conversion times can vary, it's simpler to let the sensor hold the line until its data is ready to be read.
+  - Always uses CRC. Readings are silently ignored if CRC fails.
   - Can be read with direct methods `HTU21D#read_temperature` and `HTU21D#read_humidity`, but these do not accept block callbacks, and there is no polling.
-  - For callbacks and polling use the sub-objects accessible through `HTU21D#temperature` and `HTU21D#humidity`. See examples for more info.
-  
+  - For callbacks and polling, use the sub-objects accessible through `HTU21D#temperature` and `HTU21D#humidity`. See examples for more info.
+
+- HTU31D Temperature + Humidity Sensor:
+  - Class: `Dino::Sensor::HTU31D`
+  - Connects via I2C bus. Driver written in Ruby.
+  - Similar to HTU21D, but temperature and humidity can be, and always are, read together.
+  - Always uses CRC. Readings are silently ignored if CRC fails.
+  - Uses standard `#read` and `#poll` methods, like other sensors, which take blocks and return a hash with `:temperature` and `:humidity`.
+  - Diagnostic register reading not implemented yet.
+
+- AHT20 / AHT21 / AHT25 / AM2301B Temperature + Humidity Sensors:
+  - All share a compatible interface, and use the same class: `Dino::Sensor::AHT20`
+  - Connects via I2C bus. Driver written in Ruby.
+  - Always uses calibrated mode.
+  - Always uses CRC. Readings are silently ignored if CRC fails.
+  - Uses standard `#read` and `#poll` methods, like other sensors, which take blocks and return a hash with `:temperature` and `:humidity`.
+
 - SSD1306 OLED Display:
   - Class: `Dino::Display::SSD1306`
   - Connects via I2C bus. Driver written in Ruby.
