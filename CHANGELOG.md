@@ -83,6 +83,11 @@
   - Uses standard `#read` and `#poll` methods, like other sensors, which take blocks and return a hash with `:temperature` and `:humidity`.
   - Diagnostic register reading not implemented yet.
 
+- AHT10 / AHT15 Temperature + Humidity Sensors:
+  - Both share a compatible interface, and use the same class: `Dino::Sensor::AHT10`
+  - Connects via I2C bus. Driver written in Ruby.
+  - Identical interface and behavior to AHT20 below, except no CRC.
+
 - AHT20 / AHT21 / AHT25 / AM2301B Temperature + Humidity Sensors:
   - All share a compatible interface, and use the same class: `Dino::Sensor::AHT20`
   - Connects via I2C bus. Driver written in Ruby.

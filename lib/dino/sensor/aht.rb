@@ -1,11 +1,11 @@
 module Dino
   module Sensor
-    class AHT20
+    class AHT10
       include I2C::Peripheral
       include Behaviors::Poller
 
       # Commands
-      INIT_AND_CALIBRATE   = [0xBE, 0x08, 0x00] 
+      INIT_AND_CALIBRATE   = [0xE1, 0x08, 0x00] 
       READ_STATUS_REGISTER = [0x71]
       START_MEASUREMENT    = [0xAC, 0x33, 0x00]
       SOFT_RESET           = [0xBA]
@@ -25,6 +25,9 @@ module Dino
       CALIBRATED        = 0x08
       BUSY              = 0x80
 
+      # Number of bytes in each reading.
+      DATA_LENGTH       = 6
+
       def before_initialize(options={})
         @i2c_address = 0x38
         super(options)
@@ -38,7 +41,7 @@ module Dino
         self.state       = { temperature: nil, humidity: nil }
         @status_register = 0x00
 
-        sleep(POWER_ON_DELAY)
+        sleep(self.class::POWER_ON_DELAY)
         reset
         calibrate
       end
@@ -59,7 +62,7 @@ module Dino
       end
 
       def calibrate
-        i2c_write(INIT_AND_CALIBRATE)
+        i2c_write(self.class::INIT_AND_CALIBRATE)
         sleep(COMMAND_DELAY)
         read_status_register
       end
@@ -72,22 +75,18 @@ module Dino
       def _read
         i2c_write(START_MEASUREMENT)
         sleep(MEASURE_DELAY)
-        i2c_read(nil, 7)
+        i2c_read(nil, self.class::DATA_LENGTH)
       end
 
       def pre_callback_filter(bytes)
-        # Handle reading of status register, only 1 byte.
+        # Handle reading status byte only.
         if bytes.length == 1
           @status_register = bytes[0]
           return nil
         end
 
-        # Normal readings are 7 bytes given as:
-        #   [STATUS, H19-H12, H11-H4, H3-H0+T19-T16, T15-T8, T7-T0, CRC]
-
-        # Ignore everything if CRC fails.
-        return nil if calculate_crc(bytes) != bytes.last
-
+        # Normal readings are 6 bytes given as:
+        #   [STATUS, H19-H12, H11-H4, H3-H0+T19-T16, T15-T8, T7-T0]
         @status_register = bytes[0]
 
         # Humidity uses the upper 4 bits of the shared byte as its lowest 4 bits.
@@ -106,6 +105,41 @@ module Dino
           @state[:temperature] = reading[:temperature]
           @state[:humidity]    = reading[:humidity]
         end
+      end
+    end
+  end
+end
+
+module Dino
+  module Sensor
+    class AHT20 < AHT10
+      include I2C::Peripheral
+      include Behaviors::Poller
+      #
+      # Changed constants compared to AHT10. Always access with self.class::CONSTANT_NAME
+      # in shared methods coming from the superclass.
+      #
+      INIT_AND_CALIBRATE = [0xBE, 0x08, 0x00] 
+      POWER_ON_DELAY     = 0.100
+      DATA_LENGTH        = 7
+
+      # CRC Constants (unique to AHT20)
+      CRC_INITIAL_VALUE = 0xFF
+      CRC_POLYNOMIAL    = 0x31
+      MSBIT_MASK        = 0x80
+
+      def pre_callback_filter(bytes)
+        # Handle reading status byte only.
+        return super(bytes) if bytes.length == 1
+
+        # Normal readings are 7 bytes given as:
+        #   [STATUS, H19-H12, H11-H4, H3-H0+T19-T16, T15-T8, T7-T0, CRC]
+        #
+        # Ignore everything if CRC fails.
+        return nil if calculate_crc(bytes) != bytes.last
+
+        # Same calculation as AHT10 once CRC passes.
+        super(bytes)
       end
 
       def calculate_crc(bytes)

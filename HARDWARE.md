@@ -154,7 +154,7 @@ Polling and reading follow a call and response pattern.
 | BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temp/Press
 | HTU21D           | :green_heart:  | I2C         | `Sensor::HTU21D`   | Temp/RH. Locks I2C bus during read. No user register read.
 | HTU31D           | :yellow_heart: | I2C         | `Sensor::HTU31D`   | Temp/RH. No diagnostic read yet.
-| AHT10            | :heart:        | I2C         | `Sensor::AHT10`    | Temp/RH
+| AHT10/15         | :green_heart:  | I2C         | `Sensor::AHT10`    | Temp/RH
 | AHT20/21/25      | :green_heart:  | I2C         | `Sensor::AHT20`    | Temp/RH. Always uses calibrated mode and CRC.
 | ENS160           | :heart:        | I2C         | `Sensor::ENS160`   | CO2e/TVOC/AQI
 | AGS02MA          | :heart:        | I2C         | `Sensor::AGS02MA`  | TVOC

@@ -7,6 +7,7 @@ module Dino
     autoload :BME280,      "#{__dir__}/sensor/bme280"
     autoload :HTU21D,      "#{__dir__}/sensor/htu21d"
     autoload :HTU31D,      "#{__dir__}/sensor/htu31d"
-    autoload :AHT20,       "#{__dir__}/sensor/aht20"
+    autoload :AHT10,       "#{__dir__}/sensor/aht"
+    autoload :AHT20,       "#{__dir__}/sensor/aht"
   end
 end
