@@ -26,7 +26,7 @@ class DHTTest < MiniTest::Test
   # It should tell the board to do a #pulse_read
   def test__read
     part
-    mock = MiniTest::Mock.new.expect(:call, nil, [PIN], reset: board.low, reset_time: 20000, pulse_limit: 84, timeout: 20)
+    mock = MiniTest::Mock.new.expect(:call, nil, [PIN], reset: board.low, reset_time: 20000, pulse_limit: 84, timeout: 100)
     board.stub(:pulse_read, mock) do
       part._read
     end
