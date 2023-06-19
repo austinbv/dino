@@ -149,13 +149,13 @@ Polling and reading follow a call and response pattern.
 | :--------------- | :------:       | :--------   | :---------------   |------ |
 | DHT 11/21/22     | :green_heart:  | Digi In/Out | `Sensor::DHT`      | Temp/RH
 | DS18B20          | :green_heart:  | OneWire     | `Sensor::DS18B20`  | Temp
-| MAX31850         | :heart:        | OneWire     | `Sensor::MAX31850` | Thermocouple Amplifier
 | BME280           | :green_heart:  | I2C         | `Sensor::BME280`   | Temp/RH/Press
 | BMP280           | :green_heart:  | I2C         | `Sensor::BMP280`   | Temp/Press
 | HTU21D           | :green_heart:  | I2C         | `Sensor::HTU21D`   | Temp/RH. Locks I2C bus during read. No user register read.
 | HTU31D           | :yellow_heart: | I2C         | `Sensor::HTU31D`   | Temp/RH. No diagnostic read yet.
-| AHT10/15         | :green_heart:  | I2C         | `Sensor::AHT10`    | Temp/RH
+| AHT10/15         | :green_heart:  | I2C         | `Sensor::AHT10`    | Temp/RH. Always uses calibrated mode.
 | AHT20/21/25      | :green_heart:  | I2C         | `Sensor::AHT20`    | Temp/RH. Always uses calibrated mode and CRC.
+| MAX31850         | :heart:        | OneWire     | `Sensor::MAX31850` | Thermocouple Amplifier
 | ENS160           | :heart:        | I2C         | `Sensor::ENS160`   | CO2e/TVOC/AQI
 | AGS02MA          | :heart:        | I2C         | `Sensor::AGS02MA`  | TVOC
 

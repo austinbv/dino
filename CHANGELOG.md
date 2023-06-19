@@ -56,7 +56,7 @@
     - Negative pin (1 or 3) of differential pair can be set with the keyword argument `negative_pin:`
     - Gain can be set with the keyword argument `gain:`
     - Sample rate can be set with the keyword argument `sample_rate:`
-    - Sample rate doesn't affect update rate. Higher sample rates oversample for a single reaidng, reducing noise.
+    - Sample rate doesn't affect update rate. Higher sample rates oversample for a single reading, increasing resolution.
     - `ADS1118` sets `@volts_per_bit` in the subcomponent, so exact voltages can be calculated.
     - There is no listening interface for subcomponents.
   - Built in temperature sensor can be read with `ADS1118#temperature_read`. Only 128 SPS. No polling.
@@ -80,20 +80,18 @@
   - Connects via I2C bus. Driver written in Ruby.
   - Similar to HTU21D, but temperature and humidity can be, and always are, read together.
   - Always uses CRC. Readings are silently ignored if CRC fails.
-  - Uses standard `#read` and `#poll` methods, like other sensors, which take blocks and return a hash with `:temperature` and `:humidity`.
   - Diagnostic register reading not implemented yet.
 
 - AHT10 / AHT15 Temperature + Humidity Sensors:
   - Both share a compatible interface, and use the same class: `Dino::Sensor::AHT10`
   - Connects via I2C bus. Driver written in Ruby.
-  - Identical interface and behavior to AHT20 below, except no CRC.
+  - Always uses calibrated mode.
 
 - AHT20 / AHT21 / AHT25 / AM2301B Temperature + Humidity Sensors:
   - All share a compatible interface, and use the same class: `Dino::Sensor::AHT20`
   - Connects via I2C bus. Driver written in Ruby.
   - Always uses calibrated mode.
   - Always uses CRC. Readings are silently ignored if CRC fails.
-  - Uses standard `#read` and `#poll` methods, like other sensors, which take blocks and return a hash with `:temperature` and `:humidity`.
 
 - SSD1306 OLED Display:
   - Class: `Dino::Display::SSD1306`
