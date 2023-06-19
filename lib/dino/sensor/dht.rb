@@ -5,7 +5,7 @@ module Dino
       include Behaviors::Poller
 
       def _read
-        board.pulse_read(pin, reset: board.low, reset_time: 1000, pulse_limit: 84)
+        board.pulse_read(pin, reset: board.low, reset_time: 20000, pulse_limit: 84, timeout: 20)
       end
 
       def pre_callback_filter(data)

@@ -6,10 +6,10 @@ module Dino
       # Give as 1 (high) or 0 (low) values to the :reset key.
       options[:reset] ||= false
       
-      # How long to hold the rest for, in milliseconds.
+      # How long to hold reset for, in microseconds.
       options[:reset_time] ||= 0
       if (options[:reset_time] < 0) || (options[:reset_time] > 0xFFFF)
-        raise ArgumentError, "error in reset time: #{options[:reset_time]}. Should be Integer in range 0..65535 ms"
+        raise ArgumentError, "error in reset time: #{options[:reset_time]}. Should be Integer in range 0..65535 us"
       end
 
       # Maximum number of pulses to capture.
