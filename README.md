@@ -1,3 +1,7 @@
+## :warning: This repo is no longer maintained!
+Please use [denko](http://https://github.com/denko-rb/denko) instead. It's identical other than the name, and being up to date.
+I've reset the master branch of this repo to match the last Rubygems release. - @vickash 
+
 # Dino 0.11.2
 [![Build Status](https://secure.travis-ci.org/austinbv/dino.png)](http://travis-ci.org/austinbv/dino)
 
